@@ -9,13 +9,16 @@ import simpleJson.asJson
 import simpleJson.serialize
 
 fun Route.stopsRouting() = route("/stops") {
-    get("/{stopCode}/mode/{codMode}/times") {
-        val codMode = call.parameters["codMode"]!!
-        val stopCode = createStopCode(codMode,call.parameters["stopCode"]!!)
-        val stopTimes = getStopTimes(stopCode,codMode)
+    get("/{stopCode}/times") {
+        val stopCode = createStopCode("8", call.parameters["stopCode"]!!)
+        val codMode = call.request.queryParameters["codMode"]
+        val stopTimes = try { getStopTimes(stopCode,codMode) }
+        catch (e: Exception) {
+            println(e)
+            null }
         ?: return@get call.respond(HttpStatusCode.NotFound)
 
-        val json = stopTimes.stopTimes.times.time.map(::buildStopTimesJson).asJson()
+        val json = stopTimes.stopTimes.times.shortTime.map(::buildStopTimesJson).asJson()
 
         call.respondText(json.serialize(), ContentType.Application.Json)
     }
