@@ -13,9 +13,7 @@ fun Route.stopsRouting() = route("/stops") {
         val stopCode = createStopCode("8", call.parameters["stopCode"]!!)
         val codMode = call.request.queryParameters["codMode"]
         val stopTimes = try { getStopTimes(stopCode,codMode) }
-        catch (e: Exception) {
-            println(e)
-            null }
+        catch (e: Exception) { null }
         ?: return@get call.respond(HttpStatusCode.NotFound)
 
         val json = stopTimes.stopTimes.times.shortTime.map(::buildStopTimesJson).asJson()
