@@ -22,5 +22,6 @@ fun getStopTimes(stopCode : String, codMode : String?): ShortStopTimesResponse? 
 fun buildStopTimesJson(time: ShortTime) = jObject {
     "lineCode" += time.codLine
     "destination" += time.destination
+    "codVehicle" += time.codVehicle
     "time" += time.time.toGregorianCalendar().time.toInstant().toEpochMilli()
 }
