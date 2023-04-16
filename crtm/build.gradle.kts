@@ -11,7 +11,7 @@ repositories {
 plugins {
     kotlin("jvm") version "1.8.0"
     `maven-publish`
-     application
+    application
 }
 
 dependencies {
@@ -22,8 +22,6 @@ dependencies {
     //kluent
     testImplementation("org.amshove.kluent:kluent:1.72")
 }
-
-
 
 
 //publish
@@ -46,6 +44,7 @@ tasks.withType<KotlinCompile> {
 tasks.withType<JavaCompile> {
     sourceCompatibility = JavaVersion.VERSION_1_8.toString()
     targetCompatibility = JavaVersion.VERSION_1_8.toString()
+    options.encoding = "UTF-8"
 }
 
 task("wsimport-myservice") {
