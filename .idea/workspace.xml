@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Specify encoding">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Remove encoding">
       <change beforePath="$PROJECT_DIR$/crtm/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/crtm/build.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -160,7 +160,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681666008041</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Remove encoding">
+      <created>1681666229002</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1681666229002</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -168,6 +175,7 @@
     <MESSAGE value="Simplify dtos" />
     <MESSAGE value="Poc" />
     <MESSAGE value="Specify encoding" />
-    <option name="LAST_COMMIT_MESSAGE" value="Specify encoding" />
+    <MESSAGE value="Remove encoding" />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove encoding" />
   </component>
 </project>
