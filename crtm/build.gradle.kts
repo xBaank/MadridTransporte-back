@@ -41,11 +41,11 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-tasks.withType<JavaCompile> {
+/*tasks.withType<JavaCompile> {
     sourceCompatibility = JavaVersion.VERSION_1_8.toString()
     targetCompatibility = JavaVersion.VERSION_1_8.toString()
-    options.encoding = "UTF-8"
-}
+    options.encoding = "UTF-16"
+}*/
 
 task("wsimport-myservice") {
     group = BasePlugin.BUILD_GROUP
