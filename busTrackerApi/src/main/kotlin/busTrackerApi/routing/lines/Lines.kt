@@ -1,5 +1,6 @@
 package busTrackerApi.routing.lines
 
+import arrow.core.continuations.result
 import crtm.auth
 import crtm.defaultClient
 import crtm.soap.*
@@ -79,4 +80,5 @@ fun buildItinerariesJson(itinerary: LineItinerary) = jObject {
             }
         }
     }
+    "kml" += itinerary.kml
 }

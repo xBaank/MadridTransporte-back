@@ -17,7 +17,7 @@ dependencies {
     //arrow kt
     implementation("io.arrow-kt:arrow-core:1.1.5")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
-    implementation("io.github.xbaank:simpleJson-core:1.0.1")
+    implementation("io.github.xbaank:simpleJson-core:2.1.0")
     implementation(project(":crtm"))
 }
 
