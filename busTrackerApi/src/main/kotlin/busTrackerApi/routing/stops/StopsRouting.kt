@@ -8,10 +8,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.*
 import simpleJson.JsonNode
 import simpleJson.asJson
 import simpleJson.jObject
@@ -20,14 +17,14 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 val stopTimesCache = Cache.Builder().expireAfterWrite(6.hours).build<String, TimedCachedValue<JsonNode>>()
-
+val stopsDispathcers = CoroutineScope(Dispatchers.IO)
 fun Route.stopsRouting() = route("/stops") {
     get("/{stopCode}/times") {
         val stopCode = createStopCode("8", call.parameters["stopCode"]!!)
         val codMode = call.request.queryParameters["codMode"]
         val timedVCached = try {
             withTimeout(20.seconds) {
-                val stopTimes = GlobalScope.async { getStopTimes(stopCode, codMode) }.await()
+                val stopTimes = stopsDispathcers.async { getStopTimes(stopCode, codMode) }.await()
                 stopTimes?.stopTimes?.times?.shortTime?.map(::buildStopTimesJson)?.asJson()?.timed()
             } ?: stopTimesCache.get(stopCode)
         } catch (e: Exception) {
