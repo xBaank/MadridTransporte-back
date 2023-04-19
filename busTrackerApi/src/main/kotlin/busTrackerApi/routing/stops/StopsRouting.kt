@@ -30,13 +30,27 @@ fun Route.stopsRouting() = route("/stops") {
         } catch (e: Exception) {
             if (e is TimeoutCancellationException) stopTimesCache.get(stopCode)
             else null
-        } ?: return@get call.respond(HttpStatusCode.NotFound)
+        } ?: return@get call.respond(HttpStatusCode.BadRequest)
 
         stopTimesCache.put(stopCode, timedVCached)
 
         val json = jObject {
             "data" += timedVCached.value
             "lastTime" += timedVCached.createdAt.toEpochMilli()
+        }
+        call.respondText(json.serialized(), ContentType.Application.Json)
+    }
+
+    get("/{stopCode}/times/cached") {
+        val stopCode = createStopCode("8", call.parameters["stopCode"]!!)
+        val cached = stopTimesCache.get(stopCode)
+        if (cached == null) {
+            call.respond(HttpStatusCode.NotFound)
+            return@get
+        }
+        val json = jObject {
+            "data" += cached.value
+            "lastTime" += cached.createdAt.toEpochMilli()
         }
         call.respondText(json.serialized(), ContentType.Application.Json)
     }
