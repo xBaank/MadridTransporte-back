@@ -1,13 +1,12 @@
-package busTrackerApi.routing.lines
+package busTrackerApi.routing.bus.lines
 
-import arrow.core.continuations.result
 import crtm.auth
 import crtm.defaultClient
 import crtm.soap.*
 import simpleJson.jArray
 import simpleJson.jObject
 
-fun getLocations(itinerary : LineItinerary, lineCode: String, codMode: String): LineLocationResponse? {
+fun getLocations(itinerary: LineItinerary, lineCode: String, codMode: String): LineLocationResponse? {
     val lineRequest = LineLocationRequest().apply {
         this.codMode = codMode
         codLine = lineCode

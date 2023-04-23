@@ -1,4 +1,4 @@
-package busTrackerApi.routing.stops
+package busTrackerApi.routing.bus.stops
 
 import busTrackerApi.TimedCachedValue
 import busTrackerApi.timed

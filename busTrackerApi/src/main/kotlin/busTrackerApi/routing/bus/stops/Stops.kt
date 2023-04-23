@@ -1,4 +1,4 @@
-package busTrackerApi.routing.stops
+package busTrackerApi.routing.bus.stops
 
 import crtm.auth
 import crtm.defaultClient
@@ -7,7 +7,7 @@ import crtm.soap.ShortStopTimesResponse
 import crtm.soap.ShortTime
 import simpleJson.jObject
 
-fun getStopTimes(stopCode : String, codMode : String?): ShortStopTimesResponse? {
+fun getStopTimes(stopCode: String, codMode: String?): ShortStopTimesResponse? {
     val request = ShortStopTimesRequest().apply {
         codStop = stopCode
         type = 1
@@ -15,7 +15,7 @@ fun getStopTimes(stopCode : String, codMode : String?): ShortStopTimesResponse? 
         stopTimesByIti = 3
         authentication = defaultClient.auth()
     }
-    if(codMode != null) request.codMode = codMode
+    if (codMode != null) request.codMode = codMode
     return defaultClient.getShortStopTimes(request)
 }
 

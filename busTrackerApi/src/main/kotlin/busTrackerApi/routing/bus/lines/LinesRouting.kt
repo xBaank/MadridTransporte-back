@@ -1,4 +1,4 @@
-package busTrackerApi.routing.lines
+package busTrackerApi.routing.bus.lines
 
 import crtm.utils.createLineCode
 import io.ktor.http.*
