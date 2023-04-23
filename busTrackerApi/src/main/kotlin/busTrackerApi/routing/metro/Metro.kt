@@ -5,6 +5,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import simpleJson.JsonNode
 import simpleJson.deserialized
+import simpleJson.get
 
 val httpClient = OkHttpClient.Builder().build()
 private val urlBuilder = HttpUrl.Builder()
@@ -28,5 +29,5 @@ fun getTimes(id: String? = null): JsonNode? {
 
     val response = httpClient.newCall(request).execute()
     if (!response.isSuccessful) return null
-    return response.body?.source()?.deserialized()?.getOrNull()
+    return response.body?.string()?.deserialized()?.get("Vtelindicadores")?.getOrNull()
 }

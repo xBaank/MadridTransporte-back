@@ -17,7 +17,7 @@ dependencies {
     //arrow kt
     implementation("io.arrow-kt:arrow-core:1.1.5")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
-    implementation("io.github.xbaank:simpleJson-core:2.1.0")
+    implementation("io.github.xbaank:simpleJson-core:2.1.1")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("io.github.reactivecircus.cache4k:cache4k:0.10.0")
     // https://mvnrepository.com/artifact/org.amshove.kluent/kluent
