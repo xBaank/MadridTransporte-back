@@ -7,7 +7,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.cors.routing.*
 
 fun main() {
-    embeddedServer(Netty, port = 8080) {
+    embeddedServer(Netty, port = System.getenv("PORT")?.toIntOrNull() ?: 8080) {
         configureRoutingV1()
         install(CORS) {
             anyHost()
