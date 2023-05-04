@@ -40,6 +40,6 @@ kotlin {
 
 ktor {
     fatJar {
-        archiveFileName.set("${project.name}-${project.version}.jar")
+        archiveFileName.set("${project.name}.jar")
     }
 }
