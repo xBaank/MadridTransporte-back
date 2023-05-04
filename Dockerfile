@@ -1,8 +1,11 @@
-FROM openjdk:17-jdk-slim-buster
+FROM gradle:7.6.1-jdk17 AS build
+COPY --chown=gradle:gradle . /home/gradle/src
+WORKDIR /home/gradle/src
+RUN gradle build
+
+FROM openjdk:20-jdk-slim-buster
 COPY . /build
-WORKDIR /build
-RUN chmod +xr ./gradlew
-RUN ./gradlew build
-COPY  busTrackerApi/build/libs/busTrackerApi.jar /app/busTrackerApi.jar
-WORKDIR /app
-ENTRYPOINT ["java", "-jar", "busTrackerApi.jar"]
+RUN mkdir /app
+
+COPY --from=build /home/gradle/src/busTrackerApi/build/libs/*.jar /app/busTrackerApi.jar
+ENTRYPOINT ["java", "-jar", "/app/busTrackerApi.jar"]
