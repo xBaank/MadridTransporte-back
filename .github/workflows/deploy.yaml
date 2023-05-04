@@ -42,7 +42,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: xbank/busTrackerApi
+          images: xbank/bus_tracker_api
       
       - name: Build and push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
@@ -67,5 +67,5 @@ jobs:
         script: |
           docker stop busTrakerApi
           docker rm busTrackerApi
-          docker rmi busTrackerApi:latest
-          docker run -p 7777:8080 --name busTrackerApi xbank/busTrackerApi:latest          
+          docker rmi bus_tracker_api:latest
+          docker run -p 7777:8080 --name bus_tracker_api xbank/bus_tracker_api:latest          
