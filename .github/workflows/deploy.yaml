@@ -65,7 +65,7 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
         script: |
-          docker stop busTrakerApi
-          docker rm busTrackerApi
+          docker stop bus_tracker_api
+          docker rm bus_tracker_api
           docker rmi bus_tracker_api:latest
           docker run -p 7777:8080 --name bus_tracker_api xbank/bus_tracker_api:latest          
