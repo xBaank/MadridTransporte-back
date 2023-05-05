@@ -68,4 +68,4 @@ jobs:
           docker stop bus_tracker_api
           docker rm bus_tracker_api
           docker rmi xbank/bus_tracker_api
-          docker run -p 7777:8080 -d --name bus_tracker_api xbank/bus_tracker_api:latest          
+          docker run -p 7777:8080 -d --restart unless-stopped --name bus_tracker_api xbank/bus_tracker_api:latest          
