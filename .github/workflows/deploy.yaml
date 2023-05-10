@@ -69,5 +69,5 @@ jobs:
           docker compose -f ./bus-tracker-back/docker-compose.yml rm -f
           docker compose -f ./bus-tracker-back/docker-compose.yml pull
           rm -r ./bus-tracker-back
-          git clone https://github.com/xBaank/bus-tracker-back.git
+          git clone https://github.com/xBaank/bus-tracker-api.git
           docker compose -f ./bus-tracker-back/docker-compose.yml up -d --force-recreate --build       
