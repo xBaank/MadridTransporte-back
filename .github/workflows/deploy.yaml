@@ -65,7 +65,9 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
         script: |
-          docker stop bus_tracker_api
-          docker rm bus_tracker_api
-          docker rmi xbank/bus_tracker_api:latest
-          docker run -p 7777:8080 -d --restart unless-stopped --name bus_tracker_api xbank/bus_tracker_api:latest          
+          docker compose -f ./bus-tracker-back/docker-compose.yml stop
+          docker compose -f ./bus-tracker-back/docker-compose.yml rm -f
+          docker compose -f ./bus-tracker-back/docker-compose.yml pull
+          rm -r ./bus-tracker-back
+          git clone https://github.com/xBaank/bus-tracker-back.git
+          docker compose -f ./bus-tracker-back/docker-compose.yml up -d --force-recreate --build       
