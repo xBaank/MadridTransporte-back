@@ -17,17 +17,18 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 val stopTimesCache = Cache.Builder().expireAfterWrite(6.hours).build<String, TimedCachedValue<JsonNode>>()
-val stopsDispathcers = CoroutineScope(Dispatchers.IO)
+
 fun Route.stopsRouting() = route("/stops") {
     get("/{stopCode}/times") {
         val stopCode = createStopCode("8", call.parameters["stopCode"]!!)
         val codMode = call.request.queryParameters["codMode"]
         val timedVCached = try {
             withTimeout(20.seconds) {
-                val stopTimes = stopsDispathcers.async { getStopTimes(stopCode, codMode) }.await()
+                val stopTimes = CoroutineScope(Dispatchers.IO).async { getStopTimes(stopCode, codMode) }.await()
                 stopTimes?.stopTimes?.times?.shortTime?.map(::buildStopTimesJson)?.asJson()?.timed()
             } ?: stopTimesCache.get(stopCode)
-        } catch (e: Exception) {
+        }
+        catch (e: Exception) {
             if (e is TimeoutCancellationException) stopTimesCache.get(stopCode)
             else null
         } ?: return@get call.respond(HttpStatusCode.BadRequest)

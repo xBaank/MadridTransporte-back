@@ -46,4 +46,12 @@ class StopsRoutingTests {
         bodyCached["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
         body["lastTime"].getOrElse { throw it } shouldBeEqualTo bodyCached["lastTime"].getOrElse { throw it }
     }
+
+
+    @Test
+    fun should_not_get_stop_times() = testApplication {
+        application { configureRoutingV1() }
+        val response = client.get("/v1/bus/stops/aasdsad/times")
+        response.status shouldBeEqualTo HttpStatusCode.BadRequest
+    }
 }
