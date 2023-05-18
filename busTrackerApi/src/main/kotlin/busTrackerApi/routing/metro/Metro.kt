@@ -8,7 +8,7 @@ import simpleJson.deserialized
 import simpleJson.get
 
 val httpClient = OkHttpClient.Builder().build()
-private val urlBuilder = HttpUrl.Builder()
+fun urlBuilder() = HttpUrl.Builder()
     .scheme("https")
     .host("serviciosapp.metromadrid.es")
     .addPathSegment("servicios")
@@ -16,7 +16,7 @@ private val urlBuilder = HttpUrl.Builder()
     .addPathSegment("teleindicadores")
 
 fun getTimes(id: String? = null): JsonNode? {
-    val url = urlBuilder
+    val url = urlBuilder()
         .also { if (id != null) it.addPathSegment(id) }
         .build()
 
