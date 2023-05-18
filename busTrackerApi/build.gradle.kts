@@ -12,7 +12,7 @@ plugins {
 }
 
 application {
-    mainClass.set("com.example.ApplicationKt")
+    mainClass.set("busTrackerApi.MainKt")
 }
 
 
