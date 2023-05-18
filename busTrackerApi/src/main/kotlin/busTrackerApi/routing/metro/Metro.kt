@@ -27,7 +27,8 @@ fun getTimes(id: String? = null): JsonNode? {
         .addHeader("Accept", "application/json")
         .build()
 
-    val response = httpClient.newCall(request).execute()
-    if (!response.isSuccessful) return null
-    return response.body?.string()?.deserialized()?.get("Vtelindicadores")?.getOrNull()
+    return httpClient.newCall(request).execute().use {
+        if (!it.isSuccessful) null
+        else it.body?.string()?.deserialized()?.get("Vtelindicadores")?.getOrNull()
+    }
 }
