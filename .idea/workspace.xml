@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Cleanup">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Redo">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/MetroRoutingTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/MetroRoutingTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -144,8 +147,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.All in bus-tracker-back.busTrackerApi.test" />
-        <item itemvalue="JUnit.MetroRoutingTests.should_get_metros_times_by_code" />
         <item itemvalue="Kotlin.MainKt" />
+        <item itemvalue="JUnit.MetroRoutingTests.should_get_metros_times_by_code" />
         <item itemvalue="JUnit.StopsRoutingTests" />
         <item itemvalue="JUnit.MetroRoutingTests.should_get_metro_times" />
       </list>
@@ -342,7 +345,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684755245282</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Redo">
+      <created>1684762766895</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1684762766895</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -370,7 +380,8 @@
     <MESSAGE value="If not number its null" />
     <MESSAGE value="Return proximos in array" />
     <MESSAGE value="Cleanup" />
-    <option name="LAST_COMMIT_MESSAGE" value="Cleanup" />
+    <MESSAGE value="Redo" />
+    <option name="LAST_COMMIT_MESSAGE" value="Redo" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

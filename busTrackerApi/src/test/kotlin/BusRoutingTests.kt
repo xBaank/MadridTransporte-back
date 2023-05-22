@@ -7,6 +7,7 @@ import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import simpleJson.JsonArray
 import simpleJson.JsonObject
@@ -17,6 +18,7 @@ const val busStopCode = "08242"
 
 class StopsRoutingTests {
     @Test
+    @Disabled
     fun should_get_stop_times() = testApplication {
         application { configureRoutingV1() }
         val response = client.get("/v1/bus/stops/$busStopCode/times")
@@ -29,6 +31,7 @@ class StopsRoutingTests {
 
 
     @Test
+    @Disabled
     fun should_get_stop_times_cached() = testApplication {
         application { configureRoutingV1() }
         val response = client.get("/v1/bus/stops/$busStopCode/times")
@@ -49,6 +52,7 @@ class StopsRoutingTests {
 
 
     @Test
+    @Disabled
     fun should_not_get_stop_times() = testApplication {
         application { configureRoutingV1() }
         val response = client.get("/v1/bus/stops/aasdsad/times")

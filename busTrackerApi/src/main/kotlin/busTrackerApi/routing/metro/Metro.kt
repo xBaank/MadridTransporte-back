@@ -28,20 +28,18 @@ fun getTimes(id: String? = null): JsonNode? {
     return httpClient.newCall(request).execute().use { response ->
         if (!response.isSuccessful) return@use null
         val array = response.body?.string()?.deserialized()?.get("Vtelindicadores")?.asArray()?.getOrNull()
-        jObject {
-            "times" += jArray {
-                //TODO Replace with nullable assigns when simpleJson supports it
-                array?.forEach {
-                    addObject {
-                        "nombre_estacion" += it["nombreest"].asString().getOrNull() ?: return@forEach
-                        "linea" += it["linea"].asNumber().getOrNull() ?: return@forEach
-                        "anden" += it["anden"].asNumber().getOrNull() ?: return@forEach
-                        "sentido" += it["sentido"].asString().getOrNull() ?: return@forEach
-                        val proximo = it["proximo"].asNumber().getOrNull()
-                        val siguiente = it["siguiente"].asNumber().getOrNull()
-                        val proximos = listOfNotNull(proximo, siguiente).map(Number::asJson).asJson()
-                        "proximos" += proximos
-                    }
+        jArray {
+            //TODO Replace with nullable assigns when simpleJson supports it
+            array?.forEach {
+                addObject {
+                    "nombre_estacion" += it["nombreest"].asString().getOrNull() ?: return@forEach
+                    "linea" += it["linea"].asNumber().getOrNull() ?: return@forEach
+                    "anden" += it["anden"].asNumber().getOrNull() ?: return@forEach
+                    "sentido" += it["sentido"].asString().getOrNull() ?: return@forEach
+                    val proximo = it["proximo"].asNumber().getOrNull()
+                    val siguiente = it["siguiente"].asNumber().getOrNull()
+                    val proximos = listOfNotNull(proximo, siguiente).map(Number::asJson).asJson()
+                    "proximos" += proximos
                 }
             }
         }
