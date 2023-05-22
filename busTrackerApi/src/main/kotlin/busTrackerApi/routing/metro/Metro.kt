@@ -37,8 +37,10 @@ fun getTimes(id: String? = null): JsonNode? {
                         "linea" += it["linea"].asNumber().getOrNull() ?: return@forEach
                         "anden" += it["anden"].asNumber().getOrNull() ?: return@forEach
                         "sentido" += it["sentido"].asString().getOrNull() ?: return@forEach
-                        "proximo" += it["proximo"].asNumber().getOrNull()?.asJson() ?: JsonNull
-                        "siguiente" += it["siguiente"].asNumber().getOrNull()?.asJson() ?: JsonNull
+                        val proximo = it["proximo"].asNumber().getOrNull()
+                        val siguiente = it["siguiente"].asNumber().getOrNull()
+                        val proximos = listOf(proximo, siguiente).filterNotNull().map(Number::asJson).asJson()
+                        "proximos" += proximos
                     }
                 }
             }

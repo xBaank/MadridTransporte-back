@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Change metro dto">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="If not number its null">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" afterDir="false" />
     </list>
@@ -321,7 +321,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684753525378</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="If not number its null">
+      <created>1684754370426</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1684754370426</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -346,7 +353,8 @@
     <MESSAGE value="Use different Coroutines scopes for diferent requests" />
     <MESSAGE value="Properly close resources" />
     <MESSAGE value="Change metro dto" />
-    <option name="LAST_COMMIT_MESSAGE" value="Change metro dto" />
+    <MESSAGE value="If not number its null" />
+    <option name="LAST_COMMIT_MESSAGE" value="If not number its null" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
