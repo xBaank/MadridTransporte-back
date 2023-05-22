@@ -29,11 +29,11 @@ fun getTimes(id: String? = null): JsonNode? {
         if (!response.isSuccessful) return@use null
         val array = response.body?.string()?.deserialized()?.get("Vtelindicadores")?.asArray()?.getOrNull()
         jObject {
-            "nombre_estacion" += array?.get(0)?.get("nombreest")?.asString()?.getOrNull() ?: return@use null
             "times" += jArray {
                 //TODO Replace with nullable assigns when simpleJson supports it
                 array?.forEach {
                     addObject {
+                        "nombre_estacion" += it["nombreest"].asString().getOrNull() ?: return@forEach
                         "linea" += it["linea"].asNumber().getOrNull() ?: return@forEach
                         "anden" += it["anden"].asNumber().getOrNull() ?: return@forEach
                         "sentido" += it["sentido"].asString().getOrNull() ?: return@forEach
