@@ -8,9 +8,10 @@ import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldNotBeEmpty
 import org.junit.jupiter.api.Test
-import simpleJson.JsonArray
+import simpleJson.JsonObject
 import simpleJson.asArray
 import simpleJson.deserialized
+import simpleJson.get
 
 const val metroStopCode = "209"
 
@@ -22,8 +23,8 @@ class MetroRoutingTests {
         val body = response.bodyAsText().deserialized()
 
         response.status.isSuccess().shouldBe(true)
-        body.getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
-        body.asArray().getOrElse { throw it }.shouldNotBeEmpty()
+        body.getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
+        body["times"].asArray().getOrElse { throw it }.shouldNotBeEmpty()
     }
 
     @Test
@@ -33,8 +34,8 @@ class MetroRoutingTests {
         val body = response.bodyAsText().deserialized()
 
         response.status.isSuccess().shouldBe(true)
-        body.getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
-        body.asArray().getOrElse { throw it }.shouldNotBeEmpty()
+        body.getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
+        body["times"].asArray().getOrElse { throw it }.shouldNotBeEmpty()
     }
 
     @Test

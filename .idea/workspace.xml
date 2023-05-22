@@ -7,6 +7,7 @@
     <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Properly close resources">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/MetroRoutingTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/MetroRoutingTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,17 +86,17 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/RobertoBlazquez/Documents/bus-tracker-back",
-    "rearrange.code.on.save": "true",
-    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/RobertoBlazquez/Documents/bus-tracker-back&quot;,
+    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="JUnit.MetroRoutingTests.should_get_metros_times_by_code">
     <configuration name="All in bus-tracker-back.busTrackerApi.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="bus-tracker-back.busTrackerApi.test" />
@@ -145,9 +146,9 @@
       <list>
         <item itemvalue="JUnit.MetroRoutingTests.should_get_metros_times_by_code" />
         <item itemvalue="JUnit.All in bus-tracker-back.busTrackerApi.test" />
-        <item itemvalue="JUnit.MetroRoutingTests.should_get_metro_times" />
-        <item itemvalue="JUnit.StopsRoutingTests" />
         <item itemvalue="Kotlin.MainKt" />
+        <item itemvalue="JUnit.StopsRoutingTests" />
+        <item itemvalue="JUnit.MetroRoutingTests.should_get_metro_times" />
       </list>
     </recent_temporary>
   </component>
