@@ -39,7 +39,7 @@ fun getTimes(id: String? = null): JsonNode? {
                         "sentido" += it["sentido"].asString().getOrNull() ?: return@forEach
                         val proximo = it["proximo"].asNumber().getOrNull()
                         val siguiente = it["siguiente"].asNumber().getOrNull()
-                        val proximos = listOf(proximo, siguiente).filterNotNull().map(Number::asJson).asJson()
+                        val proximos = listOfNotNull(proximo, siguiente).map(Number::asJson).asJson()
                         "proximos" += proximos
                     }
                 }

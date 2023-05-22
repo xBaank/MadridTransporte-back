@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="If not number its null">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Return proximos in array">
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -328,7 +327,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684754370426</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Return proximos in array">
+      <created>1684755078121</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1684755078121</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -354,7 +360,8 @@
     <MESSAGE value="Properly close resources" />
     <MESSAGE value="Change metro dto" />
     <MESSAGE value="If not number its null" />
-    <option name="LAST_COMMIT_MESSAGE" value="If not number its null" />
+    <MESSAGE value="Return proximos in array" />
+    <option name="LAST_COMMIT_MESSAGE" value="Return proximos in array" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
