@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Properly close resources">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Change metro dto">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/MetroRoutingTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/MetroRoutingTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,7 +96,7 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;
   }
 }</component>
-  <component name="RunManager" selected="JUnit.MetroRoutingTests.should_get_metros_times_by_code">
+  <component name="RunManager" selected="JUnit.All in bus-tracker-back.busTrackerApi.test">
     <configuration name="All in bus-tracker-back.busTrackerApi.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="bus-tracker-back.busTrackerApi.test" />
       <option name="PACKAGE_NAME" value="" />
@@ -144,8 +143,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.MetroRoutingTests.should_get_metros_times_by_code" />
         <item itemvalue="JUnit.All in bus-tracker-back.busTrackerApi.test" />
+        <item itemvalue="JUnit.MetroRoutingTests.should_get_metros_times_by_code" />
         <item itemvalue="Kotlin.MainKt" />
         <item itemvalue="JUnit.StopsRoutingTests" />
         <item itemvalue="JUnit.MetroRoutingTests.should_get_metro_times" />
@@ -315,7 +314,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684422490207</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Change metro dto">
+      <created>1684753525378</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1684753525378</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -339,7 +345,8 @@
     <MESSAGE value="Add tests to stops time" />
     <MESSAGE value="Use different Coroutines scopes for diferent requests" />
     <MESSAGE value="Properly close resources" />
-    <option name="LAST_COMMIT_MESSAGE" value="Properly close resources" />
+    <MESSAGE value="Change metro dto" />
+    <option name="LAST_COMMIT_MESSAGE" value="Change metro dto" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

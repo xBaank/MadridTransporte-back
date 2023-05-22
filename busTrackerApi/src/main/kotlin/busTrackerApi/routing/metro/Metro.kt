@@ -28,7 +28,7 @@ fun getTimes(id: String? = null): JsonNode? {
     return httpClient.newCall(request).execute().use { response ->
         if (!response.isSuccessful) return@use null
         val array = response.body?.string()?.deserialized()?.get("Vtelindicadores")?.asArray()?.getOrNull()
-        return jObject {
+        jObject {
             "nombre_estacion" += array?.get(0)?.get("nombreest")?.asString()?.getOrNull() ?: return@use null
             "times" += jArray {
                 //TODO Replace with nullable assigns when simpleJson supports it
@@ -37,8 +37,8 @@ fun getTimes(id: String? = null): JsonNode? {
                         "linea" += it["linea"].asNumber().getOrNull() ?: return@forEach
                         "anden" += it["anden"].asNumber().getOrNull() ?: return@forEach
                         "sentido" += it["sentido"].asString().getOrNull() ?: return@forEach
-                        "proximo" += it["proximo"].asNumber().getOrNull() ?: return@forEach
-                        "siguiente" += it["siguiente"].asNumber().getOrNull() ?: return@forEach
+                        "proximo" += it["proximo"].asNumber().getOrNull()?.asJson() ?: JsonNull
+                        "siguiente" += it["siguiente"].asNumber().getOrNull()?.asJson() ?: JsonNull
                     }
                 }
             }
