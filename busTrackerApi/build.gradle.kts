@@ -37,6 +37,7 @@ dependencies {
     runtimeOnly("io.insert-koin:koin-core:3.4.1")
     // https://mvnrepository.com/artifact/io.insert-koin/koin-ktor
     implementation("io.insert-koin:koin-ktor:3.4.1")
+    implementation("com.ToxicBakery.library.bcrypt:bcrypt:+")
     // https://mvnrepository.com/artifact/org.amshove.kluent/kluent
     testImplementation("org.amshove.kluent:kluent:1.72")
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
