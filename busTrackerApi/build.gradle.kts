@@ -33,6 +33,10 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("io.github.reactivecircus.cache4k:cache4k:0.10.0")
+    // https://mvnrepository.com/artifact/io.insert-koin/koin-core
+    runtimeOnly("io.insert-koin:koin-core:3.4.1")
+    // https://mvnrepository.com/artifact/io.insert-koin/koin-ktor
+    implementation("io.insert-koin:koin-ktor:3.4.1")
     // https://mvnrepository.com/artifact/org.amshove.kluent/kluent
     testImplementation("org.amshove.kluent:kluent:1.72")
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
