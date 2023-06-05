@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 repositories {
     mavenCentral()
 }
@@ -23,6 +25,12 @@ dependencies {
     implementation("io.arrow-kt:arrow-core:1.1.5")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
     implementation("io.github.xbaank:simpleJson-core:2.1.3")
+    implementation("org.litote.kmongo:kmongo-async:4.9.0")
+    implementation("net.axay:simplekotlinmail-core:1.4.0")
+    implementation("net.axay:simplekotlinmail-client:1.4.0")
+    implementation("org.litote.kmongo:kmongo-coroutine:4.9.0")
+    implementation("io.ktor:ktor-server-auth:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("io.github.reactivecircus.cache4k:cache4k:0.10.0")
     // https://mvnrepository.com/artifact/org.amshove.kluent/kluent
@@ -35,8 +43,14 @@ dependencies {
 }
 
 
-kotlin {
-    jvmToolchain(8)
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+    java {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
 }
 
 ktor {
