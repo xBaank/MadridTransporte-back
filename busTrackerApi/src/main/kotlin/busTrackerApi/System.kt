@@ -1,5 +1,6 @@
 package busTrackerApi
 
-fun getenvOrThrow(key: String): String {
-    return System.getenv(key) ?: throw IllegalStateException("Environment variable $key is not set")
-}
+import io.github.cdimascio.dotenv.Dotenv
+
+fun Dotenv.getenvOrThrow(key: String): String =
+    get(key) ?: throw IllegalStateException("Environment variable $key is not set")

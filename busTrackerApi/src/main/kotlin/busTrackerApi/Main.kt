@@ -11,9 +11,9 @@ import java.lang.System.getenv
 
 fun main() {
     embeddedServer(Netty, port = getenv("PORT")?.toIntOrNull() ?: 8080) {
+        configureDependencies()
         configureRoutingV1()
         configureAuth()
-        configureDependencies()
         install(CORS) {
             anyHost()
         }

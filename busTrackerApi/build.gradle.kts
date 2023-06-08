@@ -21,13 +21,13 @@ application {
 dependencies {
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
     //arrow kt
     implementation("io.arrow-kt:arrow-core:1.1.5")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
     implementation("io.github.xbaank:simpleJson-core:2.1.3")
     implementation("org.litote.kmongo:kmongo-async:4.9.0")
-    implementation("net.axay:simplekotlinmail-core:1.4.0")
-    implementation("net.axay:simplekotlinmail-client:1.4.0")
+    implementation("org.simplejavamail:simple-java-mail:8.1.1")
     implementation("org.litote.kmongo:kmongo-coroutine:4.9.0")
     implementation("io.ktor:ktor-server-auth:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")

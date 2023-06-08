@@ -3,6 +3,7 @@ package busTrackerApi.plugins
 import busTrackerApi.routing.bus.lines.linesRouting
 import busTrackerApi.routing.bus.stops.stopsRouting
 import busTrackerApi.routing.metro.timesRouting
+import busTrackerApi.routing.users.authRouting
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 
@@ -11,7 +12,14 @@ fun Application.configureRoutingV1() {
         route("/v1") {
             busRouting()
             metroRouting()
+            usersRouting()
         }
+    }
+}
+
+private fun Route.usersRouting() {
+    route("/users") {
+        authRouting()
     }
 }
 
