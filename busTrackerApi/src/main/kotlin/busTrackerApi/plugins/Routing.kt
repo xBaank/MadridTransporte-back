@@ -2,6 +2,7 @@ package busTrackerApi.plugins
 
 import busTrackerApi.routing.bus.lines.linesRouting
 import busTrackerApi.routing.bus.stops.stopsRouting
+import busTrackerApi.routing.favourites.favouritesRouting
 import busTrackerApi.routing.metro.timesRouting
 import busTrackerApi.routing.users.authRouting
 import io.ktor.server.application.*
@@ -13,7 +14,14 @@ fun Application.configureRoutingV1() {
             busRouting()
             metroRouting()
             usersRouting()
+            favoriteRouting()
         }
+    }
+}
+
+private fun Route.favoriteRouting() {
+    route("/favorites") {
+        favouritesRouting()
     }
 }
 

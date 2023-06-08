@@ -1,7 +1,13 @@
 package busTrackerApi.routing.users
 
 import arrow.core.getOrElse
+import busTrackerApi.badRequest
+import busTrackerApi.hashAsString
 import busTrackerApi.plugins.Signer
+import busTrackerApi.plugins.saltRounds
+import busTrackerApi.verifyHash
+import com.auth0.jwt.JWTVerifier
+import com.toxicbakery.bcrypt.Bcrypt
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -21,9 +27,11 @@ import simpleJson.*
 import java.net.URLEncoder
 
 const val mailValidation = """^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$"""
+
 fun Route.authRouting() {
     val userRepo by inject<CoroutineDatabase>()
     val signer by inject<Signer>()
+    val verifier by inject<JWTVerifier>()
     val mailer by inject<Mailer>()
 
     post("/register") {
@@ -32,9 +40,14 @@ fun Route.authRouting() {
             ?: badRequest("Missing redirectUrl")
 
         val userTyped = User(
-            username = user["username"].asString().getOrElse { badRequest(it.message) },
-            password = user["password"].asString().getOrElse { badRequest(it.message) },
-            email = user["email"].asString().getOrElse { badRequest(it.message) }.also { validateMail(it) },
+            username = user["username"].asString()
+                .getOrElse { badRequest(it.message) },
+            password = user["password"].asString()
+                .map { Bcrypt.hashAsString(it, saltRounds) }
+                .getOrElse { badRequest(it.message) },
+            email = user["email"].asString()
+                .getOrElse { badRequest(it.message) }
+                .also { validateMail(it) },
             verified = false
         )
 
@@ -51,7 +64,7 @@ fun Route.authRouting() {
             .from("BusTracker", "noreply@bustracker.com")
             .to(userTyped.username, userTyped.email)
             .withSubject("Account Verification")
-            .withPlainText("Click here to verify your account: ${redirectUrl}/verify?token=$token")
+            .withPlainText("Click here to verify your account: ${redirectUrl}/v1/users/verify?token=$token")
             .buildEmail()
 
         CoroutineScope(Dispatchers.IO).launch { mailer.sendMail(email) }
@@ -61,15 +74,16 @@ fun Route.authRouting() {
 
     get("/verify") {
         val rawToken = call.request.queryParameters["token"] ?: badRequest("Token not found")
-        val token = rawToken.deserialized()
+        val token = verifier.verify(rawToken)
+        val username = token.getClaim("username").asString() ?: badRequest("Username not found")
 
         val user = userRepo.getCollection<User>()
-            .findOne(User::username eq token["username"].asString().getOrElse { badRequest(it.message) })
+            .findOne(User::username eq username)
             ?: badRequest("User not found")
 
         if (user.verified) badRequest("User already verified")
 
-        userRepo.getCollection<User>().updateOne(user)
+        userRepo.getCollection<User>().updateOne(user.copy(verified = true))
 
         call.respond(HttpStatusCode.OK)
     }
@@ -79,11 +93,11 @@ fun Route.authRouting() {
         val username = user["username"].asString().getOrElse { badRequest(it.message) }
         val password = user["password"].asString().getOrElse { badRequest(it.message) }
 
-        val userTyped = userRepo.getCollection<User>().findOne(User::username eq username)
+        val userTyped =
+            userRepo.getCollection<User>().findOne(User::username eq username) ?: badRequest("User not found")
 
-        if (userTyped == null) badRequest("User not found")
+        if (!Bcrypt.verifyHash(password, userTyped.password)) badRequest("Wrong password")
         if (!userTyped.verified) badRequest("User not verified")
-        if (userTyped.password != password) badRequest("Wrong password")
 
         val rawToken = signer { withClaim("username", userTyped.username) }
 
@@ -97,14 +111,6 @@ fun Route.authRouting() {
     }
 }
 
-suspend fun PipelineContext<Unit, ApplicationCall>.badRequest(message: String?): Nothing {
-    val messageResponse = message ?: "Bad Request"
-    val messageResponseJson = jObject {
-        "message" to messageResponse
-    }.serialized()
-    call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.BadRequest)
-    error(messageResponse) //This should not return
-}
 
 suspend fun PipelineContext<Unit, ApplicationCall>.validateMail(mail: String) {
     if (!mail.matches(mailValidation.toRegex())) {

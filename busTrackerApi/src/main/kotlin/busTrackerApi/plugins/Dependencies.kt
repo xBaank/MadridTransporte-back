@@ -4,11 +4,9 @@ import busTrackerApi.getenvOrThrow
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
-import io.github.cdimascio.dotenv.Dotenv
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.server.application.*
 import org.koin.dsl.module
-import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.koin
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
@@ -16,6 +14,8 @@ import org.simplejavamail.api.mailer.config.TransportStrategy
 import org.simplejavamail.mailer.MailerBuilder
 
 typealias Signer = (f: JWTCreator.Builder.() -> Unit) -> String
+
+const val saltRounds = 10
 
 private val dbModule = module {
     val dotenv = dotenv()
@@ -57,7 +57,6 @@ private val dbModule = module {
 }
 
 fun Application.configureDependencies() {
-    val dotenv by inject<Dotenv>()
     koin { modules(dbModule) }
 
 }
