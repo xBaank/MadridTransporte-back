@@ -38,6 +38,7 @@ fun Route.favouritesRouting() = authenticate("user") {
 
     get {
         val username = call.principal<JWTPrincipal>()?.get("username") ?: badRequest("Missing username in token")
+        db.getCollection<User>().findOne(User::username eq username) ?: badRequest("User not found")
         val favourites = db.getCollection<Favourite>().find(Favourite::username eq username).toList()
         val respondObject = favourites.map(Favourite::toJson).asJson()
         call.respondText(respondObject.serialized(), ContentType.Application.Json)

@@ -17,7 +17,6 @@ application {
     mainClass.set("busTrackerApi.MainKt")
 }
 
-
 dependencies {
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
@@ -43,8 +42,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
+    testImplementation("org.testcontainers:testcontainers:1.18.3")
     implementation(project(":crtm"))
-
 }
 
 
