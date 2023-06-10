@@ -1,5 +1,5 @@
 import arrow.core.getOrElse
-import busTrackerApi.plugins.configureRoutingV1
+import busTrackerApi.startUp
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -7,8 +7,9 @@ import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.koin.core.context.GlobalContext
 import simpleJson.JsonArray
 import simpleJson.JsonObject
 import simpleJson.deserialized
@@ -17,10 +18,15 @@ import simpleJson.get
 const val busStopCode = "08242"
 
 class StopsRoutingTests {
+
+    @AfterEach()
+    fun tearDown() {
+        GlobalContext.stopKoin()
+    }
+
     @Test
-    @Disabled
     fun should_get_stop_times() = testApplication {
-        application { configureRoutingV1() }
+        application { startUp() }
         val response = client.get("/v1/bus/stops/$busStopCode/times")
         val body = response.bodyAsText().deserialized()
 
@@ -31,9 +37,8 @@ class StopsRoutingTests {
 
 
     @Test
-    @Disabled
     fun should_get_stop_times_cached() = testApplication {
-        application { configureRoutingV1() }
+        application { startUp() }
         val response = client.get("/v1/bus/stops/$busStopCode/times")
         val responseCached = client.get("/v1/bus/stops/$busStopCode/times/cached")
 
@@ -52,9 +57,8 @@ class StopsRoutingTests {
 
 
     @Test
-    @Disabled
     fun should_not_get_stop_times() = testApplication {
-        application { configureRoutingV1() }
+        application { startUp() }
         val response = client.get("/v1/bus/stops/aasdsad/times")
         response.status shouldBeEqualTo HttpStatusCode.BadRequest
     }

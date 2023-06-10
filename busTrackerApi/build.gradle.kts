@@ -5,7 +5,7 @@ repositories {
 }
 
 val ktor_version: String by project
-
+val test_containers_version: String by project
 
 plugins {
     kotlin("jvm")
@@ -42,7 +42,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
-    testImplementation("org.testcontainers:testcontainers:1.18.3")
+    testImplementation("org.testcontainers:mongodb:$test_containers_version")
+    testImplementation("org.testcontainers:junit-jupiter:$test_containers_version")
+    implementation("io.github.serpro69:kotlin-faker:1.14.0")
     implementation(project(":crtm"))
 }
 
@@ -50,6 +52,7 @@ dependencies {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
+        freeCompilerArgs = listOf("-Xcontext-receivers")
     }
     java {
         sourceCompatibility = JavaVersion.VERSION_11

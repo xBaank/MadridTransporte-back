@@ -20,11 +20,13 @@ fun Route.favouritesRouting() = authenticate("user") {
 
     post {
         val stopToSave = call.receiveText().deserialized()
-        val stopType = stopToSave["stopType"].asString().getOrElse { badRequest(it.message) }
-        val stopId = stopToSave["stopId"].asString().getOrElse { badRequest(it.message) }
+        val stopType = stopToSave["stopType"].asString().getOrElse { return@post badRequest(it.message) }
+        val stopId = stopToSave["stopId"].asString().getOrElse { return@post badRequest(it.message) }
 
-        val username = call.principal<JWTPrincipal>()?.get("username") ?: badRequest("Missing username in token")
-        val user = db.getCollection<User>().findOne(User::username eq username) ?: badRequest("User not found")
+        val username =
+            call.principal<JWTPrincipal>()?.get("username") ?: return@post badRequest("Missing username in token")
+        val user =
+            db.getCollection<User>().findOne(User::username eq username) ?: return@post badRequest("User not found")
         db.getCollection<Favourite>().insertOne(
             Favourite(
                 username = user.username,
@@ -37,8 +39,9 @@ fun Route.favouritesRouting() = authenticate("user") {
     }
 
     get {
-        val username = call.principal<JWTPrincipal>()?.get("username") ?: badRequest("Missing username in token")
-        db.getCollection<User>().findOne(User::username eq username) ?: badRequest("User not found")
+        val username =
+            call.principal<JWTPrincipal>()?.get("username") ?: return@get badRequest("Missing username in token")
+        db.getCollection<User>().findOne(User::username eq username) ?: return@get badRequest("User not found")
         val favourites = db.getCollection<Favourite>().find(Favourite::username eq username).toList()
         val respondObject = favourites.map(Favourite::toJson).asJson()
         call.respondText(respondObject.serialized(), ContentType.Application.Json)

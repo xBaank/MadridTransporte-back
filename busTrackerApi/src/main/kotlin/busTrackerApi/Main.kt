@@ -11,11 +11,15 @@ import java.lang.System.getenv
 
 fun main() {
     embeddedServer(Netty, port = getenv("PORT")?.toIntOrNull() ?: 8080) {
-        configureDependencies()
-        configureRoutingV1()
-        configureAuth()
-        install(CORS) {
-            anyHost()
-        }
+        startUp()
     }.start(wait = true)
+}
+
+fun Application.startUp() {
+    configureDependencies()
+    configureAuth()
+    configureRoutingV1()
+    install(CORS) {
+        anyHost()
+    }
 }

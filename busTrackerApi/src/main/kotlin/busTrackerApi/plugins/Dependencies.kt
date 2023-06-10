@@ -17,36 +17,39 @@ typealias Signer = (f: JWTCreator.Builder.() -> Unit) -> String
 
 const val saltRounds = 10
 
-private val dbModule = module {
-    val dotenv = dotenv()
+val dbModule = module {
+    val dotenv = dotenv {
+        ignoreIfMissing = true
+        systemProperties = true
+    }
 
     val client = KMongo
-        .createClient(dotenv.getenvOrThrow("MONGO_CONNECTION_STRING"))
+        .createClient(getenvOrThrow("MONGO_CONNECTION_STRING"))
         .coroutine
-        .getDatabase(dotenv.getenvOrThrow("MONGO_DATABASE_NAME"))
+        .getDatabase(getenvOrThrow("MONGO_DATABASE_NAME"))
 
     val mailer = MailerBuilder
         .withSMTPServer(
-            /* host = */ dotenv.getenvOrThrow("STMP_HOST"),
-            /* port = */ dotenv.getenvOrThrow("STMP_PORT").toInt(),
-            /* username = */ dotenv.getenvOrThrow("STMP_USERNAME"),
-            /* password = */ dotenv.getenvOrThrow("STMP_PASSWORD")
+            /* host = */ getenvOrThrow("STMP_HOST"),
+            /* port = */ getenvOrThrow("STMP_PORT").toInt(),
+            /* username = */ getenvOrThrow("STMP_USERNAME"),
+            /* password = */ getenvOrThrow("STMP_PASSWORD")
         )
         .withTransportStrategy(TransportStrategy.SMTP_TLS)
         .buildMailer()
 
     val jwtVerifier = JWT
-        .require(Algorithm.HMAC256(dotenv.getenvOrThrow("JWT_SECRET")))
-        .withAudience(dotenv.getenvOrThrow("JWT_AUDIENCE"))
-        .withIssuer(dotenv.getenvOrThrow("JWT_ISSUER"))
+        .require(Algorithm.HMAC256(getenvOrThrow("JWT_SECRET")))
+        .withAudience(getenvOrThrow("JWT_AUDIENCE"))
+        .withIssuer(getenvOrThrow("JWT_ISSUER"))
         .build()
 
     val signer: Signer = {
         JWT.create()
-            .withAudience(dotenv.getenvOrThrow("JWT_AUDIENCE"))
-            .withIssuer(dotenv.getenvOrThrow("JWT_ISSUER"))
+            .withAudience(getenvOrThrow("JWT_AUDIENCE"))
+            .withIssuer(getenvOrThrow("JWT_ISSUER"))
             .apply(it)
-            .sign(Algorithm.HMAC256(dotenv.getenvOrThrow("JWT_SECRET")))
+            .sign(Algorithm.HMAC256(getenvOrThrow("JWT_SECRET")))
     }
 
     single { client }
@@ -58,5 +61,4 @@ private val dbModule = module {
 
 fun Application.configureDependencies() {
     koin { modules(dbModule) }
-
 }
