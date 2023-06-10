@@ -5,8 +5,8 @@ import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.left
 import busTrackerApi.*
-import busTrackerApi.plugins.Signer
-import busTrackerApi.plugins.saltRounds
+import busTrackerApi.config.Signer
+import busTrackerApi.config.saltRounds
 import com.auth0.jwt.JWTVerifier
 import com.toxicbakery.bcrypt.Bcrypt
 import io.ktor.http.*

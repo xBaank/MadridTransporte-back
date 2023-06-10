@@ -1,4 +1,4 @@
-package busTrackerApi.plugins
+package busTrackerApi.config
 
 import busTrackerApi.getenvOrThrow
 import com.auth0.jwt.JWT

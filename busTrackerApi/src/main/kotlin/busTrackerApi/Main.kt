@@ -1,8 +1,8 @@
 package busTrackerApi
 
-import busTrackerApi.plugins.configureAuth
-import busTrackerApi.plugins.configureDependencies
-import busTrackerApi.plugins.configureRoutingV1
+import busTrackerApi.config.configureAuth
+import busTrackerApi.config.configureDependencies
+import busTrackerApi.config.configureRoutingV1
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*

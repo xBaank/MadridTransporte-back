@@ -1,4 +1,4 @@
-package busTrackerApi.plugins
+package busTrackerApi.config
 
 import busTrackerApi.routing.bus.lines.linesRouting
 import busTrackerApi.routing.bus.stops.stopsRouting

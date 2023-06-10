@@ -1,4 +1,4 @@
-package busTrackerApi.plugins
+package busTrackerApi.config
 
 import com.auth0.jwt.JWTVerifier
 import io.ktor.server.application.*

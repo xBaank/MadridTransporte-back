@@ -38,11 +38,13 @@ dependencies {
     // https://mvnrepository.com/artifact/org.amshove.kluent/kluent
     testImplementation("org.amshove.kluent:kluent:1.72")
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     testImplementation("org.testcontainers:mongodb:$test_containers_version")
     testImplementation("org.testcontainers:junit-jupiter:$test_containers_version")
-    implementation("io.github.serpro69:kotlin-faker:1.14.0")
+    testImplementation("io.github.serpro69:kotlin-faker:1.14.0")
     implementation(project(":crtm"))
 }
 
@@ -51,7 +53,7 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(11)
 }
 
 

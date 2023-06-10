@@ -1,5 +1,5 @@
 import MongoContainer.mongoDBContainer
-import busTrackerApi.plugins.Signer
+import busTrackerApi.config.Signer
 import busTrackerApi.startUp
 import io.github.serpro69.kfaker.faker
 import io.ktor.http.*
