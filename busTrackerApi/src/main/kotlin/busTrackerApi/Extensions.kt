@@ -9,7 +9,7 @@ import simpleJson.jObject
 import simpleJson.serialized
 
 fun getenvOrThrow(key: String): String =
-    System.getProperty(key) ?: throw IllegalStateException("Environment variable $key is not set")
+    System.getenv(key) ?: System.getProperty(key) ?: throw IllegalStateException("Environment variable $key is not set")
 
 
 fun Bcrypt.hashAsString(input: String, saltRounds: Int = 10): String =
