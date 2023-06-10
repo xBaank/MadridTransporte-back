@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 repositories {
     mavenCentral()
 }
@@ -40,7 +38,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.amshove.kluent/kluent
     testImplementation("org.amshove.kluent:kluent:1.72")
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     testImplementation("org.testcontainers:mongodb:$test_containers_version")
     testImplementation("org.testcontainers:junit-jupiter:$test_containers_version")
@@ -48,17 +46,15 @@ dependencies {
     implementation(project(":crtm"))
 }
 
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-        freeCompilerArgs = listOf("-Xcontext-receivers")
-    }
-    java {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
+tasks.test {
+    useJUnitPlatform()
 }
+
+kotlin {
+    jvmToolchain(17)
+}
+
+
 
 ktor {
     fatJar {
