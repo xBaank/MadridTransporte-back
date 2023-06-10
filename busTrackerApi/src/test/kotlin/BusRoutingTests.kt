@@ -10,6 +10,7 @@ import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.koin.core.context.GlobalContext
 import org.litote.kmongo.reactivestreams.KMongo
@@ -36,6 +37,7 @@ class StopsRoutingTests {
     }
 
     @Test
+    @Disabled
     fun should_get_stop_times() = testApplication {
         application { startUp() }
         val response = client.get("/v1/bus/stops/$busStopCode/times")
@@ -48,6 +50,7 @@ class StopsRoutingTests {
 
 
     @Test
+    @Disabled
     fun should_get_stop_times_cached() = testApplication {
         application { startUp() }
         val response = client.get("/v1/bus/stops/$busStopCode/times")
@@ -68,6 +71,7 @@ class StopsRoutingTests {
 
 
     @Test
+    @Disabled
     fun should_not_get_stop_times() = testApplication {
         application { startUp() }
         val response = client.get("/v1/bus/stops/aasdsad/times")

@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Fix tests">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Load from env">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/Extensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/Extensions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +126,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'">
+  <component name="RunManager" selected="Gradle.bus-tracker-back [build]">
     <configuration name="Tests in 'bus-tracker-back.busTrackerApi.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -197,9 +197,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.bus-tracker-back [build]" />
         <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
         <item itemvalue="JUnit.All in bus-tracker-back" />
-        <item itemvalue="Gradle.bus-tracker-back [build]" />
         <item itemvalue="JUnit.All in bus-tracker-back.busTrackerApi.test (1)" />
         <item itemvalue="JUnit.All in bus-tracker-back.busTrackerApi.test" />
       </list>
@@ -452,11 +452,17 @@
       <option name="project" value="LOCAL" />
       <updated>1686425175387</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="Load from env">
+      <created>1686426409443</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1686426409444</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Use global scope for blocking code" />
     <MESSAGE value="Add cache" />
     <MESSAGE value="Add metro times" />
     <MESSAGE value="Update dependencies" />
@@ -481,7 +487,8 @@
     <MESSAGE value="Some cleanup" />
     <MESSAGE value="Added a bunch of tests" />
     <MESSAGE value="Fix tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix tests" />
+    <MESSAGE value="Load from env" />
+    <option name="LAST_COMMIT_MESSAGE" value="Load from env" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
