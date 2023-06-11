@@ -64,11 +64,15 @@ jobs:
         STMP_PORT: ${{ vars.STMP_PORT }}
         STMP_USERNAME: ${{ secrets.STMP_USERNAME }}
         STMP_PASSWORD: ${{ secrets.STMP_PASSWORD }}
+        MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+        MONGO_DATABASE_NAME: ${{ secrets.MONGO_DATABASE_NAME }}
+        MONGO_USER: ${{ secrets.MONGO_USER }}
+        MONGO_PASS: ${{ secrets.MONGO_PASS }}
     steps:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v0.1.10
         with:
-          envs: JWT_SECRET,JWT_AUDIENCE,JWT_ISSUER,STMP_HOST,STMP_PORT,STMP_USERNAME,STMP_PASSWORD
+          envs: JWT_SECRET,JWT_AUDIENCE,JWT_ISSUER,STMP_HOST,STMP_PORT,STMP_USERNAME,STMP_PASSWORD,MONGO_CONNECTION_STRING,MONGO_DATABASE_NAME,MONGO_USER,MONGO_PASS
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
@@ -81,6 +85,10 @@ jobs:
             export STMP_PORT=$STMP_PORT
             export STMP_USERNAME=$STMP_USERNAME
             export STMP_PASSWORD=$STMP_PASSWORD
+            export MONGO_CONNECTION_STRING=$MONGO_CONNECTION_STRING
+            export MONGO_DATABASE_NAME=$MONGO_DATABASE_NAME
+            export MONGO_USER=$MONGO_USER
+            export MONGO_PASS=$MONGO_PASS
             docker compose -f ./bus-tracker-back/docker-compose.yml stop
             docker compose -f ./bus-tracker-back/docker-compose.yml rm -f
             docker compose -f ./bus-tracker-back/docker-compose.yml pull
