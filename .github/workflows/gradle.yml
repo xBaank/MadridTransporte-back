@@ -25,8 +25,8 @@ jobs:
         JWT_SECRET: secret
         JWT_AUDIENCE: audience
         JWT_ISSUER: audience
-        STMP_HOST: smtp.gmail.com
-        STMP_PORT: 587
+        STMP_HOST: ${{ vars.STMP_HOST }}
+        STMP_PORT: ${{ vars.STMP_PORT }}
         STMP_USERNAME: ${{ secrets.STMP_USERNAME }}
         STMP_PASSWORD: ${{ secrets.STMP_PASSWORD }}
     steps:
