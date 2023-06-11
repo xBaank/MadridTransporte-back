@@ -3,6 +3,9 @@ import busTrackerApi.config.Signer
 import busTrackerApi.startUp
 import io.github.serpro69.kfaker.faker
 import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.AfterEach
@@ -29,7 +32,14 @@ class UsersVerifyTest {
 
     @Test
     fun `should register then verify`() = testApplication {
-        application { startUp() }
+        application {
+            startUp()
+            routing {
+                get("/ping") {
+                    call.respond(HttpStatusCode.OK)
+                }
+            }
+        }
         val faker = faker {}
         val mail = faker.internet.safeEmail()
         val username = faker.name.name()

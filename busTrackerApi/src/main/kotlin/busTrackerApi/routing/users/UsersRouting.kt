@@ -36,7 +36,7 @@ fun Route.authRouting() {
     post("/register") {
         val user = call.receiveText().deserialized()
         val redirectUrl = call.request.queryParameters["redirectUrl"]?.also { URLEncoder.encode(it, "utf-8") }
-            ?: badRequest("Missing redirectUrl")
+            ?: return@post badRequest("Missing redirectUrl")
 
         val userTyped = User(
             username = user["username"].asString()
@@ -74,6 +74,8 @@ fun Route.authRouting() {
     }
 
     get("/verify") {
+        val redirectUrl = call.request.queryParameters["redirectUrl"] ?: return@get badRequest("Missing redirectUrl")
+
         val rawToken = call.request.queryParameters["token"] ?: return@get badRequest("Token not found")
         val token = Either.catch { verifier.verify(rawToken) }.getOrElse { return@get unauthorized("Invalid token") }
         val email = token.getClaim("email").asString() ?: return@get badRequest("Email not found")
@@ -86,7 +88,7 @@ fun Route.authRouting() {
 
         userRepo.getCollection<User>().updateOne(user.copy(verified = true))
 
-        call.respond(HttpStatusCode.OK)
+        call.respondRedirect(redirectUrl)
     }
 
     post("/login") {

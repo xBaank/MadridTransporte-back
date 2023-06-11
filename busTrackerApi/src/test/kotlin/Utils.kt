@@ -25,7 +25,7 @@ suspend fun ApplicationTestBuilder.login(mail: String, password: String) =
     }
 
 suspend fun ApplicationTestBuilder.verify(token: String) =
-    client.get("/v1/users/verify?token=$token")
+    client.get("/v1/users/verify?token=$token&redirectUrl=/ping")
 
 suspend fun ApplicationTestBuilder.getFavourites(token: String) =
     client.get("/v1/favorites") {
