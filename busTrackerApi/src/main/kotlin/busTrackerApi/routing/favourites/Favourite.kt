@@ -6,7 +6,7 @@ import simpleJson.jObject
 
 data class Favourite(
     val _id: Id<Favourite> = newId(),
-    val username: String,
+    val email: String,
     val stopType: String,
     val stopId: String
 )
@@ -14,5 +14,5 @@ data class Favourite(
 fun Favourite.toJson() = jObject {
     "stopType" += stopType
     "stopId" += stopId
-    "username" += username
+    "email" += email
 }
