@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Redo">
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" afterDir="false" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Load from env">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,6 +45,24 @@
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="build" type="c8890929:TasksNode$1" />
               </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="bus-tracker-back" type="f1a62948:ProjectNode" />
+                <item name="busTrackerApi" type="2d1252cf:ModuleNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="bus-tracker-back" type="f1a62948:ProjectNode" />
+                <item name="busTrackerApi" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="bus-tracker-back" type="f1a62948:ProjectNode" />
+                <item name="busTrackerApi" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="build" type="c8890929:TasksNode$1" />
+              </path>
             </expand>
             <select />
           </tree_state>
@@ -64,11 +82,10 @@
     <option name="myRunOnSave" value="true" />
   </component>
   <component name="Git.Settings">
-    <option name="PUSH_TAGS">
-      <GitPushTagMode>
-        <option name="argument" value="--tags" />
-        <option name="title" value="All" />
-      </GitPushTagMode>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -89,14 +106,87 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;auth&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/RobertoBlazquez/Documents/bus-tracker-back&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Roberto/IdeaProjects/bus-tracker-back/busTrackerApi/src/test/kotlin&quot;,
     &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;
   }
 }</component>
-  <component name="RunManager" selected="JUnit.All in bus-tracker-back.busTrackerApi.test">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Roberto\IdeaProjects\bus-tracker-back\busTrackerApi\src\test\kotlin" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Roberto\IdeaProjects\bus-tracker-back\busTrackerApi" />
+      <recent name="C:\Users\Roberto\IdeaProjects\bus-tracker-back" />
+    </key>
+    <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Gradle.bus-tracker-back [build]">
+    <configuration name="Tests in 'bus-tracker-back.busTrackerApi.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":busTrackerApi:test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>true</ForceTestExec>
+      <method v="2" />
+    </configuration>
+    <configuration name="bus-tracker-back [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="build" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>false</ForceTestExec>
+      <method v="2" />
+    </configuration>
+    <configuration name="All in bus-tracker-back" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="bus-tracker-back" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in bus-tracker-back.busTrackerApi.test (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="bus-tracker-back.busTrackerApi.test" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="All in bus-tracker-back.busTrackerApi.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="bus-tracker-back.busTrackerApi.test" />
       <option name="PACKAGE_NAME" value="" />
@@ -105,49 +195,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MetroRoutingTests.should_get_metro_times" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="bus-tracker-back.busTrackerApi.test" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="MetroRoutingTests" />
-      <option name="METHOD_NAME" value="should_get_metro_times" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="MetroRoutingTests.should_get_metros_times_by_code" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="bus-tracker-back.busTrackerApi.test" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="MetroRoutingTests" />
-      <option name="METHOD_NAME" value="should_get_metros_times_by_code" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="StopsRoutingTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="bus-tracker-back.busTrackerApi.test" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="StopsRoutingTests" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="MainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="busTrackerApi.MainKt" />
-      <module name="bus-tracker-back.busTrackerApi.main" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.bus-tracker-back [build]" />
+        <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
+        <item itemvalue="JUnit.All in bus-tracker-back" />
+        <item itemvalue="JUnit.All in bus-tracker-back.busTrackerApi.test (1)" />
         <item itemvalue="JUnit.All in bus-tracker-back.busTrackerApi.test" />
-        <item itemvalue="Kotlin.MainKt" />
-        <item itemvalue="JUnit.MetroRoutingTests.should_get_metros_times_by_code" />
-        <item itemvalue="JUnit.StopsRoutingTests" />
-        <item itemvalue="JUnit.MetroRoutingTests.should_get_metro_times" />
       </list>
     </recent_temporary>
   </component>
@@ -349,18 +403,66 @@
       <option name="project" value="LOCAL" />
       <updated>1684762766895</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Add some auth">
+      <created>1685999396126</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1685999396126</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Add bcrypt dependency">
+      <created>1686000126515</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1686000126515</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Some auth">
+      <created>1686226451918</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1686226451918</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Added favourites endpoints">
+      <created>1686237059520</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1686237059521</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Some cleanup">
+      <created>1686252867874</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1686252867874</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Added a bunch of tests">
+      <created>1686415422867</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1686415422867</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Fix tests">
+      <created>1686425175387</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1686425175387</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Load from env">
+      <created>1686426409443</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1686426409444</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Use short codes" />
-    <MESSAGE value="Simplify dtos" />
-    <MESSAGE value="Poc" />
-    <MESSAGE value="Specify encoding" />
-    <MESSAGE value="Remove encoding" />
-    <MESSAGE value="Add cache for bus times" />
-    <MESSAGE value="Add last updated time" />
-    <MESSAGE value="Use global scope for blocking code" />
     <MESSAGE value="Add cache" />
     <MESSAGE value="Add metro times" />
     <MESSAGE value="Update dependencies" />
@@ -378,7 +480,15 @@
     <MESSAGE value="Return proximos in array" />
     <MESSAGE value="Cleanup" />
     <MESSAGE value="Redo" />
-    <option name="LAST_COMMIT_MESSAGE" value="Redo" />
+    <MESSAGE value="Add some auth" />
+    <MESSAGE value="Add bcrypt dependency" />
+    <MESSAGE value="Some auth" />
+    <MESSAGE value="Added favourites endpoints" />
+    <MESSAGE value="Some cleanup" />
+    <MESSAGE value="Added a bunch of tests" />
+    <MESSAGE value="Fix tests" />
+    <MESSAGE value="Load from env" />
+    <option name="LAST_COMMIT_MESSAGE" value="Load from env" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
