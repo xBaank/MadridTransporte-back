@@ -109,6 +109,48 @@ fun Route.authRouting() {
 
         call.respondText(tokenObject, ContentType.Application.Json, HttpStatusCode.OK)
     }
+
+    post("/send-reset-password") {
+        val user = call.receiveText().deserialized()
+        val email = user["email"].asString().getOrElse { return@post badRequest(it.message) }
+        val redirectUrl = call.request.queryParameters["redirectUrl"]?.also { URLEncoder.encode(it, "utf-8") }
+            ?: return@post badRequest("Missing redirectUrl")
+
+        val userTyped =
+            userRepo.getCollection<User>().findOne(User::email eq email) ?: return@post notFound("User not found")
+
+        val rawToken = signer { withClaim("email", userTyped.email) }
+
+        val token = URLEncoder.encode(rawToken, "utf-8")
+
+        val emailToSend = EmailBuilder.startingBlank()
+            .from("BusTracker", "noreply@bustracker.com")
+            .to(userTyped.username, userTyped.email)
+            .withSubject("Reset Password")
+            .withPlainText("Click here to verify your account: ${redirectUrl}/v1/users/verify?token=$token")
+            .buildEmail()
+
+        CoroutineScope(Dispatchers.IO).launch { mailer.sendMail(emailToSend) }
+
+        call.respond(HttpStatusCode.OK)
+    }
+
+    put("/reset-password") {
+        val token = call.request.queryParameters["token"] ?: return@put badRequest("Token not found")
+        val rawToken = Either.catch { verifier.verify(token) }.getOrElse { return@put unauthorized("Invalid token") }
+        val email = rawToken.getClaim("email").asString() ?: return@put badRequest("Email not found")
+
+        val newPass =
+            call.receiveText().deserialized()["password"].asString().getOrElse { return@put badRequest(it.message) }
+
+        val userTyped =
+            userRepo.getCollection<User>().findOne(User::email eq email) ?: return@put notFound("User not found")
+
+        val user = userTyped.copy(password = Bcrypt.hashAsString(newPass, saltRounds))
+        userRepo.getCollection<User>().updateOne(user)
+
+        call.respond(HttpStatusCode.OK)
+    }
 }
 
 

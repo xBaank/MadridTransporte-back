@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Remove added header in nginx.conf">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Added redirect to verify">
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UserResetPassword.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersVerifyTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersVerifyTest.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/Utils.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -106,30 +106,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'">
-    <configuration name="FavouritesTest.test add favourites" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":busTrackerApi:test" />
-            <option value="--tests" />
-            <option value="&quot;FavouritesTest.test add favourites&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>true</ForceTestExec>
-      <method v="2" />
-    </configuration>
     <configuration name="Tests in 'bus-tracker-back.busTrackerApi.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -142,6 +118,30 @@
         <option name="taskNames">
           <list>
             <option value=":busTrackerApi:test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>true</ForceTestExec>
+      <method v="2" />
+    </configuration>
+    <configuration name="UserResetPassword.should reset password" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":busTrackerApi:test" />
+            <option value="--tests" />
+            <option value="&quot;UserResetPassword.should reset password&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -208,10 +208,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
+        <item itemvalue="Gradle.UserResetPassword.should reset password" />
         <item itemvalue="Gradle.UsersVerifyTest.should register then verify" />
         <item itemvalue="Kotlin.MainKt" />
         <item itemvalue="Gradle.bus-tracker-back [build]" />
-        <item itemvalue="Gradle.FavouritesTest.test add favourites" />
       </list>
     </recent_temporary>
   </component>
@@ -546,11 +546,17 @@
       <option name="project" value="LOCAL" />
       <updated>1686518497374</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="Added redirect to verify">
+      <created>1686520499630</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1686520499630</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Use different Coroutines scopes for diferent requests" />
     <MESSAGE value="Properly close resources" />
     <MESSAGE value="Change metro dto" />
     <MESSAGE value="If not number its null" />
@@ -575,7 +581,8 @@
     <MESSAGE value="Update deploy.yaml" />
     <MESSAGE value="Remove auth on mongo" />
     <MESSAGE value="Remove added header in nginx.conf" />
-    <option name="LAST_COMMIT_MESSAGE" value="Remove added header in nginx.conf" />
+    <MESSAGE value="Added redirect to verify" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added redirect to verify" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
