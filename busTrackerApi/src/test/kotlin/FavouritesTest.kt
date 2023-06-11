@@ -41,7 +41,7 @@ class FavouritesTest {
         val signer by lazy { GlobalContext.get().get<Signer>() }
         val username = faker.name.name()
         val mail = faker.internet.safeEmail()
-        val password = faker.worldOfWarcraft.hero()
+        val password = faker.crypto.md5()
 
         register(mail, username, password)
         val rawToken = signer { withClaim("email", mail) }
@@ -61,7 +61,7 @@ class FavouritesTest {
         val signer by lazy { GlobalContext.get().get<Signer>() }
         val username = faker.name.name()
         val mail = faker.internet.safeEmail()
-        val password = faker.worldOfWarcraft.hero()
+        val password = faker.crypto.md5()
 
         register(mail, username, password)
         val rawToken = signer { withClaim("email", mail) }

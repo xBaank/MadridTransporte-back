@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Update nginx.conf">
-      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/resources/logback.xml" afterDir="false" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Add logging">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/FavouritesTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/FavouritesTest.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,7 +103,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.MainKt">
+  <component name="RunManager" selected="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'">
     <configuration name="FavouritesTest.test add favourites" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -129,7 +128,7 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="FavouritesTest.test get favourites" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="Tests in 'bus-tracker-back.busTrackerApi.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -141,8 +140,6 @@
         <option name="taskNames">
           <list>
             <option value=":busTrackerApi:test" />
-            <option value="--tests" />
-            <option value="&quot;FavouritesTest.test get favourites&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -192,11 +189,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
         <item itemvalue="Kotlin.MainKt" />
         <item itemvalue="Gradle.bus-tracker-back [build]" />
         <item itemvalue="Gradle.FavouritesTest.test add favourites" />
         <item itemvalue="JUnit.All in bus-tracker-back" />
-        <item itemvalue="Gradle.FavouritesTest.test get favourites" />
       </list>
     </recent_temporary>
   </component>
@@ -489,11 +486,17 @@
       <option name="project" value="LOCAL" />
       <updated>1686507302047</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="Add logging">
+      <created>1686508220226</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1686508220226</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Update path" />
     <MESSAGE value="Update Version" />
     <MESSAGE value="Update version" />
     <MESSAGE value="Update" />
@@ -518,7 +521,8 @@
     <MESSAGE value="Validations" />
     <MESSAGE value="Fix tests" />
     <MESSAGE value="Update nginx.conf" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update nginx.conf" />
+    <MESSAGE value="Add logging" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add logging" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
