@@ -1,9 +1,6 @@
 package busTrackerApi.routing.users
 
-import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.getOrElse
-import arrow.core.left
+import arrow.core.*
 import busTrackerApi.*
 import busTrackerApi.config.Signer
 import busTrackerApi.config.saltRounds
@@ -43,8 +40,10 @@ fun Route.authRouting() {
 
         val userTyped = User(
             username = user["username"].asString()
+                .validateUsername()
                 .getOrElse { return@post badRequest(it.message) },
             password = user["password"].asString()
+                .validatePassword()
                 .map { Bcrypt.hashAsString(it, saltRounds) }
                 .getOrElse { return@post badRequest(it.message) },
             email = user["email"].asString()
@@ -92,8 +91,8 @@ fun Route.authRouting() {
 
     post("/login") {
         val user = call.receiveText().deserialized()
-        val email = user["email"].asString().getOrElse { return@post badRequest(it.message) }
-        val password = user["password"].asString().getOrElse { return@post badRequest(it.message) }
+        val email = user["email"].asString().validateMail().getOrElse { return@post badRequest(it.message) }
+        val password = user["password"].asString().validatePassword().getOrElse { return@post badRequest(it.message) }
 
         val userTyped =
             userRepo.getCollection<User>().findOne(User::email eq email) ?: return@post notFound("User not found")
@@ -114,4 +113,12 @@ fun Route.authRouting() {
 fun Either<Exception, String>.validateMail(): Either<Exception, String> = flatMap {
     if (!it.matches(mailValidation.toRegex()))
         Exception("Invalid mail").left() else this
+}
+
+fun Either<Exception, String>.validateUsername(): Either<Exception, String> = flatMap {
+    if (it.length < 3) Exception("Username too short").left() else it.right()
+}
+
+fun Either<Exception, String>.validatePassword(): Either<Exception, String> = flatMap {
+    if (it.length < 8) Exception("Password too short").left() else it.right()
 }

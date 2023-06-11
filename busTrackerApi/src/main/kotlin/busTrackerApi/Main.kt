@@ -16,10 +16,10 @@ fun main() {
 }
 
 fun Application.startUp() {
-    configureDependencies()
-    configureAuth()
-    configureRoutingV1()
     install(CORS) {
         anyHost()
     }
+    configureDependencies()
+    configureAuth()
+    configureRoutingV1()
 }
