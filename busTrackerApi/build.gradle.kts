@@ -16,6 +16,7 @@ application {
 }
 
 dependencies {
+    implementation("ch.qos.logback:logback-classic:1.4.7")
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
