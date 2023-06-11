@@ -3,9 +3,6 @@ services:
   mongo:
     image: mongo
     restart: always
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME
-      - MONGO_INITDB_ROOT_PASSWORD
   api:
     depends_on:
       - mongo
