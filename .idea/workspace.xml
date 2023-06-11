@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Update deploy.yaml" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Remove auth on mongo">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/nginx.conf" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -511,11 +514,17 @@
       <option name="project" value="LOCAL" />
       <updated>1686514159329</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="Remove auth on mongo">
+      <created>1686516057073</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1686516057073</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Modify nginx.conf" />
     <MESSAGE value="Add tests to stops time" />
     <MESSAGE value="Use different Coroutines scopes for diferent requests" />
     <MESSAGE value="Properly close resources" />
@@ -540,7 +549,8 @@
     <MESSAGE value="Fix tests again" />
     <MESSAGE value="Update compose" />
     <MESSAGE value="Update deploy.yaml" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update deploy.yaml" />
+    <MESSAGE value="Remove auth on mongo" />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove auth on mongo" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
