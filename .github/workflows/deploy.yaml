@@ -8,11 +8,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-        JWT_SECRET: secret
-        JWT_AUDIENCE: audience
-        JWT_ISSUER: audience
-        STMP_HOST: smtp.gmail.com
-        STMP_PORT: 587
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+        JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+        STMP_HOST: ${{ secrets.STMP_HOST }}
+        STMP_PORT: ${{ secrets.STMP_PORT }}
         STMP_USERNAME: ${{ secrets.STMP_USERNAME }}
         STMP_PASSWORD: ${{ secrets.STMP_PASSWORD }}
     steps:
