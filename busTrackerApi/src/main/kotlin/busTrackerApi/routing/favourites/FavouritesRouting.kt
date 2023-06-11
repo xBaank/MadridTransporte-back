@@ -15,7 +15,7 @@ import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 import simpleJson.*
 
-fun Route.favouritesRouting() = authenticate("user") {
+fun Route.favoritesRouting() = authenticate("user") {
     val db by inject<CoroutineDatabase>()
 
     post {
@@ -23,13 +23,13 @@ fun Route.favouritesRouting() = authenticate("user") {
         val stopType = stopToSave["stopType"].asString().getOrElse { return@post badRequest(it.message) }
         val stopId = stopToSave["stopId"].asString().getOrElse { return@post badRequest(it.message) }
 
-        val username =
-            call.principal<JWTPrincipal>()?.get("username") ?: return@post badRequest("Missing username in token")
+        val email =
+            call.principal<JWTPrincipal>()?.get("email") ?: return@post badRequest("Missing email in token")
         val user =
-            db.getCollection<User>().findOne(User::username eq username) ?: return@post badRequest("User not found")
+            db.getCollection<User>().findOne(User::email eq email) ?: return@post badRequest("Email not found")
         db.getCollection<Favourite>().insertOne(
             Favourite(
-                username = user.username,
+                email = user.email,
                 stopType = stopType,
                 stopId = stopId
             )
@@ -39,10 +39,10 @@ fun Route.favouritesRouting() = authenticate("user") {
     }
 
     get {
-        val username =
-            call.principal<JWTPrincipal>()?.get("username") ?: return@get badRequest("Missing username in token")
-        db.getCollection<User>().findOne(User::username eq username) ?: return@get badRequest("User not found")
-        val favourites = db.getCollection<Favourite>().find(Favourite::username eq username).toList()
+        val email =
+            call.principal<JWTPrincipal>()?.get("email") ?: return@get badRequest("Missing email in token")
+        db.getCollection<User>().findOne(User::email eq email) ?: return@get badRequest("Email not found")
+        val favourites = db.getCollection<Favourite>().find(Favourite::email eq email).toList()
         val respondObject = favourites.map(Favourite::toJson).asJson()
         call.respondText(respondObject.serialized(), ContentType.Application.Json)
     }

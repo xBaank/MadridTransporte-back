@@ -27,6 +27,21 @@ suspend fun ApplicationTestBuilder.login(mail: String, password: String) =
 suspend fun ApplicationTestBuilder.verify(token: String) =
     client.get("/v1/users/verify?token=$token")
 
+suspend fun ApplicationTestBuilder.getFavourites(token: String) =
+    client.get("/v1/favorites") {
+        header("Authorization", "Bearer ${token}")
+    }
+
+suspend fun ApplicationTestBuilder.addFavourite(token: String, stopType: String, stopId: String) =
+    client.post("/v1/favorites") {
+        header("Authorization", "Bearer ${token}")
+        contentType(ContentType.Application.Json)
+        setBody(jObject {
+            "stopType" += stopType
+            "stopId" += stopId
+        }.serialized())
+    }
+
 fun initEnv() {
     //Even if it not used
     System.setProperty("MONGO_CONNECTION_STRING", "")
