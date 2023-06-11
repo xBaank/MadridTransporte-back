@@ -91,8 +91,8 @@ fun Route.authRouting() {
 
     post("/login") {
         val user = call.receiveText().deserialized()
-        val email = user["email"].asString().validateMail().getOrElse { return@post badRequest(it.message) }
-        val password = user["password"].asString().validatePassword().getOrElse { return@post badRequest(it.message) }
+        val email = user["email"].asString().getOrElse { return@post badRequest(it.message) }
+        val password = user["password"].asString().getOrElse { return@post badRequest(it.message) }
 
         val userTyped =
             userRepo.getCollection<User>().findOne(User::email eq email) ?: return@post notFound("User not found")

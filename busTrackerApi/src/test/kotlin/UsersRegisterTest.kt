@@ -37,7 +37,7 @@ class UsersRegisterTest {
         val faker = faker {}
         val mail = faker.internet.safeEmail()
         val username = faker.name.name()
-        val password = faker.worldOfWarcraft.hero()
+        val password = faker.crypto.md5()
 
         val response = register(mail, username, password)
 
@@ -49,7 +49,7 @@ class UsersRegisterTest {
         application { startUp() }
         val faker = faker {}
         val username = faker.name.name()
-        val password = faker.worldOfWarcraft.hero()
+        val password = faker.crypto.md5()
 
         val response = register("", username, password)
 
@@ -63,7 +63,7 @@ class UsersRegisterTest {
         val faker = faker { }
         val mail = faker.internet.safeEmail()
         val username = faker.name.name()
-        val password = faker.worldOfWarcraft.hero()
+        val password = faker.crypto.md5()
 
         val response = client.post("/v1/users/register") {
             contentType(ContentType.Application.Json)
@@ -84,7 +84,7 @@ class UsersRegisterTest {
         val faker = faker {}
         val mail = faker.internet.safeEmail()
         val username = faker.name.name()
-        val password = faker.worldOfWarcraft.hero()
+        val password = faker.crypto.md5()
 
         register(mail, username, password)
 

@@ -33,7 +33,7 @@ class UsersVerifyTest {
         val faker = faker {}
         val mail = faker.internet.safeEmail()
         val username = faker.name.name()
-        val password = faker.worldOfWarcraft.hero()
+        val password = faker.crypto.md5()
         val signer by lazy { GlobalContext.get().get<Signer>() }
 
         register(mail, username, password)

@@ -41,7 +41,7 @@ class UsersLoginTest {
         val signer by lazy { GlobalContext.get().get<Signer>() }
         val username = faker.name.name()
         val mail = faker.internet.safeEmail()
-        val password = faker.worldOfWarcraft.hero()
+        val password = faker.crypto.md5()
 
         register(mail, username, password)
         val rawToken = signer { withClaim("email", mail) }
@@ -59,7 +59,7 @@ class UsersLoginTest {
         application { startUp() }
         val faker = faker {}
         val mail = faker.internet.safeEmail()
-        val password = faker.worldOfWarcraft.hero()
+        val password = faker.crypto.md5()
 
         val response = login(mail, password)
 
@@ -73,7 +73,7 @@ class UsersLoginTest {
         val signer by lazy { GlobalContext.get().get<Signer>() }
         val username = faker.name.name()
         val mail = faker.internet.safeEmail()
-        val password = faker.worldOfWarcraft.hero()
+        val password = faker.crypto.md5()
 
 
         register(mail, username, password)
