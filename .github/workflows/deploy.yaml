@@ -65,10 +65,10 @@ jobs:
     needs: push_to_registry
     env:
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        JWT_AUDIENCE: ${{ vars.JWT_AUDIENCE }}
-        JWT_ISSUER: ${{ vars.JWT_ISSUER }}
-        STMP_HOST: ${{ vars.STMP_HOST }}
-        STMP_PORT: ${{ vars.STMP_PORT }}
+        JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+        JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+        STMP_HOST: ${{ secrets.STMP_HOST }}
+        STMP_PORT: ${{ secrets.STMP_PORT }}
         STMP_USERNAME: ${{ secrets.STMP_USERNAME }}
         STMP_PASSWORD: ${{ secrets.STMP_PASSWORD }}
         MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
