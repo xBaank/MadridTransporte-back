@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Fix tests again">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Update compose">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/deploy.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/deploy.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -500,11 +499,17 @@
       <option name="project" value="LOCAL" />
       <updated>1686513534819</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="Update compose">
+      <created>1686514049251</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1686514049251</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Update version" />
     <MESSAGE value="Update" />
     <MESSAGE value="Modify nginx.conf" />
     <MESSAGE value="Add tests to stops time" />
@@ -529,7 +534,8 @@
     <MESSAGE value="Update nginx.conf" />
     <MESSAGE value="Add logging" />
     <MESSAGE value="Fix tests again" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix tests again" />
+    <MESSAGE value="Update compose" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update compose" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
