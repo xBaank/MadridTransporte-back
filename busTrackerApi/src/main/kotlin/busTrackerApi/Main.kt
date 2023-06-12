@@ -26,6 +26,7 @@ fun Application.startUp() {
         allowMethod(HttpMethod.Get)
         allowHeader(HttpHeaders.AccessControlAllowOrigin)
         allowHeader(HttpHeaders.ContentType)
+        allowCredentials = true
         anyHost()
     }
     configureDependencies()
