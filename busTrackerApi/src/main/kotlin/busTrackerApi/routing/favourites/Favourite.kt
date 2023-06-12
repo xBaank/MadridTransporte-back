@@ -8,7 +8,8 @@ data class Favourite(
     val _id: Id<Favourite> = newId(),
     val email: String,
     val stopType: String,
-    val stopId: String
+    val stopId: String,
+    val name: String
 )
 
 fun Favourite.toJson() = jObject {

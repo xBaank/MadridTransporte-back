@@ -22,6 +22,7 @@ fun Route.favoritesRouting() = authenticate("user") {
         val stopToSave = call.receiveText().deserialized()
         val stopType = stopToSave["stopType"].asString().getOrElse { return@post badRequest(it.message) }
         val stopId = stopToSave["stopId"].asString().getOrElse { return@post badRequest(it.message) }
+        val name = stopToSave["name"].asString().getOrElse { "Default" }
 
         val email =
             call.principal<JWTPrincipal>()?.get("email") ?: return@post badRequest("Missing email in token")
@@ -31,7 +32,8 @@ fun Route.favoritesRouting() = authenticate("user") {
             Favourite(
                 email = user.email,
                 stopType = stopType,
-                stopId = stopId
+                stopId = stopId,
+                name = name
             )
         )
 
