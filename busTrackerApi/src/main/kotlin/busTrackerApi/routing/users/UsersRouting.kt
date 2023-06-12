@@ -139,8 +139,6 @@ fun Route.authRouting() {
 
     put("/reset-password") {
         val token = call.request.queryParameters["token"] ?: return@put badRequest("Token not found")
-        val redirectFrontUrl =
-            call.request.queryParameters["redirectFrontUrl"] ?: return@put badRequest("Missing redirectUrl")
         val rawToken = Either.catch { verifier.verify(token) }.getOrElse { return@put unauthorized("Invalid token") }
         val email = rawToken.getClaim("email").asString() ?: return@put badRequest("Email not found")
 
@@ -154,7 +152,7 @@ fun Route.authRouting() {
         val user = userTyped.copy(password = Bcrypt.hashAsString(newPass, saltRounds))
         userRepo.getCollection<User>().updateOne(user)
 
-        call.respondRedirect(redirectFrontUrl)
+        call.respond(HttpStatusCode.OK)
     }
 }
 

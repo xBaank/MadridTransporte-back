@@ -38,7 +38,7 @@ suspend fun ApplicationTestBuilder.sendResetPassword(mail: String) =
     }
 
 suspend fun ApplicationTestBuilder.resetPassword(token: String, password: String) =
-    client.put("/v1/users/reset-password?token=$token&redirectFrontUrl=/ping") {
+    client.put("/v1/users/reset-password?token=$token") {
         contentType(ContentType.Application.Json)
         setBody(jObject {
             "password" += password

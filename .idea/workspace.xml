@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Change url redirection with reset pass">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Validate new password">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/Utils.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -245,13 +246,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1679857965691</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Poc">
-      <created>1681665665148</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1681665665148</updated>
     </task>
     <task id="LOCAL-00004" summary="Specify encoding">
       <created>1681666008041</created>
@@ -589,11 +583,17 @@
       <option name="project" value="LOCAL" />
       <updated>1686572893541</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="Validate new password">
+      <created>1686573287866</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1686573287866</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Cleanup" />
     <MESSAGE value="Redo" />
     <MESSAGE value="Add some auth" />
     <MESSAGE value="Add bcrypt dependency" />
@@ -618,7 +618,8 @@
     <MESSAGE value="Add redirect url to reset password endpoints" />
     <MESSAGE value="Add backUrl and redirect to endpoints sent in emails" />
     <MESSAGE value="Change url redirection with reset pass" />
-    <option name="LAST_COMMIT_MESSAGE" value="Change url redirection with reset pass" />
+    <MESSAGE value="Validate new password" />
+    <option name="LAST_COMMIT_MESSAGE" value="Validate new password" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

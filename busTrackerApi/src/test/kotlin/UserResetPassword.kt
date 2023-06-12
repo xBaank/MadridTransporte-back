@@ -61,7 +61,7 @@ class UserResetPassword {
         val response3 = login(mail, newPassword)
 
         response.status.shouldBe(HttpStatusCode.OK)
-        response2.status.shouldBe(HttpStatusCode.Found)
+        response2.status.shouldBe(HttpStatusCode.OK)
         response3.status.shouldBe(HttpStatusCode.OK)
         response3.bodyAsText().deserialized()["token"].asString().getOrElse { throw it }
     }
