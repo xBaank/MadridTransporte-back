@@ -7,6 +7,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -35,7 +36,7 @@ class FavouritesTest {
     }
 
     @Test
-    fun `should get favourites`() = testApplication {
+    fun `should get add and get favourites`() = testApplication {
         application { startUp() }
         val faker = faker {}
         val signer by lazy { GlobalContext.get().get<Signer>() }
@@ -49,29 +50,14 @@ class FavouritesTest {
         verify(token)
         val accessToken = login(mail, password).bodyAsText().deserialized()["token"].asString().getOrElse { throw it }
 
-        val favouritesResponse = getFavourites(accessToken)
-        favouritesResponse.status.shouldBe(HttpStatusCode.OK)
-        favouritesResponse.bodyAsText().deserialized().getOrElse { throw it }.shouldBeInstanceOf(JsonArray::class)
-    }
-
-    @Test
-    fun `should add favourites`() = testApplication {
-        application { startUp() }
-        val faker = faker {}
-        val signer by lazy { GlobalContext.get().get<Signer>() }
-        val username = faker.name.name()
-        val mail = faker.internet.safeEmail()
-        val password = faker.crypto.md5()
-
-        register(mail, username, password)
-        val rawToken = signer { withClaim("email", mail) }
-        val token = URLEncoder.encode(rawToken, "UTF-8")
-        verify(token)
-        val response = login(mail, password).bodyAsText()
-        val accessToken = response.deserialized()["token"].asString().getOrElse { throw it }
-
         val favouritesResponse = addFavourite(accessToken, "bus", "123")
+        val getFavouritesResponse = getFavourites(accessToken)
+
         favouritesResponse.status.shouldBe(HttpStatusCode.Created)
+        getFavouritesResponse.status.shouldBe(HttpStatusCode.OK)
+        getFavouritesResponse.bodyAsText().deserialized().getOrElse { throw it }.shouldBeInstanceOf(JsonArray::class)
+        getFavouritesResponse.bodyAsText().deserialized().getOrElse { throw it }[0]["stopId"].asString()
+            .getOrElse { throw it }.shouldBeEqualTo("123")
     }
 
     @Test
@@ -118,6 +104,7 @@ class FavouritesTest {
 
         favouritesResponse.status.shouldBe(HttpStatusCode.Created)
         byIdResponse.status.shouldBe(HttpStatusCode.OK)
+
     }
 
     @Test
