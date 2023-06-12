@@ -31,6 +31,7 @@ fun getTimes(id: String? = null): JsonNode? {
         jArray {
             array?.forEach {
                 addObject {
+                    "id" += it["idnumerica"].asNumber().getOrNull()
                     "nombre_estacion" += it["nombreest"].asString().getOrNull()
                     "linea" += it["linea"].asNumber().getOrNull()
                     "anden" += it["anden"].asNumber().getOrNull()
