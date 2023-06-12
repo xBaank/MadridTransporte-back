@@ -65,7 +65,7 @@ class UsersRegisterTest {
         val username = faker.name.name()
         val password = faker.crypto.md5()
 
-        val response = client.post("/v1/users/register") {
+        val response = client.post("/v1/users/register?backUrl=http://localhost:8080") {
             contentType(ContentType.Application.Json)
             setBody(jObject {
                 "email" += mail
@@ -76,6 +76,27 @@ class UsersRegisterTest {
 
         response.status.shouldBe(HttpStatusCode.BadRequest)
         response.bodyAsText().shouldBeEqualTo(errorObject("Missing redirectUrl"))
+    }
+
+    @Test
+    fun `should not register with missing backUrl`() = testApplication {
+        application { startUp() }
+        val faker = faker { }
+        val mail = faker.internet.safeEmail()
+        val username = faker.name.name()
+        val password = faker.crypto.md5()
+
+        val response = client.post("/v1/users/register?redirectUrl=http://localhost:8080") {
+            contentType(ContentType.Application.Json)
+            setBody(jObject {
+                "email" += mail
+                "username" += username
+                "password" += password
+            }.serialized())
+        }
+
+        response.status.shouldBe(HttpStatusCode.BadRequest)
+        response.bodyAsText().shouldBeEqualTo(errorObject("Missing backUrl"))
     }
 
     @Test

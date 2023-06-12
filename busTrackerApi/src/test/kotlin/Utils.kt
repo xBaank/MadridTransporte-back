@@ -1,12 +1,16 @@
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import simpleJson.jObject
 import simpleJson.serialized
+import java.net.URLEncoder
 
 
-suspend fun ApplicationTestBuilder.register(mail: String, username: String, password: String) =
-    client.post("/v1/users/register?redirectUrl=http://localhost:8080/v1/users/verify") {
+suspend fun ApplicationTestBuilder.register(mail: String, username: String, password: String): HttpResponse {
+    val redirectUrl = URLEncoder.encode("http://localhost:8080/v1/users/verify", "UTF-8")
+    val backUrl = URLEncoder.encode("http://localhost:8080", "UTF-8")
+    return client.post("/v1/users/register?redirectUrl=$redirectUrl&backUrl=$backUrl") {
         contentType(ContentType.Application.Json)
         setBody(jObject {
             "email" += mail
@@ -14,6 +18,7 @@ suspend fun ApplicationTestBuilder.register(mail: String, username: String, pass
             "password" += password
         }.serialized())
     }
+}
 
 suspend fun ApplicationTestBuilder.login(mail: String, password: String) =
     client.post("/v1/users/login") {
@@ -25,7 +30,7 @@ suspend fun ApplicationTestBuilder.login(mail: String, password: String) =
     }
 
 suspend fun ApplicationTestBuilder.sendResetPassword(mail: String) =
-    client.post("/v1/users/send-reset-password?redirectUrl=http://localhost:8080/v1/users/resetPassword&redirectFrontUrl=/ping") {
+    client.post("/v1/users/send-reset-password?backUrl=http://localhost:8080/v1/users/resetPassword&redirectUrl=/ping") {
         contentType(ContentType.Application.Json)
         setBody(jObject {
             "email" += mail
@@ -41,16 +46,16 @@ suspend fun ApplicationTestBuilder.resetPassword(token: String, password: String
     }
 
 suspend fun ApplicationTestBuilder.verify(token: String) =
-    client.get("/v1/users/verify?token=$token&redirectUrl=/ping")
+    client.get("/v1/users/verify?token=$token&redirectUrl=/ping&backUrl=http://localhost:8080")
 
 suspend fun ApplicationTestBuilder.getFavourites(token: String) =
     client.get("/v1/favorites") {
-        header("Authorization", "Bearer ${token}")
+        header("Authorization", "Bearer $token")
     }
 
 suspend fun ApplicationTestBuilder.addFavourite(token: String, stopType: String, stopId: String) =
     client.post("/v1/favorites") {
-        header("Authorization", "Bearer ${token}")
+        header("Authorization", "Bearer $token")
         contentType(ContentType.Application.Json)
         setBody(jObject {
             "stopType" += stopType

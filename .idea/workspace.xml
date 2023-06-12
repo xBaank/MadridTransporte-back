@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Improve tests and add coverage">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Add redirect url to reset password endpoints">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UserResetPassword.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UserResetPassword.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersRegisterTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersRegisterTest.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/Utils.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -35,6 +35,17 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="bus-tracker-back" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="bus-tracker-back" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="bus-tracker-back" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="verification" type="c8890929:TasksNode$1" />
               </path>
             </expand>
             <select />
@@ -128,7 +139,7 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="UserResetPassword.should reset password" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="UsersRegisterTest.should not register with missing redirect" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -141,7 +152,7 @@
           <list>
             <option value=":busTrackerApi:test" />
             <option value="--tests" />
-            <option value="&quot;UserResetPassword.should reset password&quot;" />
+            <option value="&quot;UsersRegisterTest.should not register with missing redirect&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -221,10 +232,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
-        <item itemvalue="Gradle.bus-tracker-back:busTrackerApi [koverHtmlReport]" />
-        <item itemvalue="Gradle.bus-tracker-back [clean]" />
+        <item itemvalue="Gradle.UsersRegisterTest.should not register with missing redirect" />
         <item itemvalue="Gradle.bus-tracker-back [koverHtmlReport]" />
-        <item itemvalue="Gradle.UserResetPassword.should reset password" />
+        <item itemvalue="Gradle.bus-tracker-back [clean]" />
+        <item itemvalue="Gradle.bus-tracker-back:busTrackerApi [koverHtmlReport]" />
       </list>
     </recent_temporary>
   </component>
@@ -573,11 +584,17 @@
       <option name="project" value="LOCAL" />
       <updated>1686567432140</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="Add redirect url to reset password endpoints">
+      <created>1686568043537</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1686568043537</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Change metro dto" />
     <MESSAGE value="If not number its null" />
     <MESSAGE value="Return proximos in array" />
     <MESSAGE value="Cleanup" />
@@ -602,7 +619,27 @@
     <MESSAGE value="Remove added header in nginx.conf" />
     <MESSAGE value="Added redirect to verify" />
     <MESSAGE value="Improve tests and add coverage" />
-    <option name="LAST_COMMIT_MESSAGE" value="Improve tests and add coverage" />
+    <MESSAGE value="Add redirect url to reset password endpoints" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add redirect url to reset password endpoints" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt</url>
+          <line>38</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt</url>
+          <line>37</line>
+          <properties>
+            <option name="lambda-ordinal" value="-1" />
+          </properties>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

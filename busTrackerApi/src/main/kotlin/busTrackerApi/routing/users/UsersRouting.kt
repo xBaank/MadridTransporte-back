@@ -35,6 +35,8 @@ fun Route.authRouting() {
 
     post("/register") {
         val user = call.receiveText().deserialized()
+        val backUrl = call.request.queryParameters["backUrl"]?.also { URLEncoder.encode(it, "utf-8") }
+            ?: return@post badRequest("Missing backUrl")
         val redirectUrl = call.request.queryParameters["redirectUrl"]?.also { URLEncoder.encode(it, "utf-8") }
             ?: return@post badRequest("Missing redirectUrl")
 
@@ -65,7 +67,7 @@ fun Route.authRouting() {
             .from("BusTracker", "noreply@bustracker.com")
             .to(userTyped.username, userTyped.email)
             .withSubject("Account Verification")
-            .withPlainText("Click here to verify your account: ${redirectUrl}/v1/users/verify?token=$token")
+            .withPlainText("Click here to verify your account: ${backUrl}/v1/users/verify?token=$token&redirectUrl=$redirectUrl")
             .buildEmail()
 
         CoroutineScope(Dispatchers.IO).launch { mailer.sendMail(email) }
@@ -75,7 +77,6 @@ fun Route.authRouting() {
 
     get("/verify") {
         val redirectUrl = call.request.queryParameters["redirectUrl"] ?: return@get badRequest("Missing redirectUrl")
-
         val rawToken = call.request.queryParameters["token"] ?: return@get badRequest("Token not found")
         val token = Either.catch { verifier.verify(rawToken) }.getOrElse { return@get unauthorized("Invalid token") }
         val email = token.getClaim("email").asString() ?: return@get badRequest("Email not found")
@@ -113,9 +114,9 @@ fun Route.authRouting() {
     post("/send-reset-password") {
         val user = call.receiveText().deserialized()
         val email = user["email"].asString().getOrElse { return@post badRequest(it.message) }
-        val backUrl = call.request.queryParameters["redirectUrl"]?.also { URLEncoder.encode(it, "utf-8") }
+        val backUrl = call.request.queryParameters["backUrl"]?.also { URLEncoder.encode(it, "utf-8") }
             ?: return@post badRequest("Missing redirectUrl")
-        val redirectFrontUrl = call.request.queryParameters["redirectFrontUrl"]?.also { URLEncoder.encode(it, "utf-8") }
+        val redirectUrl = call.request.queryParameters["redirectUrl"]?.also { URLEncoder.encode(it, "utf-8") }
             ?: return@post badRequest("Missing redirectFrontUrl")
 
         val userTyped =
@@ -129,7 +130,7 @@ fun Route.authRouting() {
             .from("BusTracker", "noreply@bustracker.com")
             .to(userTyped.username, userTyped.email)
             .withSubject("Reset Password")
-            .withPlainText("Click here to reset your password: ${backUrl}/v1/users/reset-password?token=$token&redirectFrontUrl=$redirectFrontUrl")
+            .withPlainText("Click here to reset your password: ${backUrl}/v1/users/reset-password?token=$token&redirectFrontUrl=$redirectUrl")
             .buildEmail()
 
         CoroutineScope(Dispatchers.IO).launch { mailer.sendMail(emailToSend) }
