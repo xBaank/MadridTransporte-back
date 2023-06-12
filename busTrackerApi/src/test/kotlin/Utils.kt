@@ -25,7 +25,7 @@ suspend fun ApplicationTestBuilder.login(mail: String, password: String) =
     }
 
 suspend fun ApplicationTestBuilder.sendResetPassword(mail: String) =
-    client.post("/v1/users/send-reset-password?redirectUrl=http://localhost:8080/v1/users/resetPassword") {
+    client.post("/v1/users/send-reset-password?redirectUrl=http://localhost:8080/v1/users/resetPassword&redirectFrontUrl=/ping") {
         contentType(ContentType.Application.Json)
         setBody(jObject {
             "email" += mail
@@ -33,7 +33,7 @@ suspend fun ApplicationTestBuilder.sendResetPassword(mail: String) =
     }
 
 suspend fun ApplicationTestBuilder.resetPassword(token: String, password: String) =
-    client.put("/v1/users/reset-password?token=$token") {
+    client.put("/v1/users/reset-password?token=$token&redirectFrontUrl=/ping") {
         contentType(ContentType.Application.Json)
         setBody(jObject {
             "password" += password

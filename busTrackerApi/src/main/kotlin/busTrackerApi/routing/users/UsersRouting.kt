@@ -113,8 +113,10 @@ fun Route.authRouting() {
     post("/send-reset-password") {
         val user = call.receiveText().deserialized()
         val email = user["email"].asString().getOrElse { return@post badRequest(it.message) }
-        val redirectUrl = call.request.queryParameters["redirectUrl"]?.also { URLEncoder.encode(it, "utf-8") }
+        val backUrl = call.request.queryParameters["redirectUrl"]?.also { URLEncoder.encode(it, "utf-8") }
             ?: return@post badRequest("Missing redirectUrl")
+        val redirectFrontUrl = call.request.queryParameters["redirectFrontUrl"]?.also { URLEncoder.encode(it, "utf-8") }
+            ?: return@post badRequest("Missing redirectFrontUrl")
 
         val userTyped =
             userRepo.getCollection<User>().findOne(User::email eq email) ?: return@post notFound("User not found")
@@ -127,7 +129,7 @@ fun Route.authRouting() {
             .from("BusTracker", "noreply@bustracker.com")
             .to(userTyped.username, userTyped.email)
             .withSubject("Reset Password")
-            .withPlainText("Click here to verify your account: ${redirectUrl}/v1/users/verify?token=$token")
+            .withPlainText("Click here to reset your password: ${backUrl}/v1/users/reset-password?token=$token&redirectFrontUrl=$redirectFrontUrl")
             .buildEmail()
 
         CoroutineScope(Dispatchers.IO).launch { mailer.sendMail(emailToSend) }
@@ -137,6 +139,8 @@ fun Route.authRouting() {
 
     put("/reset-password") {
         val token = call.request.queryParameters["token"] ?: return@put badRequest("Token not found")
+        val redirectFrontUrl =
+            call.request.queryParameters["redirectFrontUrl"] ?: return@put badRequest("Missing redirectUrl")
         val rawToken = Either.catch { verifier.verify(token) }.getOrElse { return@put unauthorized("Invalid token") }
         val email = rawToken.getClaim("email").asString() ?: return@put badRequest("Email not found")
 
@@ -149,7 +153,7 @@ fun Route.authRouting() {
         val user = userTyped.copy(password = Bcrypt.hashAsString(newPass, saltRounds))
         userRepo.getCollection<User>().updateOne(user)
 
-        call.respond(HttpStatusCode.OK)
+        call.respondRedirect(redirectFrontUrl)
     }
 }
 

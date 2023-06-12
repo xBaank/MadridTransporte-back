@@ -5,6 +5,9 @@ import busTrackerApi.startUp
 import io.github.serpro69.kfaker.faker
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.AfterEach
@@ -33,7 +36,14 @@ class UserResetPassword {
 
     @Test
     fun `should reset password then login`() = testApplication {
-        application { startUp() }
+        application {
+            startUp()
+            routing {
+                get("/ping") {
+                    call.respond(HttpStatusCode.OK)
+                }
+            }
+        }
         val faker = faker {}
         val signer by lazy { GlobalContext.get().get<Signer>() }
         val username = faker.name.name()
@@ -51,7 +61,7 @@ class UserResetPassword {
         val response3 = login(mail, newPassword)
 
         response.status.shouldBe(HttpStatusCode.OK)
-        response2.status.shouldBe(HttpStatusCode.OK)
+        response2.status.shouldBe(HttpStatusCode.Found)
         response3.status.shouldBe(HttpStatusCode.OK)
         response3.bodyAsText().deserialized()["token"].asString().getOrElse { throw it }
     }
