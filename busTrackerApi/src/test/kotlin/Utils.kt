@@ -30,7 +30,7 @@ suspend fun ApplicationTestBuilder.login(mail: String, password: String) =
     }
 
 suspend fun ApplicationTestBuilder.sendResetPassword(mail: String) =
-    client.post("/v1/users/send-reset-password?backUrl=http://localhost:8080/v1/users/resetPassword&redirectUrl=/ping") {
+    client.post("/v1/users/send-reset-password?redirectUrl=/ping") {
         contentType(ContentType.Application.Json)
         setBody(jObject {
             "email" += mail
