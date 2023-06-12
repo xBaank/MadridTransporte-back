@@ -35,7 +35,7 @@ class FavouritesTest {
     }
 
     @Test
-    fun `test get favourites`() = testApplication {
+    fun `should get favourites`() = testApplication {
         application { startUp() }
         val faker = faker {}
         val signer by lazy { GlobalContext.get().get<Signer>() }
@@ -55,7 +55,7 @@ class FavouritesTest {
     }
 
     @Test
-    fun `test add favourites`() = testApplication {
+    fun `should add favourites`() = testApplication {
         application { startUp() }
         val faker = faker {}
         val signer by lazy { GlobalContext.get().get<Signer>() }
@@ -72,5 +72,13 @@ class FavouritesTest {
 
         val favouritesResponse = addFavourite(accessToken, "bus", "123")
         favouritesResponse.status.shouldBe(HttpStatusCode.Created)
+    }
+
+    @Test
+    fun `should not add favourites`() = testApplication {
+        application { startUp() }
+
+        val favouritesResponse = addFavourite("asd", "bus", "123")
+        favouritesResponse.status.shouldBe(HttpStatusCode.Unauthorized)
     }
 }
