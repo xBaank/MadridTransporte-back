@@ -75,6 +75,52 @@ class FavouritesTest {
     }
 
     @Test
+    fun `should add and delete`() = testApplication {
+        application { startUp() }
+        val faker = faker {}
+        val signer by lazy { GlobalContext.get().get<Signer>() }
+        val username = faker.name.name()
+        val mail = faker.internet.safeEmail()
+        val password = faker.crypto.md5()
+
+        register(mail, username, password)
+        val rawToken = signer { withClaim("email", mail) }
+        val token = URLEncoder.encode(rawToken, "UTF-8")
+        verify(token)
+        val response = login(mail, password).bodyAsText()
+        val accessToken = response.deserialized()["token"].asString().getOrElse { throw it }
+
+        val favouritesResponse = addFavourite(accessToken, "bus", "123")
+        val deletedResponse = deleteFavourite(accessToken, "123")
+
+        favouritesResponse.status.shouldBe(HttpStatusCode.Created)
+        deletedResponse.status.shouldBe(HttpStatusCode.NoContent)
+    }
+
+    @Test
+    fun `should add and getById`() = testApplication {
+        application { startUp() }
+        val faker = faker {}
+        val signer by lazy { GlobalContext.get().get<Signer>() }
+        val username = faker.name.name()
+        val mail = faker.internet.safeEmail()
+        val password = faker.crypto.md5()
+
+        register(mail, username, password)
+        val rawToken = signer { withClaim("email", mail) }
+        val token = URLEncoder.encode(rawToken, "UTF-8")
+        verify(token)
+        val response = login(mail, password).bodyAsText()
+        val accessToken = response.deserialized()["token"].asString().getOrElse { throw it }
+
+        val favouritesResponse = addFavourite(accessToken, "bus", "123")
+        val byIdResponse = getFavourite(accessToken, "123")
+
+        favouritesResponse.status.shouldBe(HttpStatusCode.Created)
+        byIdResponse.status.shouldBe(HttpStatusCode.OK)
+    }
+
+    @Test
     fun `should not add favourites`() = testApplication {
         application { startUp() }
 

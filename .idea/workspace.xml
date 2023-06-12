@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Add unauthorized test">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Allow credentials">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/Main.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/FavouritesRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/FavouritesRouting.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/FavouritesTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/FavouritesTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/Utils.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -245,13 +247,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1679857965691</updated>
-    </task>
-    <task id="LOCAL-00007" summary="Add last updated time">
-      <created>1681833061252</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1681833061252</updated>
     </task>
     <task id="LOCAL-00008" summary="Use global scope for blocking code">
       <created>1681833155533</created>
@@ -589,11 +584,17 @@
       <option name="project" value="LOCAL" />
       <updated>1686580503415</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="Allow credentials">
+      <created>1686586676110</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1686586676110</updated>
+    </task>
+    <option name="localTasksCounter" value="57" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Some auth" />
     <MESSAGE value="Added favourites endpoints" />
     <MESSAGE value="Some cleanup" />
     <MESSAGE value="Added a bunch of tests" />
@@ -618,7 +619,8 @@
     <MESSAGE value="Remove redirect url" />
     <MESSAGE value="Allow methods" />
     <MESSAGE value="Add unauthorized test" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add unauthorized test" />
+    <MESSAGE value="Allow credentials" />
+    <option name="LAST_COMMIT_MESSAGE" value="Allow credentials" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

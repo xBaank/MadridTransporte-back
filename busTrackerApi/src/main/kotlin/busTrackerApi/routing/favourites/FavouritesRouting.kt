@@ -46,5 +46,26 @@ fun Route.favoritesRouting() = authenticate("user") {
         val respondObject = favourites.map(Favourite::toJson).asJson()
         call.respondText(respondObject.serialized(), ContentType.Application.Json)
     }
+
+    get("/{id}") {
+        val id = call.parameters["id"] ?: return@get badRequest("Missing id")
+        val email =
+            call.principal<JWTPrincipal>()?.get("email") ?: return@get badRequest("Missing email in token")
+        db.getCollection<User>().findOne(User::email eq email) ?: return@get badRequest("Email not found")
+        val favourite =
+            db.getCollection<Favourite>().findOne(Favourite::stopId eq id)
+                ?: return@get badRequest("Favourite not found")
+        val respondObject = favourite.toJson().asJson()
+        call.respondText(respondObject.serialized(), ContentType.Application.Json)
+    }
+
+    delete("/{id}") {
+        val id = call.parameters["id"] ?: return@delete badRequest("Missing id")
+        val email =
+            call.principal<JWTPrincipal>()?.get("email") ?: return@delete badRequest("Missing email in token")
+        db.getCollection<User>().findOne(User::email eq email) ?: return@delete badRequest("Email not found")
+        db.getCollection<Favourite>().deleteOne(Favourite::stopId eq id)
+        call.respond(HttpStatusCode.NoContent)
+    }
 }
 

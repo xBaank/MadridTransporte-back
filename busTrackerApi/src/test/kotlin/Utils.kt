@@ -63,6 +63,16 @@ suspend fun ApplicationTestBuilder.addFavourite(token: String, stopType: String,
         }.serialized())
     }
 
+suspend fun ApplicationTestBuilder.deleteFavourite(token: String, stopId: String) =
+    client.delete("/v1/favorites/$stopId") {
+        header("Authorization", "Bearer $token")
+    }
+
+suspend fun ApplicationTestBuilder.getFavourite(token: String, stopId: String) =
+    client.get("/v1/favorites/$stopId") {
+        header("Authorization", "Bearer $token")
+    }
+
 fun initEnv() {
     //Even if it not used
     System.setProperty("MONGO_CONNECTION_STRING", "")
