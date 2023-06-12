@@ -32,13 +32,14 @@ class UserResetPassword {
     }
 
     @Test
-    fun `should reset password`() = testApplication {
+    fun `should reset password then login`() = testApplication {
         application { startUp() }
         val faker = faker {}
         val signer by lazy { GlobalContext.get().get<Signer>() }
         val username = faker.name.name()
         val mail = faker.internet.safeEmail()
         val password = faker.crypto.md5()
+        val newPassword = faker.crypto.md5()
 
         register(mail, username, password)
         val rawToken = signer { withClaim("email", mail) }
@@ -46,9 +47,12 @@ class UserResetPassword {
         verify(token)
         val accessToken = login(mail, password).bodyAsText().deserialized()["token"].asString().getOrElse { throw it }
         val response = sendResetPassword(mail)
-        val response2 = resetPassword(accessToken, password)
+        val response2 = resetPassword(accessToken, newPassword)
+        val response3 = login(mail, newPassword)
 
         response.status.shouldBe(HttpStatusCode.OK)
         response2.status.shouldBe(HttpStatusCode.OK)
+        response3.status.shouldBe(HttpStatusCode.OK)
+        response3.bodyAsText().deserialized()["token"].asString().getOrElse { throw it }
     }
 }
