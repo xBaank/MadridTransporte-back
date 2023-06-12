@@ -100,8 +100,8 @@ fun Route.authRouting() {
         val userTyped =
             userRepo.getCollection<User>().findOne(User::email eq email) ?: return@post notFound("User not found")
 
-        if (!Bcrypt.verifyHash(password, userTyped.password)) unauthorized("Wrong password")
         if (!userTyped.verified) badRequest("User not verified")
+        if (!Bcrypt.verifyHash(password, userTyped.password)) unauthorized("Wrong password")
 
         val rawToken = signer { withClaim("email", userTyped.email) }
 
