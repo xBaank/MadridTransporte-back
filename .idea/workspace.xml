@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Add backUrl and redirect to endpoints sent in emails">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Change url redirection with reset pass">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/Extensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/Extensions.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -246,13 +245,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1679857965691</updated>
-    </task>
-    <task id="LOCAL-00002" summary="Simplify dtos">
-      <created>1680281538132</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1680281538132</updated>
     </task>
     <task id="LOCAL-00003" summary="Poc">
       <created>1681665665148</created>
@@ -590,11 +582,17 @@
       <option name="project" value="LOCAL" />
       <updated>1686569682150</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="Change url redirection with reset pass">
+      <created>1686572893541</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1686572893541</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Return proximos in array" />
     <MESSAGE value="Cleanup" />
     <MESSAGE value="Redo" />
     <MESSAGE value="Add some auth" />
@@ -619,7 +617,8 @@
     <MESSAGE value="Improve tests and add coverage" />
     <MESSAGE value="Add redirect url to reset password endpoints" />
     <MESSAGE value="Add backUrl and redirect to endpoints sent in emails" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add backUrl and redirect to endpoints sent in emails" />
+    <MESSAGE value="Change url redirection with reset pass" />
+    <option name="LAST_COMMIT_MESSAGE" value="Change url redirection with reset pass" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

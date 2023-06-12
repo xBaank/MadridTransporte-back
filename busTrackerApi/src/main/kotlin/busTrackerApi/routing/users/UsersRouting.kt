@@ -145,7 +145,8 @@ fun Route.authRouting() {
         val email = rawToken.getClaim("email").asString() ?: return@put badRequest("Email not found")
 
         val newPass =
-            call.receiveText().deserialized()["password"].asString().getOrElse { return@put badRequest(it.message) }
+            call.receiveText().deserialized()["password"].asString().validatePassword()
+                .getOrElse { return@put badRequest(it.message) }
 
         val userTyped =
             userRepo.getCollection<User>().findOne(User::email eq email) ?: return@put notFound("User not found")
