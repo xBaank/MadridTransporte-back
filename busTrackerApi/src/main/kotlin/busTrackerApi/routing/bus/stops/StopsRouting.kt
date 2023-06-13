@@ -16,7 +16,7 @@ import simpleJson.serialized
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
-val stopTimesCache = Cache.Builder().expireAfterWrite(6.hours).build<String, TimedCachedValue<JsonNode>>()
+val stopTimesCache = Cache.Builder().expireAfterWrite(24.hours).build<String, TimedCachedValue<JsonNode>>()
 
 fun Route.stopsRouting() = route("/stops") {
     get("/{stopCode}/times") {
@@ -27,8 +27,7 @@ fun Route.stopsRouting() = route("/stops") {
                 val stopTimes = CoroutineScope(Dispatchers.IO).async { getStopTimes(stopCode, codMode) }.await()
                 stopTimes?.stopTimes?.times?.shortTime?.map(::buildStopTimesJson)?.asJson()?.timed()
             } ?: stopTimesCache.get(stopCode)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             if (e is TimeoutCancellationException) stopTimesCache.get(stopCode)
             else null
         } ?: return@get call.respond(HttpStatusCode.BadRequest)

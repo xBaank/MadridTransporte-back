@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Add name to favorite">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Add name to mapped json">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/Favourite.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/Favourite.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -245,13 +244,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1679857965691</updated>
-    </task>
-    <task id="LOCAL-00014" summary="Update Version">
-      <created>1683218336673</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1683218336673</updated>
     </task>
     <task id="LOCAL-00015" summary="Update version">
       <created>1683219020362</created>
@@ -589,11 +581,17 @@
       <option name="project" value="LOCAL" />
       <updated>1686608779190</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="Add name to mapped json">
+      <created>1686653748378</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1686653748379</updated>
+    </task>
+    <option name="localTasksCounter" value="64" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Validations" />
     <MESSAGE value="Fix tests" />
     <MESSAGE value="Update nginx.conf" />
     <MESSAGE value="Add logging" />
@@ -618,7 +616,8 @@
     <MESSAGE value="Add id to endpoint" />
     <MESSAGE value="Cleanup" />
     <MESSAGE value="Add name to favorite" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add name to favorite" />
+    <MESSAGE value="Add name to mapped json" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add name to mapped json" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
