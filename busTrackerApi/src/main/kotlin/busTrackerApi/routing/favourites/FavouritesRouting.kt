@@ -2,6 +2,7 @@ package busTrackerApi.routing.favourites
 
 import arrow.core.getOrElse
 import busTrackerApi.badRequest
+import busTrackerApi.notFound
 import busTrackerApi.routing.users.User
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -53,10 +54,9 @@ fun Route.favoritesRouting() = authenticate("user") {
         val id = call.parameters["id"] ?: return@get badRequest("Missing id")
         val email =
             call.principal<JWTPrincipal>()?.get("email") ?: return@get badRequest("Missing email in token")
-        db.getCollection<User>().findOne(User::email eq email) ?: return@get badRequest("Email not found")
-
+        db.getCollection<User>().findOne(User::email eq email) ?: return@get notFound("Email not found")
         val favourite = db.getCollection<Favourite>().findOne(Favourite::stopId eq id, Favourite::email eq email)
-            ?: return@get badRequest("Favourite not found")
+            ?: return@get notFound("Favourite not found")
 
         val respondObject = favourite.toJson().asJson()
         call.respondText(respondObject.serialized(), ContentType.Application.Json)
@@ -66,8 +66,7 @@ fun Route.favoritesRouting() = authenticate("user") {
         val id = call.parameters["id"] ?: return@delete badRequest("Missing id")
         val email =
             call.principal<JWTPrincipal>()?.get("email") ?: return@delete badRequest("Missing email in token")
-        db.getCollection<User>().findOne(User::email eq email) ?: return@delete badRequest("Email not found")
-        db.getCollection<Favourite>().deleteOne(Favourite::stopId eq id)
+        db.getCollection<Favourite>().deleteOne(Favourite::stopId eq id, Favourite::email eq email)
         call.respond(HttpStatusCode.NoContent)
     }
 }
