@@ -15,5 +15,6 @@ data class Favourite(
 fun Favourite.toJson() = jObject {
     "stopType" += stopType
     "stopId" += stopId
+    "name" += name
     "email" += email
 }
