@@ -1,7 +1,6 @@
 import MongoContainer.mongoDBContainer
 import busTrackerApi.config.Signer
 import busTrackerApi.startUp
-import io.github.serpro69.kfaker.faker
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -40,10 +39,7 @@ class UsersVerifyTest {
                 }
             }
         }
-        val faker = faker {}
-        val mail = faker.internet.safeEmail()
-        val username = faker.name.name()
-        val password = faker.crypto.md5()
+        val (mail, username, password) = getFakerUserData()
         val signer by lazy { GlobalContext.get().get<Signer>() }
 
         register(mail, username, password)

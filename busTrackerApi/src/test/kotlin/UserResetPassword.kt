@@ -2,7 +2,6 @@ import MongoContainer.mongoDBContainer
 import arrow.core.getOrElse
 import busTrackerApi.config.Signer
 import busTrackerApi.startUp
-import io.github.serpro69.kfaker.faker
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -44,12 +43,11 @@ class UserResetPassword {
                 }
             }
         }
-        val faker = faker {}
+
         val signer by lazy { GlobalContext.get().get<Signer>() }
-        val username = faker.name.name()
-        val mail = faker.internet.safeEmail()
-        val password = faker.crypto.md5()
-        val newPassword = faker.crypto.md5()
+        val (mail, username, password) = getFakerUserData()
+        val newPassword = "newPassword"
+
 
         register(mail, username, password)
         val rawToken = signer { withClaim("email", mail) }

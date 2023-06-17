@@ -1,3 +1,4 @@
+import io.github.serpro69.kfaker.faker
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -72,3 +73,11 @@ suspend fun ApplicationTestBuilder.getFavourite(token: String, stopId: String) =
     client.get("/v1/favorites/$stopId") {
         header("Authorization", "Bearer $token")
     }
+
+fun getFakerUserData(): Triple<String, String, String> {
+    val faker = faker { }
+    val mail = faker.internet.safeEmail()
+    val username = faker.name.name()
+    val password = faker.crypto.md5()
+    return Triple(mail, username, password)
+}

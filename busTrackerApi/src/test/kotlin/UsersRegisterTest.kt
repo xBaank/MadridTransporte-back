@@ -34,10 +34,7 @@ class UsersRegisterTest {
     @Test
     fun `should register`() = testApplication {
         application { startUp() }
-        val faker = faker {}
-        val mail = faker.internet.safeEmail()
-        val username = faker.name.name()
-        val password = faker.crypto.md5()
+        val (mail, username, password) = getFakerUserData()
 
         val response = register(mail, username, password)
 
@@ -47,9 +44,7 @@ class UsersRegisterTest {
     @Test
     fun `should not register`() = testApplication {
         application { startUp() }
-        val faker = faker {}
-        val username = faker.name.name()
-        val password = faker.crypto.md5()
+        val (_, username, password) = getFakerUserData()
 
         val response = register("", username, password)
 
@@ -60,10 +55,7 @@ class UsersRegisterTest {
     @Test
     fun `should not register with missing redirect`() = testApplication {
         application { startUp() }
-        val faker = faker { }
-        val mail = faker.internet.safeEmail()
-        val username = faker.name.name()
-        val password = faker.crypto.md5()
+        val (mail, username, password) = getFakerUserData()
 
         val response = client.post("/v1/users/register?backUrl=http://localhost:8080") {
             contentType(ContentType.Application.Json)
@@ -81,10 +73,7 @@ class UsersRegisterTest {
     @Test
     fun `should not register with missing backUrl`() = testApplication {
         application { startUp() }
-        val faker = faker { }
-        val mail = faker.internet.safeEmail()
-        val username = faker.name.name()
-        val password = faker.crypto.md5()
+        val (mail, username, password) = getFakerUserData()
 
         val response = client.post("/v1/users/register?redirectUrl=http://localhost:8080") {
             contentType(ContentType.Application.Json)

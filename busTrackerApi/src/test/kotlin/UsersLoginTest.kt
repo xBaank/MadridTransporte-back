@@ -2,7 +2,6 @@ import MongoContainer.mongoDBContainer
 import arrow.core.getOrElse
 import busTrackerApi.config.Signer
 import busTrackerApi.startUp
-import io.github.serpro69.kfaker.faker
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
@@ -37,11 +36,8 @@ class UsersLoginTest {
     @Test
     fun `should register then verify then login`() = testApplication {
         application { startUp() }
-        val faker = faker {}
+        val (mail, username, password) = getFakerUserData()
         val signer by lazy { GlobalContext.get().get<Signer>() }
-        val username = faker.name.name()
-        val mail = faker.internet.safeEmail()
-        val password = faker.crypto.md5()
 
         register(mail, username, password)
         val rawToken = signer { withClaim("email", mail) }
@@ -57,9 +53,7 @@ class UsersLoginTest {
     @Test
     fun `should not login with not found username`() = testApplication {
         application { startUp() }
-        val faker = faker {}
-        val mail = faker.internet.safeEmail()
-        val password = faker.crypto.md5()
+        val (mail, _, password) = getFakerUserData()
 
         val response = login(mail, password)
 
@@ -69,12 +63,8 @@ class UsersLoginTest {
     @Test
     fun `should not login with incorrect credentials`() = testApplication {
         application { startUp() }
-        val faker = faker {}
+        val (mail, username, password) = getFakerUserData()
         val signer by lazy { GlobalContext.get().get<Signer>() }
-        val username = faker.name.name()
-        val mail = faker.internet.safeEmail()
-        val password = faker.crypto.md5()
-
 
         register(mail, username, password)
         val rawToken = signer { withClaim("email", mail) }
