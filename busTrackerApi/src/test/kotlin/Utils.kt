@@ -72,9 +72,3 @@ suspend fun ApplicationTestBuilder.getFavourite(token: String, stopId: String) =
     client.get("/v1/favorites/$stopId") {
         header("Authorization", "Bearer $token")
     }
-
-fun initEnv() {
-    //Even if it not used
-    System.setProperty("MONGO_CONNECTION_STRING", "")
-    System.setProperty("MONGO_DATABASE_NAME", "")
-}

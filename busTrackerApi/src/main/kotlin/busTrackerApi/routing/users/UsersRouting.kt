@@ -1,6 +1,7 @@
 package busTrackerApi.routing.users
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.getOrElse
 import busTrackerApi.*
 import busTrackerApi.config.Signer
 import busTrackerApi.config.saltRounds
@@ -25,7 +26,6 @@ import simpleJson.deserialized
 import simpleJson.get
 import java.net.URLEncoder
 
-const val mailValidation = """^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$"""
 
 fun Route.authRouting() {
     val userRepo by inject<CoroutineDatabase>()
@@ -157,15 +157,3 @@ fun Route.authRouting() {
 }
 
 
-fun Either<Exception, String>.validateMail(): Either<Exception, String> = flatMap {
-    if (!it.matches(mailValidation.toRegex()))
-        Exception("Invalid mail").left() else this
-}
-
-fun Either<Exception, String>.validateUsername(): Either<Exception, String> = flatMap {
-    if (it.length < 3) Exception("Username too short").left() else it.right()
-}
-
-fun Either<Exception, String>.validatePassword(): Either<Exception, String> = flatMap {
-    if (it.length < 8) Exception("Password too short").left() else it.right()
-}
