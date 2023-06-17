@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="More fixes">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Cleanup">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/User.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/User.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/Stops.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/Stops.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/StopsRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/StopsRouting.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -246,13 +247,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1679857965691</updated>
-    </task>
-    <task id="LOCAL-00017" summary="Update version">
-      <created>1683223787109</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1683223787111</updated>
     </task>
     <task id="LOCAL-00018" summary="Update">
       <created>1683738464842</created>
@@ -590,7 +584,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686690301727</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="Cleanup">
+      <created>1687000665850</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1687000665851</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -614,12 +615,12 @@
     <MESSAGE value="Allow auth" />
     <MESSAGE value="Update tests" />
     <MESSAGE value="Add id to endpoint" />
-    <MESSAGE value="Cleanup" />
     <MESSAGE value="Add name to favorite" />
     <MESSAGE value="Add name to mapped json" />
     <MESSAGE value="Fix favorites by id" />
     <MESSAGE value="More fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="More fixes" />
+    <MESSAGE value="Cleanup" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleanup" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

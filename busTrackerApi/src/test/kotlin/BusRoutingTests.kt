@@ -71,6 +71,6 @@ class StopsRoutingTests {
     fun should_not_get_stop_times() = testApplication {
         application { startUp() }
         val response = client.get("/v1/bus/stops/aasdsad/times")
-        response.status shouldBeEqualTo HttpStatusCode.BadRequest
+        response.status shouldBeEqualTo HttpStatusCode.NotFound
     }
 }
