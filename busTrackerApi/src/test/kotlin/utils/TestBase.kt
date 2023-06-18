@@ -12,7 +12,6 @@ interface TestBase {
         KMongo.createClient(mongoDBContainer.connectionString).getDatabase("test").drop()
         System.setProperty("MONGO_CONNECTION_STRING", mongoDBContainer.connectionString)
         System.setProperty("MONGO_DATABASE_NAME", "test")
-        //drop
     }
 
     @AfterEach()
