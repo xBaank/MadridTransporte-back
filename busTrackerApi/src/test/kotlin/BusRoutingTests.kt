@@ -1,4 +1,4 @@
-import MongoContainer.mongoDBContainer
+import Utils.TestBase
 import arrow.core.getOrElse
 import busTrackerApi.startUp
 import io.ktor.client.request.*
@@ -8,11 +8,7 @@ import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.koin.core.context.GlobalContext
-import org.litote.kmongo.reactivestreams.KMongo
 import simpleJson.JsonArray
 import simpleJson.JsonObject
 import simpleJson.deserialized
@@ -20,20 +16,7 @@ import simpleJson.get
 
 const val busStopCode = "08242"
 
-class StopsRoutingTests {
-
-    @BeforeEach
-    fun setUp() {
-        KMongo.createClient(mongoDBContainer.connectionString).getDatabase("test").drop()
-        System.setProperty("MONGO_CONNECTION_STRING", mongoDBContainer.connectionString)
-        System.setProperty("MONGO_DATABASE_NAME", "test")
-        //drop
-    }
-
-    @AfterEach()
-    fun tearDown() {
-        GlobalContext.stopKoin()
-    }
+class StopsRoutingTests : TestBase {
 
     @Test
     fun should_get_stop_times() = testApplication {

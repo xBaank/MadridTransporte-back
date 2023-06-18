@@ -1,4 +1,4 @@
-import MongoContainer.mongoDBContainer
+import Utils.*
 import arrow.core.getOrElse
 import busTrackerApi.config.Signer
 import busTrackerApi.startUp
@@ -8,31 +8,15 @@ import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.koin.core.context.GlobalContext
-import org.litote.kmongo.reactivestreams.KMongo
 import simpleJson.JsonArray
 import simpleJson.asString
 import simpleJson.deserialized
 import simpleJson.get
 import java.net.URLEncoder
 
-class FavouritesTest {
-
-    @BeforeEach
-    fun setUp() {
-        KMongo.createClient(mongoDBContainer.connectionString).getDatabase("test").drop()
-        System.setProperty("MONGO_CONNECTION_STRING", mongoDBContainer.connectionString)
-        System.setProperty("MONGO_DATABASE_NAME", "test")
-        //drop
-    }
-
-    @AfterEach()
-    fun tearDown() {
-        GlobalContext.stopKoin()
-    }
+class FavouritesTest : TestBase {
 
     @Test
     fun `should get add and get favourites`() = testApplication {

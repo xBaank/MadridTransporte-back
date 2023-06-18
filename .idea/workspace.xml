@@ -4,14 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="More cleanup">
-      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/EmailTemplate.kt" afterDir="false" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Improve email styling with kotlinx-html">
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/TestBase.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/Cache.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/Cache.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/Stops.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/Stops.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/FavouritesTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/FavouritesTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/MetroRoutingTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/MetroRoutingTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UserResetPassword.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UserResetPassword.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersLoginTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersLoginTest.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersRegisterTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersRegisterTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersVerifyTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersVerifyTest.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,8 +62,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Kotlin Class" />
         <option value="Kotlin File" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
@@ -256,13 +258,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1679857965691</updated>
-    </task>
-    <task id="LOCAL-00021" summary="Use different Coroutines scopes for diferent requests">
-      <created>1684421258337</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1684421258337</updated>
     </task>
     <task id="LOCAL-00022" summary="Properly close resources">
       <created>1684422490207</created>
@@ -600,11 +595,17 @@
       <option name="project" value="LOCAL" />
       <updated>1687123698046</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <task id="LOCAL-00070" summary="Improve email styling with kotlinx-html">
+      <created>1687127921036</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1687127921036</updated>
+    </task>
+    <option name="localTasksCounter" value="71" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Update compose" />
     <MESSAGE value="Update deploy.yaml" />
     <MESSAGE value="Remove auth on mongo" />
     <MESSAGE value="Remove added header in nginx.conf" />
@@ -629,7 +630,8 @@
     <MESSAGE value="Cleanup" />
     <MESSAGE value="Cleanup tests" />
     <MESSAGE value="More cleanup" />
-    <option name="LAST_COMMIT_MESSAGE" value="More cleanup" />
+    <MESSAGE value="Improve email styling with kotlinx-html" />
+    <option name="LAST_COMMIT_MESSAGE" value="Improve email styling with kotlinx-html" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

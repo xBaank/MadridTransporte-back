@@ -1,4 +1,4 @@
-import MongoContainer.mongoDBContainer
+import Utils.*
 import arrow.core.getOrElse
 import busTrackerApi.config.Signer
 import busTrackerApi.startUp
@@ -9,29 +9,14 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.koin.core.context.GlobalContext
-import org.litote.kmongo.reactivestreams.KMongo
 import simpleJson.asString
 import simpleJson.deserialized
 import simpleJson.get
 import java.net.URLEncoder
 
-class UserResetPassword {
-    @BeforeEach
-    fun setUp() {
-        KMongo.createClient(mongoDBContainer.connectionString).getDatabase("test").drop()
-        System.setProperty("MONGO_CONNECTION_STRING", mongoDBContainer.connectionString)
-        System.setProperty("MONGO_DATABASE_NAME", "test")
-        //drop
-    }
-
-    @AfterEach()
-    fun tearDown() {
-        GlobalContext.stopKoin()
-    }
+class UserResetPassword : TestBase {
 
     @Test
     fun `should reset password then login`() = testApplication {

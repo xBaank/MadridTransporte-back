@@ -1,4 +1,4 @@
-import MongoContainer.mongoDBContainer
+import Utils.*
 import arrow.core.getOrElse
 import busTrackerApi.config.Signer
 import busTrackerApi.startUp
@@ -7,31 +7,14 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.koin.core.context.GlobalContext
-import org.koin.core.context.GlobalContext.stopKoin
-import org.litote.kmongo.reactivestreams.KMongo
 import simpleJson.JsonObject
 import simpleJson.deserialized
 import java.net.URLEncoder
 
 
-class UsersLoginTest {
-
-    @BeforeEach
-    fun setUp() {
-        KMongo.createClient(mongoDBContainer.connectionString).getDatabase("test").drop()
-        System.setProperty("MONGO_CONNECTION_STRING", mongoDBContainer.connectionString)
-        System.setProperty("MONGO_DATABASE_NAME", "test")
-        //drop
-    }
-
-    @AfterEach()
-    fun tearDown() {
-        stopKoin()
-    }
+class UsersLoginTest : TestBase {
 
     @Test
     fun `should register then verify then login`() = testApplication {

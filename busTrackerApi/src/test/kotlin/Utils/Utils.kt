@@ -1,3 +1,5 @@
+package Utils
+
 import io.github.serpro69.kfaker.faker
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

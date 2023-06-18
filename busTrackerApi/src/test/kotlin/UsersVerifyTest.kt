@@ -1,4 +1,7 @@
-import MongoContainer.mongoDBContainer
+import Utils.TestBase
+import Utils.getFakerUserData
+import Utils.register
+import Utils.verify
 import busTrackerApi.config.Signer
 import busTrackerApi.startUp
 import io.ktor.http.*
@@ -7,27 +10,11 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.koin.core.context.GlobalContext
-import org.koin.core.context.GlobalContext.stopKoin
-import org.litote.kmongo.reactivestreams.KMongo
 import java.net.URLEncoder
 
-class UsersVerifyTest {
-    @BeforeEach
-    fun setUp() {
-        KMongo.createClient(mongoDBContainer.connectionString).getDatabase("test").drop()
-        System.setProperty("MONGO_CONNECTION_STRING", mongoDBContainer.connectionString)
-        System.setProperty("MONGO_DATABASE_NAME", "test")
-        //drop
-    }
-
-    @AfterEach()
-    fun tearDown() {
-        stopKoin()
-    }
+class UsersVerifyTest : TestBase {
 
     @Test
     fun `should register then verify`() = testApplication {

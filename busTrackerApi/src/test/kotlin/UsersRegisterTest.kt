@@ -1,4 +1,6 @@
-import MongoContainer.mongoDBContainer
+import Utils.TestBase
+import Utils.getFakerUserData
+import Utils.register
 import busTrackerApi.errorObject
 import busTrackerApi.startUp
 import io.github.serpro69.kfaker.faker
@@ -8,28 +10,11 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.koin.core.context.GlobalContext.stopKoin
-import org.litote.kmongo.reactivestreams.KMongo
 import simpleJson.jObject
 import simpleJson.serialized
 
-class UsersRegisterTest {
-
-    @BeforeEach
-    fun setUp() {
-        KMongo.createClient(mongoDBContainer.connectionString).getDatabase("test").drop()
-        System.setProperty("MONGO_CONNECTION_STRING", mongoDBContainer.connectionString)
-        System.setProperty("MONGO_DATABASE_NAME", "test")
-        //drop
-    }
-
-    @AfterEach()
-    fun tearDown() {
-        stopKoin()
-    }
+class UsersRegisterTest : TestBase {
 
     @Test
     fun `should register`() = testApplication {
