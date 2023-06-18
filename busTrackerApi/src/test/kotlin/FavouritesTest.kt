@@ -2,7 +2,6 @@ import MongoContainer.mongoDBContainer
 import arrow.core.getOrElse
 import busTrackerApi.config.Signer
 import busTrackerApi.startUp
-import io.github.serpro69.kfaker.faker
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
@@ -38,11 +37,9 @@ class FavouritesTest {
     @Test
     fun `should get add and get favourites`() = testApplication {
         application { startUp() }
-        val faker = faker {}
         val signer by lazy { GlobalContext.get().get<Signer>() }
-        val username = faker.name.name()
-        val mail = faker.internet.safeEmail()
-        val password = faker.crypto.md5()
+        val (mail, username, password) = getFakerUserData()
+
 
         register(mail, username, password)
         val rawToken = signer { withClaim("email", mail) }
@@ -63,11 +60,9 @@ class FavouritesTest {
     @Test
     fun `should add and delete`() = testApplication {
         application { startUp() }
-        val faker = faker {}
         val signer by lazy { GlobalContext.get().get<Signer>() }
-        val username = faker.name.name()
-        val mail = faker.internet.safeEmail()
-        val password = faker.crypto.md5()
+        val (mail, username, password) = getFakerUserData()
+
 
         register(mail, username, password)
         val rawToken = signer { withClaim("email", mail) }
@@ -86,11 +81,9 @@ class FavouritesTest {
     @Test
     fun `should add and getById`() = testApplication {
         application { startUp() }
-        val faker = faker {}
         val signer by lazy { GlobalContext.get().get<Signer>() }
-        val username = faker.name.name()
-        val mail = faker.internet.safeEmail()
-        val password = faker.crypto.md5()
+        val (mail, username, password) = getFakerUserData()
+
 
         register(mail, username, password)
         val rawToken = signer { withClaim("email", mail) }
