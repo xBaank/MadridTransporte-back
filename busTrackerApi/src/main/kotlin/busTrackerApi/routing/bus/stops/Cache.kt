@@ -1,4 +1,4 @@
-package busTrackerApi
+package busTrackerApi.routing.bus.stops
 
 import java.time.Instant
 

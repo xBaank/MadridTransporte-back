@@ -4,8 +4,6 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
-import busTrackerApi.TimedCachedValue
-import busTrackerApi.timed
 import crtm.auth
 import crtm.defaultClient
 import crtm.soap.ShortStopTimesRequest

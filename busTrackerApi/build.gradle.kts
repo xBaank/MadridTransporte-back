@@ -47,6 +47,10 @@ dependencies {
     testImplementation("org.testcontainers:mongodb:$test_containers_version")
     testImplementation("org.testcontainers:junit-jupiter:$test_containers_version")
     testImplementation("io.github.serpro69:kotlin-faker:1.14.0")
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-html
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-html-jvm
+    implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
+
     implementation(project(":crtm"))
 }
 

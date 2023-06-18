@@ -62,12 +62,13 @@ fun Route.authRouting() {
         val rawToken = signer { withClaim("email", userTyped.email) }
 
         val token = URLEncoder.encode(rawToken, "utf-8")
+        val verifyUrl = "${backUrl}/v1/users/verify?token=$token&redirectUrl=$redirectUrl"
 
         val email = EmailBuilder.startingBlank()
             .from("BusTracker", "noreply@bustracker.com")
             .to(userTyped.username, userTyped.email)
             .withSubject("Account Verification")
-            .withPlainText("Click here to verify your account: ${backUrl}/v1/users/verify?token=$token&redirectUrl=$redirectUrl")
+            .withHTMLText(createVerifyTemplate(userTyped.username, verifyUrl))
             .buildEmail()
 
         CoroutineScope(Dispatchers.IO).launch { mailer.sendMail(email) }
@@ -129,7 +130,7 @@ fun Route.authRouting() {
             .from("BusTracker", "noreply@bustracker.com")
             .to(userTyped.username, userTyped.email)
             .withSubject("Reset Password")
-            .withPlainText("Click here to reset your password: $redirectUrlWithToken")
+            .withHTMLText(createResetPasswordEmailTemplate(userTyped.username, redirectUrlWithToken))
             .buildEmail()
 
         CoroutineScope(Dispatchers.IO).launch { mailer.sendMail(emailToSend) }
