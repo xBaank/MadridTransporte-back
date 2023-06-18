@@ -1,4 +1,4 @@
-package Utils
+package utils
 
 import io.github.serpro69.kfaker.faker
 import io.ktor.client.request.*

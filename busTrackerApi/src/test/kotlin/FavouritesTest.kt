@@ -1,4 +1,3 @@
-import Utils.*
 import arrow.core.getOrElse
 import busTrackerApi.config.Signer
 import busTrackerApi.startUp
@@ -14,6 +13,7 @@ import simpleJson.JsonArray
 import simpleJson.asString
 import simpleJson.deserialized
 import simpleJson.get
+import utils.*
 import java.net.URLEncoder
 
 class FavouritesTest : TestBase {

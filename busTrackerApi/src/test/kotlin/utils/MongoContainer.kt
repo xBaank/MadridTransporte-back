@@ -1,4 +1,4 @@
-package Utils
+package utils
 
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.junit.jupiter.Testcontainers

@@ -1,4 +1,3 @@
-import Utils.TestBase
 import arrow.core.getOrElse
 import busTrackerApi.startUp
 import io.ktor.client.request.*
@@ -13,6 +12,7 @@ import simpleJson.JsonArray
 import simpleJson.JsonObject
 import simpleJson.deserialized
 import simpleJson.get
+import utils.TestBase
 
 const val busStopCode = "08242"
 

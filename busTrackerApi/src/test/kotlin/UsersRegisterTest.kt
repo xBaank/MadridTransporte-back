@@ -1,6 +1,3 @@
-import Utils.TestBase
-import Utils.getFakerUserData
-import Utils.register
 import busTrackerApi.errorObject
 import busTrackerApi.startUp
 import io.github.serpro69.kfaker.faker
@@ -13,6 +10,9 @@ import org.amshove.kluent.shouldBeEqualTo
 import org.junit.jupiter.api.Test
 import simpleJson.jObject
 import simpleJson.serialized
+import utils.TestBase
+import utils.getFakerUserData
+import utils.register
 
 class UsersRegisterTest : TestBase {
 

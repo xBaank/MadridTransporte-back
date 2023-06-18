@@ -1,4 +1,3 @@
-import Utils.TestBase
 import arrow.core.getOrElse
 import busTrackerApi.startUp
 import io.ktor.client.request.*
@@ -12,6 +11,7 @@ import org.junit.jupiter.api.Test
 import simpleJson.JsonArray
 import simpleJson.asArray
 import simpleJson.deserialized
+import utils.TestBase
 
 const val metroStopCode = "209"
 

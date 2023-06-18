@@ -1,10 +1,10 @@
-package Utils
+package utils
 
-import Utils.MongoContainer.mongoDBContainer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.koin.core.context.GlobalContext
 import org.litote.kmongo.reactivestreams.KMongo
+import utils.MongoContainer.mongoDBContainer
 
 interface TestBase {
     @BeforeEach

@@ -1,7 +1,3 @@
-import Utils.TestBase
-import Utils.getFakerUserData
-import Utils.register
-import Utils.verify
 import busTrackerApi.config.Signer
 import busTrackerApi.startUp
 import io.ktor.http.*
@@ -12,6 +8,10 @@ import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.Test
 import org.koin.core.context.GlobalContext
+import utils.TestBase
+import utils.getFakerUserData
+import utils.register
+import utils.verify
 import java.net.URLEncoder
 
 class UsersVerifyTest : TestBase {
