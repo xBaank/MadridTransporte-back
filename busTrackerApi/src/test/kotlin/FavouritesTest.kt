@@ -1,5 +1,4 @@
 import arrow.core.getOrElse
-import busTrackerApi.config.Signer
 import busTrackerApi.startUp
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -8,7 +7,6 @@ import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
 import org.junit.jupiter.api.Test
-import org.koin.core.context.GlobalContext
 import simpleJson.JsonArray
 import simpleJson.asString
 import simpleJson.deserialized
@@ -21,12 +19,12 @@ class FavouritesTest : TestBase {
     @Test
     fun `should get add and get favourites`() = testApplication {
         application { startUp() }
-        val signer by lazy { GlobalContext.get().get<Signer>() }
         val (mail, username, password) = getFakerUserData()
+        val (_, registerSigner, _) = getSigners()
 
 
         register(mail, username, password)
-        val rawToken = signer { withClaim("email", mail) }
+        val rawToken = registerSigner.value { withClaim("email", mail) }
         val token = URLEncoder.encode(rawToken, "UTF-8")
         verify(token)
         val accessToken = login(mail, password).bodyAsText().deserialized()["token"].asString().getOrElse { throw it }
@@ -44,12 +42,11 @@ class FavouritesTest : TestBase {
     @Test
     fun `should add and delete`() = testApplication {
         application { startUp() }
-        val signer by lazy { GlobalContext.get().get<Signer>() }
         val (mail, username, password) = getFakerUserData()
-
+        val (_, registerSigner, _) = getSigners()
 
         register(mail, username, password)
-        val rawToken = signer { withClaim("email", mail) }
+        val rawToken = registerSigner.value { withClaim("email", mail) }
         val token = URLEncoder.encode(rawToken, "UTF-8")
         verify(token)
         val response = login(mail, password).bodyAsText()
@@ -65,12 +62,11 @@ class FavouritesTest : TestBase {
     @Test
     fun `should add and getById`() = testApplication {
         application { startUp() }
-        val signer by lazy { GlobalContext.get().get<Signer>() }
         val (mail, username, password) = getFakerUserData()
-
+        val (_, registerSigner, _) = getSigners()
 
         register(mail, username, password)
-        val rawToken = signer { withClaim("email", mail) }
+        val rawToken = registerSigner.value { withClaim("email", mail) }
         val token = URLEncoder.encode(rawToken, "UTF-8")
         verify(token)
         val response = login(mail, password).bodyAsText()

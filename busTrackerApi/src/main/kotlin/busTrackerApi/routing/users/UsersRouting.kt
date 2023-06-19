@@ -3,8 +3,7 @@ package busTrackerApi.routing.users
 import arrow.core.Either
 import arrow.core.getOrElse
 import busTrackerApi.*
-import busTrackerApi.config.Signer
-import busTrackerApi.config.saltRounds
+import busTrackerApi.config.*
 import com.auth0.jwt.JWTVerifier
 import com.toxicbakery.bcrypt.Bcrypt
 import io.ktor.http.*
@@ -29,7 +28,9 @@ import java.net.URLEncoder
 
 fun Route.authRouting() {
     val userRepo by inject<CoroutineDatabase>()
-    val signer by inject<Signer>()
+    val authSigner by inject<Signer>(AuthSignerQualifier)
+    val resetPasswordSigner by inject<Signer>(ResetPasswordSignerQualifier)
+    val registerSigner by inject<Signer>(RegisterSignerQualifier)
     val verifier by inject<JWTVerifier>()
     val mailer by inject<Mailer>()
 
@@ -59,7 +60,7 @@ fun Route.authRouting() {
 
         userRepo.getCollection<User>().insertOne(userTyped)
 
-        val rawToken = signer { withClaim("email", userTyped.email) }
+        val rawToken = registerSigner { withClaim("email", userTyped.email) }
 
         val token = URLEncoder.encode(rawToken, "utf-8")
         val verifyUrl = "${backUrl}/v1/users/verify?token=$token&redirectUrl=$redirectUrl"
@@ -79,7 +80,10 @@ fun Route.authRouting() {
     get("/verify") {
         val redirectUrl = call.request.queryParameters["redirectUrl"] ?: return@get badRequest("Missing redirectUrl")
         val rawToken = call.request.queryParameters["token"] ?: return@get badRequest("Token not found")
+
         val token = Either.catch { verifier.verify(rawToken) }.getOrElse { return@get unauthorized("Invalid token") }
+        val scope = token.getClaim("scope").asString() ?: return@get badRequest("Scope not found")
+        if (scope != RegisterScope) return@get badRequest("Invalid scope")
         val email = token.getClaim("email").asString() ?: return@get badRequest("Email not found")
 
         val user = userRepo.getCollection<User>()
@@ -93,6 +97,8 @@ fun Route.authRouting() {
         call.respondRedirect(redirectUrl)
     }
 
+
+
     post("/login") {
         val user = call.receiveText().deserialized()
         val email = user["email"].asString().getOrElse { return@post badRequest(it.message) }
@@ -104,7 +110,7 @@ fun Route.authRouting() {
         if (!userTyped.verified) badRequest("User not verified")
         if (!Bcrypt.verifyHash(password, userTyped.password)) unauthorized("Wrong password")
 
-        val rawToken = signer { withClaim("email", userTyped.email) }
+        val rawToken = authSigner { withClaim("email", userTyped.email) }
 
         val token = URLEncoder.encode(rawToken, "utf-8")
         val tokenObject = accessTokenObject(token)
@@ -121,7 +127,7 @@ fun Route.authRouting() {
         val userTyped =
             userRepo.getCollection<User>().findOne(User::email eq email) ?: return@post notFound("User not found")
 
-        val rawToken = signer { withClaim("email", userTyped.email) }
+        val rawToken = resetPasswordSigner { withClaim("email", userTyped.email) }
 
         val token = URLEncoder.encode(rawToken, "utf-8")
         val redirectUrlWithToken = "$redirectUrl?token=$token"
@@ -142,6 +148,9 @@ fun Route.authRouting() {
         val token = call.request.queryParameters["token"] ?: return@put badRequest("Token not found")
         val rawToken = Either.catch { verifier.verify(token) }.getOrElse { return@put unauthorized("Invalid token") }
         val email = rawToken.getClaim("email").asString() ?: return@put badRequest("Email not found")
+
+        val scope = rawToken.getClaim("scope").asString() ?: return@put badRequest("Scope not found")
+        if (scope != ResetPasswordScope) return@put badRequest("Invalid scope")
 
         val newPass =
             call.receiveText().deserialized()["password"].asString().validatePassword()

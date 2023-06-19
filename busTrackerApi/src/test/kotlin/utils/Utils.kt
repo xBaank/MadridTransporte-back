@@ -1,10 +1,15 @@
 package utils
 
+import busTrackerApi.config.AuthSignerQualifier
+import busTrackerApi.config.RegisterSignerQualifier
+import busTrackerApi.config.ResetPasswordSignerQualifier
+import busTrackerApi.config.Signer
 import io.github.serpro69.kfaker.faker
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import org.koin.core.context.GlobalContext
 import simpleJson.jObject
 import simpleJson.serialized
 import java.net.URLEncoder
@@ -82,4 +87,11 @@ fun getFakerUserData(): Triple<String, String, String> {
     val username = faker.name.name()
     val password = faker.crypto.md5()
     return Triple(mail, username, password)
+}
+
+fun getSigners(): Triple<Lazy<Signer>, Lazy<Signer>, Lazy<Signer>> {
+    val authSigner = lazy { GlobalContext.get().get<Signer>(AuthSignerQualifier) }
+    val registerSigner = lazy { GlobalContext.get().get<Signer>(RegisterSignerQualifier) }
+    val resetPasswordSigner = lazy { GlobalContext.get().get<Signer>(ResetPasswordSignerQualifier) }
+    return Triple(authSigner, registerSigner, resetPasswordSigner)
 }

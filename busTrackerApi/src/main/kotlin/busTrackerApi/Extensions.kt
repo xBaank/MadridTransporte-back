@@ -1,5 +1,6 @@
 package busTrackerApi
 
+import com.auth0.jwt.JWTCreator
 import com.toxicbakery.bcrypt.Bcrypt
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -7,7 +8,8 @@ import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 import simpleJson.jObject
 import simpleJson.serialized
-
+import java.util.*
+import kotlin.time.Duration
 
 fun getenvOrThrow(key: String): String =
     System.getenv(key) ?: System.getProperty(key) ?: throw IllegalStateException("Environment variable $key is not set")
@@ -15,6 +17,8 @@ fun getenvOrThrow(key: String): String =
 fun getenvOrNull(key: String): String? =
     System.getenv(key) ?: System.getProperty(key) ?: null
 
+fun JWTCreator.Builder.withExpiresIn(duration: Duration): JWTCreator.Builder =
+    withExpiresAt(Date(System.currentTimeMillis() + duration.inWholeMilliseconds))
 
 fun Bcrypt.hashAsString(input: String, saltRounds: Int = 10): String =
     hash(input, saltRounds).toString(Charsets.UTF_8)

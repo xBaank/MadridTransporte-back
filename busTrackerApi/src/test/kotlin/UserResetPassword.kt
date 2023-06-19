@@ -1,5 +1,4 @@
 import arrow.core.getOrElse
-import busTrackerApi.config.Signer
 import busTrackerApi.startUp
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -9,7 +8,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.Test
-import org.koin.core.context.GlobalContext
 import simpleJson.asString
 import simpleJson.deserialized
 import simpleJson.get
@@ -29,18 +27,20 @@ class UserResetPassword : TestBase {
             }
         }
 
-        val signer by lazy { GlobalContext.get().get<Signer>() }
         val (mail, username, password) = getFakerUserData()
         val newPassword = "newPassword"
+        val (_, registerSigner, resetPasswordSigner) = getSigners()
 
 
         register(mail, username, password)
-        val rawToken = signer { withClaim("email", mail) }
+        val rawToken = registerSigner.value { withClaim("email", mail) }
+        val rawResetPasswordToken = resetPasswordSigner.value { withClaim("email", mail) }
         val token = URLEncoder.encode(rawToken, "UTF-8")
+        val resetPasswordToken = URLEncoder.encode(rawResetPasswordToken, "UTF-8")
         verify(token)
-        val accessToken = login(mail, password).bodyAsText().deserialized()["token"].asString().getOrElse { throw it }
+        login(mail, password)
         val response = sendResetPassword(mail)
-        val response2 = resetPassword(accessToken, newPassword)
+        val response2 = resetPassword(resetPasswordToken, newPassword)
         val response3 = login(mail, newPassword)
 
         response.status.shouldBe(HttpStatusCode.OK)

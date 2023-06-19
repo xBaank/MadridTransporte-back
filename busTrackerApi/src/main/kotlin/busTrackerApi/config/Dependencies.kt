@@ -1,6 +1,7 @@
 package busTrackerApi.config
 
 import busTrackerApi.getenvOrThrow
+import busTrackerApi.withExpiresIn
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
@@ -12,10 +13,13 @@ import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 import org.simplejavamail.api.mailer.config.TransportStrategy
 import org.simplejavamail.mailer.MailerBuilder
+import kotlin.time.Duration.Companion.minutes
 
+private typealias SignerBuilder = (f: JWTCreator.Builder.() -> Unit) -> JWTCreator.Builder
 typealias Signer = (f: JWTCreator.Builder.() -> Unit) -> String
 
 const val saltRounds = 10
+
 
 val dbModule = module {
     val dotenv = dotenv {
@@ -44,19 +48,43 @@ val dbModule = module {
         .withIssuer(getenvOrThrow("JWT_ISSUER"))
         .build()
 
-    val signer: Signer = {
+    val signer: SignerBuilder = {
         JWT.create()
             .withAudience(getenvOrThrow("JWT_AUDIENCE"))
             .withIssuer(getenvOrThrow("JWT_ISSUER"))
             .apply(it)
-            .sign(Algorithm.HMAC256(getenvOrThrow("JWT_SECRET")))
+    }
+
+    val authSigner: Signer = {
+        signer {
+            withClaim("scope", AuthScope)
+            withExpiresIn(30.minutes)
+            apply(it)
+        }.sign(Algorithm.HMAC256(getenvOrThrow("JWT_SECRET")))
+    }
+
+    val registerSigner: Signer = {
+        signer {
+            withClaim("scope", RegisterScope)
+            apply(it)
+        }.sign(Algorithm.HMAC256(getenvOrThrow("JWT_SECRET")))
+    }
+
+    val resetPasswordSigner: Signer = {
+        signer {
+            withClaim("scope", ResetPasswordScope)
+            withExpiresIn(10.minutes)
+            apply(it)
+        }.sign(Algorithm.HMAC256(getenvOrThrow("JWT_SECRET")))
     }
 
     single { client }
     single { dotenv }
     single { mailer }
     single { jwtVerifier }
-    single { signer }
+    single(ResetPasswordSignerQualifier) { resetPasswordSigner }
+    single(AuthSignerQualifier) { authSigner }
+    single(RegisterSignerQualifier) { registerSigner }
 }
 
 fun Application.configureDependencies() {

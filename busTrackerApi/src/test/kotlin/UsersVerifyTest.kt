@@ -1,4 +1,3 @@
-import busTrackerApi.config.Signer
 import busTrackerApi.startUp
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -7,11 +6,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.Test
-import org.koin.core.context.GlobalContext
-import utils.TestBase
-import utils.getFakerUserData
-import utils.register
-import utils.verify
+import utils.*
 import java.net.URLEncoder
 
 class UsersVerifyTest : TestBase {
@@ -27,11 +22,11 @@ class UsersVerifyTest : TestBase {
             }
         }
         val (mail, username, password) = getFakerUserData()
-        val signer by lazy { GlobalContext.get().get<Signer>() }
+        val (_, registerSigner, _) = getSigners()
 
         register(mail, username, password)
 
-        val rawToken = signer { withClaim("email", mail) }
+        val rawToken = registerSigner.value { withClaim("email", mail) }
         val token = URLEncoder.encode(rawToken, "UTF-8")
 
         val response = verify(token)
