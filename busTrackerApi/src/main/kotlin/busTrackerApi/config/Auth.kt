@@ -12,7 +12,8 @@ fun Application.configureAuth() {
         jwt("user") {
             verifier(verifier)
             validate {
-                JWTPrincipal(it.payload)
+                if (it.payload.getClaim("scope").asString() != AuthScope) null
+                else JWTPrincipal(it.payload)
             }
         }
     }
