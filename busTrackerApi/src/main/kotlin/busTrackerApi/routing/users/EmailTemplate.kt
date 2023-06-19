@@ -4,7 +4,7 @@ import kotlinx.html.*
 import kotlinx.html.dom.createHTMLDocument
 import kotlinx.html.dom.serialize
 
-typealias ElementF = FlowContent.() -> Unit
+private typealias ElementF = FlowContent.() -> Unit
 
 private fun createEmailTemplate(title: ElementF, body: ElementF, link: ElementF) =
     createHTMLDocument().html {

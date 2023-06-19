@@ -32,7 +32,7 @@ fun getTimes(id: String? = null): JsonNode? {
             array?.forEach {
                 addObject {
                     "id" += it["idnumerica"].asNumber().getOrNull()
-                    "nombre_estacion" += it["nombreest"].asString().getOrNull()
+                    "nombreEstacion" += it["nombreest"].asString().getOrNull()
                     "linea" += it["linea"].asNumber().getOrNull()
                     "anden" += it["anden"].asNumber().getOrNull()
                     "sentido" += it["sentido"].asString().getOrNull()

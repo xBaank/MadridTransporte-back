@@ -8,10 +8,9 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.cors.routing.*
-import java.lang.System.getenv
 
 fun main() {
-    embeddedServer(Netty, port = getenv("PORT")?.toIntOrNull() ?: 8080) {
+    embeddedServer(Netty, port = getenvOrNull("PORT")?.toIntOrNull() ?: 8080) {
         startUp()
     }.start(wait = true)
 }
