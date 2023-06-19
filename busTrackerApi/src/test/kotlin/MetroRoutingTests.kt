@@ -19,7 +19,7 @@ class MetroRoutingTests : TestBase {
 
 
     @Test
-    fun should_get_metro_times() = testApplication {
+    fun `should get metro times`() = testApplication {
         application { startUp() }
         val response = client.get("/v1/metro/times")
         val body = response.bodyAsText().deserialized()
@@ -30,7 +30,7 @@ class MetroRoutingTests : TestBase {
     }
 
     @Test
-    fun should_get_metros_times_by_code() = testApplication {
+    fun `should get metros times by code`() = testApplication {
         application { startUp() }
         val response = client.get("/v1/metro/times/$metroStopCode")
         val body = response.bodyAsText().deserialized()
@@ -41,7 +41,7 @@ class MetroRoutingTests : TestBase {
     }
 
     @Test
-    fun should_not_get_metros_times_by_code() = testApplication {
+    fun `should not get metros times by code`() = testApplication {
         application { startUp() }
         val response = client.get("/v1/metro/times/asdasd")
 

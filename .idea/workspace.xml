@@ -4,16 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Improve email styling with kotlinx-html">
-      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/TestBase.kt" afterDir="false" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Remove comment">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusRoutingTests.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/FavouritesTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/FavouritesTest.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/MetroRoutingTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/MetroRoutingTests.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UserResetPassword.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UserResetPassword.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersLoginTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersLoginTest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersRegisterTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersRegisterTest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersVerifyTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersVerifyTest.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,6 +108,7 @@
       <recent name="C:\Users\Roberto\IdeaProjects\bus-tracker-back\busTrackerApi\src\test\kotlin" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Roberto\IdeaProjects\bus-tracker-back\busTrackerApi\src\test\kotlin\Utils" />
       <recent name="C:\Users\Roberto\IdeaProjects\bus-tracker-back\busTrackerApi\src\main\kotlin\busTrackerApi\routing\bus\stops" />
       <recent name="C:\Users\Roberto\IdeaProjects\bus-tracker-back\busTrackerApi\src\main\kotlin\busTrackerApi\routing\bus" />
       <recent name="C:\Users\Roberto\IdeaProjects\bus-tracker-back\busTrackerApi" />
@@ -123,7 +118,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.UserResetPassword.should reset password then login">
+  <component name="RunManager" selected="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'">
     <configuration name="Tests in 'bus-tracker-back.busTrackerApi.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -242,9 +237,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
         <item itemvalue="Gradle.UserResetPassword.should reset password then login" />
         <item itemvalue="Gradle.UsersRegisterTest.should register" />
-        <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
         <item itemvalue="Gradle.UsersRegisterTest.should not register with missing redirect" />
         <item itemvalue="Gradle.bus-tracker-back [koverHtmlReport]" />
       </list>
@@ -258,27 +253,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1679857965691</updated>
-    </task>
-    <task id="LOCAL-00022" summary="Properly close resources">
-      <created>1684422490207</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1684422490207</updated>
-    </task>
-    <task id="LOCAL-00023" summary="Change metro dto">
-      <created>1684753525378</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1684753525378</updated>
-    </task>
-    <task id="LOCAL-00024" summary="If not number its null">
-      <created>1684754370426</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1684754370426</updated>
     </task>
     <task id="LOCAL-00025" summary="Return proximos in array">
       <created>1684755078121</created>
@@ -602,13 +576,31 @@
       <option name="project" value="LOCAL" />
       <updated>1687127921036</updated>
     </task>
-    <option name="localTasksCounter" value="71" />
+    <task id="LOCAL-00071" summary="More cleanup for tests">
+      <created>1687129207605</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1687129207605</updated>
+    </task>
+    <task id="LOCAL-00072" summary="Rename Utils -&gt; utils">
+      <created>1687129239895</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1687129239895</updated>
+    </task>
+    <task id="LOCAL-00073" summary="Remove comment">
+      <created>1687129266702</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1687129266702</updated>
+    </task>
+    <option name="localTasksCounter" value="74" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Update deploy.yaml" />
-    <MESSAGE value="Remove auth on mongo" />
-    <MESSAGE value="Remove added header in nginx.conf" />
     <MESSAGE value="Added redirect to verify" />
     <MESSAGE value="Improve tests and add coverage" />
     <MESSAGE value="Add redirect url to reset password endpoints" />
@@ -631,7 +623,10 @@
     <MESSAGE value="Cleanup tests" />
     <MESSAGE value="More cleanup" />
     <MESSAGE value="Improve email styling with kotlinx-html" />
-    <option name="LAST_COMMIT_MESSAGE" value="Improve email styling with kotlinx-html" />
+    <MESSAGE value="More cleanup for tests" />
+    <MESSAGE value="Rename Utils -&gt; utils" />
+    <MESSAGE value="Remove comment" />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove comment" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

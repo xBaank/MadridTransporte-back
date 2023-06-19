@@ -19,7 +19,7 @@ const val busStopCode = "08242"
 class StopsRoutingTests : TestBase {
 
     @Test
-    fun should_get_stop_times() = testApplication {
+    fun `should get stop times`() = testApplication {
         application { startUp() }
         val response = client.get("/v1/bus/stops/$busStopCode/times")
         val body = response.bodyAsText().deserialized()
@@ -31,7 +31,7 @@ class StopsRoutingTests : TestBase {
 
 
     @Test
-    fun should_get_stop_times_cached() = testApplication {
+    fun `should get stop times cached`() = testApplication {
         application { startUp() }
         val response = client.get("/v1/bus/stops/$busStopCode/times")
         val responseCached = client.get("/v1/bus/stops/$busStopCode/times/cached")
@@ -51,7 +51,7 @@ class StopsRoutingTests : TestBase {
 
 
     @Test
-    fun should_not_get_stop_times() = testApplication {
+    fun `should not get stop times`() = testApplication {
         application { startUp() }
         val response = client.get("/v1/bus/stops/aasdsad/times")
         response.status shouldBeEqualTo HttpStatusCode.NotFound
