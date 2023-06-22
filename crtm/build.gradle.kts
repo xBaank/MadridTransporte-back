@@ -53,7 +53,7 @@ tasks.withType<JavaCompile> {
     options.encoding = "ISO-8859-1"
 }
 
-task("wsimport-myservice") {
+task("wsimport-myservice-buses") {
     group = BasePlugin.BUILD_GROUP
     val destDir = file("$projectDir/src/main/java")
     destDir.mkdirs()
@@ -73,6 +73,34 @@ task("wsimport-myservice") {
                 //"destDir" to destDir, alreaddy compiled java classes, not needed
                 "package" to "crtm.soap",
                 "wsdl" to "http://www.citram.es:8080/WSMultimodalInformation/MultimodalInformation.svc?wsdl",
+            ) {
+                "xjcarg"("value" to "-XautoNameResolution")
+            }
+        }
+    }
+}
+
+
+task("wsimport-myservice-abono") {
+    group = BasePlugin.BUILD_GROUP
+    val destDir = file("$projectDir/src/main/java")
+    destDir.mkdirs()
+    val sourceDestDir = file("$projectDir/src/main/java")
+    sourceDestDir.mkdirs()
+    doLast {
+        ant.withGroovyBuilder {
+            "taskdef"(
+                "name" to "wsimport",
+                "classname" to "com.sun.tools.ws.ant.WsImport",
+                "classpath" to jaxws.asPath
+            )
+
+            "wsimport"(
+                "keep" to true,
+                "sourcedestdir" to sourceDestDir,
+                //"destDir" to destDir, alreaddy compiled java classes, not needed
+                "package" to "crtm.abono",
+                "wsdl" to "http://www.citram.es:50081/VENTAPREPAGOTITULO/VentaPrepagoTitulo.svc?wsdl",
             ) {
                 "xjcarg"("value" to "-XautoNameResolution")
             }
