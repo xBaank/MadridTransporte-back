@@ -1,5 +1,6 @@
 package busTrackerApi.routing.abono
 
+import busTrackerApi.errorObject
 import crtm.abonoClient
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -10,6 +11,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.serialization.decodeFromString
 import nl.adaptivity.xmlutil.serialization.XML
+import simpleJson.serialized
+
+val xml = XML {
+    autoPolymorphic = true
+}
 
 fun Route.abonoRouting() {
     get("{id}") {
@@ -18,11 +24,19 @@ fun Route.abonoRouting() {
             status = HttpStatusCode.BadRequest
         )
         val response = CoroutineScope(Dispatchers.IO).async { abonoClient.consultaSaldo1(id) }.await()
-        val xml = XML {
-            // configuration options
-            autoPolymorphic = true
-        }
+
         val result = xml.decodeFromString<SS_prepagoConsultaSaldo>(response.sResulXMLField)
-        println(result)
+
+        if (!isFound(result)) return@get call.respondText(
+            errorObject("No se ha encontrado el abono"),
+            contentType = ContentType.Application.Json,
+            status = HttpStatusCode.NotFound
+        )
+
+        return@get call.respondText(
+            buildAbonoJson(result).serialized(),
+            contentType = ContentType.Application.Json,
+            status = HttpStatusCode.OK
+        )
     }
 }
