@@ -2,6 +2,7 @@ package busTrackerApi
 
 import com.auth0.jwt.JWTCreator
 import com.toxicbakery.bcrypt.Bcrypt
+import io.github.reactivecircus.cache4k.Cache
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -10,6 +11,9 @@ import simpleJson.jObject
 import simpleJson.serialized
 import java.util.*
 import kotlin.time.Duration
+
+inline fun <T : Any, K : Any> Cache<T, K>.getOrPut(key: T, value: () -> K): K =
+    get(key) ?: value().also { put(key, it) }
 
 fun getenvOrThrow(key: String): String =
     System.getenv(key) ?: System.getProperty(key) ?: throw IllegalStateException("Environment variable $key is not set")

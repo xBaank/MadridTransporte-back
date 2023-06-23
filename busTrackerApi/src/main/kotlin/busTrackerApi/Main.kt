@@ -8,6 +8,7 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.websocket.*
 
 fun main() {
     embeddedServer(Netty, port = getenvOrNull("PORT")?.toIntOrNull() ?: 8080) {
@@ -28,6 +29,7 @@ fun Application.startUp() {
         allowHeader(HttpHeaders.Authorization)
         anyHost()
     }
+    install(WebSockets)
     configureDependencies()
     configureAuth()
     configureRoutingV1()

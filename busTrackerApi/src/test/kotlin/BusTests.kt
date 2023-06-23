@@ -1,10 +1,13 @@
 import arrow.core.getOrElse
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.websocket.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
+import org.amshove.kluent.shouldNotBeNull
 import org.junit.jupiter.api.Test
 import simpleJson.JsonArray
 import simpleJson.JsonObject
@@ -51,5 +54,22 @@ class StopsRoutingTests : TestBase {
     fun `should not get stop times`() = testApplicationBusTracker {
         val response = client.get("/v1/bus/stops/aasdsad/times")
         response.status shouldBeEqualTo HttpStatusCode.NotFound
+    }
+
+    @Test
+    fun `should subscribe to stopTimes`() = testApplicationBusTracker { client ->
+        client.webSocket({
+            url("/v1/bus/stops/$busStopCode/times/subscribe")
+        })
+        {
+            val response = incoming.receive() as? Frame.Text
+            val body = response?.readText()?.deserialized()
+
+            response.shouldBeInstanceOf<Frame.Text>()
+            body!!.getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
+            body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
+            body["lastTime"].getOrElse { throw it }.shouldNotBeNull()
+            close()
+        }
     }
 }
