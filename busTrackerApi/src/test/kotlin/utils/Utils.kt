@@ -81,6 +81,9 @@ suspend fun ApplicationTestBuilder.getFavourite(token: String, stopId: String) =
         header("Authorization", "Bearer $token")
     }
 
+suspend fun ApplicationTestBuilder.getAbono(id: String) =
+    client.get("/v1/abono/$id")
+
 fun getFakerUserData(): Triple<String, String, String> {
     val faker = faker { }
     val mail = faker.internet.safeEmail()

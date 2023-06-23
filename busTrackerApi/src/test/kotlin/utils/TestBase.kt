@@ -14,7 +14,7 @@ interface TestBase {
         System.setProperty("MONGO_DATABASE_NAME", "test")
     }
 
-    @AfterEach()
+    @AfterEach
     fun tearDown() {
         GlobalContext.stopKoin()
     }

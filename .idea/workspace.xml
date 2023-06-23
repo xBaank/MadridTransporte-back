@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Added some files">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Added Abono endpoint">
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/AbonoTest.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/abono/Abono.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/abono/Abono.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/abono/AbonoRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/abono/AbonoRouting.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/abono/AbonoXml.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/abono/AbonoXml.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/utils/TestBase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/utils/TestBase.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/utils/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/utils/Utils.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -148,7 +148,31 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.MainKt">
+  <component name="RunManager" selected="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'">
+    <configuration name="AbonoTest.should get abono" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":busTrackerApi:test" />
+            <option value="--tests" />
+            <option value="&quot;AbonoTest.should get abono&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>true</ForceTestExec>
+      <method v="2" />
+    </configuration>
     <configuration name="FavouritesTest.should add and delete" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -219,28 +243,6 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
-    <configuration name="bus-tracker-back [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="clean" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>false</ForceTestExec>
-      <method v="2" />
-    </configuration>
     <configuration name="MainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="busTrackerApi.MainKt" />
       <module name="bus-tracker-back.busTrackerApi.main" />
@@ -250,11 +252,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Kotlin.MainKt" />
         <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
+        <item itemvalue="Gradle.AbonoTest.should get abono" />
+        <item itemvalue="Kotlin.MainKt" />
         <item itemvalue="Gradle.UsersVerifyTest.should register then verify" />
         <item itemvalue="Gradle.FavouritesTest.should add and delete" />
-        <item itemvalue="Gradle.bus-tracker-back [clean]" />
       </list>
     </recent_temporary>
   </component>
@@ -610,11 +612,10 @@
       <option name="project" value="LOCAL" />
       <updated>1687181447717</updated>
     </task>
-    <option name="localTasksCounter" value="79" />
+    <option name="localTasksCounter" value="80" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Change url redirection with reset pass" />
     <MESSAGE value="Validate new password" />
     <MESSAGE value="Remove redirect url" />
     <MESSAGE value="Allow methods" />
@@ -639,7 +640,19 @@
     <MESSAGE value="Add scopes and lifetime to tokens" />
     <MESSAGE value="Check for scope in auth middleware" />
     <MESSAGE value="Added some files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added some files" />
+    <MESSAGE value="Added Abono endpoint" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Abono endpoint" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/abono/AbonoRouting.kt</url>
+          <line>21</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
