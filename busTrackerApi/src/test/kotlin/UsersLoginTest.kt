@@ -1,8 +1,6 @@
 import arrow.core.getOrElse
-import busTrackerApi.startUp
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
 import org.junit.jupiter.api.Test
@@ -15,8 +13,7 @@ import java.net.URLEncoder
 class UsersLoginTest : TestBase {
 
     @Test
-    fun `should register then verify then login`() = testApplication {
-        application { startUp() }
+    fun `should register then verify then login`() = testApplicationBusTracker {
         val (mail, username, password) = getFakerUserData()
         val (_, registerSigner, _) = getSigners()
 
@@ -32,8 +29,7 @@ class UsersLoginTest : TestBase {
     }
 
     @Test
-    fun `should not login with not found username`() = testApplication {
-        application { startUp() }
+    fun `should not login with not found username`() = testApplicationBusTracker {
         val (mail, _, password) = getFakerUserData()
 
         val response = login(mail, password)
@@ -42,8 +38,7 @@ class UsersLoginTest : TestBase {
     }
 
     @Test
-    fun `should not login with incorrect credentials`() = testApplication {
-        application { startUp() }
+    fun `should not login with incorrect credentials`() = testApplicationBusTracker {
         val (mail, username, password) = getFakerUserData()
         val (_, registerSigner, _) = getSigners()
 

@@ -20,7 +20,8 @@ val xml = XML {
 fun Route.abonoRouting() {
     get("{id}") {
         val id = call.parameters["id"] ?: return@get call.respondText(
-            "Missing or malformed id",
+            errorObject("Missing id"),
+            contentType = ContentType.Application.Json,
             status = HttpStatusCode.BadRequest
         )
         val response = CoroutineScope(Dispatchers.IO).async { abonoClient.consultaSaldo1(id) }.await()

@@ -1,11 +1,6 @@
 import arrow.core.getOrElse
-import busTrackerApi.startUp
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.Test
 import simpleJson.asString
@@ -14,19 +9,9 @@ import simpleJson.get
 import utils.*
 import java.net.URLEncoder
 
-class UserResetPassword : TestBase {
-
+class UserResetPasswordTest : TestBase {
     @Test
-    fun `should reset password then login`() = testApplication {
-        application {
-            startUp()
-            routing {
-                get("/ping") {
-                    call.respond(HttpStatusCode.OK)
-                }
-            }
-        }
-
+    fun `should reset password then login`() = testApplicationBusTracker(pingStartUp) {
         val (mail, username, password) = getFakerUserData()
         val newPassword = "newPassword"
         val (_, registerSigner, resetPasswordSigner) = getSigners()
