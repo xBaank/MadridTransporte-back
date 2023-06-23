@@ -35,7 +35,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("io.github.reactivecircus.cache4k:cache4k:0.10.0")
     // https://mvnrepository.com/artifact/io.insert-koin/koin-core
-    runtimeOnly("io.insert-koin:koin-core:3.4.1")
+    runtimeOnly("io.insert-koin:koin-core:3.4.2")
     // https://mvnrepository.com/artifact/io.insert-koin/koin-ktor
     implementation("io.insert-koin:koin-ktor:3.4.1")
     implementation("com.ToxicBakery.library.bcrypt:bcrypt:+")
