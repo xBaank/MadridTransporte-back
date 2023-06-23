@@ -9,6 +9,7 @@ plugins {
     kotlin("jvm")
     id("io.ktor.plugin")
     id("org.jetbrains.kotlinx.kover") version "0.7.1"
+    kotlin("plugin.serialization") version "1.8.21"
     application
 }
 
@@ -50,6 +51,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-html
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-html-jvm
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
+    implementation("io.github.pdvrieze.xmlutil:core:0.86.0")
+    implementation("io.github.pdvrieze.xmlutil:serialization:0.86.0")
 
     implementation(project(":crtm"))
 }

@@ -1,8 +1,6 @@
 import arrow.core.getOrElse
-import busTrackerApi.startUp
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
@@ -17,8 +15,7 @@ import java.net.URLEncoder
 class FavouritesTest : TestBase {
 
     @Test
-    fun `should get add and get favourites`() = testApplication {
-        application { startUp() }
+    fun `should get add and get favourites`() = testApplicationBusTracker {
         val (mail, username, password) = getFakerUserData()
         val (_, registerSigner, _) = getSigners()
 
@@ -40,8 +37,7 @@ class FavouritesTest : TestBase {
     }
 
     @Test
-    fun `should add and delete`() = testApplication {
-        application { startUp() }
+    fun `should add and delete`() = testApplicationBusTracker {
         val (mail, username, password) = getFakerUserData()
         val (_, registerSigner, _) = getSigners()
 
@@ -60,8 +56,7 @@ class FavouritesTest : TestBase {
     }
 
     @Test
-    fun `should add and getById`() = testApplication {
-        application { startUp() }
+    fun `should add and getById`() = testApplicationBusTracker {
         val (mail, username, password) = getFakerUserData()
         val (_, registerSigner, _) = getSigners()
 
@@ -81,9 +76,7 @@ class FavouritesTest : TestBase {
     }
 
     @Test
-    fun `should not add favourites`() = testApplication {
-        application { startUp() }
-
+    fun `should not add favourites`() = testApplicationBusTracker {
         val favouritesResponse = addFavourite("asd", "bus", "123")
         favouritesResponse.status.shouldBe(HttpStatusCode.Unauthorized)
     }

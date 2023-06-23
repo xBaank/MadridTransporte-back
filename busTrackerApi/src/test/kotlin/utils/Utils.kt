@@ -4,10 +4,14 @@ import busTrackerApi.config.AuthSignerQualifier
 import busTrackerApi.config.RegisterSignerQualifier
 import busTrackerApi.config.ResetPasswordSignerQualifier
 import busTrackerApi.config.Signer
+import busTrackerApi.startUp
 import io.github.serpro69.kfaker.faker
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import org.koin.core.context.GlobalContext
 import simpleJson.jObject
@@ -81,6 +85,9 @@ suspend fun ApplicationTestBuilder.getFavourite(token: String, stopId: String) =
         header("Authorization", "Bearer $token")
     }
 
+suspend fun ApplicationTestBuilder.getAbono(id: String) =
+    client.get("/v1/abono/$id")
+
 fun getFakerUserData(): Triple<String, String, String> {
     val faker = faker { }
     val mail = faker.internet.safeEmail()
@@ -94,4 +101,21 @@ fun getSigners(): Triple<Lazy<Signer>, Lazy<Signer>, Lazy<Signer>> {
     val registerSigner = lazy { GlobalContext.get().get<Signer>(RegisterSignerQualifier) }
     val resetPasswordSigner = lazy { GlobalContext.get().get<Signer>(ResetPasswordSignerQualifier) }
     return Triple(authSigner, registerSigner, resetPasswordSigner)
+}
+
+fun testApplicationBusTracker(
+    startUpF: Application.() -> Unit = { startUp() },
+    block: suspend ApplicationTestBuilder.() -> Unit
+) = testApplication {
+    application { startUpF() }
+    block()
+}
+
+val pingStartUp: Application.() -> Unit = {
+    startUp()
+    routing {
+        get("/ping") {
+            call.respond(HttpStatusCode.OK)
+        }
+    }
 }

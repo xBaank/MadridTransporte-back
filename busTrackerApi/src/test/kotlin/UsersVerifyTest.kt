@@ -1,9 +1,4 @@
-import busTrackerApi.startUp
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.server.testing.*
 import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.Test
 import utils.*
@@ -12,15 +7,7 @@ import java.net.URLEncoder
 class UsersVerifyTest : TestBase {
 
     @Test
-    fun `should register then verify`() = testApplication {
-        application {
-            startUp()
-            routing {
-                get("/ping") {
-                    call.respond(HttpStatusCode.OK)
-                }
-            }
-        }
+    fun `should register then verify`() = testApplicationBusTracker(pingStartUp) {
         val (mail, username, password) = getFakerUserData()
         val (_, registerSigner, _) = getSigners()
 
@@ -35,8 +22,7 @@ class UsersVerifyTest : TestBase {
     }
 
     @Test
-    fun `should not verify`() = testApplication {
-        application { startUp() }
+    fun `should not verify`() = testApplicationBusTracker {
         val token = "ASdasd"
 
         val response = verify(token)
