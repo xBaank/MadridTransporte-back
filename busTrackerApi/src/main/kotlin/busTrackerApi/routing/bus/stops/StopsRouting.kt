@@ -64,9 +64,8 @@ fun Route.stopsRouting() = route("/stops") {
                     )
                 )
             }
-            subscribedStops[subId] = this
-
             try {
+                subscribedStops[subId] = this
                 while (isActive) {
                     val timedVCached = tryGetTimesOrCached(stopCode, codMode)
                         ?: return@webSocket close(
