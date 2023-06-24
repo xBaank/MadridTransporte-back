@@ -1,6 +1,6 @@
 package busTrackerApi.routing.bus.lines
 
-import crtm.utils.createLineCode
+import crtm.utils.getCodModeFromLineCode
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -9,14 +9,16 @@ import simpleJson.asJson
 import simpleJson.serialized
 
 fun Route.linesRouting() = route("/lines") {
-    get("/{lineCode}/mode/{codMode}/locations") {
-        val lineCode = createLineCode(call.parameters["codMode"]!!, call.parameters["lineCode"]!!)
+    get("/{lineCode}/locations") {
+        val lineCode = call.parameters["lineCode"]!!
+        val codMode = getCodModeFromLineCode(lineCode)
+
 
         val itineraries = getItineraries(lineCode)
             ?: return@get call.respond(HttpStatusCode.NotFound)
 
         val locations = itineraries.itineraries.lineItinerary.map {
-            getLocations(it, lineCode, call.parameters["codMode"]!!)
+            getLocations(it, lineCode, codMode)
         }
 
         val json = locations.mapNotNull {
@@ -26,9 +28,9 @@ fun Route.linesRouting() = route("/lines") {
         call.respondText(json.serialized(), ContentType.Application.Json)
     }
 
-    get("/{lineCode}/mode/{codMode}/stops") {
-        val lineCode = createLineCode(call.parameters["codMode"]!!, call.parameters["lineCode"]!!)
-        val codMode = call.parameters["codMode"]!!
+    get("/{lineCode}/stops") {
+        val lineCode = call.parameters["lineCode"]!!
+        val codMode = getCodModeFromLineCode(lineCode)
 
         val stops = getStops(lineCode, codMode)
             ?: return@get call.respond(HttpStatusCode.NotFound)
@@ -38,8 +40,8 @@ fun Route.linesRouting() = route("/lines") {
         call.respondText(json.serialized(), ContentType.Application.Json)
     }
 
-    get("/{lineCode}/mode/{codMode}/itineraries") {
-        val lineCode = createLineCode(call.parameters["codMode"]!!, call.parameters["lineCode"]!!)
+    get("/{lineCode}/itineraries") {
+        val lineCode = call.parameters["lineCode"]!!
 
         val itineraries = getItineraries(lineCode)
             ?: return@get call.respond(HttpStatusCode.NotFound)
