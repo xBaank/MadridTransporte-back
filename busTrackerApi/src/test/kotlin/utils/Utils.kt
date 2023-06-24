@@ -6,6 +6,8 @@ import busTrackerApi.config.ResetPasswordSignerQualifier
 import busTrackerApi.config.Signer
 import busTrackerApi.startUp
 import io.github.serpro69.kfaker.faker
+import io.ktor.client.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -105,10 +107,17 @@ fun getSigners(): Triple<Lazy<Signer>, Lazy<Signer>, Lazy<Signer>> {
 
 fun testApplicationBusTracker(
     startUpF: Application.() -> Unit = { startUp() },
-    block: suspend ApplicationTestBuilder.() -> Unit
+    block: suspend ApplicationTestBuilder.(client: HttpClient) -> Unit
 ) = testApplication {
-    application { startUpF() }
-    block()
+    val newClient = createClient {
+        install(WebSockets) {
+            pingInterval = 1000
+        }
+    }
+    application {
+        startUpF()
+    }
+    block(newClient)
 }
 
 val pingStartUp: Application.() -> Unit = {
