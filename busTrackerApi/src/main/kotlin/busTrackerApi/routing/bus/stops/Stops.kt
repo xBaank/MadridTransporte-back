@@ -8,6 +8,7 @@ import crtm.defaultClient
 import crtm.soap.ShortStopTimesRequest
 import crtm.soap.ShortStopTimesResponse
 import crtm.soap.ShortTime
+import crtm.utils.getCodModeFromLineCode
 import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,6 +60,7 @@ private suspend inline fun <T> tryGetTimes(
 
 fun buildStopTimesJson(time: ShortTime) = jObject {
     "lineCode" += time.codLine
+    "codMode" += getCodModeFromLineCode(time.codLine)
     "destination" += time.destination
     "codVehicle" += time.codVehicle
     "time" += time.time.toGregorianCalendar().time.toInstant().toEpochMilli()

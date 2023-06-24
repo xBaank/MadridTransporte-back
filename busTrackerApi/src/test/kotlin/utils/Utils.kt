@@ -90,6 +90,15 @@ suspend fun ApplicationTestBuilder.getFavourite(token: String, stopId: String) =
 suspend fun ApplicationTestBuilder.getAbono(id: String) =
     client.get("/v1/abono/$id")
 
+suspend fun ApplicationTestBuilder.getLineLocation(line: String) =
+    client.get("/v1/bus/lines/$line/locations")
+
+suspend fun ApplicationTestBuilder.getItineraries(line: String) =
+    client.get("/v1/bus/lines/$line/itineraries")
+
+suspend fun ApplicationTestBuilder.getStops(line: String) =
+    client.get("/v1/bus/lines/$line/stops")
+
 fun getFakerUserData(): Triple<String, String, String> {
     val faker = faker { }
     val mail = faker.internet.safeEmail()

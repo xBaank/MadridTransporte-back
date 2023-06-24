@@ -1,8 +1,8 @@
 package busTrackerApi.routing.abono
 
-import simpleJson.JsonNull
 import simpleJson.JsonObject
 import simpleJson.asJson
+import simpleJson.jArray
 import simpleJson.jObject
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -36,7 +36,7 @@ fun buildAbonoJson(data: SS_prepagoConsultaSaldo): JsonObject {
                 "useDays" += contract.InvalidityPeriod
                 "leftDays" += leftDays
             }
-        }?.asJson() ?: JsonNull
+        }?.asJson() ?: jArray {}
     }
     return json
 }

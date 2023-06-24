@@ -19,7 +19,8 @@ fun getLocations(itinerary: LineItinerary, lineCode: String, codMode: String): L
 
     return try {
         defaultClient.getLineLocation(lineRequest)
-    } catch (e: Exception) {
+    }
+    catch (e: Exception) {
         return null
     }
 }
@@ -33,7 +34,8 @@ fun getItineraries(lineCode: String): LineItineraryResponse? {
 
     return try {
         defaultClient.getLineItineraries(itineraryRequest).takeIf { it.itineraries.lineItinerary.isNotEmpty() }
-    } catch (e: Exception) {
+    }
+    catch (e: Exception) {
         return null
     }
 }
@@ -44,7 +46,7 @@ fun getStops(lineCode: String, codMode: String): StopResponse? {
         this.codMode = codMode
         authentication = defaultClient.auth()
     }
-    return defaultClient.getStops(request).takeIf { it.stops.stop.isNotEmpty() }
+    return runCatching { defaultClient.getStops(request).takeIf { it.stops.stop.isNotEmpty() } }.getOrNull()
 }
 
 fun buildVehicleLocationJson(vehicleLocation: VehicleLocation) = jObject {
