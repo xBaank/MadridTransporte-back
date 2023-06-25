@@ -45,6 +45,7 @@ dependencies {
 // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     testImplementation("org.testcontainers:mongodb:$test_containers_version")
     testImplementation("org.testcontainers:junit-jupiter:$test_containers_version")

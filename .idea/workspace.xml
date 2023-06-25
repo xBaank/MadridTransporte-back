@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Add TODO">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="More fixes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/abono/Abono.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/abono/Abono.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/AbonoTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/AbonoTest.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -623,7 +624,7 @@
       <option name="project" value="LOCAL" />
       <updated>1687181447717</updated>
     </task>
-    <option name="localTasksCounter" value="85" />
+    <option name="localTasksCounter" value="87" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -635,7 +636,6 @@
     <MESSAGE value="Add name to favorite" />
     <MESSAGE value="Add name to mapped json" />
     <MESSAGE value="Fix favorites by id" />
-    <MESSAGE value="More fixes" />
     <MESSAGE value="Cleanup tests" />
     <MESSAGE value="More cleanup" />
     <MESSAGE value="Improve email styling with kotlinx-html" />
@@ -652,7 +652,15 @@
     <MESSAGE value="Fix tests" />
     <MESSAGE value="Cleanup" />
     <MESSAGE value="Add TODO" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add TODO" />
+    <MESSAGE value="More fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="More fixes" />
+  </component>
+  <component name="XDebuggerManager">
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="busTrackerApi.routing.abono.OperationResult" memberName="FEapValidityIndexT2" />
+      </pinned-members>
+    </pin-to-top-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
