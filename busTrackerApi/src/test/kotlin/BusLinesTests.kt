@@ -32,15 +32,10 @@ class BusLinesTests : TestBase {
         response.status.shouldBe(HttpStatusCode.NotFound)
     }
 
-    @Test
-    fun `should get interUrban stops from line`() = testApplicationBusTracker {
-        val response = getStops(interUrbanCode)
-        response.status.shouldBe(HttpStatusCode.OK)
-    }
-
-    @Test
-    fun `should get urban stops from line`() = testApplicationBusTracker {
-        val response = getStops(urbanCode)
+    @ParameterizedTest
+    @ValueSource(strings = [interUrbanCode, urbanCode])
+    fun `should get interUrban stops from line`(code: String) = testApplicationBusTracker {
+        val response = getStops(code)
         response.status.shouldBe(HttpStatusCode.OK)
     }
 
@@ -50,15 +45,10 @@ class BusLinesTests : TestBase {
         response.status.shouldBe(HttpStatusCode.NotFound)
     }
 
-    @Test
-    fun `should get interUrban itineraries from line`() = testApplicationBusTracker {
-        val response = getItineraries(interUrbanCode)
-        response.status.shouldBe(HttpStatusCode.OK)
-    }
-
-    @Test
-    fun `should get urban itineraries from line`() = testApplicationBusTracker {
-        val response = getItineraries(urbanCode)
+    @ParameterizedTest
+    @ValueSource(strings = [interUrbanCode, urbanCode])
+    fun `should get interUrban itineraries from line`(code: String) = testApplicationBusTracker {
+        val response = getItineraries(code)
         response.status.shouldBe(HttpStatusCode.OK)
     }
 
