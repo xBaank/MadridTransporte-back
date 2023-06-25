@@ -5,6 +5,8 @@ import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldNotBeEmpty
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import simpleJson.JsonArray
 import simpleJson.asArray
 import simpleJson.deserialized
@@ -14,18 +16,10 @@ const val interUrbanCode = "8__450___"
 const val urbanCode = "9__1__074_"
 
 class BusLinesTests : TestBase {
-    @Test
-    fun `should get interurban line location`() = testApplicationBusTracker {
-        val response = getLineLocation(interUrbanCode)
-        val json = response.bodyAsText().deserialized().asArray().getOrElse { throw it }
-        response.status.shouldBe(HttpStatusCode.OK)
-        json.shouldBeInstanceOf<JsonArray>()
-        json.shouldNotBeEmpty()
-    }
-
-    @Test
-    fun `should get urban line location`() = testApplicationBusTracker {
-        val response = getLineLocation(urbanCode)
+    @ParameterizedTest
+    @ValueSource(strings = [interUrbanCode, urbanCode])
+    fun `should get interurban line location`(code: String) = testApplicationBusTracker {
+        val response = getLineLocation(code)
         val json = response.bodyAsText().deserialized().asArray().getOrElse { throw it }
         response.status.shouldBe(HttpStatusCode.OK)
         json.shouldBeInstanceOf<JsonArray>()
