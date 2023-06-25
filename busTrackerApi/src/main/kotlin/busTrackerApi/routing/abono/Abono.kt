@@ -30,8 +30,8 @@ fun buildAbonoJson(data: SS_prepagoConsultaSaldo): JsonObject {
                 "contractCompanyPropietary" += contract.ContractCompanyPropietary
                 "contractUserProfileType" += contract.ContractUserProfileType
                 "contractUserProfilePropietaryCompany" += contract.ContractUserProfilePropietaryCompany
-                "chargeDate" += contract.ContractRechargeDate ?: contract.ContractChargeStartDate
-                "firstUseDateLimit" += contract.RechargeFirstUseDate ?: contract.ContractChargeStartDate
+                "chargeDate" += contract.ContractRechargeDate ?: contract.ContractChargeDate
+                "firstUseDateLimit" += contract.RechargeFirstUseDate ?: contract.ChargeFirstUseDate
                 "firstUseDate" += contract.ContractRechargeStartDate ?: contract.ContractChargeStartDate
                 "lastUseDate" += lastUseDate
                 "useDays" += contract.InvalidityPeriod
