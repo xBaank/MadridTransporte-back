@@ -12,10 +12,24 @@ import utils.TestBase
 import utils.getAbono
 import utils.testApplicationBusTracker
 
+const val abonoJoven = "0000000010040117584"
+const val abonoAdulto = "2222222510010656361"
+
 class AbonoTest : TestBase {
     @Test
-    fun `should get abono`() = testApplicationBusTracker {
-        val result = getAbono("0000000010040117584")
+    fun `should get abono joven`() = testApplicationBusTracker {
+        val result = getAbono(abonoJoven)
+
+        val json = result.bodyAsText().deserialized().getOrElse { throw it }
+
+        result.status.shouldBe(HttpStatusCode.OK)
+        json.shouldBeInstanceOf<JsonObject>()
+        json["contracts"].getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
+    }
+
+    @Test
+    fun `should get abono adulto`() = testApplicationBusTracker {
+        val result = getAbono(abonoAdulto)
 
         val json = result.bodyAsText().deserialized().getOrElse { throw it }
 

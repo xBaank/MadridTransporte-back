@@ -18,11 +18,11 @@ fun buildAbonoJson(data: SS_prepagoConsultaSaldo): JsonObject {
         "createdAt" += data.ttpSearchResult?.ttpData?.UserGroupValidityDate
         "expireAt" += data.ttpSearchResult?.ttpData?.UserGroupExpiryDate
         "contracts" += contracts?.map { contract ->
-            val firstUseDate = LocalDate.parse(contract.ContractChargeStartDate)
+            val firstUseDate = LocalDate.parse(contract.ContractRechargeStartDate ?: contract.ContractChargeStartDate)
             //TODO maybe add +1 to invalidty period?
             val lastUseDay = firstUseDate.plusDays(contract.InvalidityPeriod!!.toLong())
             val lastUseDate = lastUseDay.format(DateTimeFormatter.ISO_DATE)
-            val leftDays = LocalDate.now().until(lastUseDay).days
+            val leftDays = LocalDate.now().until(lastUseDay).days.takeIf { it > 0 } ?: 0
 
             jObject {
                 "contractCode" += contract.ContractCode
@@ -30,9 +30,9 @@ fun buildAbonoJson(data: SS_prepagoConsultaSaldo): JsonObject {
                 "contractCompanyPropietary" += contract.ContractCompanyPropietary
                 "contractUserProfileType" += contract.ContractUserProfileType
                 "contractUserProfilePropietaryCompany" += contract.ContractUserProfilePropietaryCompany
-                "chargeDate" += contract.ContractChargeDate
-                "firstUseDateLimit" += contract.ChargeFirstUseDate
-                "firstUseDate" += contract.ContractChargeStartDate
+                "chargeDate" += contract.ContractRechargeDate ?: contract.ContractChargeStartDate
+                "firstUseDateLimit" += contract.RechargeFirstUseDate ?: contract.ContractChargeStartDate
+                "firstUseDate" += contract.ContractRechargeStartDate ?: contract.ContractChargeStartDate
                 "lastUseDate" += lastUseDate
                 "useDays" += contract.InvalidityPeriod
                 "leftDays" += leftDays
