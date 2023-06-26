@@ -5,9 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import crtm.auth
 import crtm.defaultClient
-import crtm.soap.ShortStopTimesRequest
-import crtm.soap.ShortStopTimesResponse
-import crtm.soap.ShortTime
+import crtm.soap.*
 import crtm.utils.getCodModeFromLineCode
 import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +14,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.withTimeoutOrNull
 import simpleJson.JsonNode
 import simpleJson.asJson
+import simpleJson.jArray
 import simpleJson.jObject
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -35,6 +34,21 @@ fun getStopTimes(stopCode: String, codMode: String?) = Either.catch {
     if (codMode != null) request.codMode = codMode
     defaultClient.getShortStopTimes(request)
 }
+
+fun getStopsByLocation(lat: Double, lon: Double) = Either.catch {
+    val request = StopsByGeoLocationRequest().apply {
+        coordinates = Coordinates().apply {
+            latitude = lat
+            longitude = lon
+        }
+        method = 1
+        precision = 1000
+        codMode = "8"
+        authentication = defaultClient.auth()
+    }
+    defaultClient.getNearestStopsByGeoLocation(request)
+}
+
 
 suspend fun tryGetTimes(stopCode: String, codMode: String?) =
     tryGetTimes(stopCode, codMode, ::getStopTimes)
@@ -64,4 +78,16 @@ fun buildStopTimesJson(time: ShortTime) = jObject {
     "destination" += time.destination
     "codVehicle" += time.codVehicle
     "time" += time.time.toGregorianCalendar().time.toInstant().toEpochMilli()
+}
+
+fun buildStopLocationsJson(stops: StopsByGeoLocationResponse) = jArray {
+    stops.stops.stop.forEach { stop ->
+        addObject {
+            "codStop" += stop.codStop
+            "codMode" += stop.codMode
+            "name" += stop.name
+            "latitude" += stop.coordinates.latitude
+            "longitude" += stop.coordinates.longitude
+        }
+    }
 }

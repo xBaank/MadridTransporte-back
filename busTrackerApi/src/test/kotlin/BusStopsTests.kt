@@ -8,18 +8,12 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldBeInstanceOf
-import org.amshove.kluent.shouldNotBeNull
+import org.amshove.kluent.*
 import org.junit.jupiter.api.Test
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
-import simpleJson.JsonArray
-import simpleJson.JsonObject
-import simpleJson.deserialized
-import simpleJson.get
+import simpleJson.*
 import utils.TestBase
 import utils.testApplicationBusTracker
 
@@ -35,6 +29,22 @@ class StopsRoutingTests : TestBase, KoinComponent {
         response.status.isSuccess().shouldBe(true)
         body.getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
         body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
+    }
+
+    @Test
+    fun `should get stop by location`() = testApplicationBusTracker {
+        val response = client.get("/v1/bus/stops/locations?latitude=40.31043738780061&longitude=-3.736834949732102")
+        val body = response.bodyAsText().deserialized().asArray().getOrElse { throw it }
+
+        response.status.isSuccess().shouldBe(true)
+        body.shouldBeInstanceOf<JsonArray>()
+        body.shouldNotBeEmpty()
+    }
+
+    @Test
+    fun `should not get stop by location`() = testApplicationBusTracker {
+        val response = client.get("/v1/bus/stops/locations?latitude=40.asdds&longitude=-3.736834949732102")
+        response.status shouldBeEqualTo HttpStatusCode.BadRequest
     }
 
 

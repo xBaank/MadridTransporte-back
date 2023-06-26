@@ -20,6 +20,22 @@ import kotlin.time.Duration.Companion.minutes
 val subscribedStops = mutableMapOf<String, DefaultWebSocketSession>()
 
 fun Route.stopsRouting() = route("/stops") {
+    get("/locations") {
+        val latitude = call.request.queryParameters["latitude"]?.toDoubleOrNull() ?: return@get call.respond(
+            HttpStatusCode.BadRequest,
+            errorObject("Missing latitude")
+        )
+        val longitude = call.request.queryParameters["longitude"]?.toDoubleOrNull() ?: return@get call.respond(
+            HttpStatusCode.BadRequest,
+            errorObject("Missing longitude")
+        )
+
+        return@get getStopsByLocation(lat = latitude, lon = longitude)
+            .fold(
+                ifLeft = { call.respond(HttpStatusCode.NotFound) },
+                ifRight = { call.respondText(buildStopLocationsJson(it).serialized(), ContentType.Application.Json) }
+            )
+    }
     get("/{stopCode}/times") {
         val stopCode = createStopCode("8", call.parameters["stopCode"]!!)
         val codMode = call.request.queryParameters["codMode"]
@@ -83,8 +99,7 @@ fun Route.stopsRouting() = route("/stops") {
                     send(json.serialized())
                     delay(1.minutes)
                 }
-            }
-            finally {
+            } finally {
                 subscribedStops.remove(subId)
             }
         }

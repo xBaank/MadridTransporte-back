@@ -6,6 +6,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import org.koin.ktor.ext.inject
 
+
 fun Application.configureAuth() {
     val verifier by inject<JWTVerifier>()
     install(Authentication) {

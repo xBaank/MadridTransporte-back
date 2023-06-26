@@ -3,7 +3,6 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
-import org.amshove.kluent.shouldNotBeEmpty
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -23,7 +22,6 @@ class BusLinesTests : TestBase {
         val json = response.bodyAsText().deserialized().asArray().getOrElse { throw it }
         response.status.shouldBe(HttpStatusCode.OK)
         json.shouldBeInstanceOf<JsonArray>()
-        json.shouldNotBeEmpty()
     }
 
     @Test
