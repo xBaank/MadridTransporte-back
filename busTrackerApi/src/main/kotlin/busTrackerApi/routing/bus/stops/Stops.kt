@@ -64,6 +64,7 @@ fun getEstimations(stopCode: String) = Either.catch {
         authentication = defaultClient.auth()
     }
     val estimations = defaultClient.getEstimations(request)
+    if (estimations.stopsEstimations.stopEstimations.isEmpty()) throw Exception("No estimations found")
     val json = buildStopEstimationsJson(estimations).timed()
     stopEstimationsCache.put(stopCode, json)
     json

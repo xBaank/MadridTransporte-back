@@ -42,7 +42,7 @@ class StopsRoutingTests : TestBase, KoinComponent {
     }
 
     @Test
-    fun `should get not stop estimations`() = testApplicationBusTracker {
+    fun `should not get stop estimations`() = testApplicationBusTracker {
         val response = client.get("/v1/bus/stops/asdasd/estimations")
         response.status shouldBeEqualTo HttpStatusCode.NotFound
     }
