@@ -28,7 +28,23 @@ class StopsRoutingTests : TestBase, KoinComponent {
 
         response.status.isSuccess().shouldBe(true)
         body.getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
-        body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
+        body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
+    }
+
+    @Test
+    fun `should get stop estimations`() = testApplicationBusTracker {
+        val response = client.get("/v1/bus/stops/$busStopCode/estimations")
+        val body = response.bodyAsText().deserialized()
+
+        response.status.isSuccess().shouldBe(true)
+        body.getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
+        body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
+    }
+
+    @Test
+    fun `should get not stop estimations`() = testApplicationBusTracker {
+        val response = client.get("/v1/bus/stops/asdasd/estimations")
+        response.status shouldBeEqualTo HttpStatusCode.NotFound
     }
 
     @Test
@@ -61,8 +77,8 @@ class StopsRoutingTests : TestBase, KoinComponent {
 
         body.getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
         bodyCached.getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
-        body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
-        bodyCached["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
+        body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
+        bodyCached["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
         body["lastTime"].getOrElse { throw it } shouldBeEqualTo bodyCached["lastTime"].getOrElse { throw it }
     }
 
@@ -91,7 +107,7 @@ class StopsRoutingTests : TestBase, KoinComponent {
 
             response.shouldBeInstanceOf<Frame.Text>()
             body!!.getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
-            body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
+            body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
             body["lastTime"].getOrElse { throw it }.shouldNotBeNull()
             close()
         }

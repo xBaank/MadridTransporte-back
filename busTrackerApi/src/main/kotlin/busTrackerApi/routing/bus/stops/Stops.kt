@@ -23,6 +23,10 @@ val stopTimesCache = Cache.Builder()
     .expireAfterWrite(24.hours)
     .build<String, TimedCachedValue<JsonNode>>()
 
+val stopEstimationsCache = Cache.Builder()
+    .expireAfterWrite(1.hours)
+    .build<String, TimedCachedValue<JsonNode>>()
+
 fun getStopTimes(stopCode: String, codMode: String?) = Either.catch {
     val request = ShortStopTimesRequest().apply {
         codStop = stopCode
@@ -49,6 +53,22 @@ fun getStopsByLocation(lat: Double, lon: Double) = Either.catch {
     defaultClient.getNearestStopsByGeoLocation(request)
 }
 
+fun getEstimations(stopCode: String) = Either.catch {
+    val fromCache = stopEstimationsCache.get(stopCode)
+    if (fromCache != null) return@catch fromCache
+
+    val request = EstimationsRequest().apply {
+        this.stopCode += stopCode
+        type = 1
+        orderBy = 2
+        authentication = defaultClient.auth()
+    }
+    val estimations = defaultClient.getEstimations(request)
+    val json = buildStopEstimationsJson(estimations).timed()
+    stopEstimationsCache.put(stopCode, json)
+    json
+}
+
 
 suspend fun tryGetTimes(stopCode: String, codMode: String?) =
     tryGetTimes(stopCode, codMode, ::getStopTimes)
@@ -69,15 +89,35 @@ private suspend inline fun <T> tryGetTimes(
         .await()
         .getOrNull()
 
-    stopTimes?.stopTimes?.times?.shortTime?.map(::buildStopTimesJson)?.asJson()?.timed()
+    stopTimes?.let(::buildStopTimesJson)?.asJson()?.timed()
 }?.right() ?: Exception("No stop times found for stop code $stopCode").left()
 
-fun buildStopTimesJson(time: ShortTime) = jObject {
-    "lineCode" += time.codLine
-    "codMode" += getCodModeFromLineCode(time.codLine)
-    "destination" += time.destination
-    "codVehicle" += time.codVehicle
-    "time" += time.time.toGregorianCalendar().time.toInstant().toEpochMilli()
+fun buildStopTimesJson(times: ShortStopTimesResponse) = jObject {
+    "name" += times.stopTimes.stop.name
+    "times" += jArray {
+        times.stopTimes?.times?.shortTime?.forEach {
+            addObject {
+                "lineCode" += it.codLine
+                "codMode" += getCodModeFromLineCode(it.codLine)
+                "destination" += it.destination
+                "codVehicle" += it.codVehicle
+                "time" += it.time.toGregorianCalendar().time.toInstant().toEpochMilli()
+            }
+        }
+    }
+}
+
+fun buildStopEstimationsJson(estimations: EstimationsResponse) = jObject {
+    val stop = estimations.stopsEstimations.stopEstimations.firstOrNull()
+    "name" += stop?.stopName
+    "estimatedTimes" += stop?.timesInfo?.timeInfo?.map { estimation ->
+        jObject {
+            "lineCode" += estimation.line
+            "codMode" += getCodModeFromLineCode(estimation.line)
+            "codVehicle" += estimation.vehicleCode
+            "time" += estimation.time.toGregorianCalendar().time.toInstant().toEpochMilli()
+        }
+    }?.asJson() ?: jArray()
 }
 
 fun buildStopLocationsJson(stops: StopsByGeoLocationResponse) = jArray {

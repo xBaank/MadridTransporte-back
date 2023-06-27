@@ -36,6 +36,21 @@ fun Route.stopsRouting() = route("/stops") {
                 ifRight = { call.respondText(buildStopLocationsJson(it).serialized(), ContentType.Application.Json) }
             )
     }
+
+    get("/{stopCode}/estimations") {
+        val stopCode = createStopCode("8", call.parameters["stopCode"]!!)
+
+        val estimationsVCached = getEstimations(stopCode).getOrNull()
+            ?: return@get call.respond(HttpStatusCode.NotFound)
+
+        val json = jObject {
+            "data" += estimationsVCached.value
+            "lastTime" += estimationsVCached.createdAt.toEpochMilli()
+        }
+
+        call.respondText(json.serialized(), ContentType.Application.Json)
+    }
+
     get("/{stopCode}/times") {
         val stopCode = createStopCode("8", call.parameters["stopCode"]!!)
         val codMode = call.request.queryParameters["codMode"]
