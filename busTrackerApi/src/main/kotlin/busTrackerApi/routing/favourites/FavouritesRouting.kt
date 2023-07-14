@@ -1,8 +1,9 @@
 package busTrackerApi.routing.favourites
 
 import arrow.core.getOrElse
-import busTrackerApi.badRequest
-import busTrackerApi.notFound
+import busTrackerApi.exceptions.BusTrackerException
+import busTrackerApi.extensions.badRequest
+import busTrackerApi.extensions.notFound
 import busTrackerApi.routing.users.User
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -54,9 +55,9 @@ fun Route.favoritesRouting() = authenticate("user") {
         val id = call.parameters["id"] ?: return@get badRequest("Missing id")
         val email =
             call.principal<JWTPrincipal>()?.get("email") ?: return@get badRequest("Missing email in token")
-        db.getCollection<User>().findOne(User::email eq email) ?: return@get notFound("Email not found")
+        db.getCollection<User>().findOne(User::email eq email) ?: return@get notFound(BusTrackerException.NotFound("Email not found"))
         val favourite = db.getCollection<Favourite>().findOne(Favourite::stopId eq id, Favourite::email eq email)
-            ?: return@get notFound("Favourite not found")
+            ?: return@get notFound(BusTrackerException.NotFound("Favourite not found"))
 
         val respondObject = favourite.toJson().asJson()
         call.respondText(respondObject.serialized(), ContentType.Application.Json)

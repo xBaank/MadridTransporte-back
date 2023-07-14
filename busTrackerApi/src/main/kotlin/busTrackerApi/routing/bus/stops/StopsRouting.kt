@@ -1,6 +1,6 @@
 package busTrackerApi.routing.bus.stops
 
-import busTrackerApi.errorObject
+import busTrackerApi.utils.errorObject
 import crtm.utils.createStopCode
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -23,11 +23,11 @@ fun Route.stopsRouting() = route("/stops") {
     get("/locations") {
         val latitude = call.request.queryParameters["latitude"]?.toDoubleOrNull() ?: return@get call.respond(
             HttpStatusCode.BadRequest,
-            errorObject("Missing latitude")
+            errorObject("Missing latitude").serialized()
         )
         val longitude = call.request.queryParameters["longitude"]?.toDoubleOrNull() ?: return@get call.respond(
             HttpStatusCode.BadRequest,
-            errorObject("Missing longitude")
+            errorObject("Missing longitude").serialized()
         )
 
         return@get getStopsByLocation(lat = latitude, lon = longitude)
@@ -91,7 +91,7 @@ fun Route.stopsRouting() = route("/stops") {
                 return@webSocket close(
                     CloseReason(
                         CloseReason.Codes.VIOLATED_POLICY,
-                        errorObject("Already subscribed to stop code $stopCode")
+                        errorObject("Already subscribed to stop code $stopCode").serialized()
                     )
                 )
             }
@@ -102,7 +102,7 @@ fun Route.stopsRouting() = route("/stops") {
                         ?: return@webSocket close(
                             CloseReason(
                                 CloseReason.Codes.INTERNAL_ERROR,
-                                errorObject("No stop times found for stop code $stopCode")
+                                errorObject("No stop times found for stop code $stopCode").serialized()
                             )
                         )
 
