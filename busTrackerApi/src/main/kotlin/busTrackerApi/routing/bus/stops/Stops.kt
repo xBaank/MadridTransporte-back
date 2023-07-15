@@ -12,6 +12,7 @@ import crtm.defaultClient
 import crtm.soap.*
 import crtm.utils.getCodModeFromLineCode
 import io.github.reactivecircus.cache4k.Cache
+import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -30,6 +31,8 @@ val stopTimesCache = Cache.Builder()
 val stopEstimationsCache = Cache.Builder()
     .expireAfterWrite(1.hours)
     .build<String, TimedCachedValue<JsonNode>>()
+
+val subscribedStops = mutableMapOf<String, WebSocketServerSession>()
 
 private val mapExceptionsF: (Throwable) -> BusTrackerException = { it ->
     if (it is BusTrackerException) it
@@ -73,7 +76,7 @@ fun getEstimations(stopCode: String) = Either.catch {
         authentication = defaultClient.auth()
     }
     val estimations = defaultClient.getEstimations(request)
-    if (estimations.stopsEstimations.stopEstimations.isEmpty()) throw Exception("No estimations found")
+    if (estimations.stopsEstimations.stopEstimations.isEmpty()) throw NotFound("No estimations found")
     val json = buildStopEstimationsJson(estimations).timed()
     stopEstimationsCache.put(stopCode, json)
     json
