@@ -1,12 +1,21 @@
 package busTrackerApi.routing.bus.lines
 
+import arrow.core.Either
+import busTrackerApi.exceptions.BusTrackerException
+import busTrackerApi.exceptions.BusTrackerException.NotFound
+import busTrackerApi.exceptions.BusTrackerException.SoapError
 import crtm.auth
 import crtm.defaultClient
 import crtm.soap.*
 import simpleJson.jArray
 import simpleJson.jObject
 
-fun getLocations(itinerary: LineItinerary, lineCode: String, codMode: String): LineLocationResponse? {
+private val mapExceptionF : (Throwable) -> BusTrackerException = { it ->
+    if (it is BusTrackerException) it
+    else SoapError(it.message)
+}
+
+fun getLocations(itinerary: LineItinerary, lineCode: String, codMode: String) = Either.catch {
     val lineRequest = LineLocationRequest().apply {
         this.codMode = codMode
         codLine = lineCode
@@ -17,37 +26,29 @@ fun getLocations(itinerary: LineItinerary, lineCode: String, codMode: String): L
         codStop = itinerary.stops.shortStop.first().codStop
     }
 
-    return try {
-        defaultClient.getLineLocation(lineRequest)
-    }
-    catch (e: Exception) {
-        return null
-    }
-}
+    defaultClient.getLineLocation(lineRequest)
+}.mapLeft(mapExceptionF)
 
-fun getItineraries(lineCode: String): LineItineraryResponse? {
+fun getItineraries(lineCode: String) = Either.catch {
     val itineraryRequest = LineItineraryRequest().apply {
         codLine = lineCode
         authentication = defaultClient.auth()
         active = 1
     }
 
-    return try {
-        defaultClient.getLineItineraries(itineraryRequest).takeIf { it.itineraries.lineItinerary.isNotEmpty() }
-    }
-    catch (e: Exception) {
-        return null
-    }
-}
+    defaultClient.getLineItineraries(itineraryRequest).takeIf { it.itineraries.lineItinerary.isNotEmpty() } ?:
+    throw NotFound("No itineraries found for line $lineCode")
+}.mapLeft(mapExceptionF)
 
-fun getStops(lineCode: String, codMode: String): StopResponse? {
+fun getStops(lineCode: String, codMode: String) = Either.catch {
     val request = StopRequest().apply {
         codLine = lineCode
         this.codMode = codMode
         authentication = defaultClient.auth()
     }
-    return runCatching { defaultClient.getStops(request).takeIf { it.stops.stop.isNotEmpty() } }.getOrNull()
-}
+    defaultClient.getStops(request).takeIf { it.stops.stop.isNotEmpty() } ?:
+    throw NotFound("No stops found for line $lineCode")
+}.mapLeft(mapExceptionF)
 
 fun buildVehicleLocationJson(vehicleLocation: VehicleLocation) = jObject {
     "lineCode" += vehicleLocation.line.codLine
