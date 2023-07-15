@@ -8,13 +8,13 @@ import busTrackerApi.exceptions.BusTrackerException.*
 import busTrackerApi.extensions.*
 import busTrackerApi.routing.Response
 import busTrackerApi.routing.Response.*
+import busTrackerApi.utils.Call
 import busTrackerApi.utils.accessTokenObject
 import com.auth0.jwt.JWTVerifier
 import com.toxicbakery.bcrypt.Bcrypt
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
-import io.ktor.util.pipeline.*
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.updateOne
 import org.litote.kmongo.eq
@@ -30,7 +30,7 @@ val registerSigner by inject<Signer>(RegisterSignerQualifier)
 val verifier by inject<JWTVerifier>()
 val mailer by inject<Mailer>()
 
-suspend fun PipelineContext<Unit, ApplicationCall>.register(): Either<BusTrackerException, Response> = either {
+suspend fun Call.register(): Either<BusTrackerException, Response> = either {
     val user = call.receiveText().deserialized().toBusTrackerException().bind()
     val backUrl = call.request.queryParameters.getWrapped("backUrl").bind()
     val redirectUrl = call.request.queryParameters.getWrapped("redirectUrl").bind()
@@ -50,7 +50,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.register(): Either<BusTracker
     ResponseRaw(HttpStatusCode.Created)
 }
 
-suspend fun PipelineContext<Unit, ApplicationCall>.verify(): Either<BusTrackerException, Response> = either {
+suspend fun Call.verify(): Either<BusTrackerException, Response> = either {
     val redirectUrl = call.request.queryParameters.getWrapped("redirectUrl").bind()
     val rawToken = call.request.queryParameters.getWrapped("token").bind()
     val token = verifier.verifyAndWrap(rawToken).bind()
@@ -69,7 +69,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.verify(): Either<BusTrackerEx
     ResponseRedirect(redirectUrl)
 }
 
-suspend fun PipelineContext<Unit, ApplicationCall>.login(): Either<BusTrackerException, Response> = either {
+suspend fun Call.login(): Either<BusTrackerException, Response> = either {
     val user = call.receiveText().deserialized().toBusTrackerException().bind()
     val email = user["email"].asString().toBusTrackerException().bind()
     val password = user["password"].asString().toBusTrackerException().bind()
@@ -86,7 +86,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.login(): Either<BusTrackerExc
    ResponseJson(tokenObject, HttpStatusCode.OK)
 }
 
-suspend fun PipelineContext<Unit, ApplicationCall>.sendResetPassword() = either {
+suspend fun Call.sendResetPassword() = either {
     val user = call.receiveText().deserialized().toBusTrackerException().bind()
     val email = user["email"].asString().toBusTrackerException().bind()
     val redirectUrl = call.request.queryParameters.getWrapped("redirectUrl").bind()
@@ -102,7 +102,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.sendResetPassword() = either 
     ResponseRaw(HttpStatusCode.OK)
 }
 
-suspend fun PipelineContext<Unit, ApplicationCall>.resetPassword() = either {
+suspend fun Call.resetPassword() = either {
     val token = call.request.queryParameters.getWrapped("token").bind()
     val rawToken = verifier.verifyAndWrap(token).bind()
     val email: String = rawToken.getClaim("email").asString() ?: shift(BadRequest("Email not found"))

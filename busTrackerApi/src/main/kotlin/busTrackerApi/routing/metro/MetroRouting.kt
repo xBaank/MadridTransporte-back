@@ -1,18 +1,21 @@
 package busTrackerApi.routing.metro
 
-import io.ktor.http.*
+import busTrackerApi.extensions.handleError
+import busTrackerApi.extensions.handleResponse
 import io.ktor.server.application.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import simpleJson.serialized
 
 fun Route.timesRouting() {
     get("/times") {
-        val result = getTimes() ?: return@get call.respond(HttpStatusCode.NotFound)
-        call.respondText(result.serialized(), ContentType.Application.Json)
+        getTimes().fold(
+            { handleError(it) },
+            { handleResponse(it) }
+        )
     }
     get("/times/{id}") {
-        val result = getTimes(call.parameters["id"]) ?: return@get call.respond(HttpStatusCode.NotFound)
-        call.respondText(result.serialized(), ContentType.Application.Json)
+        getTimes(call.parameters["id"]).fold(
+            { handleError(it) },
+            { handleResponse(it) }
+        )
     }
 }
