@@ -4,14 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Refactor UsersPart">
-      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/MetroHandler.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/utils/TypeAliases.kt" afterDir="false" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Refactor metro part">
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/FavouritesHandler.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/PipelineContextExtensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/PipelineContextExtensions.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/Metro.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/MetroRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/metro/MetroRouting.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UserHandler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UserHandler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/JwtExtensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/JwtExtensions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/SimpleJsonExtensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/SimpleJsonExtensions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/FavouritesRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/FavouritesRouting.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/FavouritesTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/FavouritesTest.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -161,8 +160,8 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.MetroRoutingTests">
-    <configuration name="FavouritesTest and 6 more" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+  <component name="RunManager" selected="Gradle.FavouritesTest">
+    <configuration name="FavouritesTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -174,13 +173,8 @@
         <option name="taskNames">
           <list>
             <option value=":busTrackerApi:test" />
-            <option value="--tests &quot;FavouritesTest&quot;" />
-            <option value="--tests &quot;MetroRoutingTests&quot;" />
-            <option value="--tests &quot;StopsRoutingTests&quot;" />
-            <option value="--tests &quot;UserResetPasswordTest&quot;" />
-            <option value="--tests &quot;UsersLoginTest&quot;" />
-            <option value="--tests &quot;UsersRegisterTest&quot;" />
-            <option value="--tests &quot;UsersVerifyTest&quot;" />
+            <option value="--tests" />
+            <option value="&quot;FavouritesTest&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -285,11 +279,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.FavouritesTest" />
         <item itemvalue="Gradle.MetroRoutingTests" />
         <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
         <item itemvalue="Gradle.bus-tracker-back [clean]" />
         <item itemvalue="Gradle.UsersLoginTest.should register then verify then login" />
-        <item itemvalue="Gradle.FavouritesTest and 6 more" />
       </list>
     </recent_temporary>
   </component>
@@ -645,11 +639,10 @@
       <option name="project" value="LOCAL" />
       <updated>1687181447717</updated>
     </task>
-    <option name="localTasksCounter" value="94" />
+    <option name="localTasksCounter" value="95" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add name to favorite" />
     <MESSAGE value="Add name to mapped json" />
     <MESSAGE value="Fix favorites by id" />
     <MESSAGE value="Cleanup tests" />
@@ -674,7 +667,8 @@
     <MESSAGE value="Add estimations" />
     <MESSAGE value="Fix for not found stop" />
     <MESSAGE value="Refactor UsersPart" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor UsersPart" />
+    <MESSAGE value="Refactor metro part" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor metro part" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>

@@ -1,74 +1,37 @@
 package busTrackerApi.routing.favourites
 
-import arrow.core.getOrElse
-import busTrackerApi.exceptions.BusTrackerException
-import busTrackerApi.extensions.badRequest
-import busTrackerApi.extensions.notFound
-import busTrackerApi.routing.users.User
-import io.ktor.http.*
-import io.ktor.server.application.*
+import busTrackerApi.extensions.handleError
+import busTrackerApi.extensions.handleResponse
 import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.koin.ktor.ext.inject
-import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.eq
-import simpleJson.*
 
 fun Route.favoritesRouting() = authenticate("user") {
-    val db by inject<CoroutineDatabase>()
-
     post {
-        val stopToSave = call.receiveText().deserialized()
-        val stopType = stopToSave["stopType"].asString().getOrElse { return@post badRequest(it.message) }
-        val stopId = stopToSave["stopId"].asString().getOrElse { return@post badRequest(it.message) }
-        val name = stopToSave["name"].asString().getOrElse { "Default" }
-
-        val email =
-            call.principal<JWTPrincipal>()?.get("email") ?: return@post badRequest("Missing email in token")
-        val user =
-            db.getCollection<User>().findOne(User::email eq email) ?: return@post badRequest("Email not found")
-        db.getCollection<Favourite>().insertOne(
-            Favourite(
-                email = user.email,
-                stopType = stopType,
-                stopId = stopId,
-                name = name
-            )
+        createFavourite().fold(
+            { handleError(it) },
+            { handleResponse(it) }
         )
-
-        call.respond(HttpStatusCode.Created)
     }
 
     get {
-        val email =
-            call.principal<JWTPrincipal>()?.get("email") ?: return@get badRequest("Missing email in token")
-        db.getCollection<User>().findOne(User::email eq email) ?: return@get badRequest("Email not found")
-        val favourites = db.getCollection<Favourite>().find(Favourite::email eq email).toList()
-        val respondObject = favourites.map(Favourite::toJson).asJson()
-        call.respondText(respondObject.serialized(), ContentType.Application.Json)
+        getFavourites().fold(
+            { handleError(it) },
+            { handleResponse(it) }
+        )
     }
 
     get("/{id}") {
-        val id = call.parameters["id"] ?: return@get badRequest("Missing id")
-        val email =
-            call.principal<JWTPrincipal>()?.get("email") ?: return@get badRequest("Missing email in token")
-        db.getCollection<User>().findOne(User::email eq email) ?: return@get notFound(BusTrackerException.NotFound("Email not found"))
-        val favourite = db.getCollection<Favourite>().findOne(Favourite::stopId eq id, Favourite::email eq email)
-            ?: return@get notFound(BusTrackerException.NotFound("Favourite not found"))
-
-        val respondObject = favourite.toJson().asJson()
-        call.respondText(respondObject.serialized(), ContentType.Application.Json)
+        getFavourite().fold(
+            { handleError(it) },
+            { handleResponse(it) }
+        )
     }
 
     delete("/{id}") {
-        val id = call.parameters["id"] ?: return@delete badRequest("Missing id")
-        val email =
-            call.principal<JWTPrincipal>()?.get("email") ?: return@delete badRequest("Missing email in token")
-        db.getCollection<Favourite>().deleteOne(Favourite::stopId eq id, Favourite::email eq email)
-        call.respond(HttpStatusCode.NoContent)
+        deleteFavourite().fold(
+            { handleError(it) },
+            { handleResponse(it) }
+        )
     }
 }
 
