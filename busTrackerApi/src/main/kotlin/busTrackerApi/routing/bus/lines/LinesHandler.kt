@@ -11,7 +11,6 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import simpleJson.asJson
 
-//TODO Apply regex validation to lineCode
 suspend fun Call.getLocationsHandler() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
     val codMode = getCodModeFromLineCode(lineCode)
