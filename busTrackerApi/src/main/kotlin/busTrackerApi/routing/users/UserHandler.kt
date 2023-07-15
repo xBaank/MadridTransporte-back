@@ -37,7 +37,7 @@ suspend fun Call.register(): Either<BusTrackerException, Response> = either {
     val userTyped = createUser(user).bind()
 
     val userExists = userRepo.getCollection<User>().findOne(User::email eq userTyped.email) != null
-    if (userExists) conflict("User already exists")
+    if (userExists) shift<Conflict>(Conflict("User already exists"))
 
     val inserted = userRepo.getCollection<User>().insertOne(userTyped)
     if (!inserted.wasAcknowledged()) throw InternalServerError("Failed to insert user")

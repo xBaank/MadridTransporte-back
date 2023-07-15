@@ -16,35 +16,35 @@ suspend fun Call.badRequest(message: String?) {
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.BadRequest)
 }
 
-suspend fun Call.unauthorized(ex: BusTrackerException.Unauthorized) {
+private suspend fun Call.unauthorized(ex: BusTrackerException.Unauthorized) {
     val messageResponse = ex.message ?: "Unauthorized"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.Unauthorized)
 }
 
-suspend fun Call.notFound(ex: BusTrackerException.NotFound) {
+private suspend fun Call.notFound(ex: BusTrackerException.NotFound) {
     val messageResponse = ex.message ?: "Not found"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.NotFound)
 }
 
-suspend fun Call.conflict(message: String?) {
-    val messageResponse = message ?: "Conflict"
+private suspend fun Call.conflict(ex: BusTrackerException.Conflict) {
+    val messageResponse = ex.message ?: "Conflict"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.Conflict)
 }
 
-suspend fun Call.soapError(ex: BusTrackerException.SoapError) {
+private suspend fun Call.soapError(ex: BusTrackerException.SoapError) {
     val messageResponse = ex.message ?: "Soap Error"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.BadRequest)
 }
 
-suspend fun Call.internalServerError(ex: BusTrackerException.InternalServerError) {
+private suspend fun Call.internalServerError(ex: BusTrackerException.InternalServerError) {
     val messageResponse = ex.message ?: "Internal Server Error"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
@@ -60,6 +60,7 @@ suspend fun Call.handleError(ex: BusTrackerException) = when (ex) {
     is BusTrackerException.QueryParamError -> badRequest(ex.message)
     is BusTrackerException.ValidationException -> badRequest(ex.message)
     is BusTrackerException.BadRequest -> badRequest(ex.message)
+    is BusTrackerException.Conflict -> conflict(ex)
 }
 
 suspend fun Call.handleResponse(response: Response): Unit = when (response) {
