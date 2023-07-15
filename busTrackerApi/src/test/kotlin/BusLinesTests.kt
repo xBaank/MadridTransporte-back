@@ -13,6 +13,9 @@ import utils.*
 
 const val interUrbanCode = "8__450___"
 const val urbanCode = "9__1__074_"
+const val nonExistanceInterUrbanCode = "8__999___"
+const val nonExistanceUrbanCode = "9__1__999_"
+
 
 class BusLinesTests : TestBase {
     @ParameterizedTest
@@ -27,6 +30,13 @@ class BusLinesTests : TestBase {
     @Test
     fun `should not get urban line location`() = testApplicationBusTracker {
         val response = getLineLocation("asdasd")
+        response.status.shouldBe(HttpStatusCode.BadRequest)
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [nonExistanceUrbanCode, nonExistanceInterUrbanCode])
+    fun `should not find urban line location`(code : String) = testApplicationBusTracker {
+        val response = getLineLocation(code)
         response.status.shouldBe(HttpStatusCode.NotFound)
     }
 
@@ -40,6 +50,13 @@ class BusLinesTests : TestBase {
     @Test
     fun `should not get stops from line`() = testApplicationBusTracker {
         val response = getStops("asdasd")
+        response.status.shouldBe(HttpStatusCode.BadRequest)
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [nonExistanceUrbanCode, nonExistanceInterUrbanCode])
+    fun `should not find stops from line`(code: String) = testApplicationBusTracker {
+        val response = getStops(code)
         response.status.shouldBe(HttpStatusCode.NotFound)
     }
 
@@ -53,6 +70,13 @@ class BusLinesTests : TestBase {
     @Test
     fun `should not get itineraries from line`() = testApplicationBusTracker {
         val response = getItineraries("asdasd")
+        response.status.shouldBe(HttpStatusCode.BadRequest)
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [nonExistanceUrbanCode, nonExistanceInterUrbanCode])
+    fun `should not find itineraries from line`(code : String) = testApplicationBusTracker {
+        val response = getItineraries(code)
         response.status.shouldBe(HttpStatusCode.NotFound)
     }
 }
