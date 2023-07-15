@@ -1,13 +1,18 @@
 package busTrackerApi.routing.bus.stops
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
+import busTrackerApi.exceptions.BusTrackerException
+import busTrackerApi.exceptions.BusTrackerException.NotFound
+import busTrackerApi.exceptions.BusTrackerException.SoapError
 import crtm.auth
 import crtm.defaultClient
 import crtm.soap.*
 import crtm.utils.getCodModeFromLineCode
 import io.github.reactivecircus.cache4k.Cache
+import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -27,6 +32,13 @@ val stopEstimationsCache = Cache.Builder()
     .expireAfterWrite(1.hours)
     .build<String, TimedCachedValue<JsonNode>>()
 
+val subscribedStops = mutableMapOf<String, WebSocketServerSession>()
+
+private val mapExceptionsF: (Throwable) -> BusTrackerException = { it ->
+    if (it is BusTrackerException) it
+    else SoapError(it.message)
+}
+
 fun getStopTimes(stopCode: String, codMode: String?) = Either.catch {
     val request = ShortStopTimesRequest().apply {
         codStop = stopCode
@@ -37,7 +49,7 @@ fun getStopTimes(stopCode: String, codMode: String?) = Either.catch {
     }
     if (codMode != null) request.codMode = codMode
     defaultClient.getShortStopTimes(request)
-}
+}.mapLeft(mapExceptionsF)
 
 fun getStopsByLocation(lat: Double, lon: Double) = Either.catch {
     val request = StopsByGeoLocationRequest().apply {
@@ -51,7 +63,7 @@ fun getStopsByLocation(lat: Double, lon: Double) = Either.catch {
         authentication = defaultClient.auth()
     }
     defaultClient.getNearestStopsByGeoLocation(request)
-}
+}.mapLeft(mapExceptionsF)
 
 fun getEstimations(stopCode: String) = Either.catch {
     val fromCache = stopEstimationsCache.get(stopCode)
@@ -64,23 +76,26 @@ fun getEstimations(stopCode: String) = Either.catch {
         authentication = defaultClient.auth()
     }
     val estimations = defaultClient.getEstimations(request)
-    if (estimations.stopsEstimations.stopEstimations.isEmpty()) throw Exception("No estimations found")
+    if (estimations.stopsEstimations.stopEstimations.isEmpty()) throw NotFound("No estimations found")
     val json = buildStopEstimationsJson(estimations).timed()
     stopEstimationsCache.put(stopCode, json)
     json
-}
+}.mapLeft(mapExceptionsF)
 
 
-suspend fun tryGetTimes(stopCode: String, codMode: String?) =
-    tryGetTimes(stopCode, codMode, ::getStopTimes)
+suspend fun getTimes(stopCode: String, codMode: String?) =
+    getTimes(stopCode, codMode, ::getStopTimes)
+        .mapLeft(mapExceptionsF)
 
-suspend fun tryGetTimesOrCached(stopCode: String, codMode: String?) =
-    tryGetTimes(stopCode, codMode).getOrNull()
-        ?.also { stopTimesCache.put(stopCode, it) }
-        ?: stopTimesCache.get(stopCode)
+suspend fun getTimesOrCached(stopCode: String, codMode: String?) =
+    getTimes(stopCode, codMode)
+        .onRight { stopTimesCache.put(stopCode, it) }
+        .getOrElse { stopTimesCache.get(stopCode) }?.right() ?:
+        NotFound("No stop times found for stop code $stopCode").left()
 
 
-private suspend inline fun <T> tryGetTimes(
+
+private suspend inline fun <T> getTimes(
     stopCode: String,
     codMode: String?,
     crossinline getF: (stopCode: String, codMode: String?) -> Either<T, ShortStopTimesResponse>

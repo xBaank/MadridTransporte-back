@@ -15,7 +15,7 @@ import java.net.URLEncoder
 class FavouritesTest : TestBase {
 
     @Test
-    fun `should get add and get favourites`() = testApplicationBusTracker {
+    fun `should add and get favourites`() = testApplicationBusTracker {
         val (mail, username, password) = getFakerUserData()
         val (_, registerSigner, _) = getSigners()
 

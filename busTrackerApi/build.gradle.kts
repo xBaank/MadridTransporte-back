@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 repositories {
     mavenCentral()
 }
@@ -66,6 +68,11 @@ tasks.test {
 kotlin {
     jvmToolchain(11)
 }
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.freeCompilerArgs = listOf("-Xcontext-receivers")
+}
+
 
 
 

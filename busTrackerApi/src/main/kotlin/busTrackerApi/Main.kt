@@ -3,6 +3,7 @@ package busTrackerApi
 import busTrackerApi.config.configureAuth
 import busTrackerApi.config.configureDependencies
 import busTrackerApi.config.configureRoutingV1
+import busTrackerApi.utils.getenvOrNull
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*

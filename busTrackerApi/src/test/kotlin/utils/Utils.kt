@@ -74,6 +74,7 @@ suspend fun ApplicationTestBuilder.addFavourite(token: String, stopType: String,
         setBody(jObject {
             "stopType" += stopType
             "stopId" += stopId
+            "name" += "test"
         }.serialized())
     }
 

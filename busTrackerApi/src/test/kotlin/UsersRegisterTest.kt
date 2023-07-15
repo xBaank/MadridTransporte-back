@@ -1,4 +1,4 @@
-import busTrackerApi.errorObject
+import busTrackerApi.utils.errorObject
 import io.github.serpro69.kfaker.faker
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -31,7 +31,7 @@ class UsersRegisterTest : TestBase {
         val response = register("", username, password)
 
         response.status.shouldBe(HttpStatusCode.BadRequest)
-        response.bodyAsText().shouldBeEqualTo(errorObject("Invalid mail"))
+        response.bodyAsText().shouldBeEqualTo(errorObject("Invalid mail").serialized())
     }
 
     @Test
@@ -48,7 +48,7 @@ class UsersRegisterTest : TestBase {
         }
 
         response.status.shouldBe(HttpStatusCode.BadRequest)
-        response.bodyAsText().shouldBeEqualTo(errorObject("Missing redirectUrl"))
+        response.bodyAsText().shouldBeEqualTo(errorObject("Missing query parameter redirectUrl").serialized())
     }
 
     @Test
@@ -65,7 +65,7 @@ class UsersRegisterTest : TestBase {
         }
 
         response.status.shouldBe(HttpStatusCode.BadRequest)
-        response.bodyAsText().shouldBeEqualTo(errorObject("Missing backUrl"))
+        response.bodyAsText().shouldBeEqualTo(errorObject("Missing query parameter backUrl").serialized())
     }
 
     @Test

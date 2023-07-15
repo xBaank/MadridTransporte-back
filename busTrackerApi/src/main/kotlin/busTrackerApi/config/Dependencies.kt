@@ -1,7 +1,7 @@
 package busTrackerApi.config
 
-import busTrackerApi.getenvOrThrow
-import busTrackerApi.withExpiresIn
+import busTrackerApi.extensions.withExpiresIn
+import busTrackerApi.utils.getenvOrThrow
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
