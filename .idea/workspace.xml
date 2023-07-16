@@ -4,14 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Some refactor on stops part">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Refactor stops part">
+      <change afterPath="$PROJECT_DIR$/.docs/Abono.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.docs/Buses.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.docs/Home.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.docs/Lines.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.docs/Metro.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/discord.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/exceptions/BusTrackerException.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/exceptions/BusTrackerException.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/PipelineContextExtensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/PipelineContextExtensions.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/SimpleJsonExtensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/EitherExtensions.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/Stops.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/Stops.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/StopsHandler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/StopsHandler.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/StopsRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/StopsRouting.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +115,7 @@
     </option>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="customExceptions" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -141,7 +142,7 @@
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/elrob/IdeaProjects/bus-tracker-back&quot;,
     &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;actions.on.save&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -161,31 +162,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'">
-    <configuration name="AbonoTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":busTrackerApi:test" />
-            <option value="--tests" />
-            <option value="&quot;AbonoTest&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>true</ForceTestExec>
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Kotlin.MainKt">
     <configuration name="BusLinesTests" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -200,30 +177,6 @@
             <option value=":busTrackerApi:test" />
             <option value="--tests" />
             <option value="&quot;BusLinesTests&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <ForceTestExec>true</ForceTestExec>
-      <method v="2" />
-    </configuration>
-    <configuration name="BusLinesTests.should not get stops from line" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":busTrackerApi:test" />
-            <option value="--tests" />
-            <option value="&quot;BusLinesTests.should not get stops from line&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -258,6 +211,30 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
+    <configuration name="StopsRoutingTests.should not get stop estimations" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":busTrackerApi:test" />
+            <option value="--tests" />
+            <option value="&quot;StopsRoutingTests.should not get stop estimations&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <ForceTestExec>true</ForceTestExec>
+      <method v="2" />
+    </configuration>
     <configuration name="Tests in 'bus-tracker-back.busTrackerApi.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -280,13 +257,20 @@
       <ForceTestExec>true</ForceTestExec>
       <method v="2" />
     </configuration>
+    <configuration name="MainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="busTrackerApi.MainKt" />
+      <module name="bus-tracker-back.busTrackerApi.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Kotlin.MainKt" />
+        <item itemvalue="Gradle.StopsRoutingTests.should not get stop estimations" />
         <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
         <item itemvalue="Gradle.StopsRoutingTests.should get stop times" />
         <item itemvalue="Gradle.BusLinesTests" />
-        <item itemvalue="Gradle.BusLinesTests.should not get stops from line" />
-        <item itemvalue="Gradle.AbonoTest" />
       </list>
     </recent_temporary>
   </component>
@@ -642,11 +626,10 @@
       <option name="project" value="LOCAL" />
       <updated>1687181447717</updated>
     </task>
-    <option name="localTasksCounter" value="102" />
+    <option name="localTasksCounter" value="103" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Remove comment" />
     <MESSAGE value="Normalize tests names" />
     <MESSAGE value="Add scopes and lifetime to tokens" />
     <MESSAGE value="Check for scope in auth middleware" />
@@ -671,16 +654,12 @@
     <MESSAGE value="Add some regex for lineCodes" />
     <MESSAGE value="Remove TODO" />
     <MESSAGE value="Some refactor on stops part" />
-    <option name="LAST_COMMIT_MESSAGE" value="Some refactor on stops part" />
+    <MESSAGE value="Refactor stops part" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor stops part" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/PipelineContextExtensions.kt</url>
-          <line>45</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusStopsTests.kt</url>
           <line>28</line>
