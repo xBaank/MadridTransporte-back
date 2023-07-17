@@ -1,4 +1,4 @@
-package busTrackerApi.routing.favourites
+package busTrackerApi.routing.favorites
 
 import busTrackerApi.extensions.handleError
 import busTrackerApi.extensions.handleResponse
@@ -7,28 +7,28 @@ import io.ktor.server.routing.*
 
 fun Route.favoritesRouting() = authenticate("user") {
     post {
-        createFavourite().fold(
+        createFavorite().fold(
             { handleError(it) },
             { handleResponse(it) }
         )
     }
 
     get {
-        getFavourites().fold(
+        getFavorites().fold(
             { handleError(it) },
             { handleResponse(it) }
         )
     }
 
     get("/{id}") {
-        getFavourite().fold(
+        getFavorite().fold(
             { handleError(it) },
             { handleResponse(it) }
         )
     }
 
     delete("/{id}") {
-        deleteFavourite().fold(
+        deleteFavorite().fold(
             { handleError(it) },
             { handleResponse(it) }
         )

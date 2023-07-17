@@ -84,6 +84,7 @@ suspend fun WebSocketServerSession.subscribeStopsTimes() = either {
     val codMode = call.request.queryParameters.getWrapped("codMode").getOrNull()
     val ip = call.request.origin.remoteAddress
     val subId = "$ip-$email-$stopCode"
+
     if (subscribedStops.containsKey(subId)) shift<Nothing>(
         CloseSocketException("Already subscribed to stop code $stopCode", CloseReason.Codes.VIOLATED_POLICY)
     )

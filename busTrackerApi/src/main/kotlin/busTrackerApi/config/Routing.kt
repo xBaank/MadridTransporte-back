@@ -3,7 +3,7 @@ package busTrackerApi.config
 import busTrackerApi.routing.abono.abonoRouting
 import busTrackerApi.routing.bus.lines.linesRouting
 import busTrackerApi.routing.bus.stops.stopsRouting
-import busTrackerApi.routing.favourites.favoritesRouting
+import busTrackerApi.routing.favorites.favoritesRouting
 import busTrackerApi.routing.metro.timesRouting
 import busTrackerApi.routing.users.authRouting
 import io.ktor.server.application.*

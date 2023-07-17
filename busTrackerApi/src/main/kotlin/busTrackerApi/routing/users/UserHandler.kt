@@ -29,7 +29,7 @@ val resetPasswordSigner by inject<Signer>(ResetPasswordSignerQualifier)
 val registerSigner by inject<Signer>(RegisterSignerQualifier)
 val verifier by inject<JWTVerifier>()
 val mailer by inject<Mailer>()
-
+//TODO maybe move redirect urls to the body?
 suspend fun Call.register(): Either<BusTrackerException, Response> = either {
     val user = call.receiveText().deserialized().toBusTrackerException().bind()
     val backUrl = call.request.queryParameters.getWrapped("backUrl").bind()
