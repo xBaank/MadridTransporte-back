@@ -6,6 +6,6 @@ Here you can see how to use the API:
 - [Buses](Buses.md)
 - - [Lines](Lines.md)
 - - [Stops](Stops.md)
-- [Auhentification](Auhtentication.md)
+- [Authentication](Auhtentication.md)
 - - [User](User.md)
 - - [Favorites](Favorites.md)
