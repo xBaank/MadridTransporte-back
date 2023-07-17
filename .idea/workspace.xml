@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Update Readme.md">
-      <change afterPath="$PROJECT_DIR$/.docs/Setup.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.docs/Home.md" beforeDir="false" afterPath="$PROJECT_DIR$/.docs/Home.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="More docs">
+      <change beforePath="$PROJECT_DIR$/.docs/Setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/.docs/Setup.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -625,11 +623,10 @@
       <option name="project" value="LOCAL" />
       <updated>1687181447717</updated>
     </task>
-    <option name="localTasksCounter" value="110" />
+    <option name="localTasksCounter" value="111" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added ws to stopTimes in bus" />
     <MESSAGE value="Fix tests" />
     <MESSAGE value="Add TODO" />
     <MESSAGE value="More fixes" />
@@ -654,7 +651,8 @@
     <MESSAGE value="Cleanup" />
     <MESSAGE value="Fix typo" />
     <MESSAGE value="Update Readme.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update Readme.md" />
+    <MESSAGE value="More docs" />
+    <option name="LAST_COMMIT_MESSAGE" value="More docs" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>

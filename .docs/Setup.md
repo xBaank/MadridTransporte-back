@@ -27,4 +27,5 @@ Execute the following command to run the application:
  java --jar busTrackerApi/build/libs/busTrackerApi.jar
  ```
 
-> **WARNING**: The application doesn't allow using SSL, so it is recommended to use a reverse proxy to handle the SSL connection.
+> **WARNING**
+> The application doesn't allow using SSL, so it is recommended to use a reverse proxy to handle the SSL connection.
