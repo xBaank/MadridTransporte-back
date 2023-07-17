@@ -1,6 +1,10 @@
 # User
 
 ## Register
+Create a user account.
+<details>
+<summary>See more</summary>
+
 To create a user account you need to send a POST request to the following URL:
 `{url}/v1/user/register?backUrl={backUrl}&redirectUrl={redirectUrl}`
 - `backUrl`: The Host of the back.
@@ -15,15 +19,25 @@ The response code will be `201` or `409` or `400`.
 
 This will email the user with a link to activate the account in the format of `{backUrl}/v1/users/verify?token={verifyToken}&redirectUrl={redirectUrl}`.
 
+</details>
+
 ## Verify
 This endpoint is used to verify a user account, it is sent to the email specified during the register.
+<details>
+<summary>See more</summary>
+
 To verify a user account you need to send a GET request to the following URL:
 `{url}/v1/user/verify?token={verifyToken}&redirectUrl={redirectUrl}`
 
 The response code will be `308` or `400`.
 
+</details>
+
 ## Login
 Once the verification is done, the user can log in to the system.
+<details>
+<summary>See more</summary>
+
 To log in you need to send a POST request to the following URL:
 `{url}/v1/user/login`
 
@@ -35,7 +49,13 @@ The response code will be `200` or `401` or `400`.
 The response will contain a JSON object with the following fields:
 - `token`: The Bearer token to authenticate with.
 
+</details>
+
 ## Reset Password
+Reset the password of the user.
+<details>
+<summary>See more</summary>
+
 If the user forgets the password, he can reset it.
 
 First step is to send a POST request to the following URL:
@@ -55,3 +75,5 @@ The body of the request must be a JSON object with the following fields:
 - `password`: The new password of the user.
 
 The response code will be `200` or `401` or `400`.
+
+</details>

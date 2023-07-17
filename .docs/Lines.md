@@ -1,8 +1,13 @@
 # Lines
 
 ## Locations
+Get the location of the buses of a line.
+<details>
+<summary>See more</summary>
 To get information about the lines, you need to make a GET request to the following URL:
 `{url}/v1/bus/lines/{lineCode}/locations`
+
+The response code will be `200` or `400`.
 
 > **Note** lineCode is the code of the line you want to get information about. It can be obtained from stops section.
 
@@ -50,10 +55,16 @@ To get information about the lines, you need to make a GET request to the follow
     }
 ]
 ```
+</details>
 
 ## Itineraries
+Get the itineraries of a line.
+<details>
+<summary>See more</summary>
 To get information about the lines, you need to make a GET request to the following URL:
 `{url}/v1/bus/lines/{lineCode}/itineraries`
+
+The response code will be `200` or `400`.
 
 ### Example Request
 ```GET http://localhost:8080/v1/bus/lines/8__450___/itineraries```
@@ -443,10 +454,16 @@ To get information about the lines, you need to make a GET request to the follow
     }
 ]
 ```
+</details>
 
 ## Stops
+Get the stops of a line.
+<details>
+<summary>See more</summary>
 To get the stops of a line, you have to make a GET request to the following URL:
 `{url}/v1/bus/lines/{lineCode}/stops`
+
+The response code will be `200` or `400`.
 
 ### Example Request
 `GET http://localhost:8080/v1/bus/lines/8__450___/stops`
@@ -930,3 +947,5 @@ To get the stops of a line, you have to make a GET request to the following URL:
 ]
 ```
 
+
+</details>

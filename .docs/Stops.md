@@ -1,9 +1,13 @@
 # Stops
 
 ## Locations
+Get the locations of the stops near a coordinate.
+<details>
+<summary>See more</summary>
 To get the locations of the stops near a coordinate, you need to make a GET request to the following URL:
 - `{url}/v1/stops/locations?latitude={lat}&longitude={lon}` to get the locations of the stops near a coordinate.
 
+The response code will be `200` or `400`.
 
 ### Example Request
 ```GET http://localhost:8080/v1/bus/stops/locations?latitude=40.37043738780061&longitude=-3.536834949732102```
@@ -573,10 +577,16 @@ To get the locations of the stops near a coordinate, you need to make a GET requ
     }
 ]
 ```
+</details>
 
 ## Estimations
+Get the estimations of bus lines in a bus stop.
+<details>
+<summary>See more</summary>
 To get the estimations of bus lines in a bus stop, you need make a GET request to the following endpoint:
 - `{url}/v1/stops/{stopCodes}/estimations`
+
+The response code will be `200` or `400`.
 
 ### Example Request
 ```GET http://localhost:8080/v1/bus/stops/08242/estimations```
@@ -742,12 +752,18 @@ To get the estimations of bus lines in a bus stop, you need make a GET request t
     "lastTime": 1689534681714
 }
 ```
+</details>
 
 ## Times
+Get the times of bus lines in a bus stop.
+<details>
+<summary>See more</summary>
 To get the times of bus lines in a bus stop, you need make a GET request to the following endpoint:
 - `{url}/v1/stops/{stopCodes}/times`
 - `{url}/v1/stops/{stopCodes}/times/cached` (cached response, this endpoint is faster but can be outdated if no one has made a request in minutes)
 - `{url}/v1/stops/{stopCodes}/times/subscribe` (websocket endpoint, you can subscribe to a bus stop and receive the times in real time)
+
+The response code will be `200` or `400`.
 
 ### Example Request
 ```GET http://localhost:8080/v1/bus/stops/08242/times```
@@ -938,3 +954,4 @@ To get the times of bus lines in a bus stop, you need make a GET request to the 
     "lastTime": 1689534982807
 }
 ```
+</details>

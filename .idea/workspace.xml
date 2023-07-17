@@ -4,12 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="User docs part">
-      <change afterPath="$PROJECT_DIR$/.docs/Favorites.md" afterDir="false" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Favorite docs part">
+      <change beforePath="$PROJECT_DIR$/.docs/Abono.md" beforeDir="false" afterPath="$PROJECT_DIR$/.docs/Abono.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.docs/Favorites.md" beforeDir="false" afterPath="$PROJECT_DIR$/.docs/Favorites.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.docs/Lines.md" beforeDir="false" afterPath="$PROJECT_DIR$/.docs/Lines.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.docs/Metro.md" beforeDir="false" afterPath="$PROJECT_DIR$/.docs/Metro.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.docs/Stops.md" beforeDir="false" afterPath="$PROJECT_DIR$/.docs/Stops.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.docs/User.md" beforeDir="false" afterPath="$PROJECT_DIR$/.docs/User.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/Favourite.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/Favorite.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/FavouritesHandler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/FavouritesHandler.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UserHandler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UserHandler.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -623,11 +625,10 @@
       <option name="project" value="LOCAL" />
       <updated>1687181447717</updated>
     </task>
-    <option name="localTasksCounter" value="106" />
+    <option name="localTasksCounter" value="107" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added some files" />
     <MESSAGE value="Added Abono endpoint" />
     <MESSAGE value="Added tests" />
     <MESSAGE value="Added ws to stopTimes in bus" />
@@ -652,7 +653,8 @@
     <MESSAGE value="Some docs" />
     <MESSAGE value="Stops docs" />
     <MESSAGE value="User docs part" />
-    <option name="LAST_COMMIT_MESSAGE" value="User docs part" />
+    <MESSAGE value="Favorite docs part" />
+    <option name="LAST_COMMIT_MESSAGE" value="Favorite docs part" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>

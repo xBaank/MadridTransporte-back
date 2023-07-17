@@ -1,8 +1,14 @@
 # Metro
+## Times
+Get information about the metro times.
+<details>
+<summary>See more</summary>
+
 To get information about the metro, you need to make a GET request to the following URL:
 - `{url}/v1/metro/times/{id}` to get the next metro times of one station.
 - `{url}/v1/metro/times` to get the next metro times of all stations.
 
+The response code will be `200` or `400`.
 `{id}` is the auto numeric id of the metro station.
 
 ## Example Request
@@ -64,3 +70,4 @@ To get information about the metro, you need to make a GET request to the follow
     }
 ]
 ```
+</details>

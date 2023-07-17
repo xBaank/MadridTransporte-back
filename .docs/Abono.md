@@ -1,6 +1,11 @@
 # Abono
+Get information about an abono.
+<details>
+<summary>See more</summary>
 To get information about the abono, you need to make a GET request to the following URL:
 ` {url}/v1/abono/{id}`
+
+The response code will be `200` or `401` or `400`.
 
 `{id}` is the id of the abono you want to get information about.
 > **Note**
@@ -35,3 +40,4 @@ To get information about the abono, you need to make a GET request to the follow
     ]
 }
 ```
+</details>
