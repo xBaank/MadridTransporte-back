@@ -1,4 +1,4 @@
-package busTrackerApi.routing.favourites
+package busTrackerApi.routing.favorites
 
 import arrow.core.continuations.either
 import busTrackerApi.exceptions.BusTrackerException.NotFound
@@ -22,7 +22,8 @@ import simpleJson.deserialized
 import simpleJson.get
 
 val db by inject<CoroutineDatabase>()
-suspend fun Call.createFavourite() = either {
+
+suspend fun Call.createFavorite() = either {
     val stopToSave = call.receiveText().deserialized()
     val stopType = stopToSave["stopType"].asString().toBusTrackerException().bind()
     val stopId = stopToSave["stopId"].asString().toBusTrackerException().bind()
@@ -31,8 +32,8 @@ suspend fun Call.createFavourite() = either {
 
     val user: User = db.getCollection<User>().findOne(User::email eq email) ?: shift(NotFound("Email not found"))
 
-    db.getCollection<Favourite>().insertOne(
-        Favourite(
+    db.getCollection<Favorite>().insertOne(
+        Favorite(
             email = user.email,
             stopType = stopType,
             stopId = stopId,
@@ -43,31 +44,31 @@ suspend fun Call.createFavourite() = either {
     ResponseRaw(HttpStatusCode.Created)
 }
 
-suspend fun Call.getFavourites() = either {
+suspend fun Call.getFavorites() = either {
     val email = call.principal<JWTPrincipal>().getWrapped("email").bind()
 
     db.getCollection<User>().findOne(User::email eq email) ?: shift(NotFound("Email not found"))
-    val favourites = db.getCollection<Favourite>().find(Favourite::email eq email).toList()
+    val favourites = db.getCollection<Favorite>().find(Favorite::email eq email).toList()
 
-    ResponseJson(favourites.map(Favourite::toJson).asJson(), HttpStatusCode.OK)
+    ResponseJson(favourites.map(::buildFavoriteJson).asJson(), HttpStatusCode.OK)
 }
 
-suspend fun Call.getFavourite() = either {
+suspend fun Call.getFavorite() = either {
     val id = call.parameters.getWrapped("id").bind()
     val email = call.principal<JWTPrincipal>().getWrapped("email").bind()
 
-    val filters = arrayOf(Favourite::stopId eq id, Favourite::email eq email)
+    val filters = arrayOf(Favorite::stopId eq id, Favorite::email eq email)
     db.getCollection<User>().findOne(User::email eq email) ?: shift(NotFound("Email not found"))
-    val favourite: Favourite = db.getCollection<Favourite>().findOne(*filters) ?: shift(NotFound("Favourite not found"))
+    val favourite: Favorite = db.getCollection<Favorite>().findOne(*filters) ?: shift(NotFound("Favourite not found"))
 
-    ResponseJson(favourite.toJson(), HttpStatusCode.OK)
+    ResponseJson(buildFavoriteJson(favourite), HttpStatusCode.OK)
 }
 
-suspend fun Call.deleteFavourite() = either {
+suspend fun Call.deleteFavorite() = either {
     val id = call.parameters.getWrapped("id").bind()
     val email = call.principal<JWTPrincipal>().getWrapped("email").bind()
 
-    db.getCollection<Favourite>().deleteOne(Favourite::stopId eq id, Favourite::email eq email)
+    db.getCollection<Favorite>().deleteOne(Favorite::stopId eq id, Favorite::email eq email)
 
     ResponseRaw(HttpStatusCode.NoContent)
 }

@@ -4,15 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Refactor stops part">
-      <change afterPath="$PROJECT_DIR$/.docs/Abono.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.docs/Buses.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.docs/Home.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.docs/Lines.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.docs/Metro.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/discord.xml" afterDir="false" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="User docs part">
+      <change afterPath="$PROJECT_DIR$/.docs/Favorites.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/StopsHandler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/bus/stops/StopsHandler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/Favourite.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/Favorite.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/FavouritesHandler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favourites/FavouritesHandler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UserHandler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UserHandler.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -626,13 +623,10 @@
       <option name="project" value="LOCAL" />
       <updated>1687181447717</updated>
     </task>
-    <option name="localTasksCounter" value="103" />
+    <option name="localTasksCounter" value="106" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Normalize tests names" />
-    <MESSAGE value="Add scopes and lifetime to tokens" />
-    <MESSAGE value="Check for scope in auth middleware" />
     <MESSAGE value="Added some files" />
     <MESSAGE value="Added Abono endpoint" />
     <MESSAGE value="Added tests" />
@@ -655,18 +649,12 @@
     <MESSAGE value="Remove TODO" />
     <MESSAGE value="Some refactor on stops part" />
     <MESSAGE value="Refactor stops part" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor stops part" />
+    <MESSAGE value="Some docs" />
+    <MESSAGE value="Stops docs" />
+    <MESSAGE value="User docs part" />
+    <option name="LAST_COMMIT_MESSAGE" value="User docs part" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusStopsTests.kt</url>
-          <line>28</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="busTrackerApi.routing.abono.OperationResult" memberName="FEapValidityIndexT2" />
