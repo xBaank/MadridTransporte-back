@@ -1,5 +1,5 @@
 **/.dockerignore
-**/.env
+../busTrackerApi/.env
 **/.git
 **/.gitignore
 **/.project
