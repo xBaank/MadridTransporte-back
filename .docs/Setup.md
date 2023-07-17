@@ -17,10 +17,14 @@ This variables can be loaded from a .env file in the root of the project or can 
 
 Execute the following command to install the dependencies:
 
-```bash .gradlew buildFatJar```
+```bash
+ .gradlew buildFatJar
+ ```
 
 Execute the following command to run the application:
 
-```bash java --jar busTrackerApi/build/libs/busTrackerApi.jar```
+```bash
+ java --jar busTrackerApi/build/libs/busTrackerApi.jar
+ ```
 
 > **WARNING**: The application doesn't allow using SSL, so it is recommended to use a reverse proxy to handle the SSL connection.
