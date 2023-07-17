@@ -1,4 +1,8 @@
 # Favorites
+All the endpoints of this section are protected, you will authenticate.
+> Authorization: Bearer **Put Here The Token You Got From Login**
+
+
 ## Add a favorite
 Add a favorite to the user's favorites list.
 <details>
