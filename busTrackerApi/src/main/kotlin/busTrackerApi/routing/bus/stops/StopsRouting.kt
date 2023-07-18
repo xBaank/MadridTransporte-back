@@ -35,6 +35,13 @@ fun Route.stopsRouting() = route("/stops") {
         )
     }
 
+    get("/query") {
+        getStopsByQuery().fold(
+            { handleError(it) },
+            { handleResponse(it) }
+        )
+    }
+
     authenticate("user") {
         webSocket("/{stopCode}/times/subscribe") {
             subscribeStopsTimes().fold(

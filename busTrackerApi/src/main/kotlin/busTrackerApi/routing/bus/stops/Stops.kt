@@ -65,6 +65,14 @@ fun getStopsByLocation(lat: Double, lon: Double) = Either.catch {
     defaultClient.getNearestStopsByGeoLocation(request)
 }.mapLeft(mapExceptionsF)
 
+fun getStopsByQuery(query: String) = Either.catch {
+    val request = StopRequestV2().apply {
+        customSearch = query
+        authentication = defaultClient.auth()
+    }
+    defaultClient.getStopsV2(request)
+}.mapLeft(mapExceptionsF)
+
 fun getEstimations(stopCode: String) = Either.catch {
     val fromCache = stopEstimationsCache.get(stopCode)
     if (fromCache != null) return@catch fromCache
@@ -137,6 +145,18 @@ fun buildStopEstimationsJson(estimations: EstimationsResponse) = jObject {
 }
 
 fun buildStopLocationsJson(stops: StopsByGeoLocationResponse) = jArray {
+    stops.stops.stop.forEach { stop ->
+        addObject {
+            "codStop" += stop.codStop
+            "codMode" += stop.codMode
+            "name" += stop.name
+            "latitude" += stop.coordinates.latitude
+            "longitude" += stop.coordinates.longitude
+        }
+    }
+}
+
+fun buildStopsJson(stops: StopResponse) = jArray {
     stops.stops.stop.forEach { stop ->
         addObject {
             "codStop" += stop.codStop
