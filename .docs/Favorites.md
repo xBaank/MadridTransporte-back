@@ -8,6 +8,7 @@ Add a favorite to the user's favorites list.
 <details>
 <summary>See more</summary>
 To add a favorite you need to send a POST request to the following URL:
+
 `{url}/v1/favorites`
 
 The body of the request must be a JSON object with the following fields:
@@ -23,6 +24,7 @@ Get a favorite from the user's favorites list.
 <details>
 <summary>See more</summary>
 To get a favorite you need to send a GET request to the following URL:
+
 `{url}/v1/favorites/{favoriteId}`
 
 The response code will be `200` or `401` or `400`.
@@ -38,6 +40,7 @@ Get all favorites from the user's favorites list.
 <details>
 <summary>See more</summary>
 To get all favorites you need to send a GET request to the following URL:
+
 `{url}/v1/favorites`
 
 The response code will be `200` or `401` or `400`.
@@ -53,6 +56,7 @@ Delete a favorite from the user's favorites list.
 <details>
 <summary>See more</summary>
 To delete a favorite you need to send a DELETE request to the following URL:
+
 `{url}/v1/favorites/{favoriteId}`
 
 The response code will be `204` or `401` or `400`.

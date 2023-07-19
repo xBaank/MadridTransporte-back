@@ -6,6 +6,7 @@ Create a user account.
 <summary>See more</summary>
 
 To create a user account you need to send a POST request to the following URL:
+
 `{url}/v1/user/register?backUrl={backUrl}&redirectUrl={redirectUrl}`
 - `backUrl`: The Host of the back.
 - `redirectUrl`: The URL where you will be redirected.
@@ -27,6 +28,7 @@ This endpoint is used to verify a user account, it is sent to the email specifie
 <summary>See more</summary>
 
 To verify a user account you need to send a GET request to the following URL:
+
 `{url}/v1/user/verify?token={verifyToken}&redirectUrl={redirectUrl}`
 
 The response code will be `308` or `400`.
@@ -59,6 +61,7 @@ Reset the password of the user.
 If the user forgets the password, he can reset it.
 
 First step is to send a POST request to the following URL:
+
 `{url}/v1/user/send-reset-password?redirectUrl={redirectUrl}`
 
 The body of the request must be a JSON object with the following fields:
@@ -69,6 +72,7 @@ This will email the user with a link to reset the password in the format of `{re
 This will call the `front` passing the required token to reset the password.
 
 Second step is to send a PUT request to the following URL:
+
 `{url}/v1/user/reset-password?token={resetPasswordToken}`
 
 The body of the request must be a JSON object with the following fields:

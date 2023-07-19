@@ -33,14 +33,6 @@ suspend fun Call.getLocations() = either {
     ResponseJson(buildStopLocationsJson(stops), HttpStatusCode.OK)
 }
 
-suspend fun Call.getStopsByQuery() = either {
-    val query = call.request.queryParameters.getWrapped("search").bind()
-
-    val stops = getStopsByQuery(query).bind()
-
-    ResponseJson(buildStopsJson(stops), HttpStatusCode.OK)
-}
-
 suspend fun Call.getEstimations() = either {
     val stopCode = createStopCode("8", call.parameters.getWrapped("stopCode").bind())
 

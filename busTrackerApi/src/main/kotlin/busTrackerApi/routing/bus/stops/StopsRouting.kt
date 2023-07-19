@@ -6,7 +6,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 
-fun Route.stopsRouting() = route("/stops") {
+fun Route.busStopsRouting() = route("/stops") {
     get("/locations") {
         getLocations().fold(
             { handleError(it) },
@@ -30,13 +30,6 @@ fun Route.stopsRouting() = route("/stops") {
 
     get("/{stopCode}/times/cached") {
         getStopTimesCached().fold(
-            { handleError(it) },
-            { handleResponse(it) }
-        )
-    }
-
-    get("/query") {
-        getStopsByQuery().fold(
             { handleError(it) },
             { handleResponse(it) }
         )

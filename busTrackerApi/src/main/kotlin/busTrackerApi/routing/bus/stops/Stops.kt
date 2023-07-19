@@ -4,9 +4,8 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
-import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.BusTrackerException.NotFound
-import busTrackerApi.exceptions.BusTrackerException.SoapError
+import busTrackerApi.utils.mapExceptionsF
 import crtm.auth
 import crtm.defaultClient
 import crtm.soap.*
@@ -34,11 +33,6 @@ val stopEstimationsCache = Cache.Builder()
 
 val subscribedStops = mutableMapOf<String, WebSocketServerSession>()
 
-private val mapExceptionsF: (Throwable) -> BusTrackerException = { it ->
-    if (it is BusTrackerException) it
-    else SoapError(it.message)
-}
-
 fun getStopTimes(stopCode: String, codMode: String?) = Either.catch {
     val request = ShortStopTimesRequest().apply {
         codStop = stopCode
@@ -65,13 +59,7 @@ fun getStopsByLocation(lat: Double, lon: Double) = Either.catch {
     defaultClient.getNearestStopsByGeoLocation(request)
 }.mapLeft(mapExceptionsF)
 
-fun getStopsByQuery(query: String) = Either.catch {
-    val request = StopRequestV2().apply {
-        customSearch = query
-        authentication = defaultClient.auth()
-    }
-    defaultClient.getStopsV2(request)
-}.mapLeft(mapExceptionsF)
+
 
 fun getEstimations(stopCode: String) = Either.catch {
     val fromCache = stopEstimationsCache.get(stopCode)
@@ -145,18 +133,6 @@ fun buildStopEstimationsJson(estimations: EstimationsResponse) = jObject {
 }
 
 fun buildStopLocationsJson(stops: StopsByGeoLocationResponse) = jArray {
-    stops.stops.stop.forEach { stop ->
-        addObject {
-            "codStop" += stop.codStop
-            "codMode" += stop.codMode
-            "name" += stop.name
-            "latitude" += stop.coordinates.latitude
-            "longitude" += stop.coordinates.longitude
-        }
-    }
-}
-
-fun buildStopsJson(stops: StopResponse) = jArray {
     stops.stops.stop.forEach { stop ->
         addObject {
             "codStop" += stop.codStop

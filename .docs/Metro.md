@@ -5,6 +5,7 @@ Get information about the metro times.
 <summary>See more</summary>
 
 To get information about the metro, you need to make a GET request to the following URL:
+
 - `{url}/v1/metro/times/{id}` to get the next metro times of one station.
 - `{url}/v1/metro/times` to get the next metro times of all stations.
 

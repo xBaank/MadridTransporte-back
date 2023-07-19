@@ -5,6 +5,7 @@ Get the location of the buses of a line.
 <details>
 <summary>See more</summary>
 To get information about the lines, you need to make a GET request to the following URL:
+
 `{url}/v1/bus/lines/{lineCode}/locations`
 
 The response code will be `200` or `400`.
@@ -62,6 +63,7 @@ Get the itineraries of a line.
 <details>
 <summary>See more</summary>
 To get information about the lines, you need to make a GET request to the following URL:
+
 `{url}/v1/bus/lines/{lineCode}/itineraries`
 
 The response code will be `200` or `400`.
@@ -461,6 +463,7 @@ Get the stops of a line.
 <details>
 <summary>See more</summary>
 To get the stops of a line, you have to make a GET request to the following URL:
+
 `{url}/v1/bus/lines/{lineCode}/stops`
 
 The response code will be `200` or `400`.

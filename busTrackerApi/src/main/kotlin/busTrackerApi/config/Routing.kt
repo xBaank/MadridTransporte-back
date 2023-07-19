@@ -2,9 +2,10 @@ package busTrackerApi.config
 
 import busTrackerApi.routing.abono.abonoRouting
 import busTrackerApi.routing.bus.lines.linesRouting
-import busTrackerApi.routing.bus.stops.stopsRouting
+import busTrackerApi.routing.bus.stops.busStopsRouting
 import busTrackerApi.routing.favorites.favoritesRouting
 import busTrackerApi.routing.metro.timesRouting
+import busTrackerApi.routing.stops.stopsRouting
 import busTrackerApi.routing.users.authRouting
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
@@ -12,41 +13,48 @@ import io.ktor.server.routing.*
 fun Application.configureRoutingV1() {
     routing {
         route("/v1") {
-            busRouting()
-            metroRouting()
-            usersRouting()
-            favoriteRouting()
-            abonosRouting()
+            busRoute()
+            metroRoute()
+            usersRoute()
+            favoriteRoute()
+            abonosRoute()
+            stopsRoute()
         }
     }
 }
 
-private fun Route.favoriteRouting() {
+private fun Route.stopsRoute() {
+    route("/stops") {
+        stopsRouting()
+    }
+}
+
+private fun Route.favoriteRoute() {
     route("/favorites") {
         favoritesRouting()
     }
 }
 
-private fun Route.usersRouting() {
+private fun Route.usersRoute() {
     route("/users") {
         authRouting()
     }
 }
 
-private fun Route.busRouting() {
+private fun Route.busRoute() {
     route("/bus") {
         linesRouting()
-        stopsRouting()
+        busStopsRouting()
     }
 }
 
-private fun Route.metroRouting() {
+private fun Route.metroRoute() {
     route("/metro") {
         timesRouting()
     }
 }
 
-private fun Route.abonosRouting() {
+private fun Route.abonosRoute() {
     route("/abono") {
         abonoRouting()
     }

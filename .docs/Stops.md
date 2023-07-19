@@ -5,6 +5,7 @@ Get the locations of the stops near a coordinate.
 <details>
 <summary>See more</summary>
 To get the locations of the stops near a coordinate, you need to make a GET request to the following URL:
+
 - `{url}/v1/stops/locations?latitude={lat}&longitude={lon}` to get the locations of the stops near a coordinate.
 
 The response code will be `200` or `400`.
@@ -584,6 +585,7 @@ Get the estimations of bus lines in a bus stop.
 <details>
 <summary>See more</summary>
 To get the estimations of bus lines in a bus stop, you need make a GET request to the following endpoint:
+
 - `{url}/v1/stops/{stopCodes}/estimations`
 
 The response code will be `200` or `400`.
@@ -759,6 +761,7 @@ Get the times of bus lines in a bus stop.
 <details>
 <summary>See more</summary>
 To get the times of bus lines in a bus stop, you need make a GET request to the following endpoint:
+
 - `{url}/v1/stops/{stopCodes}/times`
 - `{url}/v1/stops/{stopCodes}/times/cached` (cached response, this endpoint is faster but can be outdated if no one has made a request in minutes)
 - `{url}/v1/stops/{stopCodes}/times/subscribe` (websocket endpoint, you can subscribe to a bus stop and receive the times in real time)
