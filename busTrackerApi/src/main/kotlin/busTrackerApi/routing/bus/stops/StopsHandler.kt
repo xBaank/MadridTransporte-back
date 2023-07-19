@@ -1,7 +1,6 @@
 package busTrackerApi.routing.bus.stops
 
 import arrow.core.continuations.either
-import busTrackerApi.exceptions.BusTrackerException.BadRequest
 import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.exceptions.CloseSocketException
 import busTrackerApi.extensions.getWrapped
@@ -21,17 +20,6 @@ import kotlinx.coroutines.isActive
 import simpleJson.jObject
 import simpleJson.serialized
 import kotlin.time.Duration.Companion.minutes
-
-suspend fun Call.getLocations() = either {
-    val latitude = call.request.queryParameters.getWrapped("latitude").bind().toDoubleOrNull() ?:
-        shift<Nothing>(BadRequest("Latitude must be a double"))
-    val longitude = call.request.queryParameters.getWrapped("longitude").bind().toDoubleOrNull() ?:
-        shift<Nothing>(BadRequest("Longitude must be a double"))
-
-    val stops = getStopsByLocation(latitude, longitude).bind()
-
-    ResponseJson(buildStopLocationsJson(stops), HttpStatusCode.OK)
-}
 
 suspend fun Call.getEstimations() = either {
     val stopCode = createStopCode("8", call.parameters.getWrapped("stopCode").bind())

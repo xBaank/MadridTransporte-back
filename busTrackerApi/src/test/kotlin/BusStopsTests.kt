@@ -8,12 +8,18 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import org.amshove.kluent.*
+import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeInstanceOf
+import org.amshove.kluent.shouldNotBeNull
 import org.junit.jupiter.api.Test
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
-import simpleJson.*
+import simpleJson.JsonArray
+import simpleJson.JsonObject
+import simpleJson.deserialized
+import simpleJson.get
 import utils.TestBase
 import utils.testApplicationBusTracker
 
@@ -42,47 +48,10 @@ class StopsRoutingTests : TestBase, KoinComponent {
     }
 
     @Test
-    fun `should get stops by query`() = testApplicationBusTracker {
-        val response = client.get("/v1/bus/stops/query?search=Leganes")
-        val body = response.bodyAsText().deserialized().asArray().getOrElse { throw it }
-
-        response.status.isSuccess().shouldBe(true)
-        body.shouldBeInstanceOf<JsonArray>()
-        body.shouldNotBeEmpty()
-    }
-
-    @Test
-    fun `should not get stops by query`() = testApplicationBusTracker {
-        val response = client.get("/v1/bus/stops/query?search=asdasdasdasd")
-        val body = response.bodyAsText().deserialized().asArray().getOrElse { throw it }
-
-        response.status.isSuccess().shouldBe(true)
-        body.shouldBeInstanceOf<JsonArray>()
-        body.shouldBeEmpty()
-    }
-
-    @Test
     fun `should not get stop estimations`() = testApplicationBusTracker {
         val response = client.get("/v1/bus/stops/asdasd/estimations")
         response.status shouldBeEqualTo HttpStatusCode.NotFound
     }
-
-    @Test
-    fun `should get stop by location`() = testApplicationBusTracker {
-        val response = client.get("/v1/bus/stops/locations?latitude=40.31043738780061&longitude=-3.736834949732102")
-        val body = response.bodyAsText().deserialized().asArray().getOrElse { throw it }
-
-        response.status.isSuccess().shouldBe(true)
-        body.shouldBeInstanceOf<JsonArray>()
-        body.shouldNotBeEmpty()
-    }
-
-    @Test
-    fun `should not get stop by location`() = testApplicationBusTracker {
-        val response = client.get("/v1/bus/stops/locations?latitude=40.asdds&longitude=-3.736834949732102")
-        response.status shouldBeEqualTo HttpStatusCode.BadRequest
-    }
-
 
     @Test
     fun `should get stop times cached`() = testApplicationBusTracker {

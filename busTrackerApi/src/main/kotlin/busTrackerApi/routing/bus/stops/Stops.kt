@@ -8,7 +8,10 @@ import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.utils.mapExceptionsF
 import crtm.auth
 import crtm.defaultClient
-import crtm.soap.*
+import crtm.soap.EstimationsRequest
+import crtm.soap.EstimationsResponse
+import crtm.soap.ShortStopTimesRequest
+import crtm.soap.ShortStopTimesResponse
 import crtm.utils.getCodModeFromLineCode
 import io.github.reactivecircus.cache4k.Cache
 import io.ktor.server.websocket.*
@@ -44,22 +47,6 @@ fun getStopTimes(stopCode: String, codMode: String?) = Either.catch {
     if (codMode != null) request.codMode = codMode
     defaultClient.getShortStopTimes(request)
 }.mapLeft(mapExceptionsF)
-
-fun getStopsByLocation(lat: Double, lon: Double) = Either.catch {
-    val request = StopsByGeoLocationRequest().apply {
-        coordinates = Coordinates().apply {
-            latitude = lat
-            longitude = lon
-        }
-        method = 1
-        precision = 1000
-        codMode = "8"
-        authentication = defaultClient.auth()
-    }
-    defaultClient.getNearestStopsByGeoLocation(request)
-}.mapLeft(mapExceptionsF)
-
-
 
 fun getEstimations(stopCode: String) = Either.catch {
     val fromCache = stopEstimationsCache.get(stopCode)
@@ -130,16 +117,4 @@ fun buildStopEstimationsJson(estimations: EstimationsResponse) = jObject {
             "time" += estimation.time.toGregorianCalendar().time.toInstant().toEpochMilli()
         }
     }?.asJson() ?: jArray()
-}
-
-fun buildStopLocationsJson(stops: StopsByGeoLocationResponse) = jArray {
-    stops.stops.stop.forEach { stop ->
-        addObject {
-            "codStop" += stop.codStop
-            "codMode" += stop.codMode
-            "name" += stop.name
-            "latitude" += stop.coordinates.latitude
-            "longitude" += stop.coordinates.longitude
-        }
-    }
 }

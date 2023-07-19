@@ -7,13 +7,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 
 fun Route.busStopsRouting() = route("/stops") {
-    get("/locations") {
-        getLocations().fold(
-            { handleError(it) },
-            { handleResponse(it) }
-        )
-    }
-
     get("/{stopCode}/estimations") {
         getEstimations().fold(
             { handleError(it) },
