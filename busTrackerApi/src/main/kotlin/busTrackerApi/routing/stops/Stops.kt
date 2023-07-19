@@ -23,7 +23,7 @@ fun getStopsByLocation(lat: Double, lon: Double) = Either.catch {
         }
         method = 1
         precision = 1000
-        codMode = "8"
+        codMode = ""
         authentication = defaultClient.auth()
     }
     defaultClient.getNearestStopsByGeoLocation(request)

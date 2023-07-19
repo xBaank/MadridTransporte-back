@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Cleanup">
-      <change afterPath="$PROJECT_DIR$/.docs/BusStops.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.docs/Buses.md" beforeDir="false" afterPath="$PROJECT_DIR$/.docs/Buses.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.docs/Home.md" beforeDir="false" afterPath="$PROJECT_DIR$/.docs/Home.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.docs/Stops.md" beforeDir="false" afterPath="$PROJECT_DIR$/.docs/Stops.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/Stops.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/Stops.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -622,7 +619,7 @@
       <option name="project" value="LOCAL" />
       <updated>1687181447717</updated>
     </task>
-    <option name="localTasksCounter" value="115" />
+    <option name="localTasksCounter" value="117" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
