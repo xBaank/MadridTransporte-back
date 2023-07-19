@@ -1,4 +1,5 @@
 # Stops
+This section is only for bus stops.
 ## Estimations
 Get the estimations of bus lines in a bus stop.
 <details>

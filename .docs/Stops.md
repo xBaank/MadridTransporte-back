@@ -1,4 +1,5 @@
 # Stops
+This section is any type of stops (Metro,Bus...).
 ## Locations
 Get the locations of the stops near a coordinate.
 <details>

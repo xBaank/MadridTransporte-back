@@ -6,6 +6,7 @@ Here you can see how to set up the API:
 
 Here you can see how to use the API:
 - [Abono](Abono.md)
+- [Stops](Stops.md)
 - [Metro](Metro.md)
 - [Buses](Buses.md)
 - - [Lines](Lines.md)
