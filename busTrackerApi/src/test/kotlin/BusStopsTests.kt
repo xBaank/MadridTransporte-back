@@ -43,12 +43,22 @@ class StopsRoutingTests : TestBase, KoinComponent {
 
     @Test
     fun `should get stops by query`() = testApplicationBusTracker {
-        val response = client.get("/v1/bus/stops/query?search=Avda. de la Peseta")
+        val response = client.get("/v1/bus/stops/query?search=Leganes")
         val body = response.bodyAsText().deserialized().asArray().getOrElse { throw it }
 
         response.status.isSuccess().shouldBe(true)
         body.shouldBeInstanceOf<JsonArray>()
         body.shouldNotBeEmpty()
+    }
+
+    @Test
+    fun `should not get stops by query`() = testApplicationBusTracker {
+        val response = client.get("/v1/bus/stops/query?search=asdasdasdasd")
+        val body = response.bodyAsText().deserialized().asArray().getOrElse { throw it }
+
+        response.status.isSuccess().shouldBe(true)
+        body.shouldBeInstanceOf<JsonArray>()
+        body.shouldBeEmpty()
     }
 
     @Test
