@@ -1,19 +1,13 @@
 package busTrackerApi.routing.bus.lines
 
 import arrow.core.Either
-import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.BusTrackerException.NotFound
-import busTrackerApi.exceptions.BusTrackerException.SoapError
+import busTrackerApi.utils.mapExceptionsF
 import crtm.auth
 import crtm.defaultClient
 import crtm.soap.*
 import simpleJson.jArray
 import simpleJson.jObject
-
-private val mapExceptionF : (Throwable) -> BusTrackerException = { it ->
-    if (it is BusTrackerException) it
-    else SoapError(it.message)
-}
 
 fun getLocations(itinerary: LineItinerary, lineCode: String, codMode: String) = Either.catch {
     val lineRequest = LineLocationRequest().apply {
@@ -27,7 +21,7 @@ fun getLocations(itinerary: LineItinerary, lineCode: String, codMode: String) = 
     }
 
     defaultClient.getLineLocation(lineRequest)
-}.mapLeft(mapExceptionF)
+}.mapLeft(mapExceptionsF)
 
 fun getItineraries(lineCode: String) = Either.catch {
     val itineraryRequest = LineItineraryRequest().apply {
@@ -38,7 +32,7 @@ fun getItineraries(lineCode: String) = Either.catch {
 
     defaultClient.getLineItineraries(itineraryRequest).takeIf { it.itineraries.lineItinerary.isNotEmpty() } ?:
     throw NotFound("No itineraries found for line $lineCode")
-}.mapLeft(mapExceptionF)
+}.mapLeft(mapExceptionsF)
 
 fun getStops(lineCode: String, codMode: String) = Either.catch {
     val request = StopRequest().apply {
@@ -48,7 +42,7 @@ fun getStops(lineCode: String, codMode: String) = Either.catch {
     }
     defaultClient.getStops(request).takeIf { it.stops.stop.isNotEmpty() } ?:
     throw NotFound("No stops found for line $lineCode")
-}.mapLeft(mapExceptionF)
+}.mapLeft(mapExceptionsF)
 
 fun buildVehicleLocationJson(vehicleLocation: VehicleLocation) = jObject {
     "lineCode" += vehicleLocation.line.codLine
