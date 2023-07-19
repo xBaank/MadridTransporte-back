@@ -9,7 +9,7 @@ Here you can see how to use the API:
 - [Metro](Metro.md)
 - [Buses](Buses.md)
 - - [Lines](Lines.md)
-- - [Stops](Stops.md)
+- - [Stops](BusStops.md)
 - [Authentication](Auhtentication.md)
 - - [User](User.md)
 - - [Favorites](Favorites.md)
