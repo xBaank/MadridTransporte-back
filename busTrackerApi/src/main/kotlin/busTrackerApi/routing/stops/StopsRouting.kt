@@ -1,21 +1,14 @@
 package busTrackerApi.routing.stops
 
-import busTrackerApi.extensions.handleError
-import busTrackerApi.extensions.handleResponse
+import busTrackerApi.extensions.handle
 import io.ktor.server.routing.*
 
 fun Route.stopsRouting() {
     get("/search") {
-        getStopsByQuery().fold(
-            { handleError(it) },
-            { handleResponse(it) }
-        )
+        getStopsByQuery().handle()
     }
 
     get("/locations") {
-        getLocations().fold(
-            { handleError(it) },
-            { handleResponse(it) }
-        )
+        getLocations().handle()
     }
 }
