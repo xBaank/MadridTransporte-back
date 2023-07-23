@@ -89,7 +89,7 @@ private suspend inline fun <T> getTimes(
         .getOrNull()
 
     stopTimes?.let(::buildStopTimesJson)?.asJson()?.timed()
-}?.right() ?: Exception("No stop times found for stop code $stopCode").left()
+}?.right() ?: NotFound("No stop times found for stop code $stopCode").left()
 
 fun buildStopTimesJson(times: ShortStopTimesResponse) = jObject {
     "name" += times.stopTimes.stop.name
