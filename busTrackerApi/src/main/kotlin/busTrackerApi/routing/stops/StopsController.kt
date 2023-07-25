@@ -33,15 +33,6 @@ val allStopsCache = Cache.Builder()
 
 val subscribedStops = mutableMapOf<String, WebSocketServerSession>()
 
-
-fun getStopsByQueryResponse(query: String) = Either.catch {
-    val request = StopRequestV2().apply {
-        customSearch = query
-        authentication = defaultClient.auth()
-    }
-    defaultClient.getStopsV2(request)
-}.mapLeft(mapExceptionsF)
-
 fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.catch {
     val request = ShortStopTimesRequest().apply {
         codStop = stopCode
@@ -52,7 +43,13 @@ fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.catch {
     }
     //Not needed?
     if (codMode != null) request.codMode = codMode
-    defaultClient.getShortStopTimes(request)
+    val response = defaultClient.getShortStopTimes(request)
+    val alerts = defaultClient.getIncidentsAffectations(IncidentsAffectationsRequest().apply {
+        this.codMode = codMode ?: ""
+        codLines = ArrayOfString().apply { response.stopTimes.linesStatus.lineStatus.map { it.line.codLine } }
+        authentication = defaultClient.auth()
+    })
+    response
 }.mapLeft(mapExceptionsF)
 
 suspend fun getTimesResponse(stopCode: String, codMode: String?) =
