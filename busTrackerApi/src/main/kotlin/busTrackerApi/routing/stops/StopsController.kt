@@ -10,6 +10,7 @@ import crtm.auth
 import crtm.defaultClient
 import crtm.soap.*
 import crtm.utils.getCodModeFromLineCode
+import crtm.utils.getCodStopFromStopCode
 import io.github.reactivecircus.cache4k.Cache
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
@@ -92,6 +93,7 @@ fun buildStopsJson(stops: StopResponse) = jArray {
     stops.stops.stop.forEach { stop ->
         addObject {
             "codStop" += stop.codStop
+            "simpleCodStop" += getCodStopFromStopCode(stop.codStop)
             "codMode" += stop.codMode
             "name" += stop.name
             "latitude" += stop.coordinates.latitude
@@ -104,6 +106,7 @@ fun buildStopLocationsJson(stops: StopsByGeoLocationResponse) = jArray {
     stops.stops.stop.forEach { stop ->
         addObject {
             "codStop" += stop.codStop
+            "simpleCodStop" += getCodStopFromStopCode(stop.codStop)
             "codMode" += stop.codMode
             "name" += stop.name
             "latitude" += stop.coordinates.latitude
