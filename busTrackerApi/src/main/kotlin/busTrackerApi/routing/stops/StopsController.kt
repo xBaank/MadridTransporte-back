@@ -1,30 +1,35 @@
 package busTrackerApi.routing.stops
 
 import arrow.core.Either
+import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
+import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
+import busTrackerApi.extensions.toBusTrackerException
 import busTrackerApi.utils.mapExceptionsF
 import crtm.auth
 import crtm.defaultClient
 import crtm.soap.*
-import crtm.utils.getCodModeFromLineCode
-import crtm.utils.getCodStopFromStopCode
 import io.github.reactivecircus.cache4k.Cache
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withTimeoutOrNull
-import simpleJson.jArray
-import simpleJson.jObject
+import okhttp3.Request
+import simpleJson.*
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 val stopTimesCache = Cache.Builder()
     .expireAfterWrite(24.hours)
     .build<String, TimedCachedValue<ShortStopTimesResponse>>()
+
+val allStopsCache = Cache.Builder()
+    .expireAfterWrite(1.hours)
+    .build<String, JsonNode>()
 
 val subscribedStops = mutableMapOf<String, WebSocketServerSession>()
 
@@ -89,43 +94,20 @@ fun getStopsByLocationResponse(lat: Double, lon: Double) = Either.catch {
     defaultClient.getNearestStopsByGeoLocation(request)
 }.mapLeft(mapExceptionsF)
 
-fun buildStopsJson(stops: StopResponse) = jArray {
-    stops.stops.stop.forEach { stop ->
-        addObject {
-            "codStop" += stop.codStop
-            "simpleCodStop" += getCodStopFromStopCode(stop.codStop)
-            "codMode" += stop.codMode
-            "name" += stop.name
-            "latitude" += stop.coordinates.latitude
-            "longitude" += stop.coordinates.longitude
-        }
-    }
+suspend fun getAllStopsResponse() = either {
+    val cached = allStopsCache.get("all")
+    if (cached != null) return@either cached
+
+    val request = Request.Builder().url("https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json").get().build()
+    httpClient.newCall(request).execute().use {
+        val json = it.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
+        json.deserialized().toBusTrackerException().bind()
+    }.also { allStopsCache.put("all", it) }
 }
 
-fun buildStopLocationsJson(stops: StopsByGeoLocationResponse) = jArray {
-    stops.stops.stop.forEach { stop ->
-        addObject {
-            "codStop" += stop.codStop
-            "simpleCodStop" += getCodStopFromStopCode(stop.codStop)
-            "codMode" += stop.codMode
-            "name" += stop.name
-            "latitude" += stop.coordinates.latitude
-            "longitude" += stop.coordinates.longitude
-        }
-    }
+suspend fun getStopById(stopCode: String) = either {
+    getAllStopsResponse().bind().asArray().toBusTrackerException().bind()
+        .firstOrNull { it["codStop"].asString().getOrNull() == stopCode } ?:
+    shift<Nothing>(BusTrackerException.NotFound("Stop with id $stopCode not found"))
 }
 
-fun buildStopTimesJson(times: ShortStopTimesResponse) = jObject {
-    "name" += times.stopTimes.stop.name
-    "times" += jArray {
-        times.stopTimes?.times?.shortTime?.forEach {
-            addObject {
-                "lineCode" += it.codLine
-                "codMode" += getCodModeFromLineCode(it.codLine)
-                "destination" += it.destination
-                "codVehicle" += it.codVehicle
-                "time" += it.time.toGregorianCalendar().time.toInstant().toEpochMilli()
-            }
-        }
-    }
-}

@@ -1,44 +1,28 @@
 package busTrackerApi.routing.users
 
-import busTrackerApi.extensions.handleError
-import busTrackerApi.extensions.handleResponse
+import busTrackerApi.extensions.handle
 import io.ktor.server.routing.*
 
 
 fun Route.authRouting() {
     post("/register") {
-        register().fold(
-            { handleError(it) },
-            { handleResponse(it) }
-        )
+        handle { register() }
     }
 
     get("/verify") {
-        verify().fold(
-            { handleError(it) },
-            { handleResponse(it) }
-        )
+        handle { verify() }
     }
 
     post("/login") {
-          login().fold(
-                { handleError(it) },
-                { handleResponse(it) }
-          )
+        handle { login() }
     }
 
     post("/send-reset-password") {
-        sendResetPassword().fold(
-            { handleError(it) },
-            { handleResponse(it) }
-        )
+        handle { sendResetPassword() }
     }
 
     put("/reset-password") {
-        resetPassword().fold(
-            { handleError(it) },
-            { handleResponse(it) }
-        )
+        handle { resetPassword() }
     }
 }
 

@@ -22,6 +22,16 @@ class StopsTests : TestBase {
     }
 
     @Test
+    fun `should get stops`() = testApplicationBusTracker {
+        val response = client.get("/v1/stops/all")
+        val body = response.bodyAsText().deserialized().asArray().getOrElse { throw it }
+
+        response.status.isSuccess().shouldBe(true)
+        body.shouldBeInstanceOf<JsonArray>()
+        body.shouldNotBeEmpty()
+    }
+
+    @Test
     fun `should not get stops by query`() = testApplicationBusTracker {
         val response = client.get("/v1/stops/search?query=asdasdasdasd")
         val body = response.bodyAsText().deserialized().asArray().getOrElse { throw it }

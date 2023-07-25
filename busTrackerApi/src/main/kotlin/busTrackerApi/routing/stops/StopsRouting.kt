@@ -11,7 +11,11 @@ fun Route.stopsRouting() {
     }
 
     get("/locations") {
-        handle { getLocations() }
+        handle { getStopsByLocation() }
+    }
+
+    get("/all") {
+        handle { getAllStops() }
     }
 }
 

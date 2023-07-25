@@ -7,6 +7,7 @@ import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.server.application.*
+import okhttp3.OkHttpClient
 import org.koin.dsl.module
 import org.koin.ktor.plugin.koin
 import org.litote.kmongo.coroutine.coroutine
@@ -19,6 +20,7 @@ private typealias SignerBuilder = (f: JWTCreator.Builder.() -> Unit) -> JWTCreat
 typealias Signer = (f: JWTCreator.Builder.() -> Unit) -> String
 
 const val saltRounds = 10
+val httpClient = OkHttpClient.Builder().build()
 
 
 val dbModule = module {

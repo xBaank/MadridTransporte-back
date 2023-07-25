@@ -3,7 +3,6 @@ package busTrackerApi.config
 import busTrackerApi.routing.abono.abonoRouting
 import busTrackerApi.routing.bus.lines.linesRouting
 import busTrackerApi.routing.favorites.favoritesRouting
-import busTrackerApi.routing.metro.timesRouting
 import busTrackerApi.routing.stops.bus.busStopsRouting
 import busTrackerApi.routing.stops.emt.emtStopsRouting
 import busTrackerApi.routing.stops.metro.metroStopsRouting
@@ -17,7 +16,6 @@ fun Application.configureRoutingV1() {
     routing {
         route("/v1") {
             busRoute()
-            metroRoute()
             usersRoute()
             favoriteRoute()
             abonosRoute()
@@ -51,12 +49,6 @@ private fun Route.usersRoute() {
 private fun Route.busRoute() {
     route("/bus") {
         linesRouting()
-    }
-}
-
-private fun Route.metroRoute() {
-    route("/metro") {
-        timesRouting()
     }
 }
 

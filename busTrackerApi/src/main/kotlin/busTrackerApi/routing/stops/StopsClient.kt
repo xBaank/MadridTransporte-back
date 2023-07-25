@@ -5,6 +5,8 @@ import arrow.core.getOrElse
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.CloseSocketException
 import busTrackerApi.extensions.getWrapped
+import busTrackerApi.extensions.removeNonSpacingMarks
+import busTrackerApi.extensions.toBusTrackerException
 import busTrackerApi.extensions.toCloseSocketException
 import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.utils.Call
@@ -18,19 +20,20 @@ import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import simpleJson.jObject
-import simpleJson.serialized
+import simpleJson.*
 import kotlin.time.Duration.Companion.minutes
 
 suspend fun Call.getStopsByQuery() = either {
-    val query = call.request.queryParameters.getWrapped("query").bind()
+    val query = call.request.queryParameters.getWrapped("query").bind().removeNonSpacingMarks()
 
-    val stops = getStopsByQueryResponse(query).bind()
+    val stops = getAllStopsResponse().bind().asArray().toBusTrackerException().bind()
+        .filter { it["name"].asString().toBusTrackerException().bind().removeNonSpacingMarks().contains(query, ignoreCase = true) }
+        .asJson()
 
     ResponseJson(buildStopsJson(stops), HttpStatusCode.OK)
 }
 
-suspend fun Call.getLocations() = either {
+suspend fun Call.getStopsByLocation() = either {
     val latitude = call.request.queryParameters.getWrapped("latitude").bind().toDoubleOrNull() ?:
     shift<Nothing>(BusTrackerException.BadRequest("Latitude must be a double"))
     val longitude = call.request.queryParameters.getWrapped("longitude").bind().toDoubleOrNull() ?:
@@ -41,18 +44,20 @@ suspend fun Call.getLocations() = either {
     ResponseJson(buildStopLocationsJson(stops), HttpStatusCode.OK)
 }
 
+suspend fun getAllStops() = either {
+    val stops = getAllStopsResponse().bind()
+    ResponseJson(buildStopsJson(stops), HttpStatusCode.OK)
+}
+
 suspend fun Call.getStopTimes(codMode : String) = either {
     val stopCode = createStopCode(codMode, call.parameters.getWrapped("stopCode").bind())
 
-    val timedVCached =  getTimesResponse(stopCode, codMode)
+    val cached =  getTimesResponse(stopCode, codMode)
         .onRight { stopTimesCache.put(stopCode, it) }
         .getOrElse { stopTimesCache.get(stopCode) } ?:
         shift<Nothing>(BusTrackerException.NotFound("No stop times found for stop code $stopCode"))
 
-    val json = jObject {
-        "data" += timedVCached.value.let(::buildStopTimesJson)
-        "lastTime" += timedVCached.createdAt.toEpochMilli()
-    }
+    val json = buildCachedJson(cached.value.let(::buildStopTimesJson), cached.createdAt.toEpochMilli())
 
     ResponseJson(json, HttpStatusCode.OK)
 }
@@ -61,10 +66,7 @@ suspend fun Call.getStopTimesCached(codMode: String) = either {
     val stopCode = createStopCode(codMode, call.parameters.getWrapped("stopCode").bind())
     val cached = stopTimesCache.get(stopCode) ?: shift<Nothing>(BusTrackerException.NotFound("Stop code not found"))
 
-    val json = jObject {
-        "data" += cached.value.let(::buildStopTimesJson)
-        "lastTime" += cached.createdAt.toEpochMilli()
-    }
+    val json = buildCachedJson(cached.value.let(::buildStopTimesJson), cached.createdAt.toEpochMilli())
 
     ResponseJson(json, HttpStatusCode.OK)
 }
@@ -89,14 +91,11 @@ suspend fun WebSocketServerSession.subscribeStopsTimes(codMode : String) = eithe
     try {
         subscribedStops[subId] = this@subscribeStopsTimes
         while (isActive) {
-            val timedVCached = getTimesOrCachedResponse(stopCode, codMode)
+            val cached = getTimesOrCachedResponse(stopCode, codMode)
                 .toCloseSocketException(CloseReason.Codes.INTERNAL_ERROR)
                 .bind()
 
-            val json = jObject {
-                "data" += timedVCached.value.let(::buildStopTimesJson)
-                "lastTime" += timedVCached.createdAt.toEpochMilli()
-            }
+            val json = buildCachedJson(cached.value.let(::buildStopTimesJson), cached.createdAt.toEpochMilli())
 
             send(json.serialized())
             delay(1.minutes)

@@ -1,31 +1,14 @@
-package busTrackerApi.routing.metro
+package busTrackerApi.routing.stops.metro
 
-import arrow.core.continuations.either
-import busTrackerApi.extensions.toBusTrackerException
-import okhttp3.HttpUrl
-import okhttp3.OkHttpClient
 import simpleJson.*
 
-val httpClient = OkHttpClient.Builder().build()
-
-fun urlBuilder() = HttpUrl.Builder()
-    .scheme("https")
-    .host("serviciosapp.metromadrid.es")
-    .addPathSegment("servicios")
-    .addPathSegment("rest")
-    .addPathSegment("teleindicadores")
-
-suspend fun buildMetroJson(value : String) = either {
-    val array = value.deserialized()
-        .get("Vtelindicadores")
-        .asArray()
-        .toBusTrackerException()
-        .bind()
-
-    jArray {
+fun buildMetroJson(array: JsonArray) = jObject {
+    "name" += array.firstOrNull()?.get("nombreest")?.asString()?.getOrNull()
+    "times" += jArray {
         array.forEach {
             addObject {
                 "id" += it["idnumerica"].asNumber().getOrNull()
+                "idTeleindicador" += it["estaciontel"].asNumber().getOrNull()
                 "nombreEstacion" += it["nombreest"].asString().getOrNull()
                 "linea" += it["linea"].asNumber().getOrNull()
                 "anden" += it["anden"].asNumber().getOrNull()

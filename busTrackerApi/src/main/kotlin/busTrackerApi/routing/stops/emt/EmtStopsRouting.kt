@@ -8,4 +8,3 @@ const val codMode = "6"
 fun Route.emtStopsRouting() = route("/emt") {
     timesConfigF(codMode)
 }
-
