@@ -9,7 +9,7 @@ import crtm.soap.*
 import simpleJson.jArray
 import simpleJson.jObject
 
-fun getLocations(itinerary: LineItinerary, lineCode: String, codMode: String) = Either.catch {
+fun getLocationsResponse(itinerary: LineItinerary, lineCode: String, codMode: String) = Either.catch {
     val lineRequest = LineLocationRequest().apply {
         this.codMode = codMode
         codLine = lineCode
@@ -23,7 +23,7 @@ fun getLocations(itinerary: LineItinerary, lineCode: String, codMode: String) = 
     defaultClient.getLineLocation(lineRequest)
 }.mapLeft(mapExceptionsF)
 
-fun getItineraries(lineCode: String) = Either.catch {
+fun getItinerariesResponse(lineCode: String) = Either.catch {
     val itineraryRequest = LineItineraryRequest().apply {
         codLine = lineCode
         authentication = defaultClient.auth()
@@ -34,7 +34,7 @@ fun getItineraries(lineCode: String) = Either.catch {
     throw NotFound("No itineraries found for line $lineCode")
 }.mapLeft(mapExceptionsF)
 
-fun getStops(lineCode: String, codMode: String) = Either.catch {
+fun getStopsResponse(lineCode: String, codMode: String) = Either.catch {
     val request = StopRequest().apply {
         codLine = lineCode
         this.codMode = codMode

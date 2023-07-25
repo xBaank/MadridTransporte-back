@@ -12,7 +12,8 @@ import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldNotBeNull
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -24,12 +25,24 @@ import utils.TestBase
 import utils.testApplicationBusTracker
 
 const val busStopCode = "08242"
+const val trainStopCode = "235"
+
+enum class Times(val url: String) {
+    BUS("/v1/stops/bus/$busStopCode/times"),
+    TRAIN("/v1/stops/train/$trainStopCode/times")
+}
+
+enum class TimesNotFound(val url: String) {
+    BUS("/v1/stops/bus/asdasd/times"),
+    TRAIN("/v1/stops/train/asdasd/times")
+}
 
 class StopsRoutingTests : TestBase, KoinComponent {
 
-    @Test
-    fun `should get stop times`() = testApplicationBusTracker {
-        val response = client.get("/v1/bus/stops/$busStopCode/times")
+    @ParameterizedTest
+    @EnumSource(Times::class)
+    fun `should get stop times`(code: Times) = testApplicationBusTracker {
+        val response = client.get(code.url)
         val body = response.bodyAsText().deserialized()
 
         response.status.isSuccess().shouldBe(true)
@@ -37,26 +50,11 @@ class StopsRoutingTests : TestBase, KoinComponent {
         body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
     }
 
-    @Test
-    fun `should get stop estimations`() = testApplicationBusTracker {
-        val response = client.get("/v1/bus/stops/$busStopCode/estimations")
-        val body = response.bodyAsText().deserialized()
-
-        response.status.isSuccess().shouldBe(true)
-        body.getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
-        body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
-    }
-
-    @Test
-    fun `should not get stop estimations`() = testApplicationBusTracker {
-        val response = client.get("/v1/bus/stops/asdasd/estimations")
-        response.status shouldBeEqualTo HttpStatusCode.NotFound
-    }
-
-    @Test
-    fun `should get stop times cached`() = testApplicationBusTracker {
-        val response = client.get("/v1/bus/stops/$busStopCode/times")
-        val responseCached = client.get("/v1/bus/stops/$busStopCode/times/cached")
+    @ParameterizedTest
+    @EnumSource(Times::class)
+    fun `should get stop times cached`(code: Times) = testApplicationBusTracker {
+        val response = client.get(code.url)
+        val responseCached = client.get(code.url + "/cached")
 
         responseCached.status.isSuccess().shouldBe(true)
         response.status.isSuccess().shouldBe(true)
@@ -72,14 +70,16 @@ class StopsRoutingTests : TestBase, KoinComponent {
     }
 
 
-    @Test
-    fun `should not get stop times`() = testApplicationBusTracker {
-        val response = client.get("/v1/bus/stops/aasdsad/times")
+    @ParameterizedTest
+    @EnumSource(TimesNotFound::class)
+    fun `should not get stop times`(code: TimesNotFound) = testApplicationBusTracker {
+        val response = client.get(code.url)
         response.status shouldBeEqualTo HttpStatusCode.NotFound
     }
 
-    @Test
-    fun `should subscribe to stopTimes`() = testApplicationBusTracker { client ->
+    @ParameterizedTest
+    @EnumSource(Times::class)
+    fun `should subscribe to stopTimes`(code: Times) = testApplicationBusTracker { client ->
         //Fix as koin is not started, and we need config before using the client
         val koinApp = startKoin { modules(dbModule) }
         val authSigner by koinApp.koin.inject<Signer>(AuthSignerQualifier)
@@ -87,7 +87,7 @@ class StopsRoutingTests : TestBase, KoinComponent {
         stopKoin()
 
         client.webSocket({
-            url("/v1/bus/stops/$busStopCode/times/subscribe")
+            url(code.url + "/subscribe")
             header("Authorization", "Bearer $token")
         })
         {
@@ -102,11 +102,12 @@ class StopsRoutingTests : TestBase, KoinComponent {
         }
     }
 
-    @Test
-    fun `should get unauthorized when subscribe to stopTimes`() = testApplicationBusTracker { client ->
+    @ParameterizedTest
+    @EnumSource(Times::class)
+    fun `should get unauthorized when subscribe to stopTimes`(code: Times) = testApplicationBusTracker { client ->
         runCatching {
             client.webSocket({
-                url("/v1/bus/stops/$busStopCode/times/subscribe")
+                url(code.url + "/subscribe")
             })
             {
                 val response = incoming.receive() as? Frame.Text
@@ -121,8 +122,9 @@ class StopsRoutingTests : TestBase, KoinComponent {
         }.exceptionOrNull()!!.shouldBeInstanceOf<IllegalStateException>()
     }
 
-    @Test
-    fun `should not find stop when subscribed`() = testApplicationBusTracker { client ->
+    @ParameterizedTest
+    @EnumSource(TimesNotFound::class)
+    fun `should not find stop when subscribed`(code: TimesNotFound) = testApplicationBusTracker { client ->
         //Fix as koin is not started, and we need config before using the client
         val koinApp = startKoin { modules(dbModule) }
         val authSigner by koinApp.koin.inject<Signer>(AuthSignerQualifier)
@@ -131,7 +133,7 @@ class StopsRoutingTests : TestBase, KoinComponent {
 
         runCatching {
             client.webSocket({
-                url("/v1/bus/stops/asdasd/times/subscribe")
+                url(code.url + "/subscribe")
                 header("Authorization", "Bearer $token")
             })
             {

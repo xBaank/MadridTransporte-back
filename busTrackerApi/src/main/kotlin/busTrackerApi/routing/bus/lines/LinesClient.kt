@@ -11,15 +11,15 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import simpleJson.asJson
 
-suspend fun Call.getLocationsHandler() = either {
+suspend fun Call.getLocations() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
     val codMode = getCodModeFromLineCode(lineCode)
     if(!isValidLineCode(lineCode)) shift<Nothing>(BadRequest("Line code is not valid"))
 
-    val locations = getItineraries(lineCode).bind()
+    val locations = getItinerariesResponse(lineCode).bind()
         .itineraries
         .lineItinerary
-        .map { getLocations(it, lineCode, codMode).bind() }
+        .map { getLocationsResponse(it, lineCode, codMode).bind() }
 
     val json = locations.mapNotNull { it?.vehiclesLocation?.vehicleLocation?.map(::buildVehicleLocationJson) }
         .flatten()
@@ -28,22 +28,22 @@ suspend fun Call.getLocationsHandler() = either {
     ResponseJson(json, HttpStatusCode.OK)
 }
 
-suspend fun Call.getStopsHandler() = either {
+suspend fun Call.getStops() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
     val codMode = getCodModeFromLineCode(lineCode)
     if(!isValidLineCode(lineCode)) shift<Nothing>(BadRequest("Line code is not valid"))
 
-    val stops = getStops(lineCode, codMode).bind()
+    val stops = getStopsResponse(lineCode, codMode).bind()
     val json = stops.stops.stop.map(::buildStopsJson).asJson()
 
     ResponseJson(json, HttpStatusCode.OK)
 }
 
-suspend fun Call.getItinerariesHandler() = either {
+suspend fun Call.getItineraries() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
     if(!isValidLineCode(lineCode)) shift<Nothing>(BadRequest("Line code is not valid"))
 
-    val itineraries = getItineraries(lineCode).bind()
+    val itineraries = getItinerariesResponse(lineCode).bind()
     val json = itineraries.itineraries.lineItinerary.map(::buildItinerariesJson).asJson()
 
     ResponseJson(json, HttpStatusCode.OK)

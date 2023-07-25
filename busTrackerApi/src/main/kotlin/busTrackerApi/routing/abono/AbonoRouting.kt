@@ -5,6 +5,6 @@ import io.ktor.server.routing.*
 
 fun Route.abonoRouting() {
     get("{id}") {
-        getAbono().handle()
+        handle { getAbono() }
     }
 }

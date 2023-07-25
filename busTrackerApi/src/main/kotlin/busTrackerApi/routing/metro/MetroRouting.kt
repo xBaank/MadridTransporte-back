@@ -6,9 +6,9 @@ import io.ktor.server.routing.*
 
 fun Route.timesRouting() {
     get("/times") {
-        getTimes().handle()
+        handle { getTimes() }
     }
     get("/times/{id}") {
-        getTimes(call.parameters["id"]).handle()
+        handle { getTimes(call.parameters["id"]) }
     }
 }

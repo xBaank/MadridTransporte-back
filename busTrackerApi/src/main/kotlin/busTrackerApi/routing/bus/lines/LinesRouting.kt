@@ -5,15 +5,15 @@ import io.ktor.server.routing.*
 
 fun Route.linesRouting() = route("/lines") {
     get("/{lineCode}/locations") {
-       getLocationsHandler().handle()
+       handle { getLocations() }
     }
 
     get("/{lineCode}/stops") {
-        getStopsHandler().handle()
+        handle { getStops() }
     }
 
     get("/{lineCode}/itineraries") {
-        getItinerariesHandler().handle()
+        handle { getItineraries() }
     }
 }
 

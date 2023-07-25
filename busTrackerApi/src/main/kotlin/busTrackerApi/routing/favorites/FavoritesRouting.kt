@@ -6,19 +6,19 @@ import io.ktor.server.routing.*
 
 fun Route.favoritesRouting() = authenticate("user") {
     post {
-        createFavorite().handle()
+        handle { createFavorite() }
     }
 
     get {
-        getFavorites().handle()
+        handle { getFavorites() }
     }
 
     get("/{id}") {
-        getFavorite().handle()
+        handle { getFavorite() }
     }
 
     delete("/{id}") {
-        deleteFavorite().handle()
+        handle { deleteFavorite() }
     }
 }
 

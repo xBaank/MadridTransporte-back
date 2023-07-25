@@ -1,14 +1,32 @@
 package busTrackerApi.routing.stops
 
 import busTrackerApi.extensions.handle
+import io.ktor.server.auth.*
 import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 
 fun Route.stopsRouting() {
     get("/search") {
-        getStopsByQuery().handle()
+        handle { getStopsByQuery() }
     }
 
     get("/locations") {
-        getLocations().handle()
+        handle { getLocations() }
+    }
+}
+
+val timesConfigF : Route.(codMode : String) -> Unit = { codMode ->
+    get("/{stopCode}/times") {
+        handle { getStopTimes(codMode) }
+    }
+
+    get("/{stopCode}/times/cached") {
+        handle { getStopTimesCached(codMode) }
+    }
+
+    authenticate("user") {
+        webSocket("/{stopCode}/times/subscribe") {
+            handle { subscribeStopsTimes(codMode) }
+        }
     }
 }
