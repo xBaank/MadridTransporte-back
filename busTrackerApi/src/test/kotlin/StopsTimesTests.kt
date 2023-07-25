@@ -25,16 +25,22 @@ import utils.TestBase
 import utils.testApplicationBusTracker
 
 const val busStopCode = "08242"
-const val trainStopCode = "235"
+const val trainStopCode = "41"
+const val metroStopCode = "235"
+const val emtStopCode = "2445"
 
 enum class Times(val url: String) {
     BUS("/v1/stops/bus/$busStopCode/times"),
-    TRAIN("/v1/stops/train/$trainStopCode/times")
+    TRAIN("/v1/stops/train/$trainStopCode/times"),
+    METRO("/v1/stops/metro/$metroStopCode/times"),
+    EMT("/v1/stops/emt/$emtStopCode/times")
 }
 
 enum class TimesNotFound(val url: String) {
     BUS("/v1/stops/bus/asdasd/times"),
-    TRAIN("/v1/stops/train/asdasd/times")
+    TRAIN("/v1/stops/train/asdasd/times"),
+    METRO("/v1/stops/metro/asdasd/times"),
+    EMT("/v1/stops/emt/asdasd/times")
 }
 
 class StopsRoutingTests : TestBase, KoinComponent {

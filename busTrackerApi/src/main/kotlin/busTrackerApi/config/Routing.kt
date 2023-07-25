@@ -5,6 +5,8 @@ import busTrackerApi.routing.bus.lines.linesRouting
 import busTrackerApi.routing.favorites.favoritesRouting
 import busTrackerApi.routing.metro.timesRouting
 import busTrackerApi.routing.stops.bus.busStopsRouting
+import busTrackerApi.routing.stops.emt.emtStopsRouting
+import busTrackerApi.routing.stops.metro.metroStopsRouting
 import busTrackerApi.routing.stops.stopsRouting
 import busTrackerApi.routing.stops.train.trainStopsRouting
 import busTrackerApi.routing.users.authRouting
@@ -29,6 +31,8 @@ private fun Route.stopsRoute() {
         stopsRouting()
         busStopsRouting()
         trainStopsRouting()
+        metroStopsRouting()
+        emtStopsRouting()
     }
 }
 

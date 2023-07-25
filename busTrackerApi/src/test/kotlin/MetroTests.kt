@@ -12,7 +12,7 @@ import simpleJson.deserialized
 import utils.TestBase
 import utils.testApplicationBusTracker
 
-const val metroStopCode = "209"
+const val metroStationCode = "209"
 
 class MetroRoutingTests : TestBase {
 
@@ -29,7 +29,7 @@ class MetroRoutingTests : TestBase {
 
     @Test
     fun `should get metros times by code`() = testApplicationBusTracker {
-        val response = client.get("/v1/metro/times/$metroStopCode")
+        val response = client.get("/v1/metro/times/$metroStationCode")
         val body = response.bodyAsText().deserialized()
 
         response.status.isSuccess().shouldBe(true)
