@@ -1,24 +1,11 @@
 package busTrackerApi.routing.stops
 
+import crtm.soap.IncidentsAffectationsResponse
 import crtm.soap.ShortStopTimesResponse
-import crtm.soap.StopResponse
 import crtm.soap.StopsByGeoLocationResponse
 import crtm.utils.getCodModeFromLineCode
 import crtm.utils.getCodStopFromStopCode
 import simpleJson.*
-
-fun buildStopsJson(stops: StopResponse) = jArray {
-    stops.stops.stop.forEach { stop ->
-        addObject {
-            "codStop" += stop.codStop
-            "simpleCodStop" += getCodStopFromStopCode(stop.codStop)
-            "codMode" += stop.codMode
-            "name" += stop.name
-            "latitude" += stop.coordinates.latitude
-            "longitude" += stop.coordinates.longitude
-        }
-    }
-}
 
 fun buildStopsJson(stops: JsonNode) = jArray {
     stops.asArray().getOrNull()?.forEach { stop ->
@@ -65,4 +52,15 @@ fun buildStopTimesJson(times: ShortStopTimesResponse) = jObject {
 fun buildCachedJson(json: JsonNode, createdAt: Long) = jObject {
     "data" += json
     "lastTime" += createdAt
+}
+
+fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
+    alerts.incidentsAffectations.incidentAffectation.forEach {
+        addObject {
+            "description" += it.description
+            "codMode" += it.codMode
+            "codLine" += it.codLine
+            "stops" += it.stopsAffectated.shortStop.map { it.codStop.asJson() }.asJson()
+        }
+    }
 }

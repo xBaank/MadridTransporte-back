@@ -31,16 +31,11 @@ val allStopsCache = Cache.Builder()
     .expireAfterWrite(1.hours)
     .build<String, JsonNode>()
 
+val cachedAlerts = Cache.Builder()
+    .expireAfterWrite(24.hours)
+    .build<String, TimedCachedValue<IncidentsAffectationsResponse>>()
+
 val subscribedStops = mutableMapOf<String, WebSocketServerSession>()
-
-
-fun getStopsByQueryResponse(query: String) = Either.catch {
-    val request = StopRequestV2().apply {
-        customSearch = query
-        authentication = defaultClient.auth()
-    }
-    defaultClient.getStopsV2(request)
-}.mapLeft(mapExceptionsF)
 
 fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.catch {
     val request = ShortStopTimesRequest().apply {
@@ -110,4 +105,18 @@ suspend fun getStopById(stopCode: String) = either {
         .firstOrNull { it["codStop"].asString().getOrNull() == stopCode } ?:
     shift<Nothing>(BusTrackerException.NotFound("Stop with id $stopCode not found"))
 }
+
+suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
+    cachedAlerts.get(codMode) ?:
+    CoroutineScope(Dispatchers.IO).async {
+        val cached = defaultClient.getIncidentsAffectations(IncidentsAffectationsRequest().apply {
+            this.codMode = codMode
+            codLines = ArrayOfString()
+            authentication = defaultClient.auth()
+        }).timed()
+        cachedAlerts.put(codMode, cached)
+        cached
+    }.await()
+
+}.mapLeft(mapExceptionsF)
 
