@@ -30,7 +30,6 @@ import simpleJson.serialized
 import kotlin.collections.set
 import kotlin.time.Duration.Companion.minutes
 
-private const val codMode = "4"
 suspend fun Call.getMetroTimes() = getMetroTimesBase(::getTimesByQuery, call.parameters.getWrapped("stopCode"))
 suspend fun Call.getMetroTimesCached() = getMetroTimesBase(::getTimesByQueryCached,call.parameters.getWrapped("stopCode"))
 
@@ -38,14 +37,14 @@ private suspend fun getMetroTimesBase(
     f: suspend (String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>,
     id: Either<BusTrackerException, String>
 ) = either {
-    val stopCode = createStopCode(codMode, id.bind())
+    val stopCode = createStopCode(metroCodMode, id.bind())
     val stopInfo = getStopById(stopCode).bind()
     val json = f(stopInfo["name"].asString().toBusTrackerException().bind()).bind()
     ResponseJson(buildCachedJson(json.value, json.createdAt.toEpochMilli()), HttpStatusCode.OK)
 }
 
 suspend fun WebSocketServerSession.subscribeMetroStopsTimes() = either {
-    val stopCode = createStopCode(codMode, call.parameters
+    val stopCode = createStopCode(metroCodMode, call.parameters
         .getWrapped("stopCode")
         .toCloseSocketException(CloseReason.Codes.CANNOT_ACCEPT)
         .bind())

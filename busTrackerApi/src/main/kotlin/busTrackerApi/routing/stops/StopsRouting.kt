@@ -34,3 +34,9 @@ val timesConfigF : Route.(codMode : String) -> Unit = { codMode ->
         }
     }
 }
+
+val alertsConfigF : Route.(codMode : String) -> Unit = { codMode ->
+    get("/alerts") {
+        handle { getAlertsByCodMode(codMode) }
+    }
+}

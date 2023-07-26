@@ -43,13 +43,7 @@ fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.catch {
     }
     //Not needed?
     if (codMode != null) request.codMode = codMode
-    val response = defaultClient.getShortStopTimes(request)
-    val alerts = defaultClient.getIncidentsAffectations(IncidentsAffectationsRequest().apply {
-        this.codMode = codMode ?: ""
-        codLines = ArrayOfString().apply { response.stopTimes.linesStatus.lineStatus.map { it.line.codLine } }
-        authentication = defaultClient.auth()
-    })
-    response
+    defaultClient.getShortStopTimes(request)
 }.mapLeft(mapExceptionsF)
 
 suspend fun getTimesResponse(stopCode: String, codMode: String?) =
@@ -107,4 +101,12 @@ suspend fun getStopById(stopCode: String) = either {
         .firstOrNull { it["codStop"].asString().getOrNull() == stopCode } ?:
     shift<Nothing>(BusTrackerException.NotFound("Stop with id $stopCode not found"))
 }
+
+fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
+     defaultClient.getIncidentsAffectations(IncidentsAffectationsRequest().apply {
+        this.codMode = codMode
+        codLines = ArrayOfString()
+        authentication = defaultClient.auth()
+    })
+}.mapLeft(mapExceptionsF)
 

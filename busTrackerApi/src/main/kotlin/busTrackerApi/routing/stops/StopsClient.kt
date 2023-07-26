@@ -23,6 +23,12 @@ import kotlinx.coroutines.isActive
 import simpleJson.*
 import kotlin.time.Duration.Companion.minutes
 
+
+suspend fun getAlertsByCodMode(codMode: String) = either {
+    val alerts = getAlertsByCodModeResponse(codMode).bind()
+    ResponseJson(buildAlertsJson(alerts), HttpStatusCode.OK)
+}
+
 suspend fun Call.getStopsByQuery() = either {
     val query = call.request.queryParameters.getWrapped("query").bind().removeNonSpacingMarks()
 
