@@ -26,7 +26,8 @@ import kotlin.time.Duration.Companion.minutes
 
 suspend fun getAlertsByCodMode(codMode: String) = either {
     val alerts = getAlertsByCodModeResponse(codMode).bind()
-    ResponseJson(buildAlertsJson(alerts), HttpStatusCode.OK)
+    
+    ResponseJson(buildAlertsJson(alerts.value), HttpStatusCode.OK)
 }
 
 suspend fun Call.getStopsByQuery() = either {
