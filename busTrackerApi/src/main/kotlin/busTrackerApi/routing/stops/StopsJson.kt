@@ -1,5 +1,6 @@
 package busTrackerApi.routing.stops
 
+import busTrackerApi.extensions.removeNonSpacingMarks
 import crtm.soap.IncidentsAffectationsResponse
 import crtm.soap.ShortStopTimesResponse
 import crtm.soap.StopsByGeoLocationResponse
@@ -13,7 +14,7 @@ fun buildStopsJson(stops: JsonNode) = jArray {
             "codStop" += stop["codStop"].asString().getOrNull()
             "simpleCodStop" += getCodStopFromStopCode(stop["codStop"].asString().getOrNull()!!)
             "codMode" += stop["codMode"].asString().getOrNull()
-            "name" += stop["name"].asString().getOrNull()
+            "name" += stop["name"].asString().getOrNull()?.removeNonSpacingMarks()
             "latitude" += stop["coordinates"]["latitude"].asNumber().getOrNull()
             "longitude" += stop["coordinates"]["longitude"].asNumber().getOrNull()
             "lines" += stop["lines"].asArray().getOrNull() ?: jArray {}
