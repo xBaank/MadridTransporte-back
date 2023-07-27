@@ -2,9 +2,9 @@ package busTrackerApi.routing.favorites
 
 import arrow.core.continuations.either
 import busTrackerApi.exceptions.BusTrackerException.NotFound
+import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.extensions.inject
-import busTrackerApi.extensions.toBusTrackerException
 import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.routing.Response.ResponseRaw
 import busTrackerApi.routing.users.User
@@ -25,9 +25,9 @@ val db by inject<CoroutineDatabase>()
 
 suspend fun Call.createFavorite() = either {
     val stopToSave = call.receiveText().deserialized()
-    val stopType = stopToSave["stopType"].asString().toBusTrackerException().bind()
-    val stopId = stopToSave["stopId"].asString().toBusTrackerException().bind()
-    val name = stopToSave["name"].asString().toBusTrackerException().bind()
+    val stopType = stopToSave["stopType"].asString().bindMap()
+    val stopId = stopToSave["stopId"].asString().bindMap()
+    val name = stopToSave["name"].asString().bindMap()
     val email = call.principal<JWTPrincipal>().getWrapped("email").bind()
 
     val user: User = db.getCollection<User>().findOne(User::email eq email) ?: shift(NotFound("Email not found"))

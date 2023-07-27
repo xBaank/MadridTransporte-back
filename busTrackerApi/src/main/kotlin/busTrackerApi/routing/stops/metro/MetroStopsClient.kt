@@ -4,8 +4,8 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.CloseSocketException
+import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.getWrapped
-import busTrackerApi.extensions.toBusTrackerException
 import busTrackerApi.extensions.toCloseSocketException
 import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.routing.stops.TimedCachedValue
@@ -39,7 +39,7 @@ private suspend fun getMetroTimesBase(
 ) = either {
     val stopCode = createStopCode(metroCodMode, id.bind())
     val stopInfo = getStopById(stopCode).bind()
-    val json = f(stopInfo["name"].asString().toBusTrackerException().bind()).bind()
+    val json = f(stopInfo["name"].asString().bindMap()).bind()
     ResponseJson(buildCachedJson(json.value, json.createdAt.toEpochMilli()), HttpStatusCode.OK)
 }
 

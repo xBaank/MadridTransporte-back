@@ -3,8 +3,8 @@ package busTrackerApi.routing.stops.metro
 import arrow.core.continuations.either
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
+import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.removeNonSpacingMarks
-import busTrackerApi.extensions.toBusTrackerException
 import busTrackerApi.routing.stops.TimedCachedValue
 import busTrackerApi.routing.stops.timed
 import io.github.reactivecircus.cache4k.Cache
@@ -63,13 +63,11 @@ suspend fun getTimesBase(filter: String, id: String? = null) = either {
         val json = body.deserialized()
             .get("Vtelindicadores")
             .asArray()
-            .toBusTrackerException()
-            .bind()
+            .bindMap()
 
         val filtered = json.filter {
             it["nombreest"].asString()
-                .toBusTrackerException()
-                .bind()
+                .bindMap()
                 .removeNonSpacingMarks()
                 .contains(filter.removeNonSpacingMarks(), true)
         }.asJson()

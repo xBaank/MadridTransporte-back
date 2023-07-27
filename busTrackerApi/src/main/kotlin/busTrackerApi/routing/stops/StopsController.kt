@@ -7,7 +7,7 @@ import arrow.core.left
 import arrow.core.right
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
-import busTrackerApi.extensions.toBusTrackerException
+import busTrackerApi.extensions.bindMap
 import busTrackerApi.utils.mapExceptionsF
 import crtm.auth
 import crtm.defaultClient
@@ -62,10 +62,10 @@ suspend fun getTimesOrCachedResponse(stopCode: String, codMode: String?) =
 
 
 
-private suspend inline fun <T> getTimes(
+private suspend fun <T> getTimes(
     stopCode: String,
     codMode: String?,
-    crossinline getF: (stopCode: String, codMode: String?) -> Either<T, ShortStopTimesResponse>
+    getF: (stopCode: String, codMode: String?) -> Either<T, ShortStopTimesResponse>
 ) = withTimeoutOrNull(20.seconds) {
     val stopTimes = CoroutineScope(Dispatchers.IO)
         .async { getF(stopCode, codMode) }
@@ -96,12 +96,12 @@ suspend fun getAllStopsResponse() = either {
     val request = Request.Builder().url("https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json").get().build()
     httpClient.newCall(request).execute().use {
         val json = it.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
-        json.deserialized().toBusTrackerException().bind()
+        json.deserialized().bindMap()
     }.also { allStopsCache.put("all", it) }
 }
 
 suspend fun getStopById(stopCode: String) = either {
-    getAllStopsResponse().bind().asArray().toBusTrackerException().bind()
+    getAllStopsResponse().bind().asArray().bindMap()
         .firstOrNull { it["codStop"].asString().getOrNull() == stopCode } ?:
     shift<Nothing>(BusTrackerException.NotFound("Stop with id $stopCode not found"))
 }

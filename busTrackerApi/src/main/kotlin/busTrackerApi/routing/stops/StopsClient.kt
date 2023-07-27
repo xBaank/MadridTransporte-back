@@ -4,9 +4,9 @@ import arrow.core.continuations.either
 import arrow.core.getOrElse
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.CloseSocketException
+import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.extensions.removeNonSpacingMarks
-import busTrackerApi.extensions.toBusTrackerException
 import busTrackerApi.extensions.toCloseSocketException
 import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.utils.Call
@@ -33,8 +33,8 @@ suspend fun getAlertsByCodMode(codMode: String) = either {
 suspend fun Call.getStopsByQuery() = either {
     val query = call.request.queryParameters.getWrapped("query").bind().removeNonSpacingMarks()
 
-    val stops = getAllStopsResponse().bind().asArray().toBusTrackerException().bind()
-        .filter { it["name"].asString().toBusTrackerException().bind().removeNonSpacingMarks().contains(query, ignoreCase = true) }
+    val stops = getAllStopsResponse().bind().asArray().bindMap()
+        .filter { it["name"].asString().bindMap().removeNonSpacingMarks().contains(query, ignoreCase = true) }
         .asJson()
 
     ResponseJson(buildStopsJson(stops), HttpStatusCode.OK)

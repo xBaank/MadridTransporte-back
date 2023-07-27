@@ -31,7 +31,7 @@ val verifier by inject<JWTVerifier>()
 val mailer by inject<Mailer>()
 //TODO maybe move redirect urls to the body?
 suspend fun Call.register(): Either<BusTrackerException, Response> = either {
-    val user = call.receiveText().deserialized().toBusTrackerException().bind()
+    val user = call.receiveText().deserialized().bindMap()
     val backUrl = call.request.queryParameters.getWrapped("backUrl").bind()
     val redirectUrl = call.request.queryParameters.getWrapped("redirectUrl").bind()
     val userTyped = createUser(user).bind()
@@ -70,9 +70,9 @@ suspend fun Call.verify(): Either<BusTrackerException, Response> = either {
 }
 
 suspend fun Call.login(): Either<BusTrackerException, Response> = either {
-    val user = call.receiveText().deserialized().toBusTrackerException().bind()
-    val email = user["email"].asString().toBusTrackerException().bind()
-    val password = user["password"].asString().toBusTrackerException().bind()
+    val user = call.receiveText().deserialized().bindMap()
+    val email = user["email"].asString().bindMap()
+    val password = user["password"].asString().bindMap()
 
     val userTyped: User = userRepo.getCollection<User>().findOne(User::email eq email) ?:
     shift(NotFound("User not found"))
@@ -87,8 +87,8 @@ suspend fun Call.login(): Either<BusTrackerException, Response> = either {
 }
 
 suspend fun Call.sendResetPassword() = either {
-    val user = call.receiveText().deserialized().toBusTrackerException().bind()
-    val email = user["email"].asString().toBusTrackerException().bind()
+    val user = call.receiveText().deserialized().bindMap()
+    val email = user["email"].asString().bindMap()
     val redirectUrl = call.request.queryParameters.getWrapped("redirectUrl").bind()
 
     val userTyped: User = userRepo.getCollection<User>().findOne(User::email eq email) ?:
@@ -111,7 +111,7 @@ suspend fun Call.resetPassword() = either {
     if (scope != ResetPasswordScope) shift<BusTrackerException>(BadRequest("Invalid scope"))
 
     val newPass = call.receiveText().deserialized()
-        .get("password").asString().toBusTrackerException().bind()
+        .get("password").asString().bindMap()
         .validatePassword().bind()
 
     val userTyped: User = userRepo.getCollection<User>().findOne(User::email eq email) ?:
