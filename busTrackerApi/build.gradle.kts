@@ -24,6 +24,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("io.ktor:ktor-server-websockets:$ktor_version")
+    implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0")
     //arrow kt
     implementation("io.arrow-kt:arrow-core:1.1.5")
     implementation("io.ktor:ktor-server-cors:$ktor_version")

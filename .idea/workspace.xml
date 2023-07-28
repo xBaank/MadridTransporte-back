@@ -4,42 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Remove accents in json">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Remove `User` part">
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/CalendarExtensions.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/OkHttpClientExtensions.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/train/TrainData.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/train/TrainStopsClient.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/train/TrainStopsController.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/utils/CsvParser.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/Main.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/config/Auth.kt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/config/Dependencies.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/config/Dependencies.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/config/Routing.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/config/Routing.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/BcryptExtensions.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/JwtExtensions.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favorites/Favorite.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favorites/FavoriteJson.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favorites/FavoritesClient.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/favorites/FavoritesRouting.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsClient.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsClient.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsRouting.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsClient.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsClient.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsRouting.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/EmailSender.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/EmailTemplate.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/User.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UserClient.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UserJson.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/users/UsersRouting.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/AbonoTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/AbonoTest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/AlertsTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/AlertsTest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusLinesTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/BusLinesTests.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/FavouritesTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/StopsTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/StopsTests.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/StopsTimesTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/StopsTimesTests.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UserResetPasswordTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersLoginTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersRegisterTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/UsersVerifyTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/utils/MongoContainer.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/utils/TestBase.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/utils/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/utils/Utils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsController.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsJson.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsJson.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsController.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsJson.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsJson.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/train/TrainStopsRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/train/TrainStopsRouting.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,8 +121,8 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'">
-    <configuration name="StopsRoutingTests.should get stop times cached" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+  <component name="RunManager" selected="Kotlin.MainKt">
+    <configuration name="StopsRoutingTests.should get unauthorized when already subscribed to stopTimes" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -156,7 +135,7 @@
           <list>
             <option value=":busTrackerApi:test" />
             <option value="--tests" />
-            <option value="&quot;StopsRoutingTests.should get stop times cached&quot;" />
+            <option value="&quot;StopsRoutingTests.should get unauthorized when already subscribed to stopTimes&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -244,11 +223,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
         <item itemvalue="Kotlin.MainKt" />
+        <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
+        <item itemvalue="Gradle.StopsRoutingTests.should get unauthorized when already subscribed to stopTimes" />
         <item itemvalue="Gradle.bus-tracker-back [koverHtmlReport]" />
         <item itemvalue="Gradle.StopsRoutingTests.should subscribe to stopTimes" />
-        <item itemvalue="Gradle.StopsRoutingTests.should get stop times cached" />
       </list>
     </recent_temporary>
   </component>
@@ -604,7 +583,7 @@
       <option name="project" value="LOCAL" />
       <updated>1687181447717</updated>
     </task>
-    <option name="localTasksCounter" value="128" />
+    <option name="localTasksCounter" value="129" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -619,8 +598,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Refactor Abono Part" />
-    <MESSAGE value="Refactor Lines Part" />
     <MESSAGE value="Add some regex for lineCodes" />
     <MESSAGE value="Remove TODO" />
     <MESSAGE value="Some refactor on stops part" />
@@ -644,7 +621,9 @@
     <MESSAGE value="Add `Alerts` endpoint" />
     <MESSAGE value="Cleanup" />
     <MESSAGE value="Remove accents in json" />
-    <option name="LAST_COMMIT_MESSAGE" value="Remove accents in json" />
+    <MESSAGE value="Remove test" />
+    <MESSAGE value="Remove `User` part" />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove `User` part" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>

@@ -2,14 +2,14 @@ package busTrackerApi.routing.stops
 
 import busTrackerApi.extensions.removeNonSpacingMarks
 import crtm.soap.IncidentsAffectationsResponse
-import crtm.soap.ShortStopTimesResponse
+import crtm.soap.StopTimesResponse
 import crtm.soap.StopsByGeoLocationResponse
-import crtm.utils.getCodModeFromLineCode
 import crtm.utils.getCodStopFromStopCode
 import simpleJson.*
 
 fun buildStopsJson(stops: JsonNode) = jArray {
     stops.asArray().getOrNull()?.forEach { stop ->
+        if(stop["codMode"].asString().getOrNull() == "10") return@forEach
         addObject {
             "codStop" += stop["codStop"].asString().getOrNull()
             "simpleCodStop" += getCodStopFromStopCode(stop["codStop"].asString().getOrNull()!!)
@@ -35,13 +35,15 @@ fun buildStopLocationsJson(stops: StopsByGeoLocationResponse) = jArray {
     }
 }
 
-fun buildStopTimesJson(times: ShortStopTimesResponse) = jObject {
+fun buildStopTimesJson(times: StopTimesResponse) = jObject {
     "name" += times.stopTimes.stop.name
+    "codMode" += times.stopTimes.stop.codMode
     "times" += jArray {
-        times.stopTimes?.times?.shortTime?.forEach {
+        times.stopTimes?.times?.time?.forEach {
             addObject {
-                "lineCode" += it.codLine
-                "codMode" += getCodModeFromLineCode(it.codLine)
+                "lineCode" += it.line.codLine
+                "lineName" += it.line.shortDescription
+                "codMode" += it.line.codMode
                 "destination" += it.destination
                 "codVehicle" += it.codVehicle
                 "time" += it.time.toGregorianCalendar().time.toInstant().toEpochMilli()

@@ -11,6 +11,7 @@ import io.github.reactivecircus.cache4k.Cache
 import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response
+import ru.gildor.coroutines.okhttp.await
 import simpleJson.*
 import kotlin.time.Duration.Companion.hours
 
@@ -25,7 +26,7 @@ fun urlBuilder() = HttpUrl.Builder()
     .addPathSegment("rest")
     .addPathSegment("teleindicadores")
 
-fun getMetroTimesResponse(id: String? = null): Response {
+suspend fun getMetroTimesResponse(id: String? = null): Response {
     val url = urlBuilder()
         .also { if (id != null) it.addPathSegment(id) }
         .build()
@@ -36,7 +37,7 @@ fun getMetroTimesResponse(id: String? = null): Response {
         .addHeader("Accept", "application/json")
         .build()
 
-    return httpClient.newCall(request).execute()
+    return httpClient.newCall(request).await()
 }
 
 suspend fun getTimesByQuery(query: String) = either {

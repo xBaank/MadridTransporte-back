@@ -4,6 +4,7 @@ import simpleJson.*
 
 fun buildMetroJson(array: JsonArray) = jObject {
     "name" += array.firstOrNull()?.get("nombreest")?.asString()?.getOrNull()
+    "codMode" += metroCodMode
     "times" += jArray {
         array.forEach {
             addObject {

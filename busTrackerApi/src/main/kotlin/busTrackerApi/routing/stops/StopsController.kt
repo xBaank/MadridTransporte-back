@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 
 val stopTimesCache = Cache.Builder()
     .expireAfterWrite(24.hours)
-    .build<String, TimedCachedValue<ShortStopTimesResponse>>()
+    .build<String, TimedCachedValue<StopTimesResponse>>()
 
 val allStopsCache = Cache.Builder()
     .expireAfterWrite(1.hours)
@@ -38,7 +38,7 @@ val cachedAlerts = Cache.Builder()
 val subscribedStops = mutableMapOf<String, WebSocketServerSession>()
 
 fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.catch {
-    val request = ShortStopTimesRequest().apply {
+    val request = StopTimesRequest().apply {
         codStop = stopCode
         type = 1
         orderBy = 2
@@ -47,7 +47,7 @@ fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.catch {
     }
     //Not needed?
     if (codMode != null) request.codMode = codMode
-    defaultClient.getShortStopTimes(request)
+    defaultClient.getStopTimes(request)
 }.mapLeft(mapExceptionsF)
 
 suspend fun getTimesResponse(stopCode: String, codMode: String?) =
@@ -65,7 +65,7 @@ suspend fun getTimesOrCachedResponse(stopCode: String, codMode: String?) =
 private suspend fun <T> getTimes(
     stopCode: String,
     codMode: String?,
-    getF: (stopCode: String, codMode: String?) -> Either<T, ShortStopTimesResponse>
+    getF: (stopCode: String, codMode: String?) -> Either<T, StopTimesResponse>
 ) = withTimeoutOrNull(20.seconds) {
     val stopTimes = CoroutineScope(Dispatchers.IO)
         .async { getF(stopCode, codMode) }
