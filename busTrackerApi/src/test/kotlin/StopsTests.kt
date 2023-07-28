@@ -7,10 +7,9 @@ import org.junit.jupiter.api.Test
 import simpleJson.JsonArray
 import simpleJson.asArray
 import simpleJson.deserialized
-import utils.TestBase
 import utils.testApplicationBusTracker
 
-class StopsTests : TestBase {
+class StopsTests {
     @Test
     fun `should get stops by query`() = testApplicationBusTracker {
         val response = client.get("/v1/stops/search?query=Leganes")

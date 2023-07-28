@@ -1,7 +1,4 @@
 import arrow.core.getOrElse
-import busTrackerApi.config.AuthSignerQualifier
-import busTrackerApi.config.Signer
-import busTrackerApi.config.dbModule
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -14,14 +11,10 @@ import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldNotBeNull
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import org.koin.core.component.KoinComponent
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
 import simpleJson.JsonArray
 import simpleJson.JsonObject
 import simpleJson.deserialized
 import simpleJson.get
-import utils.TestBase
 import utils.testApplicationBusTracker
 
 const val busStopCode = "08242"
@@ -43,7 +36,7 @@ enum class TimesNotFound(val url: String) {
     EMT("/v1/stops/emt/asdasd/times")
 }
 
-class StopsRoutingTests : TestBase, KoinComponent {
+class StopsRoutingTests {
 
     @ParameterizedTest
     @EnumSource(Times::class)
@@ -86,15 +79,8 @@ class StopsRoutingTests : TestBase, KoinComponent {
     @ParameterizedTest
     @EnumSource(Times::class)
     fun `should subscribe to stopTimes`(code: Times) = testApplicationBusTracker { client ->
-        //Fix as koin is not started, and we need config before using the client
-        val koinApp = startKoin { modules(dbModule) }
-        val authSigner by koinApp.koin.inject<Signer>(AuthSignerQualifier)
-        val token = authSigner { withClaim("email", "whatever") }
-        stopKoin()
-
         client.webSocket({
             url(code.url + "/subscribe")
-            header("Authorization", "Bearer $token")
         })
         {
             val response = incoming.receive() as? Frame.Text
@@ -109,38 +95,11 @@ class StopsRoutingTests : TestBase, KoinComponent {
     }
 
     @ParameterizedTest
-    @EnumSource(Times::class)
-    fun `should get unauthorized when subscribe to stopTimes`(code: Times) = testApplicationBusTracker { client ->
-        runCatching {
-            client.webSocket({
-                url(code.url + "/subscribe")
-            })
-            {
-                val response = incoming.receive() as? Frame.Text
-                val body = response?.readText()?.deserialized()
-
-                response.shouldBeInstanceOf<Frame.Text>()
-                body!!.getOrElse { throw it }.shouldBeInstanceOf<JsonObject>()
-                body["data"].getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
-                body["lastTime"].getOrElse { throw it }.shouldNotBeNull()
-                close()
-            }
-        }.exceptionOrNull()!!.shouldBeInstanceOf<IllegalStateException>()
-    }
-
-    @ParameterizedTest
     @EnumSource(TimesNotFound::class)
     fun `should not find stop when subscribed`(code: TimesNotFound) = testApplicationBusTracker { client ->
-        //Fix as koin is not started, and we need config before using the client
-        val koinApp = startKoin { modules(dbModule) }
-        val authSigner by koinApp.koin.inject<Signer>(AuthSignerQualifier)
-        val token = authSigner { withClaim("email", "whatever") }
-        stopKoin()
-
         runCatching {
             client.webSocket({
                 url(code.url + "/subscribe")
-                header("Authorization", "Bearer $token")
             })
             {
                 val response = incoming.receive() as? Frame.Text

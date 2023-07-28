@@ -16,8 +16,6 @@ import busTrackerApi.utils.Call
 import crtm.utils.createStopCode
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.plugins.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
@@ -48,14 +46,8 @@ suspend fun WebSocketServerSession.subscribeMetroStopsTimes() = either {
         .getWrapped("stopCode")
         .toCloseSocketException(CloseReason.Codes.CANNOT_ACCEPT)
         .bind())
-
-    val email = call.principal<JWTPrincipal>()
-        .getWrapped("email")
-        .toCloseSocketException(CloseReason.Codes.CANNOT_ACCEPT)
-        .bind()
-
     val ip = call.request.origin.remoteAddress
-    val subId = "$ip-$email-$stopCode"
+    val subId = "$ip-$stopCode"
 
     if (subscribedStops.containsKey(subId)) shift<Nothing>(
         CloseSocketException("Already subscribed to stop code $stopCode", CloseReason.Codes.VIOLATED_POLICY)

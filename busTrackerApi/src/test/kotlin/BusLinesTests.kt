@@ -9,7 +9,10 @@ import org.junit.jupiter.params.provider.ValueSource
 import simpleJson.JsonArray
 import simpleJson.asArray
 import simpleJson.deserialized
-import utils.*
+import utils.getItineraries
+import utils.getLineLocation
+import utils.getStops
+import utils.testApplicationBusTracker
 
 const val interUrbanCode = "8__450___"
 const val urbanCode = "9__1__074_"
@@ -17,7 +20,7 @@ const val nonExistanceInterUrbanCode = "8__999___"
 const val nonExistanceUrbanCode = "9__1__999_"
 
 
-class BusLinesTests : TestBase {
+class BusLinesTests {
     @ParameterizedTest
     @ValueSource(strings = [interUrbanCode, urbanCode])
     fun `should get interurban line location`(code: String) = testApplicationBusTracker {
