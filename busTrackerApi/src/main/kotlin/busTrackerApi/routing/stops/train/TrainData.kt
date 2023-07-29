@@ -1,12 +1,12 @@
 package busTrackerApi.routing.stops.train
 
-data class SimpleTrainData(
+data class SimpleTrainStopData(
     val line: String,
     val stationName: String,
     val lastStop: String,
 )
 
-data class TrainData(
+data class TrainStopData(
     val line: String,
     val stationName: String,
     val stationCode: String,
