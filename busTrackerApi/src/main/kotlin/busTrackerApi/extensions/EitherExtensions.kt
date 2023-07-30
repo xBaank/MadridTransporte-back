@@ -12,6 +12,7 @@ import simpleJson.exceptions.JsonException
 
 context(EffectScope<BusTrackerException>)
 suspend fun <T> Either<JsonException, T>.bindMap() = mapLeft { JsonError(it.message) }.bind()
+
 fun <T> Either<BusTrackerException, T>.toCloseSocketException(reason: CloseReason.Codes) = mapLeft { CloseSocketException(it.message, reason) }
 suspend inline fun Call.handle(f : () -> Either<BusTrackerException, Response>) = f().fold({ handleError(it) }, { handleResponse(it) })
 suspend inline fun DefaultWebSocketSession.handle(f : () -> Either<CloseSocketException, Unit>) = f().fold({ handleError(it) }, {})

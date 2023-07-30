@@ -96,7 +96,9 @@ suspend fun getAllStopsResponse() = either {
     val request = Request.Builder().url("https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json").get().build()
     httpClient.newCall(request).execute().use {
         val json = it.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
-        json.deserialized().bindMap()
+        json.deserialized().asArray().bindMap()
+            .distinctBy { Pair(it["codMode"].asString().bindMap(), it["name"].asString().bindMap()) }
+            .asJson()
     }.also { allStopsCache.put("all", it) }
 }
 

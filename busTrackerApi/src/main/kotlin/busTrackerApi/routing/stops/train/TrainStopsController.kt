@@ -3,14 +3,13 @@ package busTrackerApi.routing.stops.train
 import arrow.core.continuations.either
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException.InternalServerError
-import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
+import busTrackerApi.extensions.onEachAsync
 import busTrackerApi.extensions.post
 import busTrackerApi.routing.stops.TimedCachedValue
-import busTrackerApi.routing.stops.getStopById
 import busTrackerApi.routing.stops.timed
-import busTrackerApi.utils.parse
+import busTrackerApi.utils.csvToJson
 import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,97 +18,127 @@ import kotlinx.coroutines.awaitAll
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.*
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.time.Duration.Companion.hours
-
-//Good job renfe, ty for providing an easy way to get the times
-
-private val trainUrlCaches = Cache.Builder()
-    .expireAfterWrite(1.hours)
-    .build<String, TimedCachedValue<JsonNode>>()
 
 private val trainTimesCache = Cache.Builder()
     .expireAfterWrite(1.hours)
     .build<String, TimedCachedValue<JsonNode>>()
 
-private const val tramosUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/TrainTramos.csv"
-private const val trainStationsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/TrainStations.csv"
+private val trainStopsCache = Cache.Builder()
+    .expireAfterWrite(1.hours)
+    .build<String, TimedCachedValue<JsonNode>>()
+
+private const val chunks = 5
+private const val stopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/train/paradas.csv"
+private const val tripsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/train/trips.csv"
+private const val routesUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/train/routes.csv"
 private const val horariosUrl = "https://horarios.renfe.com/cer/HorariosServlet"
 
-private val outputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-private val hourFormatter = DateTimeFormatter.ofPattern("HH:mm")
+internal val outputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+internal val hourFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private val timeZoneMadrid = TimeZone.getTimeZone("Europe/Madrid")
+private val hourTimeRegex = """\d{2}:\d{2}:\d{2}""".toRegex()
 
+suspend fun getTrainTimesResponse(stopCode : String) = either {
+    val times = getTrainTimes().bind()
+    val stops = getTrainStops().bind()
+    val trips = getTrainTrips().bind()
+    val routes = getTrainRoutes().bind()
+    val now = LocalTime.parse("12:00:00")
 
-suspend fun getTrainTimesResponse(stopCode: String) = either {
-    val getStopById = getStopById(stopCode).bind()
-    val stationName = getStopById["name"].asString().bindMap()
-    val trainLines = getTrainLines().bind().value.asArray().bindMap()
-    val lastAndFirst = getLastAndFirstStop(trainLines, stationName).bind()
-    val normalized = getStationsNormalized(lastAndFirst).bind().distinctBy { it.lastStopCode }
-    val times = normalized.map {
-        CoroutineScope((Dispatchers.IO)).async { getTrainTimes(it.stationCode, it.lastStopCode).bind() }
+    val stop = stops
+        .value
+        .asArray()
+        .bindMap()
+        .find { it["IDESTACION"].asString().bindMap() == stopCode } ?:
+        shift<Nothing>(InternalServerError("Stop not found"))
+
+    val stopId = stop["CODIGOEMPRESA"].asString().bindMap()
+
+    val nextTimes = times
+        .value
+        .asArray()
+        .bindMap()
+        .filter {
+            it["stop_id"].asString().bindMap() == stopId &&
+            it["arrival_time"].asString().map(::sanitizeLocalTime).bindMap().isAfter(now)
+        }.asJson()
+
+    nextTimes.onEachAsync {
+        val routeId = trips.value.asArray().bindMap().firstOrNull { trip ->
+            trip["trip_id"].asString().bindMap() == it["trip_id"].asString().bindMap()
+        }?.get("route_id")?.asString()?.bindMap()?.trim() ?: shift<Nothing>(InternalServerError("Trip not found"))
+
+        val route = routes.value.asArray().bindMap().firstOrNull { route ->
+            route["route_id"].asString().bindMap().trim() == routeId
+        } ?: shift<Nothing>(InternalServerError("Route not found"))
+
+        it["route_short_name"] = route["route_short_name"]
+            .asString()
+            .bindMap()
+            .substringBefore("-")
+            .trim()
+
+        it["route_long_name"] = route["route_long_name"]
+            .asString()
+            .bindMap()
+            .substringBefore("-")
+            .trim()
+
+        it["stop_sequence"] = it["stop_sequence"]
+            .asString()
+            .bindMap()
+            .trim()
     }
-    val result = replaceTrans(buildTrainJson(times.awaitAll().asJson())).bind().timed()
-    trainTimesCache.put(stopCode, result)
-    result
+
+    println(nextTimes)
+    TODO()
+
 }
 
-suspend fun getTrainTimesCachedResponse(stopCode: String) = either {
-    trainTimesCache.get(stopCode) ?: shift(NotFound("No cached data found"))
-}
-
-
-private suspend fun getTrainLines() = either {
-    val cached = trainUrlCaches.get(tramosUrl)
+private suspend fun getTrainTimes() = either {
+    val cached = trainTimesCache.get("trainTimes")
     if (cached != null) return@either cached
-    val response = httpClient.get(tramosUrl).await()
-    val csv = response.body?.string() ?: shift<Nothing>(InternalServerError("Got empty response"))
-    val parsed = parse(csv).timed()
-    trainUrlCaches.put(tramosUrl, parsed)
-    parsed
+
+    val scope = CoroutineScope(Dispatchers.IO)
+
+    val responses = (0 until chunks).map {
+        scope.async { httpClient.get(getTrainStationsUrl(it)).await().body?.string() ?:
+        shift(InternalServerError("Got empty response")) }
+    }.awaitAll()
+
+    val builder = StringBuilder()
+    responses.forEach { builder.append(it) }
+
+    val times = builder
+        .toString()
+        .let { csvToJson(it) }
+        .asJson()
+        .timed()
+
+    trainTimesCache.put("trainTimes", times)
+    times
 }
 
-private suspend fun getStationsNormalized(data: List<SimpleTrainStopData>) = either {
-    val cached = trainUrlCaches.get(trainStationsUrl) ?: run {
-        val response = httpClient.get(trainStationsUrl).await()
-        val csv = response.body?.string() ?: shift<Nothing>(InternalServerError("Got empty response"))
-        val parsed = parse(csv).timed()
-        trainUrlCaches.put(trainStationsUrl, parsed)
-        parsed
-    }
+private fun getTrainStationsUrl(index : Int) = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/train/horarios_madrid_$index.csv"
+private suspend fun getTrainStops() = getNode(stopsUrl)
+private suspend fun getTrainTrips() = getNode(tripsUrl)
+private suspend fun getTrainRoutes() = getNode(routesUrl)
+private suspend fun getNode(url: String) = either {
+    val cached = trainStopsCache.get(url)
+    if (cached != null) return@either cached
 
-    val parsed = cached.value.asArray().bindMap()
-
-    data.map {
-        val stationName = it.stationName
-
-        val stationCode = parsed.firstOrNull { it["DENOMINACION"].asString().bindMap() == stationName }
-            ?.get("CODIGOEMPRESA")
-            ?.asString()
-            ?.bindMap() ?:
-            shift<Nothing>(InternalServerError("Station $stationName not found in csv"))
-
-       val lastStop = it.lastStop
-
-        val lastStopCode = parsed.firstOrNull { it["DENOMINACION"].asString().bindMap() == lastStop }
-            ?.get("CODIGOEMPRESA")
-            ?.asString()
-            ?.bindMap() ?:
-            shift<Nothing>(InternalServerError("Station $lastStop not found in csv"))
-
-        TrainStopData(
-            line = it.line,
-            stationName = stationName,
-            stationCode = stationCode,
-            lastStop = lastStop,
-            lastStopCode = lastStopCode
-        )
-    }
+    val response = httpClient.get(url).await()
+    val json = response.body?.string() ?: shift<Nothing>(InternalServerError("Got empty response"))
+   val stops = csvToJson(json).asJson().timed()
+    trainStopsCache.put(url, stops)
+    stops
 }
 
-private suspend fun getTrainTimes(origin: String, destination: String) = either {
+private suspend fun getRealTrainTimes(origin: String, destination: String) = either {
     val madridDate = LocalDateTime.now(timeZoneMadrid.toZoneId()).format(outputFormatter)
     val madridHour = LocalDateTime.now(timeZoneMadrid.toZoneId()).format(hourFormatter)
     val response = httpClient.post(horariosUrl, jObject {
@@ -128,38 +157,7 @@ private suspend fun getTrainTimes(origin: String, destination: String) = either 
     json.deserialized().bindMap()
 }
 
-private suspend fun getLastAndFirstStop(data: JsonArray, stopName: String) = either {
-    val stops = data.filter { it["DENOMINACION"].asString().getOrNull() == stopName }
-    val lines = stops.map {
-        val sentido = it["SENTIDO"].asString().bindMap()
-        val line = it["CODIGOGESTIONLINEA"].asString().bindMap()
-
-        val lastStop = data.filter { it["CODIGOGESTIONLINEA"].asString().bindMap() == line }
-            .filter { it["SENTIDO"].asString().bindMap() == sentido }
-            .maxByOrNull { it["NUMEROORDEN"].asString().bindMap().toInt() }
-            ?: shift<Nothing>(InternalServerError("Couldn't find last stop for line $line"))
-
-        SimpleTrainStopData(
-            line = line,
-            stationName = stopName,
-            lastStop = lastStop["DENOMINACION"].asString().bindMap(),
-        )
-    }
-    lines
-}
-
-private suspend fun replaceTrans(json: JsonNode) = either {
-    json["times"].asArray().bindMap().forEach { time ->
-        time["horarios"].asArray().bindMap().forEach {
-            val trans = it["trans"].asArray().getOrNull()?.firstOrNull() ?: return@forEach
-
-            json["name"] = trans["descEstacion"].asString().bindMap()
-            time["destination"] = trans["descEstacion"].asString().bindMap()
-            json["horaLlegada"] = trans["horaLlegada"].asString().bindMap()
-
-            it.asObject().bindMap().value.remove("trans")
-        }
-    }
-    json["times"] = json["times"].asArray().bindMap().distinctBy { it["destination"] }.asJson()
-    json
+private fun sanitizeLocalTime(time : String): LocalTime {
+    val timeParts= time.split(":")
+    return LocalTime.of(timeParts[0].toInt() % 24, timeParts[1].toInt(), timeParts[2].toInt())
 }

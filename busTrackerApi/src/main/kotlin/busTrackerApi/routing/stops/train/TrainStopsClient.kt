@@ -15,7 +15,7 @@ import simpleJson.JsonNode
 
 
 suspend fun Call.getTrainTimes() = getTrainTimesBase(::getTrainTimesResponse, call.parameters.getWrapped("stopCode"))
-suspend fun Call.getTrainTimesCached() = getTrainTimesBase(::getTrainTimesCachedResponse, call.parameters.getWrapped("stopCode"))
+suspend fun Call.getTrainTimesCached() = getTrainTimesBase(::getTrainTimesResponse, call.parameters.getWrapped("stopCode"))
 
 suspend fun getTrainTimesBase(
     f: suspend (String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>,
