@@ -19,19 +19,21 @@ import utils.testApplicationBusTracker
 
 const val busStopCode = "08242"
 const val trainStopCode = "41"
+const val destinationStopCode = "53"
 const val metroStopCode = "235"
 const val emtStopCode = "2445"
 
-enum class Times(val url: String) {
-    BUS("/v1/stops/bus/$busStopCode/times"),
-    TRAIN("/v1/stops/train/$trainStopCode/times"),
-    METRO("/v1/stops/metro/$metroStopCode/times"),
-    EMT("/v1/stops/emt/$emtStopCode/times")
+enum class Times(val url: String, val urlCached: String) {
+    BUS("/v1/stops/bus/$busStopCode/times", "/v1/stops/bus/$busStopCode/times/cached"),
+    TRAIN("/v1/stops/train/times?originStopCode=$trainStopCode&destinationStopCode=$destinationStopCode",
+        "/v1/stops/train/times/cached?originStopCode=$trainStopCode&destinationStopCode=$destinationStopCode"),
+    METRO("/v1/stops/metro/$metroStopCode/times", "/v1/stops/metro/$metroStopCode/times/cached"),
+    EMT("/v1/stops/emt/$emtStopCode/times", "/v1/stops/emt/$emtStopCode/times/cached")
 }
 
 enum class TimesNotFound(val url: String) {
     BUS("/v1/stops/bus/asdasd/times"),
-    TRAIN("/v1/stops/train/asdasd/times"),
+    TRAIN("/v1/stops/train/times?originStopCode=asdasd&destinationStopCode=asdasd"),
     METRO("/v1/stops/metro/asdasd/times"),
     EMT("/v1/stops/emt/asdasd/times")
 }
@@ -53,7 +55,7 @@ class StopsRoutingTests {
     @EnumSource(Times::class)
     fun `should get stop times cached`(code: Times) = testApplicationBusTracker {
         val response = client.get(code.url)
-        val responseCached = client.get(code.url + "/cached")
+        val responseCached = client.get(code.urlCached)
 
         responseCached.status.isSuccess().shouldBe(true)
         response.status.isSuccess().shouldBe(true)
