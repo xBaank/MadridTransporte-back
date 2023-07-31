@@ -5,9 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Some changes">
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/tram/TramStopRouting.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/tram/TramStopsClient.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/tram/TramStopsController.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsJson.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsJson.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/config/Routing.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/config/Routing.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/OkHttpClientExtensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/extensions/OkHttpClientExtensions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsRouting.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsClient.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsClient.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsRouting.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/StopsTimesTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/StopsTimesTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crtm/src/main/kotlin/crtm/AbonoClient.kt" beforeDir="false" afterPath="$PROJECT_DIR$/crtm/src/main/kotlin/crtm/AbonoClient.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crtm/src/main/kotlin/crtm/CRTMClient.kt" beforeDir="false" afterPath="$PROJECT_DIR$/crtm/src/main/kotlin/crtm/CRTMClient.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -111,7 +119,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.MainKt">
+  <component name="RunManager" selected="Gradle.StopsRoutingTests.should get stop times (1)">
     <configuration name="StopsRoutingTests.should get stop times (1)" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -215,9 +223,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Kotlin.MainKt" />
-        <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
         <item itemvalue="Gradle.StopsRoutingTests.should get stop times (1)" />
+        <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
+        <item itemvalue="Kotlin.MainKt" />
         <item itemvalue="Gradle.StopsRoutingTests.should get stop times" />
         <item itemvalue="Gradle.StopsRoutingTests.should get stop times cached" />
       </list>
@@ -628,5 +636,8 @@
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/bus_tracker_back$StopsRoutingTests_should_get_stop_times__1_.ic" NAME="StopsRoutingTests.should get stop times (1) Coverage Results" MODIFIED="1690817278069" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

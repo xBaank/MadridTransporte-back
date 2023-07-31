@@ -1,4 +1,4 @@
-package busTrackerApi.routing.stops.metro
+package busTrackerApi.routing.stops.tram
 
 import arrow.core.Either
 import arrow.core.continuations.either
@@ -17,17 +17,15 @@ import simpleJson.JsonNode
 import simpleJson.asString
 import simpleJson.get
 
-suspend fun Call.getMetroTimes() = getMetroTimesBase(::getTimesByQuery, call.parameters.getWrapped("stopCode"))
-suspend fun Call.getMetroTimesCached() = getMetroTimesBase(::getTimesByQueryCached,call.parameters.getWrapped("stopCode"))
+suspend fun Call.getTramTimes() = getTramTimesBase(::getTramTimesResponse, call.parameters.getWrapped("stopCode"))
+suspend fun Call.getTramTimesCached() = getTramTimesBase(::getTramTimesResponseCached, call.parameters.getWrapped("stopCode"))
 
-private suspend fun getMetroTimesBase(
+private suspend fun getTramTimesBase(
     f: suspend (String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>,
     id: Either<BusTrackerException, String>
 ) = either {
-    val stopCode = createStopCode(metroCodMode, id.bind())
-    val stopInfo = getStopById(stopCode).bind()
-    val json = f(stopInfo["name"].asString().bindMap()).bind()
+    val stopCode = createStopCode(tramCodMode, id.bind())
+    val stop = getStopById(stopCode).bind()
+    val json = f(stop["name"].asString().bindMap()).bind()
     ResponseJson(buildCachedJson(json.value, json.createdAt.toEpochMilli()), HttpStatusCode.OK)
 }
-
-

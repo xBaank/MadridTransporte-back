@@ -2,7 +2,6 @@ package busTrackerApi.routing.stops
 
 import busTrackerApi.extensions.handle
 import io.ktor.server.routing.*
-import io.ktor.server.websocket.*
 
 fun Route.stopsRouting() {
     get("/search") {
@@ -25,10 +24,6 @@ val timesConfigF : Route.(codMode : String) -> Unit = { codMode ->
 
     get("/{stopCode}/times/cached") {
         handle { getStopTimesCached(codMode) }
-    }
-
-    webSocket("/{stopCode}/times/subscribe") {
-        handle { subscribeStopsTimes(codMode) }
     }
 }
 
