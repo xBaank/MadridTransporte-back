@@ -8,6 +8,7 @@ import arrow.core.right
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
+import busTrackerApi.extensions.get
 import busTrackerApi.utils.mapExceptionsF
 import crtm.auth
 import crtm.defaultClient
@@ -19,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Request
+import ru.gildor.coroutines.okhttp.await
 import simpleJson.*
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -36,6 +38,8 @@ val cachedAlerts = Cache.Builder()
     .build<String, TimedCachedValue<IncidentsAffectationsResponse>>()
 
 val subscribedStops = mutableMapOf<String, WebSocketServerSession>()
+
+const val allStopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json"
 
 fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.catch {
     val request = StopTimesRequest().apply {
@@ -90,16 +94,15 @@ fun getStopsByLocationResponse(lat: Double, lon: Double) = Either.catch {
 }.mapLeft(mapExceptionsF)
 
 suspend fun getAllStopsResponse() = either {
-    val cached = allStopsCache.get("all")
+    val cached = allStopsCache.get(allStopsUrl)
     if (cached != null) return@either cached
 
-    val request = Request.Builder().url("https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json").get().build()
-    httpClient.newCall(request).execute().use {
-        val json = it.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
+    httpClient.get(allStopsUrl).await().use { response ->
+        val json = response.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
         json.deserialized().asArray().bindMap()
-            .distinctBy { Pair(it["codMode"].asString().bindMap(), it["name"].asString().bindMap()) }
+            .distinctBy { it["codMode"].asString().bindMap() to it["name"].asString().bindMap() }
             .asJson()
-    }.also { allStopsCache.put("all", it) }
+    }.also { allStopsCache.put(allStopsUrl, it) }
 }
 
 suspend fun getStopById(stopCode: String) = either {

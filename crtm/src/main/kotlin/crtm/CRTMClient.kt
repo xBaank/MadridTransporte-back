@@ -6,7 +6,7 @@ import crtm.soap.MultimodalInformation_Service
 import crtm.soap.PublicKeyRequest
 import crtm.utils.authHeader
 
-
+//TODO Initliaze this in a better way, here it can throw an exception
 val defaultClient = MultimodalInformation_Service().basicHttp
 
 val privateKey = "pruebapruebapruebapruebaprueba12".toByteArray()

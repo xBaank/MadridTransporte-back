@@ -9,7 +9,6 @@ import simpleJson.*
 
 fun buildStopsJson(stops: JsonNode) = jArray {
     stops.asArray().getOrNull()?.forEach { stop ->
-        if(stop["codMode"].asString().getOrNull() == "10") return@forEach
         addObject {
             "codStop" += stop["codStop"].asString().getOrNull()
             "simpleCodStop" += getCodStopFromStopCode(stop["codStop"].asString().getOrNull()!!)
