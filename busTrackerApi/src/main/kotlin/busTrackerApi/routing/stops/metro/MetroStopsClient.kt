@@ -17,14 +17,15 @@ import simpleJson.JsonNode
 import simpleJson.asString
 import simpleJson.get
 
-suspend fun Call.getMetroTimes() = getMetroTimesBase(::getTimesByQuery, call.parameters.getWrapped("stopCode"))
-suspend fun Call.getMetroTimesCached() = getMetroTimesBase(::getTimesByQueryCached,call.parameters.getWrapped("stopCode"))
+suspend fun Call.getMetroTimes(codMode: String) = getMetroTimesBase(::getTimesByQuery, codMode, call.parameters.getWrapped("stopCode"))
+suspend fun Call.getMetroTimesCached(codMode: String) = getMetroTimesBase(::getTimesByQueryCached, codMode, call.parameters.getWrapped("stopCode"))
 
 private suspend fun getMetroTimesBase(
     f: suspend (String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>,
+    codMode: String,
     id: Either<BusTrackerException, String>
 ) = either {
-    val stopCode = createStopCode(metroCodMode, id.bind())
+    val stopCode = createStopCode(codMode, id.bind())
     val stopInfo = getStopById(stopCode).bind()
     val json = f(stopInfo["name"].asString().bindMap()).bind()
     ResponseJson(buildCachedJson(json.value, json.createdAt.toEpochMilli()), HttpStatusCode.OK)
