@@ -32,10 +32,10 @@ suspend fun Call.getStopsByQuery() = either {
     val query = call.request.queryParameters.getWrapped("query").bind().removeNonSpacingMarks()
 
     val stops = getAllStopsResponse().bind().asArray().bindMap()
-        .filter { it["name"].asString().bindMap().removeNonSpacingMarks().contains(query, ignoreCase = true) }
+        .filter { it["DENOMINACION"].asString().bindMap().removeNonSpacingMarks().contains(query, ignoreCase = true) }
         .asJson()
 
-    ResponseJson(buildStopsJson(stops), HttpStatusCode.OK)
+    ResponseJson(stops, HttpStatusCode.OK)
 }
 
 suspend fun Call.getStopsByLocation() = either {
@@ -51,7 +51,7 @@ suspend fun Call.getStopsByLocation() = either {
 
 suspend fun getAllStops() = either {
     val stops = getAllStopsResponse().bind()
-    ResponseJson(buildStopsJson(stops), HttpStatusCode.OK)
+    ResponseJson(stops, HttpStatusCode.OK)
 }
 
 suspend fun Call.getStopTimes(codMode : String) = either {

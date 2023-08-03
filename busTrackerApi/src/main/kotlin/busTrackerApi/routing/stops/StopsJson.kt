@@ -1,25 +1,13 @@
 package busTrackerApi.routing.stops
 
-import busTrackerApi.extensions.removeNonSpacingMarks
 import crtm.soap.IncidentsAffectationsResponse
 import crtm.soap.StopTimesResponse
 import crtm.soap.StopsByGeoLocationResponse
 import crtm.utils.getCodStopFromStopCode
-import simpleJson.*
-
-fun buildStopsJson(stops: JsonNode) = jArray {
-    stops.asArray().getOrNull()?.forEach { stop ->
-        addObject {
-            "codStop" += stop["codStop"].asString().getOrNull()
-            "simpleCodStop" += getCodStopFromStopCode(stop["codStop"].asString().getOrNull()!!)
-            "codMode" += stop["codMode"].asString().getOrNull()
-            "name" += stop["name"].asString().getOrNull()?.removeNonSpacingMarks()
-            "latitude" += stop["coordinates"]["latitude"].asNumber().getOrNull()
-            "longitude" += stop["coordinates"]["longitude"].asNumber().getOrNull()
-            "lines" += stop["lines"].asArray().getOrNull() ?: jArray {}
-        }
-    }
-}
+import simpleJson.JsonNode
+import simpleJson.asJson
+import simpleJson.jArray
+import simpleJson.jObject
 
 fun buildStopLocationsJson(stops: StopsByGeoLocationResponse) = jArray {
     stops.stops.stop.forEach { stop ->

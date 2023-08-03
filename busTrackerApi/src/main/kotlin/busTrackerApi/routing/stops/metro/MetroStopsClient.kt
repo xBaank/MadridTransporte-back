@@ -27,7 +27,7 @@ private suspend fun getMetroTimesBase(
 ) = either {
     val stopCode = createStopCode(codMode, id.bind())
     val stopInfo = getStopById(stopCode).bind()
-    val json = f(stopInfo["name"].asString().bindMap()).bind()
+    val json = f(stopInfo["DENOMINACION"].asString().bindMap()).bind()
     ResponseJson(buildCachedJson(json.value, json.createdAt.toEpochMilli()), HttpStatusCode.OK)
 }
 

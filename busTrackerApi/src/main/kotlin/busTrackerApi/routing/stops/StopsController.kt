@@ -19,7 +19,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withTimeoutOrNull
-import okhttp3.Request
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.*
 import kotlin.time.Duration.Companion.hours
@@ -100,14 +99,14 @@ suspend fun getAllStopsResponse() = either {
     httpClient.get(allStopsUrl).await().use { response ->
         val json = response.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
         json.deserialized().asArray().bindMap()
-            .distinctBy { it["codMode"].asString().bindMap() to it["name"].asString().bindMap() }
+            .distinctBy { it["IDESTACION"].asString().bindMap() to it["DENOMINACION"].asString().bindMap() }
             .asJson()
     }.also { allStopsCache.put(allStopsUrl, it) }
 }
 
 suspend fun getStopById(stopCode: String) = either {
     getAllStopsResponse().bind().asArray().bindMap()
-        .firstOrNull { it["codStop"].asString().getOrNull() == stopCode } ?:
+        .firstOrNull { it["IDESTACION"].asString().getOrNull() == stopCode } ?:
     shift<Nothing>(BusTrackerException.NotFound("Stop with id $stopCode not found"))
 }
 
