@@ -14,7 +14,7 @@ import crtm.utils.createStopCode
 import io.ktor.http.*
 import io.ktor.server.application.*
 import simpleJson.JsonNode
-import simpleJson.asString
+import simpleJson.asNumber
 import simpleJson.get
 
 suspend fun Call.getMetroTimes(codMode: String) = getMetroTimesBase(::getTimesByQuery, codMode, call.parameters.getWrapped("stopCode"))
@@ -27,7 +27,7 @@ private suspend fun getMetroTimesBase(
 ) = either {
     val stopCode = createStopCode(codMode, id.bind())
     val stopInfo = getStopById(stopCode).bind()
-    val json = f(stopInfo["DENOMINACION"].asString().bindMap()).bind()
+    val json = f(stopInfo["CODIGOEMPRESA"].asNumber().bindMap().toString()).bind()
     ResponseJson(buildCachedJson(json.value, json.createdAt.toEpochMilli()), HttpStatusCode.OK)
 }
 
