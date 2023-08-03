@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Change to use new type of stops json" />
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Cleanup">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -570,7 +572,7 @@
       <option name="project" value="LOCAL" />
       <updated>1687181447717</updated>
     </task>
-    <option name="localTasksCounter" value="138" />
+    <option name="localTasksCounter" value="139" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -598,7 +600,6 @@
     <MESSAGE value="Move `Metro` to `Stops` so it gets unified" />
     <MESSAGE value="Add `Alerts` poc" />
     <MESSAGE value="Add `Alerts` endpoint" />
-    <MESSAGE value="Cleanup" />
     <MESSAGE value="Remove accents in json" />
     <MESSAGE value="Remove test" />
     <MESSAGE value="Remove `User` part" />
@@ -610,7 +611,8 @@
     <MESSAGE value="Change" />
     <MESSAGE value="Just fix tests" />
     <MESSAGE value="Change to use new type of stops json" />
-    <option name="LAST_COMMIT_MESSAGE" value="Change to use new type of stops json" />
+    <MESSAGE value="Cleanup" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleanup" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
