@@ -1,7 +1,5 @@
 package busTrackerApi.exceptions
 
-import io.ktor.websocket.*
-
 sealed class BusTrackerException : Exception() {
     class NotFound(override val message: String? = null) : BusTrackerException()
     class SoapError(override val message: String? = null) : BusTrackerException()
@@ -14,4 +12,3 @@ sealed class BusTrackerException : Exception() {
     class Conflict(override val message: String? = null) : BusTrackerException()
 }
 
-class CloseSocketException(override val message: String? = null, val closeReason: CloseReason.Codes) : Exception()

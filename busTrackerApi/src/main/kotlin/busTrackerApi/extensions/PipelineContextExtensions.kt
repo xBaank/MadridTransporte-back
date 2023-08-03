@@ -1,14 +1,12 @@
 package busTrackerApi.extensions
 
 import busTrackerApi.exceptions.BusTrackerException
-import busTrackerApi.exceptions.CloseSocketException
 import busTrackerApi.routing.Response
 import busTrackerApi.utils.Call
 import busTrackerApi.utils.errorObject
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
-import io.ktor.websocket.*
 import simpleJson.serialized
 
 suspend fun Call.badRequest(message: String?) {
@@ -64,9 +62,6 @@ suspend fun Call.handleError(ex: BusTrackerException) = when (ex) {
     is BusTrackerException.BadRequest -> badRequest(ex.message)
     is BusTrackerException.Conflict -> conflict(ex)
 }
-
-suspend fun DefaultWebSocketSession.handleError(ex: CloseSocketException) =
-    close(CloseReason(ex.closeReason, ex.message ?: "Close Socket"))
 
 suspend fun Call.handleResponse(response: Response): Unit = when (response) {
     is Response.ResponseJson -> call.respondText(response.json.serialized(), ContentType.Application.Json)
