@@ -21,11 +21,11 @@ data class ApiCounter(
 
 suspend fun parseLoginResponse(json: JsonNode) = either {
     LoginResponse(
-        accessToken = json["data"]["accessToken"].asString().bind(),
-        tokenSecExpiration = json["data"]["tokenSecExpiration"].asInt().bind(),
+        accessToken = json["data"][0]["accessToken"].asString().bind(),
+        tokenSecExpiration = json["data"][0]["tokenSecExpiration"].asInt().bind(),
         apiCounter = ApiCounter(
-            current = json["data"]["apiCounter"]["current"].asInt().bind(),
-            max = json["data"]["apiCounter"]["dailyUse"].asInt().bind()
+            current = json["data"][0]["apiCounter"]["current"].asInt().bind(),
+            max = json["data"][0]["apiCounter"]["dailyUse"].asInt().bind()
         )
     )
 }

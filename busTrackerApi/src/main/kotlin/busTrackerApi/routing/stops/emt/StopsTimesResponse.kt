@@ -24,14 +24,14 @@ data class Incident(
 )
 
 suspend fun parseToStopTimesResponse(json: JsonNode) = either {
-    val arrives = json["data"]["Arrive"].asArray().bind()
-    val incidents = json["data"]["Incident"]["ListaIncident"]["data"].asArray().bind()
+    val arrives = json["data"][0]["Arrive"].asArray().bind()
+    val incidents = json["data"][0]["Incident"]["ListaIncident"]["data"].asArray().bind()
     val arrivesMapped = arrives.map {
         Arrive(
             line = it["line"].asString().bind(),
             stop = it["stop"].asString().bind(),
             destination = it["destination"].asString().bind(),
-            estimatedArrive = it["estimatedArrive"].asInt().bind(),
+            estimatedArrive = it["estimateArrive"].asInt().bind(),
         )
     }
     val incidentsMapped = incidents.map {

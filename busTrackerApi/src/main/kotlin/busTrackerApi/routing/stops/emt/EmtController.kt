@@ -53,7 +53,9 @@ suspend fun getStopTimesResponse(stopId : String) = either {
 
         }, mapOf("accessToken" to currentLoginResponse.accessToken)).await()
 
-        if (response.code == 401) {
+        if (response.code == 404) shift<NotFound>(NotFound("Stop not found"))
+
+        if (response.code == 401 || response.code == 403) {
             login().bind()
             tries--
             continue

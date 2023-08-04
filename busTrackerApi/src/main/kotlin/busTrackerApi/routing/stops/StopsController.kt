@@ -2,11 +2,11 @@ package busTrackerApi.routing.stops
 
 import arrow.core.Either
 import arrow.core.continuations.either
-import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
+import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
 import busTrackerApi.utils.mapExceptionsF
@@ -14,7 +14,6 @@ import crtm.auth
 import crtm.defaultClient
 import crtm.soap.*
 import io.github.reactivecircus.cache4k.Cache
-import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -36,8 +35,6 @@ val cachedAlerts = Cache.Builder()
     .expireAfterWrite(24.hours)
     .build<String, TimedCachedValue<IncidentsAffectationsResponse>>()
 
-val subscribedStops = mutableMapOf<String, WebSocketServerSession>()
-
 const val allStopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json"
 
 fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.catch {
@@ -57,13 +54,6 @@ suspend fun getTimesResponse(stopCode: String, codMode: String?) =
     getTimes(stopCode, codMode, ::getStopTimesResponse)
         .mapLeft(mapExceptionsF)
 
-suspend fun getTimesOrCachedResponse(stopCode: String, codMode: String?) =
-    getTimesResponse(stopCode, codMode)
-        .onRight { stopTimesCache.put(stopCode, it) }
-        .getOrElse { stopTimesCache.get(stopCode) }?.right() ?:
-    BusTrackerException.NotFound("No stop times found for stop code $stopCode").left()
-
-
 
 private suspend fun <T> getTimes(
     stopCode: String,
@@ -76,7 +66,7 @@ private suspend fun <T> getTimes(
         .getOrNull()
 
     stopTimes?.timed()
-}?.right() ?: BusTrackerException.NotFound("No stop times found for stop code $stopCode").left()
+}?.right() ?: NotFound("No stop times found for stop code $stopCode").left()
 
 fun getStopsByLocationResponse(lat: Double, lon: Double) = Either.catch {
     val request = StopsByGeoLocationRequest().apply {
@@ -107,7 +97,7 @@ suspend fun getAllStopsResponse() = either {
 suspend fun getStopById(stopCode: String) = either {
     getAllStopsResponse().bind().asArray().bindMap()
         .firstOrNull { it["IDESTACION"].asString().getOrNull() == stopCode } ?:
-    shift<Nothing>(BusTrackerException.NotFound("Stop with id $stopCode not found"))
+    shift<Nothing>(NotFound("Stop with id $stopCode not found"))
 }
 
 suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
