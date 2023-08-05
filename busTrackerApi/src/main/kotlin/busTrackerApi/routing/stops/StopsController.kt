@@ -94,10 +94,13 @@ suspend fun getAllStopsResponse() = either {
     }.also { allStopsCache.put(allStopsUrl, it) }
 }
 
-suspend fun getStopById(stopCode: String) = either {
+suspend fun getCodigoEmpresaByStopCode(stopCode: String) = either {
     getAllStopsResponse().bind().asArray().bindMap()
-        .firstOrNull { it["IDESTACION"].asString().getOrNull() == stopCode } ?:
-    shift<Nothing>(NotFound("Stop with id $stopCode not found"))
+        .firstOrNull { it["IDESTACION"].asString().getOrNull() == stopCode }
+        ?.get("CODIGOEMPRESA")
+        ?.asInt()
+        ?.bindMap()
+    ?: shift<Nothing>(NotFound("Stop with id $stopCode not found"))
 }
 
 suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {

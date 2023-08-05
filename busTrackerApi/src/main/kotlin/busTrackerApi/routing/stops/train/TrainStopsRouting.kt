@@ -7,11 +7,11 @@ import io.ktor.server.routing.*
 const val trainCodMode = "5"
 fun Route.trainStopsRouting() = route("/train") {
 
-    get("/times") {
+    get("{stopCode}/times") {
         handle { getTrainTimes() }
     }
 
-    get("/times/cached") {
+    get("{stopCode}/times/cached") {
         handle { getTrainTimesCached() }
     }
 
