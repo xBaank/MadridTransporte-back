@@ -1,48 +1,26 @@
 package busTrackerApi.routing.stops
 
+import busTrackerApi.extensions.toMiliseconds
 import crtm.soap.IncidentsAffectationsResponse
 import crtm.soap.StopTimesResponse
-import crtm.soap.StopsByGeoLocationResponse
-import crtm.utils.getCodStopFromStopCode
 import simpleJson.JsonNode
 import simpleJson.asJson
 import simpleJson.jArray
 import simpleJson.jObject
 
-fun buildStopLocationsJson(stops: StopsByGeoLocationResponse) = jArray {
-    stops.stops.stop.forEach { stop ->
-        addObject {
-            "codStop" += stop.codStop
-            "simpleCodStop" += getCodStopFromStopCode(stop.codStop)
-            "codMode" += stop.codMode
-            "name" += stop.name
-            "latitude" += stop.coordinates.latitude
-            "longitude" += stop.coordinates.longitude
-        }
+fun parseStopTimesResponseToStopTimes(response: StopTimesResponse): StopTimes {
+    val arrives = response.stopTimes.times.time.map {
+        Arrive(
+            line = it.line.shortDescription,
+            stop = response.stopTimes.stop.name,
+            destination = it.destination,
+            estimatedArrive = it.time.toMiliseconds()
+        )
     }
+
+    return StopTimes(arrives, emptyList())
 }
 
-fun buildStopTimesJson(times: StopTimesResponse) = jObject {
-    "name" += times.stopTimes.stop.name
-    "codMode" += times.stopTimes.stop.codMode
-    "times" += jArray {
-        times.stopTimes?.times?.time?.forEach {
-            addObject {
-                "lineCode" += it.line.codLine
-                "lineName" += it.line.shortDescription
-                "codMode" += it.line.codMode
-                "destination" += it.destination
-                "codVehicle" += it.codVehicle
-                "time" += it.time.toGregorianCalendar().time.toInstant().toEpochMilli()
-            }
-        }
-    }
-}
-
-fun buildCachedJson(json: JsonNode, createdAt: Long) = jObject {
-    "data" += json
-    "lastTime" += createdAt
-}
 
 fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
     alerts.incidentsAffectations.incidentAffectation.forEach {
@@ -53,4 +31,33 @@ fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
             "stops" += it.stopsAffectated.shortStop.map { it.codStop.asJson() }.asJson()
         }
     }
+}
+
+fun buildJson(stopTimes : StopTimes) = jObject {
+    "arrives" to jArray {
+        stopTimes.arrives.forEach {
+            +jObject {
+                "line" += it.line
+                "stop" += it.stop
+                "destination" += it.destination
+                "estimatedArrive" += it.estimatedArrive
+            }
+        }
+    }
+    "incidents" to jArray {
+        stopTimes.incidents.forEach {
+            +jObject {
+                "title" += it.title
+                "description" += it.description
+                "cause" += it.cause
+                "effect" += it.effect
+                "url" += it.url
+            }
+        }
+    }
+}
+
+fun buildCachedJson(json: JsonNode, createdAt: Long) = jObject {
+    "data" += json
+    "lastTime" += createdAt
 }

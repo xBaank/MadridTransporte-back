@@ -5,13 +5,17 @@ import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.routing.stops.TimedCachedValue
+import busTrackerApi.routing.stops.buildJson
 import busTrackerApi.routing.stops.timed
 import io.github.reactivecircus.cache4k.Cache
 import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response
 import ru.gildor.coroutines.okhttp.await
-import simpleJson.*
+import simpleJson.JsonNode
+import simpleJson.asArray
+import simpleJson.deserialized
+import simpleJson.get
 import kotlin.time.Duration.Companion.hours
 
 private val cache = Cache.Builder()
@@ -68,6 +72,6 @@ suspend fun getTimesBase(id: String? = null) = either {
 
         if(json.isEmpty()) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
 
-        buildMetroJson(json)
+        parseMetroToStopTimes(json).bindMap().let(::buildJson)
     }
 }

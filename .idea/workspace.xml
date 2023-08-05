@@ -4,11 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Add limitless token">
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Better train support">
+      <change afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopTimes.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsClient.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsClient.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsController.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsJson.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsJson.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsRouting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/StopsRouting.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/emt/EmtController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/emt/EmtController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/emt/LoginResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/emt/LoginResponse.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/emt/StopsTimesResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/emt/StopsTimesResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/emt/StopsTimesResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/emt/EmtStopsJson.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsController.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsJson.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/main/kotlin/busTrackerApi/routing/stops/metro/MetroStopsJson.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/StopsTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/busTrackerApi/src/test/kotlin/StopsTests.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,8 +52,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
-        <option value="Kotlin Class" />
         <option value="Kotlin File" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
@@ -59,7 +66,7 @@
     </option>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="better_train_support" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -112,36 +119,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'">
-    <configuration name="AbonoTest.should get abono" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="env">
-          <map>
-            <entry key="EMT_CLIENT_ID" value="311414e0-a868-47e8-be98-452e11fcdc89" />
-            <entry key="EMT_PASS_KEY" value="EC7074914512760513FEE7368B72250524EE1193F8D8572D8F44B9C48CF71052C97F2521639BB98840FBC397F868E1F9BF7C024A9E8CA493771CED64DB05FFF5" />
-          </map>
-        </option>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":busTrackerApi:test" />
-            <option value="--tests" />
-            <option value="&quot;AbonoTest.should get abono[1]&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>true</RunAsTest>
-      <method v="2" />
-    </configuration>
     <configuration name="AbonoTest.should not get abono" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="env">
@@ -254,20 +231,27 @@
       <RunAsTest>false</RunAsTest>
       <method v="2" />
     </configuration>
+    <configuration name="MainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="busTrackerApi.MainKt" />
+      <module name="bus-tracker-back.busTrackerApi.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
       <item itemvalue="Gradle.StopsRoutingTests.should not get stop times" />
-      <item itemvalue="Gradle.AbonoTest.should get abono" />
       <item itemvalue="Gradle.AbonoTest.should not get abono" />
       <item itemvalue="Gradle.StopsRoutingTests.should get stop times (1)" />
       <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
+      <item itemvalue="Kotlin.MainKt" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.Tests in 'bus-tracker-back.busTrackerApi.test'" />
-        <item itemvalue="Gradle.StopsRoutingTests.should not get stop times" />
         <item itemvalue="Gradle.StopsRoutingTests.should get stop times (1)" />
+        <item itemvalue="Gradle.StopsRoutingTests.should not get stop times" />
+        <item itemvalue="Kotlin.MainKt" />
         <item itemvalue="Gradle.AbonoTest.should not get abono" />
-        <item itemvalue="Gradle.AbonoTest.should get abono" />
       </list>
     </recent_temporary>
   </component>
@@ -666,6 +650,15 @@
     <option name="LAST_COMMIT_MESSAGE" value="Add limitless token" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/busTrackerApi/src/test/kotlin/StopsTimesTests.kt</url>
+          <line>49</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="java.util.LinkedHashMap$Entry" memberName="value" />

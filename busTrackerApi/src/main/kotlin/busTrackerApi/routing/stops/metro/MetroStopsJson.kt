@@ -1,24 +1,40 @@
 package busTrackerApi.routing.stops.metro
 
+import arrow.core.continuations.either
+import busTrackerApi.routing.stops.Arrive
+import busTrackerApi.routing.stops.StopTimes
 import simpleJson.*
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
-fun buildMetroJson(array: JsonArray) = jObject {
-    "name" += array.firstOrNull()?.get("nombreest")?.asString()?.getOrNull()
-    "codMode" += metroCodMode
-    "times" += jArray {
-        array.forEach {
-            addObject {
-                "id" += it["idnumerica"].asNumber().getOrNull()
-                "idTeleindicador" += it["estaciontel"].asNumber().getOrNull()
-                "nombreEstacion" += it["nombreest"].asString().getOrNull()
-                "linea" += it["linea"].asNumber().getOrNull()
-                "anden" += it["anden"].asNumber().getOrNull()
-                "sentido" += it["sentido"].asString().getOrNull()
-                val proximo = it["proximo"].asNumber().getOrNull()
-                val siguiente = it["siguiente"].asNumber().getOrNull()
-                val proximos = listOfNotNull(proximo, siguiente).map(Number::asJson).asJson()
-                "proximos" += proximos
-            }
-        }
+suspend fun parseMetroToStopTimes(json: JsonNode) = either {
+    val arrives = json.asArray().bind()
+
+    val arrivesMapped = arrives.flatMap {
+
+        val proximoEstimatedArrive = it["proximo"]
+            .asLong()
+            .map { LocalDateTime.now().plusMinutes(it) }
+            .map { it.toEpochSecond(ZoneOffset.UTC) }
+            .getOrNull()
+        val siguienteEstimatedArrive = it["siguiente"]
+            .asLong()
+            .map { LocalDateTime.now().plusMinutes(it) }
+            .map { it.toEpochSecond(ZoneOffset.UTC) }
+            .getOrNull()
+
+        val first = Arrive(
+            line = it["linea"].asNumber().bind().toString(),
+            stop = it["nombreest"].asString().bind(),
+            destination = it["sentido"].asString().bind(),
+            estimatedArrive = proximoEstimatedArrive,
+        )
+
+        val second =
+            if (siguienteEstimatedArrive != null) first.copy(estimatedArrive = siguienteEstimatedArrive) else null
+
+        listOfNotNull(first, second)
     }
+
+    StopTimes(arrivesMapped, emptyList())
 }

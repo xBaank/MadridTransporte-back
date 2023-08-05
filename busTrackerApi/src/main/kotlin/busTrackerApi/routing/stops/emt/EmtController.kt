@@ -8,6 +8,7 @@ import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
 import busTrackerApi.extensions.post
 import busTrackerApi.routing.stops.TimedCachedValue
+import busTrackerApi.routing.stops.buildJson
 import busTrackerApi.routing.stops.timed
 import io.github.reactivecircus.cache4k.Cache
 import ru.gildor.coroutines.okhttp.await
@@ -63,7 +64,7 @@ suspend fun getStopTimesResponse(stopId : String) = either {
 
         if (!response.isSuccessful) shift<Nothing>(InternalServerError("EMT getStopTimes failed"))
         val body = response.body?.string()?.deserialized()?.bindMap() ?: shift<Nothing>(InternalServerError("Body is null"))
-        val result = parseToStopTimesResponse(body).bindMap().let(::buildJson).timed()
+        val result = parseEMTToStopTimes(body).bindMap().let(::buildJson).timed()
         stopTimesCache.put(stopId, result)
         return@either result
 

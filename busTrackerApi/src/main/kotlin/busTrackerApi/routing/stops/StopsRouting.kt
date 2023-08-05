@@ -4,13 +4,6 @@ import busTrackerApi.extensions.handle
 import io.ktor.server.routing.*
 
 fun Route.stopsRouting() {
-    get("/search") {
-        handle { getStopsByQuery() }
-    }
-
-    get("/locations") {
-        handle { getStopsByLocation() }
-    }
 
     get("/all") {
         handle { getAllStops() }
