@@ -43,17 +43,17 @@ suspend fun getMetroTimesResponse(id: String? = null): Response {
     return httpClient.newCall(request).await()
 }
 
-suspend fun getTimesByQuery(id: String) = either {
-    val response = getTimesBase(id).bind().timed()
+suspend fun getTimesByQuery(id: String, codMode: String) = either {
+    val response = getTimesBase(id, codMode).bind().timed()
     cache.put(id, response)
     response
 }
 
-suspend fun getTimesByQueryCached(query: String) = either {
-    cache.get(query) ?: shift<Nothing>(BusTrackerException.NotFound("No stops found for query $query"))
+suspend fun getTimesByQueryCached(id: String, codMode: String) = either {
+    cache.get(id) ?: shift<Nothing>(BusTrackerException.NotFound("No stops found for query $id"))
 }
 
-suspend fun getTimesBase(id: String? = null) = either {
+suspend fun getTimesBase(id: String, codMode: String) = either {
     val response = getMetroTimesResponse(id)
 
     response.use {
@@ -72,6 +72,6 @@ suspend fun getTimesBase(id: String? = null) = either {
 
         if(json.isEmpty()) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
 
-        parseMetroToStopTimes(json).bindMap().let(::buildJson)
+        parseMetroToStopTimes(json, codMode).bindMap().let(::buildJson)
     }
 }

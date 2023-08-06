@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 suspend fun parseEMTToStopTimes(json: JsonNode) = either {
+    val stopName = json["data"][0]["StopInfo"][0]["stopName"].asString().bind()
     val arrives = json["data"][0]["Arrive"].asArray().bind()
     val incidents = json["data"][0]["Incident"]["ListaIncident"]["data"].asArray().bind()
     val arrivesMapped = arrives.map {
@@ -18,7 +19,7 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
             line = it["line"].asString().bind(),
             stop = it["stop"].asString().bind(),
             destination = it["destination"].asString().bind(),
-            estimatedArrive = estimatedArrive.toEpochSecond(ZoneOffset.UTC),
+            estimatedArrive = estimatedArrive.toInstant(ZoneOffset.UTC).toEpochMilli(),
         )
     }
     val incidentsMapped = incidents.map {
@@ -27,8 +28,8 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
             description = it["description"].asString().bind(),
             cause = it["cause"].asString().bind(),
             effect = it["effect"].asString().bind(),
-            url = it["moreinfo"]["@url"].asString().bind(),
+            url = it["moreInfo"]["@url"].asString().bind().let(::listOf)
         )
     }
-    StopTimes(arrivesMapped, incidentsMapped)
+    StopTimes(emtCodMode, stopName, arrivesMapped, incidentsMapped)
 }

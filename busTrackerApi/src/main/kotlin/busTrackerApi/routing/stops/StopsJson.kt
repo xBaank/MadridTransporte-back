@@ -1,6 +1,7 @@
 package busTrackerApi.routing.stops
 
 import busTrackerApi.extensions.toMiliseconds
+import busTrackerApi.routing.stops.bus.busCodMode
 import crtm.soap.IncidentsAffectationsResponse
 import crtm.soap.StopTimesResponse
 import simpleJson.JsonNode
@@ -9,6 +10,7 @@ import simpleJson.jArray
 import simpleJson.jObject
 
 fun parseStopTimesResponseToStopTimes(response: StopTimesResponse): StopTimes {
+    val stopName = response.stopTimes.stop.name
     val arrives = response.stopTimes.times.time.map {
         Arrive(
             line = it.line.shortDescription,
@@ -18,7 +20,7 @@ fun parseStopTimesResponseToStopTimes(response: StopTimesResponse): StopTimes {
         )
     }
 
-    return StopTimes(arrives, emptyList())
+    return StopTimes(busCodMode, stopName, arrives, emptyList())
 }
 
 
@@ -34,6 +36,8 @@ fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
 }
 
 fun buildJson(stopTimes : StopTimes) = jObject {
+    "codMode" += stopTimes.codMode
+    "stopName" += stopTimes.stopName
     "arrives" to jArray {
         stopTimes.arrives.forEach {
             +jObject {
@@ -51,7 +55,7 @@ fun buildJson(stopTimes : StopTimes) = jObject {
                 "description" += it.description
                 "cause" += it.cause
                 "effect" += it.effect
-                "url" += it.url
+                "urls" += it.url.map { it.asJson() }.asJson()
             }
         }
     }

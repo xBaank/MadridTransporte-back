@@ -21,13 +21,13 @@ suspend fun Call.getMetroTimes(codMode: String) = getMetroTimesBase(::getTimesBy
 suspend fun Call.getMetroTimesCached(codMode: String) = getMetroTimesBase(::getTimesByQueryCached, codMode, call.parameters.getWrapped("stopCode"))
 
 private suspend fun getMetroTimesBase(
-    f: suspend (String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>,
+    f: suspend (String, String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>,
     codMode: String,
     id: Either<BusTrackerException, String>
 ) = either {
     val stopCode = createStopCode(codMode, id.bind())
     val stopInfo = getStopById(stopCode).bind()
-    val json = f(stopInfo["CODIGOEMPRESA"].asNumber().bindMap().toString()).bind()
+    val json = f(stopInfo["CODIGOEMPRESA"].asNumber().bindMap().toString(), codMode).bind()
     ResponseJson(buildCachedJson(json.value, json.createdAt.toEpochMilli()), HttpStatusCode.OK)
 }
 

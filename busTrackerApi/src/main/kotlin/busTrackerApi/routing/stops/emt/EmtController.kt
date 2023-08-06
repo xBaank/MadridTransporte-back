@@ -47,7 +47,7 @@ suspend fun getStopTimesResponse(stopId : String) = either {
 
         val response = httpClient.post(url, jObject {
             "cultureInfo" += "ES"
-            "Text_StopRequired_YN" += "N"
+            "Text_StopRequired_YN" += "Y"
             "Text_EstimationsRequired_YN" += "Y"
             "Text_IncidencesRequired_YN" += "Y"
             "DateTime_Referenced_Incidencies_YYYYMMDD" += dateFormatter.format(Date())
