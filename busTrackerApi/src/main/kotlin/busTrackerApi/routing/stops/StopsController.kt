@@ -104,6 +104,7 @@ suspend fun getAllStopsResponse() = either {
             .onEach { it["full_stop_code"] = it["cod_mode"].asNumber().bindMap().toString() + "_" + it["stop_code"].asNumberOrString() }
             //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
             .distinctBy { Pair(if(it["cod_mode"].asNumber().bindMap().toString() == metroCodMode) 1 else randomUUID().toString(), it["stop_name"].asString().bindMap()) }
+            .distinctBy { it["stop_id"].asString().bindMap() }
             .asJson()
     }
 
