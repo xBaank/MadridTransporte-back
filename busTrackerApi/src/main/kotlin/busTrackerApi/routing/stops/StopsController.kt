@@ -5,8 +5,10 @@ import arrow.core.continuations.either
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.BusTrackerException.NotFound
+import busTrackerApi.extensions.asNumberOrString
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
+import busTrackerApi.routing.stops.metro.metroCodMode
 import busTrackerApi.utils.mapExceptionsF
 import crtm.auth
 import crtm.defaultClient
@@ -21,6 +23,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.withTimeoutOrNull
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.*
+import java.util.UUID.randomUUID
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
@@ -96,8 +99,11 @@ suspend fun getAllStopsResponse() = either {
             .deserialized()
             .asArray()
             .bindMap()
-            .onEach { it["codMode"] = it["stop_id"].asString().bindMap().substringAfter("_").substringBefore("_") }
-            .onEach { it["stopCode"] = it["stop_id"].asString().bindMap().removePrefix("par_") }
+            .mapNotNull { if(!it["stop_id"].asString().bindMap().contains("par")) null else it }
+            .onEach { it["cod_mode"] = it["stop_id"].asString().bindMap().substringAfter("_").substringBefore("_").toInt() }
+            .onEach { it["full_stop_code"] = it["cod_mode"].asNumber().bindMap().toString() + "_" + it["stop_code"].asNumberOrString() }
+            //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
+            .distinctBy { Pair(if(it["cod_mode"].asNumber().bindMap().toString() == metroCodMode) 1 else randomUUID().toString(), it["stop_name"].asString().bindMap()) }
             .asJson()
     }
 
@@ -108,13 +114,13 @@ suspend fun getAllStopsResponse() = either {
 suspend fun getStopCodeStationById(stopCode: String) = either {
     getAllStopsInfoResponse().bind().asArray().bindMap()
         .firstOrNull { it["IDESTACION"].asString().getOrNull() == stopCode }
-        ?.get("CODIGOEMPRESA")?.asNumber()?.bindMap()
+        ?.get("CODIGOEMPRESA")?.asNumberOrString()
         ?: shift<Nothing>(NotFound("Stop with id $stopCode not found"))
 }
 
 suspend fun checkStopExists(stopCode: String) = either {
     getAllStopsResponse().bind().asArray().bindMap()
-        .firstOrNull { it["stopCode"].asString().getOrNull() == stopCode }
+        .firstOrNull { it["full_stop_code"].asString().getOrNull() == stopCode }
         ?: shift<Nothing>(NotFound("Stop with id $stopCode not found"))
 }
 

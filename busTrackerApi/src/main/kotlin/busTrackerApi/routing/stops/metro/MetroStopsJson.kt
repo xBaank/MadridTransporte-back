@@ -11,31 +11,28 @@ suspend fun parseMetroToStopTimes(json: JsonNode, codMode: String) = either {
     val arrives = json.asArray().bind()
     val stopName = arrives[0]["nombreest"].asString().bind()
 
-    val arrivesMapped = arrives.flatMap {
-        val proximo = it["proximo"].asLong().getOrNull()
-        val siguiente = it["siguiente"].asLong().getOrNull()
-
-        if(proximo == null || proximo == 0L && siguiente == null || siguiente == 0L) return@flatMap emptyList()
+    val arrivesMapped = arrives.flatMap { arrive ->
+        val proximo = arrive["proximo"].asLong().getOrNull()
+        val siguiente = arrive["siguiente"].asLong().getOrNull()
 
         val proximoEstimatedArrive = proximo
-            .let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
-            .toInstant(ZoneOffset.UTC)?.toEpochMilli()
+            ?.let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
+            ?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
 
         val siguienteEstimatedArrive = siguiente
             ?.let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
             ?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
 
-        val first = if(proximoEstimatedArrive != null) Arrive(
-            line = it["linea"].asNumber().bind().toString(),
-            stop = it["nombreest"].asString().bind(),
-            destination = it["sentido"].asString().bind(),
-            estimatedArrive = proximoEstimatedArrive,
-        ) else null
+        val first = Arrive(
+            line = arrive["linea"].asNumber().bind().toString(),
+            stop = arrive["nombreest"].asString().bind(),
+            destination = arrive["sentido"].asString().bind(),
+            estimatedArrive = proximoEstimatedArrive ?: -1
+        )
 
-        val second =
-            if (siguienteEstimatedArrive != null) first?.copy(estimatedArrive = siguienteEstimatedArrive) else null
+        val second = first.copy(estimatedArrive = siguienteEstimatedArrive ?: -1)
 
-        listOfNotNull(first, second)
+        listOf(first, second).filter { it.estimatedArrive != -1L }
     }
 
     StopTimes(codMode, stopName, arrivesMapped, emptyList())

@@ -68,9 +68,10 @@ suspend fun getTimesBase(id: String, codMode: String) = either {
         val json = body.deserialized()
             .get("Vtelindicadores")
             .asArray()
-            .bindMap()
+            .getOrNull()
 
-        if(json.isEmpty()) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
+        if(json == null) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
+        if(json!!.isEmpty()) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
 
         parseMetroToStopTimes(json, codMode).bindMap().let(::buildJson)
     }
