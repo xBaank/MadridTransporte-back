@@ -22,8 +22,11 @@ suspend fun getAllStops() = either {
     ResponseJson(stops, HttpStatusCode.OK)
 }
 
-suspend fun Call.getStopTimes(codMode : String) = getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getTimesResponse)
-suspend fun Call.getStopTimesCached(codMode : String) = getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getTimesResponseCached)
+suspend fun Call.getStopTimes(codMode: String) =
+    getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getTimesResponse)
+
+suspend fun Call.getStopTimesCached(codMode: String) =
+    getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getTimesResponseCached)
 
 private suspend fun getStopTimesBase(
     codMode: String,
@@ -32,7 +35,7 @@ private suspend fun getStopTimesBase(
 ) = either {
     val stopCode = createStopCode(codMode, simpleStopCode.bind())
     checkStopExists(stopCode).bind()
-    val cached =  f(stopCode, codMode).bind()
+    val cached = f(stopCode, codMode).bind()
     val json = buildCachedJson(cached.value, cached.createdAt.toEpochMilli())
     ResponseJson(json, HttpStatusCode.OK)
 }

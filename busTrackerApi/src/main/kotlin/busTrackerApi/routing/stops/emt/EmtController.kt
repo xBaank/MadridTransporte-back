@@ -23,24 +23,26 @@ val stopTimesCache = Cache.Builder()
     .expireAfterWrite(1.hours)
     .build<String, TimedCachedValue<JsonNode>>()
 
-lateinit var currentLoginResponse : LoginResponse
+lateinit var currentLoginResponse: LoginResponse
 private val dateFormatter = SimpleDateFormat("yyyy-MM-dd")
 
 suspend fun login() = either {
     val url = "https://openapi.emtmadrid.es/v1/mobilitylabs/user/login/"
 
     //Hardcoded gojo limitless token
-    val response = httpClient.get(url, mapOf(
-        "passKey" to "504fea88211f2f90633f964189b7696037d65cc3a5f47b8fa1d5ea5e34db0239ad2e068851e72be0cec125779224749e3bc236c1b7af39d8a3d398e99223f058",
-        "X-ClientId" to "428B01E6-693C-4F7F-A11E-3BB923420587",
-    )).await()
+    val response = httpClient.get(
+        url, mapOf(
+            "passKey" to "504fea88211f2f90633f964189b7696037d65cc3a5f47b8fa1d5ea5e34db0239ad2e068851e72be0cec125779224749e3bc236c1b7af39d8a3d398e99223f058",
+            "X-ClientId" to "428B01E6-693C-4F7F-A11E-3BB923420587",
+        )
+    ).await()
 
-    if(!response.isSuccessful) shift<Nothing>(InternalServerError("EMT login failed"))
+    if (!response.isSuccessful) shift<Nothing>(InternalServerError("EMT login failed"))
     val body = response.body?.string()?.deserialized()?.bindMap() ?: shift<Nothing>(InternalServerError("Body is null"))
     currentLoginResponse = parseLoginResponse(body).bindMap()
 }
 
-suspend fun getStopTimesResponse(stopId : String) = either {
+suspend fun getStopTimesResponse(stopId: String) = either {
     var tries = 3
     do {
         val url = "https://openapi.emtmadrid.es/v2/transport/busemtmad/stops/$stopId/arrives/"
@@ -63,7 +65,8 @@ suspend fun getStopTimesResponse(stopId : String) = either {
         }
 
         if (!response.isSuccessful) shift<Nothing>(InternalServerError("EMT getStopTimes failed"))
-        val body = response.body?.string()?.deserialized()?.bindMap() ?: shift<Nothing>(InternalServerError("Body is null"))
+        val body =
+            response.body?.string()?.deserialized()?.bindMap() ?: shift<Nothing>(InternalServerError("Body is null"))
         val result = parseEMTToStopTimes(body).bindMap().let(::buildJson).timed()
         stopTimesCache.put(stopId, result)
         return@either result
@@ -73,6 +76,6 @@ suspend fun getStopTimesResponse(stopId : String) = either {
     shift<Nothing>(InternalServerError("EMT getStopTimes failed"))
 }
 
-suspend fun getStopTimesResponseCached(stopId : String) = either {
+suspend fun getStopTimesResponseCached(stopId: String) = either {
     stopTimesCache.get(stopId) ?: shift<Nothing>(NotFound("No stop times found for stop $stopId"))
 }

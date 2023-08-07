@@ -24,7 +24,7 @@ enum class Times(val url: String, val urlCached: String) {
     BUS("/v1/stops/bus/$busStopCode/times", "/v1/stops/bus/$busStopCode/times/cached"),
     TRAIN(
         "/v1/stops/train/times?originStopCode=$trainStopCode&destinationStopCode=$destinationStopCode",
-    "/v1/stops/train/times/cached?originStopCode=$trainStopCode&destinationStopCode=$destinationStopCode"
+        "/v1/stops/train/times/cached?originStopCode=$trainStopCode&destinationStopCode=$destinationStopCode"
     ),
     METRO("/v1/stops/metro/$metroStopCode/times", "/v1/stops/metro/$metroStopCode/times/cached"),
     EMT("/v1/stops/emt/$emtStopCode/times", "/v1/stops/emt/$emtStopCode/times/cached"),

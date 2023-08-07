@@ -63,14 +63,14 @@ suspend fun getTimesResponse(stopCode: String, codMode: String?) = either {
             .bind()
     }
 
-    if(stopTimes == null) shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
+    if (stopTimes == null) shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
 
     val result = parseStopTimesResponseToStopTimes(stopTimes).let(::buildJson).timed()
     stopTimesCache.put(stopCode, result)
     result
 }
 
-suspend fun getTimesResponseCached(stopCode: String, codMode : String) = either {
+suspend fun getTimesResponseCached(stopCode: String, codMode: String) = either {
     stopTimesCache.get(stopCode) ?: shift<Nothing>(NotFound("Stop with id $stopCode not found"))
 }
 
@@ -99,11 +99,21 @@ suspend fun getAllStopsResponse() = either {
             .deserialized()
             .asArray()
             .bindMap()
-            .mapNotNull { if(!it["stop_id"].asString().bindMap().contains("par")) null else it }
-            .onEach { it["cod_mode"] = it["stop_id"].asString().bindMap().substringAfter("_").substringBefore("_").toInt() }
-            .onEach { it["full_stop_code"] = it["cod_mode"].asNumber().bindMap().toString() + "_" + it["stop_code"].asNumberOrString() }
+            .mapNotNull { if (!it["stop_id"].asString().bindMap().contains("par")) null else it }
+            .onEach {
+                it["cod_mode"] = it["stop_id"].asString().bindMap().substringAfter("_").substringBefore("_").toInt()
+            }
+            .onEach {
+                it["full_stop_code"] =
+                    it["cod_mode"].asNumber().bindMap().toString() + "_" + it["stop_code"].asNumberOrString()
+            }
             //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
-            .distinctBy { Pair(if(it["cod_mode"].asNumber().bindMap().toString() == metroCodMode) 1 else randomUUID().toString(), it["stop_name"].asString().bindMap()) }
+            .distinctBy {
+                Pair(
+                    if (it["cod_mode"].asNumber().bindMap().toString() == metroCodMode) 1 else randomUUID().toString(),
+                    it["stop_name"].asString().bindMap()
+                )
+            }
             .distinctBy { it["stop_id"].asString().bindMap() }
             .asJson()
     }
@@ -141,7 +151,7 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
             .await()
     }
 
-    if(result == null) throw BusTrackerException.InternalServerError("Got empty response")
+    if (result == null) throw BusTrackerException.InternalServerError("Got empty response")
 
     cachedAlerts.put(codMode, result)
     result

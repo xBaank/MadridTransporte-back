@@ -15,7 +15,7 @@ data class LoginResponse(
 data class ApiCounter(
     val current: Int,
     val max: Int,
-    val left : Int = max - current
+    val left: Int = max - current
 )
 
 

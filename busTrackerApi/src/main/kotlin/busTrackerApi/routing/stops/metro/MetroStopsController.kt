@@ -70,8 +70,8 @@ suspend fun getTimesBase(id: String, codMode: String) = either {
             .asArray()
             .getOrNull()
 
-        if(json == null) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
-        if(json!!.isEmpty()) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
+        if (json == null) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
+        if (json!!.isEmpty()) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
 
         parseMetroToStopTimes(json, codMode).bindMap().let(::buildJson)
     }

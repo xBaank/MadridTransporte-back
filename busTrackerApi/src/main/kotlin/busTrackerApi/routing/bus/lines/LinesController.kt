@@ -31,8 +31,8 @@ fun getItinerariesResponse(lineCode: String) = Either.catch {
         active = 1
     }
 
-    defaultClient.getLineItineraries(itineraryRequest).takeIf { it.itineraries.lineItinerary.isNotEmpty() } ?:
-    throw NotFound("No itineraries found for line $lineCode")
+    defaultClient.getLineItineraries(itineraryRequest).takeIf { it.itineraries.lineItinerary.isNotEmpty() }
+        ?: throw NotFound("No itineraries found for line $lineCode")
 }.mapLeft(mapExceptionsF)
 
 fun getStopsResponse(lineCode: String, codMode: String) = Either.catch {
@@ -41,6 +41,6 @@ fun getStopsResponse(lineCode: String, codMode: String) = Either.catch {
         this.codMode = codMode
         authentication = defaultClient.auth()
     }
-    defaultClient.getStops(request).takeIf { it.stops.stop.isNotEmpty() } ?:
-    throw NotFound("No stops found for line $lineCode")
+    defaultClient.getStops(request).takeIf { it.stops.stop.isNotEmpty() }
+        ?: throw NotFound("No stops found for line $lineCode")
 }.mapLeft(mapExceptionsF)

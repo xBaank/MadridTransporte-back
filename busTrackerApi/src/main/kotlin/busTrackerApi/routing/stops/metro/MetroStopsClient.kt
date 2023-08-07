@@ -14,8 +14,11 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import simpleJson.JsonNode
 
-suspend fun Call.getMetroTimes(codMode: String) = getMetroTimesBase(::getTimesByQuery, codMode, call.parameters.getWrapped("stopCode"))
-suspend fun Call.getMetroTimesCached(codMode: String) = getMetroTimesBase(::getTimesByQueryCached, codMode, call.parameters.getWrapped("stopCode"))
+suspend fun Call.getMetroTimes(codMode: String) =
+    getMetroTimesBase(::getTimesByQuery, codMode, call.parameters.getWrapped("stopCode"))
+
+suspend fun Call.getMetroTimesCached(codMode: String) =
+    getMetroTimesBase(::getTimesByQueryCached, codMode, call.parameters.getWrapped("stopCode"))
 
 private suspend fun getMetroTimesBase(
     f: suspend (String, String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>,

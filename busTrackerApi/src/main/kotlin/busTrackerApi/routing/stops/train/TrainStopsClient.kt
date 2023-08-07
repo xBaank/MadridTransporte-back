@@ -15,8 +15,17 @@ import io.ktor.server.application.*
 import simpleJson.JsonNode
 
 
-suspend fun Call.getTrainTimes() = getTrainTimesBase(::getTrainTimesResponse, call.request.queryParameters.getWrapped("originStopCode"), call.request.queryParameters.getWrapped("destinationStopCode"))
-suspend fun Call.getTrainTimesCached() = getTrainTimesBase(::getTrainTimesResponseCached, call.request.queryParameters.getWrapped("originStopCode"), call.request.queryParameters.getWrapped("destinationStopCode"))
+suspend fun Call.getTrainTimes() = getTrainTimesBase(
+    ::getTrainTimesResponse,
+    call.request.queryParameters.getWrapped("originStopCode"),
+    call.request.queryParameters.getWrapped("destinationStopCode")
+)
+
+suspend fun Call.getTrainTimesCached() = getTrainTimesBase(
+    ::getTrainTimesResponseCached,
+    call.request.queryParameters.getWrapped("originStopCode"),
+    call.request.queryParameters.getWrapped("destinationStopCode")
+)
 
 private suspend fun getTrainTimesBase(
     f: suspend (String, String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>,
@@ -28,8 +37,8 @@ private suspend fun getTrainTimesBase(
     val stopInfoOriginStationCode = getStopCodeStationById(stopCodeOrigin).bind()
     val stopInfoDestinationStationCode = getStopCodeStationById(stopCodeDestination).bind()
     val json = f(
-        stopInfoOriginStationCode.toString(),
-        stopInfoDestinationStationCode.toString()
+        stopInfoOriginStationCode,
+        stopInfoDestinationStationCode
     ).bind()
     ResponseJson(buildCachedJson(json.value, json.createdAt.toEpochMilli()), HttpStatusCode.OK)
 }

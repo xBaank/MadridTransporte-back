@@ -38,7 +38,7 @@ class BusLinesTests {
 
     @ParameterizedTest
     @ValueSource(strings = [nonExistanceUrbanCode, nonExistanceInterUrbanCode])
-    fun `should not find urban line location`(code : String) = testApplicationBusTracker {
+    fun `should not find urban line location`(code: String) = testApplicationBusTracker {
         val response = getLineLocation(code)
         response.status.shouldBe(HttpStatusCode.NotFound)
     }
@@ -78,7 +78,7 @@ class BusLinesTests {
 
     @ParameterizedTest
     @ValueSource(strings = [nonExistanceUrbanCode, nonExistanceInterUrbanCode])
-    fun `should not find itineraries from line`(code : String) = testApplicationBusTracker {
+    fun `should not find itineraries from line`(code: String) = testApplicationBusTracker {
         val response = getItineraries(code)
         response.status.shouldBe(HttpStatusCode.NotFound)
     }

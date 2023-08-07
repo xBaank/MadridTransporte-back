@@ -16,12 +16,13 @@ import simpleJson.JsonNode
 
 suspend fun Call.getStopTimes() = getStopTimesBase(::getStopTimesResponse, call.parameters.getWrapped("stopCode"))
 
-suspend fun Call.getStopTimesCached() = getStopTimesBase(::getStopTimesResponseCached, call.parameters.getWrapped("stopCode"))
+suspend fun Call.getStopTimesCached() =
+    getStopTimesBase(::getStopTimesResponseCached, call.parameters.getWrapped("stopCode"))
 
 private suspend fun getStopTimesBase(
     f: suspend (String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>,
     simpleStopCode: Either<BusTrackerException, String>
-)  = either {
+) = either {
     val stopCode = createStopCode(emtCodMode, simpleStopCode.bind())
     checkStopExists(stopCode).bind()
     val json = f(simpleStopCode.bind()).bind()

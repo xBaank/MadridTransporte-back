@@ -19,6 +19,7 @@ suspend fun ApplicationTestBuilder.getItineraries(line: String) =
 
 suspend fun ApplicationTestBuilder.getStops(line: String) =
     client.get("/v1/bus/lines/$line/stops")
+
 fun testApplicationBusTracker(
     startUpF: Application.() -> Unit = { startUp() },
     block: suspend ApplicationTestBuilder.(client: HttpClient) -> Unit

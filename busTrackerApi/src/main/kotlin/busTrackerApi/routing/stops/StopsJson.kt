@@ -14,13 +14,13 @@ fun parseStopTimesResponseToStopTimes(response: StopTimesResponse): StopTimes {
     val arrives = response.stopTimes.times.time.map {
         Arrive(
             line = it.line.shortDescription,
-            stop = response.stopTimes.stop.name,
             destination = it.destination,
+            codMode = it.line.codMode.toInt(),
             estimatedArrive = it.time.toMiliseconds()
         )
     }
 
-    return StopTimes(busCodMode, stopName, arrives, emptyList())
+    return StopTimes(busCodMode.toInt(), stopName, arrives, emptyList())
 }
 
 
@@ -35,16 +35,18 @@ fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
     }
 }
 
-fun buildJson(stopTimes : StopTimes) = jObject {
+fun buildJson(stopTimes: StopTimes) = jObject {
     "codMode" += stopTimes.codMode
     "stopName" += stopTimes.stopName
+    val arrivesGroupedByLineAndDest = stopTimes.arrives.groupBy { Pair(it.line, it.destination) }
     "arrives" to jArray {
-        stopTimes.arrives.forEach {
+        arrivesGroupedByLineAndDest.forEach { arrive ->
+            if (arrive.value.isEmpty()) return@forEach
             +jObject {
-                "line" += it.line
-                "stop" += it.stop
-                "destination" += it.destination
-                "estimatedArrive" += it.estimatedArrive
+                "codMode" += arrive.value.first().codMode
+                "line" += arrive.value.first().line
+                "destination" += arrive.value.first().destination
+                "estimatedArrives" += arrive.value.map { it.estimatedArrive.asJson() }.asJson()
             }
         }
     }

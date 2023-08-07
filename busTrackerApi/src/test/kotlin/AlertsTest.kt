@@ -19,7 +19,7 @@ enum class Alerts(val url: String) {
     EMT("/v1/stops/emt/alerts")
 }
 
-class AlertsTest  {
+class AlertsTest {
     @ParameterizedTest
     @EnumSource(Alerts::class)
     fun `should get alerts`(code: Alerts) = testApplicationBusTracker {

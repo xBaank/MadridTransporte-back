@@ -14,7 +14,9 @@ import simpleJson.exceptions.JsonException
 context(EffectScope<BusTrackerException>)
 suspend fun <T> Either<JsonException, T>.bindMap() = mapLeft { JsonError(it.message) }.bind()
 
-suspend inline fun Call.handle(f : () -> Either<BusTrackerException, Response>) = f().fold({ handleError(it) }, { handleResponse(it) })
+suspend inline fun Call.handle(f: () -> Either<BusTrackerException, Response>) =
+    f().fold({ handleError(it) }, { handleResponse(it) })
 
 context(EffectScope<BusTrackerException>)
-suspend fun Either<JsonException, JsonNode>.asNumberOrString() = asNumber().getOrNull()?.toString() ?: asString().bindMap()
+suspend fun Either<JsonException, JsonNode>.asNumberOrString() =
+    asNumber().getOrNull()?.toString() ?: asString().bindMap()

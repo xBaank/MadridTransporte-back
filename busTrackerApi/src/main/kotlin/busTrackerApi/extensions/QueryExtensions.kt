@@ -6,5 +6,4 @@ import busTrackerApi.exceptions.BusTrackerException
 import io.ktor.http.*
 
 fun Parameters.getWrapped(key: String) =
-    get(key)?.right() ?:
-    BusTrackerException.QueryParamError("Missing query parameter $key").left()
+    get(key)?.right() ?: BusTrackerException.QueryParamError("Missing query parameter $key").left()
