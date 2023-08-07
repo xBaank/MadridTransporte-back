@@ -37,6 +37,7 @@ val cachedAlerts = Cache.Builder()
     .build<String, TimedCachedValue<IncidentsAffectationsResponse>>()
 
 const val allStopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json"
+const val allStopsInfoUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/StopsInfo.json"
 
 private fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.catch {
     val request = StopTimesRequest().apply {
@@ -70,6 +71,20 @@ suspend fun getTimesResponseCached(stopCode: String, codMode : String) = either 
     stopTimesCache.get(stopCode) ?: shift<Nothing>(NotFound("Stop with id $stopCode not found"))
 }
 
+suspend fun getAllStopsInfoResponse() = either {
+    val cached = allStopsCache.get(allStopsInfoUrl)
+    if (cached != null) return@either cached
+
+    val response = httpClient.get(allStopsInfoUrl).await().use { response ->
+        val json =
+            response.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
+        json.deserialized().asArray().bindMap().asJson()
+    }
+
+    allStopsCache.put(allStopsInfoUrl, response)
+    response
+}
+
 suspend fun getAllStopsResponse() = either {
     val cached = allStopsCache.get(allStopsUrl)
     if (cached != null) return@either cached
@@ -77,8 +92,12 @@ suspend fun getAllStopsResponse() = either {
     val response = httpClient.get(allStopsUrl).await().use { response ->
         val json =
             response.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
-        json.deserialized().asArray().bindMap()
-            .distinctBy { it["IDESTACION"].asString().bindMap() to it["DENOMINACION"].asString().bindMap() }
+        json
+            .deserialized()
+            .asArray()
+            .bindMap()
+            .onEach { it["codMode"] = it["stop_id"].asString().bindMap().substringAfter("_").substringBefore("_") }
+            .onEach { it["stopCode"] = it["stop_id"].asString().bindMap().removePrefix("par_") }
             .asJson()
     }
 
@@ -86,10 +105,17 @@ suspend fun getAllStopsResponse() = either {
     response
 }
 
-suspend fun getStopById(stopCode: String) = either {
+suspend fun getStopCodeStationById(stopCode: String) = either {
+    getAllStopsInfoResponse().bind().asArray().bindMap()
+        .firstOrNull { it["IDESTACION"].asString().getOrNull() == stopCode }
+        ?.get("CODIGOEMPRESA")?.asNumber()?.bindMap()
+        ?: shift<Nothing>(NotFound("Stop with id $stopCode not found"))
+}
+
+suspend fun checkStopExists(stopCode: String) = either {
     getAllStopsResponse().bind().asArray().bindMap()
-        .firstOrNull { it["IDESTACION"].asString().getOrNull() == stopCode } ?:
-    shift<Nothing>(NotFound("Stop with id $stopCode not found"))
+        .firstOrNull { it["stopCode"].asString().getOrNull() == stopCode }
+        ?: shift<Nothing>(NotFound("Stop with id $stopCode not found"))
 }
 
 suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {

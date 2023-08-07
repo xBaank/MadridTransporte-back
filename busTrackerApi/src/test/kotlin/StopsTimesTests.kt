@@ -17,7 +17,7 @@ const val busStopCode = "08242"
 const val trainStopCode = "41"
 const val destinationStopCode = "53"
 const val metroStopCode = "235"
-const val emtStopCode = "2445"
+const val emtStopCode = "5827"
 const val tramStopCode = "4"
 
 enum class Times(val url: String, val urlCached: String) {

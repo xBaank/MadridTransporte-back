@@ -7,7 +7,7 @@ import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.routing.stops.TimedCachedValue
 import busTrackerApi.routing.stops.buildCachedJson
-import busTrackerApi.routing.stops.getStopById
+import busTrackerApi.routing.stops.checkStopExists
 import busTrackerApi.utils.Call
 import crtm.utils.createStopCode
 import io.ktor.http.*
@@ -20,10 +20,10 @@ suspend fun Call.getStopTimesCached() = getStopTimesBase(::getStopTimesResponseC
 
 private suspend fun getStopTimesBase(
     f: suspend (String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>,
-    id: Either<BusTrackerException, String>
+    simpleStopCode: Either<BusTrackerException, String>
 )  = either {
-    val stopCode = createStopCode(emtCodMode, id.bind())
-    getStopById(stopCode).bind()
-    val json = f(id.bind()).bind()
+    val stopCode = createStopCode(emtCodMode, simpleStopCode.bind())
+    checkStopExists(stopCode).bind()
+    val json = f(simpleStopCode.bind()).bind()
     ResponseJson(buildCachedJson(json.value, json.createdAt.toEpochMilli()), HttpStatusCode.OK)
 }
