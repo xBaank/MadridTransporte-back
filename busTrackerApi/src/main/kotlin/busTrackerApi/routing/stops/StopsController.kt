@@ -8,6 +8,7 @@ import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.asNumberOrString
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
+import busTrackerApi.extensions.onEachAsync
 import busTrackerApi.routing.stops.metro.metroCodMode
 import busTrackerApi.utils.mapExceptionsF
 import crtm.auth
@@ -100,10 +101,10 @@ suspend fun getAllStopsResponse() = either {
             .asArray()
             .bindMap()
             .mapNotNull { if (!it["stop_id"].asString().bindMap().contains("par")) null else it }
-            .onEach {
+            .onEachAsync {
                 it["cod_mode"] = it["stop_id"].asString().bindMap().substringAfter("_").substringBefore("_").toInt()
             }
-            .onEach {
+            .onEachAsync {
                 it["full_stop_code"] =
                     it["cod_mode"].asNumber().bindMap().toString() + "_" + it["stop_code"].asNumberOrString()
             }
