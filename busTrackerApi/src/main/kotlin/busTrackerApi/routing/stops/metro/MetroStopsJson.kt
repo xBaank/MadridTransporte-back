@@ -15,11 +15,10 @@ suspend fun parseMetroToStopTimes(json: JsonNode, codMode: String) = either {
         val proximo = arrive["proximo"].asLong().getOrNull()
         val siguiente = arrive["siguiente"].asLong().getOrNull()
 
-        if (proximo == null && siguiente == null) return@flatMap emptyList()
-        if (proximo == 0L && siguiente == 0L) return@flatMap emptyList()
+        if (proximo == null || proximo == 0L && siguiente == null || siguiente == 0L) return@flatMap emptyList()
 
         val proximoEstimatedArrive = proximo
-            ?.let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
+            .let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
             ?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
 
         val siguienteEstimatedArrive = siguiente
@@ -29,6 +28,7 @@ suspend fun parseMetroToStopTimes(json: JsonNode, codMode: String) = either {
         val first = Arrive(
             line = arrive["linea"].asNumber().bind().toString(),
             destination = arrive["sentido"].asString().bind(),
+            anden = arrive["anden"].asInt().getOrNull(),
             codMode = metroCodMode.toInt(),
             estimatedArrive = proximoEstimatedArrive ?: -1
         )

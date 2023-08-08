@@ -28,7 +28,9 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
             description = it["description"].asString().bind(),
             cause = it["cause"].asString().bind(),
             effect = it["effect"].asString().bind(),
-            url = it["moreInfo"]["@url"].asString().bind().let(::listOf)
+            from = it["rssFrom"].asString().bind(),
+            to = it["rssTo"].asString().bind(),
+            url = it["moreInfo"]["@url"].asString().bind()
         )
     }
     StopTimes(emtCodMode.toInt(), stopName, arrivesMapped, incidentsMapped)

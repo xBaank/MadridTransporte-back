@@ -45,6 +45,7 @@ fun buildJson(stopTimes: StopTimes) = jObject {
             +jObject {
                 "codMode" += arrive.value.first().codMode
                 "line" += arrive.value.first().line
+                "anden" += arrive.value.first().anden
                 "destination" += arrive.value.first().destination
                 "estimatedArrives" += arrive.value.map { it.estimatedArrive.asJson() }.asJson()
             }
@@ -55,9 +56,11 @@ fun buildJson(stopTimes: StopTimes) = jObject {
             +jObject {
                 "title" += it.title
                 "description" += it.description
+                "from" += it.from
+                "to" += it.to
                 "cause" += it.cause
                 "effect" += it.effect
-                "urls" += it.url.map { it.asJson() }.asJson()
+                "url" += it.url
             }
         }
     }
