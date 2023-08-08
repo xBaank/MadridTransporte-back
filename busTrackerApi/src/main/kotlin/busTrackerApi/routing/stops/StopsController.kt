@@ -42,8 +42,9 @@ val cachedAlerts = Cache.Builder()
 
 const val allStopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json"
 const val allStopsInfoUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/StopsInfo.json"
+private val timeoutSeconds = 30.seconds
 
-private fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.catch {
+private fun getStopTimesResponse(stopCode: String) = Either.catch {
     val request = StopTimesRequest().apply {
         codStop = stopCode
         type = 1
@@ -51,15 +52,13 @@ private fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.ca
         stopTimesByIti = 3
         authentication = defaultClient.auth()
     }
-    //Not needed?
-    if (codMode != null) request.codMode = codMode
     defaultClient.getStopTimes(request)
 }.mapLeft(mapExceptionsF)
 
-suspend fun getTimesResponse(stopCode: String, codMode: String?) = either {
-    val stopTimes = withTimeoutOrNull(20.seconds) {
+suspend fun getTimesResponse(stopCode: String) = either {
+    val stopTimes = withTimeoutOrNull(timeoutSeconds) {
         CoroutineScope(Dispatchers.IO)
-            .async { getStopTimesResponse(stopCode, codMode) }
+            .async { getStopTimesResponse(stopCode) }
             .await()
             .bind()
     }
@@ -71,7 +70,7 @@ suspend fun getTimesResponse(stopCode: String, codMode: String?) = either {
     result
 }
 
-suspend fun getTimesResponseCached(stopCode: String, codMode: String) = either {
+suspend fun getTimesResponseCached(stopCode: String) = either {
     stopTimesCache.get(stopCode) ?: shift<Nothing>(NotFound("Stop with id $stopCode not found"))
 }
 
@@ -146,7 +145,7 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
         authentication = defaultClient.auth()
     }
 
-    val result = withTimeoutOrNull(20.seconds) {
+    val result = withTimeoutOrNull(timeoutSeconds) {
         CoroutineScope(Dispatchers.IO)
             .async { defaultClient.getIncidentsAffectations(request).timed() }
             .await()

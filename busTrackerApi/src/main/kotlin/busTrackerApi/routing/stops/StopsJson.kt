@@ -20,7 +20,7 @@ fun parseStopTimesResponseToStopTimes(response: StopTimesResponse): StopTimes {
         )
     }
 
-    return StopTimes(busCodMode.toInt(), stopName, arrives, emptyList())
+    return StopTimes(busCodMode.toInt(), stopName, arrives.sortedBy { it.line.toInt() }, emptyList())
 }
 
 

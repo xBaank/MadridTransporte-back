@@ -31,11 +31,11 @@ suspend fun Call.getStopTimesCached(codMode: String) =
 private suspend fun getStopTimesBase(
     codMode: String,
     simpleStopCode: Either<BusTrackerException, String>,
-    f: suspend (String, String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>
+    f: suspend (String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>
 ) = either {
     val stopCode = createStopCode(codMode, simpleStopCode.bind())
     checkStopExists(stopCode).bind()
-    val cached = f(stopCode, codMode).bind()
+    val cached = f(stopCode).bind()
     val json = buildCachedJson(cached.value, cached.createdAt.toEpochMilli())
     ResponseJson(json, HttpStatusCode.OK)
 }
