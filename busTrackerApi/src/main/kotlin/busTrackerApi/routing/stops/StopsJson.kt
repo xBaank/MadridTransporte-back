@@ -28,7 +28,7 @@ fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
     alerts.incidentsAffectations.incidentAffectation.forEach {
         addObject {
             "description" += it.description
-            "codMode" += it.codMode
+            "codMode" += it.codMode.toInt()
             "codLine" += it.codLine
             "stops" += it.stopsAffectated.shortStop.map { it.codStop.asJson() }.asJson()
         }
