@@ -15,10 +15,10 @@ suspend fun parseMetroToStopTimes(json: JsonNode, codMode: String) = either {
         val proximo = arrive["proximo"].asLong().getOrNull()
         val siguiente = arrive["siguiente"].asLong().getOrNull()
 
-        if (proximo == null || proximo == 0L && siguiente == null || siguiente == 0L) return@flatMap emptyList()
+        if ((proximo == 0L || proximo == null) && (siguiente == 0L || siguiente == null)) return@flatMap emptyList()
 
         val proximoEstimatedArrive = proximo
-            .let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
+            ?.let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
             ?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
 
         val siguienteEstimatedArrive = siguiente
