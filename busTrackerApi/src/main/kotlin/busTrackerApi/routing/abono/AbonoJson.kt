@@ -48,8 +48,8 @@ fun buildAbonoJson(data: SS_prepagoConsultaSaldo): JsonObject {
                 "lastUseDate" += lastUseDate
                 "useDays" += contract.InvalidityPeriod
                 "leftDays" += leftDays
-                "charges" += contract.ContractChargeUnits ?: contract.ContractRechargeUnits
-                "remainingCharges" += contract.ChargeRemainUnits ?: contract.ContractRechargeUnits
+                "charges" += (contract.ContractChargeUnits ?: contract.ContractRechargeUnits)?.toIntOrNull()
+                "remainingCharges" += (contract.ChargeRemainUnits ?: contract.ContractRechargeUnits)?.toIntOrNull()
             }
         }?.asJson() ?: jArray {}
     }
