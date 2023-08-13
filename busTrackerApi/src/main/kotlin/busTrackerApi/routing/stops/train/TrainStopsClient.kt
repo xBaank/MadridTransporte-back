@@ -7,7 +7,7 @@ import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.routing.stops.TimedCachedValue
 import busTrackerApi.routing.stops.buildCachedJson
-import busTrackerApi.routing.stops.getStopCodeStationById
+import busTrackerApi.routing.stops.getIdByStopCode
 import busTrackerApi.utils.Call
 import crtm.utils.createStopCode
 import io.ktor.http.*
@@ -34,8 +34,8 @@ private suspend fun getTrainTimesBase(
 ) = either {
     val stopCodeOrigin = createStopCode(trainCodMode, originId.bind())
     val stopCodeDestination = createStopCode(trainCodMode, destinationId.bind())
-    val stopInfoOriginStationCode = getStopCodeStationById(stopCodeOrigin).bind()
-    val stopInfoDestinationStationCode = getStopCodeStationById(stopCodeDestination).bind()
+    val stopInfoOriginStationCode = getIdByStopCode(stopCodeOrigin).bind()
+    val stopInfoDestinationStationCode = getIdByStopCode(stopCodeDestination).bind()
     val json = f(
         stopInfoOriginStationCode,
         stopInfoDestinationStationCode

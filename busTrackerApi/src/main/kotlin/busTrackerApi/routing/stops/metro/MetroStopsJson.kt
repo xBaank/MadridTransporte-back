@@ -9,6 +9,7 @@ import java.time.ZoneOffset
 
 suspend fun parseMetroToStopTimes(json: JsonNode, codMode: String) = either {
     val arrives = json.asArray().bind()
+    if (arrives.isEmpty()) return@either StopTimes(codMode.toInt(), "", emptyList(), emptyList())
     val stopName = arrives[0]["nombreest"].asString().bind()
 
     val arrivesMapped = arrives.flatMap { arrive ->
