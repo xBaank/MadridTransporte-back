@@ -2,30 +2,35 @@ package busTrackerApi.routing.stops
 
 import arrow.core.Either
 import arrow.core.continuations.either
-import arrow.core.getOrElse
-import arrow.core.left
-import arrow.core.right
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
+import busTrackerApi.exceptions.BusTrackerException.NotFound
+import busTrackerApi.extensions.asNumberOrString
 import busTrackerApi.extensions.bindMap
+import busTrackerApi.extensions.get
+import busTrackerApi.extensions.onEachAsync
+import busTrackerApi.routing.stops.metro.metroCodMode
 import busTrackerApi.utils.mapExceptionsF
 import crtm.auth
 import crtm.defaultClient
-import crtm.soap.*
+import crtm.soap.ArrayOfString
+import crtm.soap.IncidentsAffectationsRequest
+import crtm.soap.IncidentsAffectationsResponse
+import crtm.soap.StopTimesRequest
 import io.github.reactivecircus.cache4k.Cache
-import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withTimeoutOrNull
-import okhttp3.Request
+import ru.gildor.coroutines.okhttp.await
 import simpleJson.*
+import java.util.UUID.randomUUID
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 val stopTimesCache = Cache.Builder()
-    .expireAfterWrite(24.hours)
-    .build<String, TimedCachedValue<ShortStopTimesResponse>>()
+    .expireAfterWrite(1.hours)
+    .build<String, TimedCachedValue<JsonNode>>()
 
 val allStopsCache = Cache.Builder()
     .expireAfterWrite(1.hours)
@@ -35,88 +40,139 @@ val cachedAlerts = Cache.Builder()
     .expireAfterWrite(24.hours)
     .build<String, TimedCachedValue<IncidentsAffectationsResponse>>()
 
-val subscribedStops = mutableMapOf<String, WebSocketServerSession>()
+const val allStopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json"
+const val allStopsInfoUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/StopsInfo.json"
+private val timeoutSeconds = 30.seconds
 
-fun getStopTimesResponse(stopCode: String, codMode: String?) = Either.catch {
-    val request = ShortStopTimesRequest().apply {
+private fun getStopTimesResponse(stopCode: String) = Either.catch {
+    val request = StopTimesRequest().apply {
         codStop = stopCode
         type = 1
         orderBy = 2
         stopTimesByIti = 3
         authentication = defaultClient.auth()
     }
-    //Not needed?
-    if (codMode != null) request.codMode = codMode
-    defaultClient.getShortStopTimes(request)
+    defaultClient.getStopTimes(request)
 }.mapLeft(mapExceptionsF)
 
-suspend fun getTimesResponse(stopCode: String, codMode: String?) =
-    getTimes(stopCode, codMode, ::getStopTimesResponse)
-        .mapLeft(mapExceptionsF)
-
-suspend fun getTimesOrCachedResponse(stopCode: String, codMode: String?) =
-    getTimesResponse(stopCode, codMode)
-        .onRight { stopTimesCache.put(stopCode, it) }
-        .getOrElse { stopTimesCache.get(stopCode) }?.right() ?:
-    BusTrackerException.NotFound("No stop times found for stop code $stopCode").left()
-
-
-
-private suspend fun <T> getTimes(
-    stopCode: String,
-    codMode: String?,
-    getF: (stopCode: String, codMode: String?) -> Either<T, ShortStopTimesResponse>
-) = withTimeoutOrNull(20.seconds) {
-    val stopTimes = CoroutineScope(Dispatchers.IO)
-        .async { getF(stopCode, codMode) }
-        .await()
-        .getOrNull()
-
-    stopTimes?.timed()
-}?.right() ?: BusTrackerException.NotFound("No stop times found for stop code $stopCode").left()
-
-fun getStopsByLocationResponse(lat: Double, lon: Double) = Either.catch {
-    val request = StopsByGeoLocationRequest().apply {
-        coordinates = Coordinates().apply {
-            latitude = lat
-            longitude = lon
-        }
-        method = 1
-        precision = 1000
-        codMode = ""
-        authentication = defaultClient.auth()
+suspend fun getTimesResponse(stopCode: String) = either {
+    val stopTimes = withTimeoutOrNull(timeoutSeconds) {
+        CoroutineScope(Dispatchers.IO)
+            .async { getStopTimesResponse(stopCode) }
+            .await()
+            .bind()
     }
-    defaultClient.getNearestStopsByGeoLocation(request)
-}.mapLeft(mapExceptionsF)
 
-suspend fun getAllStopsResponse() = either {
-    val cached = allStopsCache.get("all")
-    if (cached != null) return@either cached
+    if (stopTimes == null) shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
 
-    val request = Request.Builder().url("https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json").get().build()
-    httpClient.newCall(request).execute().use {
-        val json = it.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
-        json.deserialized().bindMap()
-    }.also { allStopsCache.put("all", it) }
+    val result = parseStopTimesResponseToStopTimes(stopTimes)
+        .copy(stopName = getStopNameByStopCode(stopCode).bind())//We need this because names are not updated in the soap responses
+        .let(::buildJson)
+        .timed()
+
+    stopTimesCache.put(stopCode, result)
+    result
 }
 
-suspend fun getStopById(stopCode: String) = either {
+suspend fun getTimesResponseCached(stopCode: String) = either {
+    stopTimesCache.get(stopCode) ?: shift<Nothing>(NotFound("Stop with id $stopCode not found"))
+}
+
+suspend fun getAllStopsInfoResponse() = either {
+    val cached = allStopsCache.get(allStopsInfoUrl)
+    if (cached != null) return@either cached
+
+    val response = httpClient.get(allStopsInfoUrl).await().use { response ->
+        val json =
+            response.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
+        json.deserialized().asArray().bindMap().asJson()
+    }
+
+    allStopsCache.put(allStopsInfoUrl, response)
+    response
+}
+
+suspend fun getAllStopsResponse() = either {
+    val cached = allStopsCache.get(allStopsUrl)
+    if (cached != null) return@either cached
+
+    val response = httpClient.get(allStopsUrl).await().use { response ->
+        val json =
+            response.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
+        json
+            .deserialized()
+            .asArray()
+            .bindMap()
+            .mapNotNull { if (!it["stop_id"].asString().bindMap().contains("par")) null else it }
+            .onEachAsync {
+                it["cod_mode"] = it["stop_id"].asString().bindMap().substringAfter("_").substringBefore("_").toInt()
+            }
+            .onEachAsync {
+                it["full_stop_code"] =
+                    it["cod_mode"].asNumber().bindMap().toString() + "_" + it["stop_code"].asNumberOrString()
+            }
+            //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
+            .distinctBy {
+                Pair(
+                    if (it["cod_mode"].asNumber().bindMap().toString() == metroCodMode) 1 else randomUUID().toString(),
+                    it["stop_name"].asString().bindMap()
+                )
+            }
+            .distinctBy { it["stop_id"].asString().bindMap() }
+            .asJson()
+    }
+
+    allStopsCache.put(allStopsUrl, response)
+    response
+}
+
+suspend fun getIdByStopCode(stopCode: String) = either {
+    getAllStopsInfoResponse().bind().asArray().bindMap()
+        .firstOrNull { it["IDESTACION"].asString().getOrNull() == stopCode }
+        ?.get("CODIGOEMPRESA")?.asNumberOrString()
+        ?: shift<Nothing>(NotFound("Stop with stopCode $stopCode not found"))
+}
+
+suspend fun getStopNameById(id: String) = either {
+    val stopCode = getAllStopsInfoResponse().bind().asArray().bindMap()
+        .firstOrNull { it["CODIGOEMPRESA"].asNumberOrString() == id }
+        ?.get("IDESTACION")?.asNumberOrString()
+        ?: shift<Nothing>(NotFound("Stop with id $id not found"))
+    getStopNameByStopCode(stopCode).bind()
+}
+
+suspend fun getStopNameByStopCode(id: String) = either {
     getAllStopsResponse().bind().asArray().bindMap()
-        .firstOrNull { it["codStop"].asString().getOrNull() == stopCode } ?:
-    shift<Nothing>(BusTrackerException.NotFound("Stop with id $stopCode not found"))
+        .firstOrNull { it["full_stop_code"].asString().getOrNull() == id }
+        ?.get("stop_name")?.asString()?.bindMap()
+        ?: shift<Nothing>(NotFound("Stop with id $id not found"))
+}
+
+suspend fun checkStopExists(stopCode: String) = either {
+    getAllStopsResponse().bind().asArray().bindMap()
+        .firstOrNull { it["full_stop_code"].asString().getOrNull() == stopCode }
+        ?: shift<Nothing>(NotFound("Stop with id $stopCode not found"))
 }
 
 suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
-    cachedAlerts.get(codMode) ?:
-    CoroutineScope(Dispatchers.IO).async {
-        val cached = defaultClient.getIncidentsAffectations(IncidentsAffectationsRequest().apply {
-            this.codMode = codMode
-            codLines = ArrayOfString()
-            authentication = defaultClient.auth()
-        }).timed()
-        cachedAlerts.put(codMode, cached)
-        cached
-    }.await()
+    val cached = cachedAlerts.get(codMode)
+    if (cached != null) return@catch cached
 
+    val request = IncidentsAffectationsRequest().apply {
+        this.codMode = codMode
+        codLines = ArrayOfString()
+        authentication = defaultClient.auth()
+    }
+
+    val result = withTimeoutOrNull(timeoutSeconds) {
+        CoroutineScope(Dispatchers.IO)
+            .async { defaultClient.getIncidentsAffectations(request).timed() }
+            .await()
+    }
+
+    if (result == null) throw BusTrackerException.InternalServerError("Got empty response")
+
+    cachedAlerts.put(codMode, result)
+    result
 }.mapLeft(mapExceptionsF)
 

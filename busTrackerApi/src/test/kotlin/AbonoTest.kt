@@ -10,16 +10,15 @@ import simpleJson.JsonArray
 import simpleJson.JsonObject
 import simpleJson.deserialized
 import simpleJson.get
-import utils.TestBase
 import utils.getAbono
 import utils.testApplicationBusTracker
 
-const val abonoJoven = "0000000010040117584"
+const val abonoJoven = "0010000000010040117584"
 const val abonoMetro10Viajes = "0000000010040117583"
-const val abonoNormal = "2222222510010656361"
+const val abonoNormal = "0012222222510010656361"
 const val abonoTerceraEdad = "0000000010040117155"
 
-class AbonoTest : TestBase {
+class AbonoTest {
     @ParameterizedTest
     @ValueSource(strings = [abonoJoven, abonoMetro10Viajes, abonoNormal, abonoTerceraEdad])
     fun `should get abono`(id: String) = testApplicationBusTracker {

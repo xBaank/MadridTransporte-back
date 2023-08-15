@@ -2,24 +2,27 @@ package busTrackerApi.routing.stops.metro
 
 import busTrackerApi.extensions.handle
 import busTrackerApi.routing.stops.alertsConfigF
-import io.ktor.server.auth.*
 import io.ktor.server.routing.*
-import io.ktor.server.websocket.*
 
 const val metroCodMode = "4"
+const val tramCodMode = "10"
 
 fun Route.metroStopsRouting() = route("/metro") {
+    metroConfigF(metroCodMode)
+}
+
+fun Route.tramStopsRouting() = route("/tram") {
+    metroConfigF(tramCodMode)
+}
+
+private val metroConfigF: Route.(String) -> Unit = { codMode ->
     get("/{stopCode}/times") {
-        handle { getMetroTimes() }
-    }
-    get("/{stopCode}/times/cached") {
-        handle { getMetroTimesCached() }
+        handle { getMetroTimes(codMode) }
     }
 
-    authenticate("user") {
-        webSocket("/{stopCode}/times/subscribe") {
-            handle { subscribeMetroStopsTimes() }
-        }
+    get("/{stopCode}/times/cached") {
+        handle { getMetroTimesCached(codMode) }
     }
-    alertsConfigF(metroCodMode)
+
+    alertsConfigF(codMode)
 }

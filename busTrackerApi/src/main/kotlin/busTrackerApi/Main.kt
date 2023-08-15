@@ -1,7 +1,5 @@
 package busTrackerApi
 
-import busTrackerApi.config.configureAuth
-import busTrackerApi.config.configureDependencies
 import busTrackerApi.config.configureRoutingV1
 import busTrackerApi.utils.getenvOrNull
 import io.ktor.http.*
@@ -31,7 +29,5 @@ fun Application.startUp() {
         anyHost()
     }
     install(WebSockets)
-    configureDependencies()
-    configureAuth()
     configureRoutingV1()
 }

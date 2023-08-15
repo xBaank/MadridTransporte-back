@@ -1,16 +1,19 @@
 package busTrackerApi.routing.stops.metro
 
 import arrow.core.continuations.either
+import arrow.core.getOrElse
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
-import busTrackerApi.extensions.removeNonSpacingMarks
 import busTrackerApi.routing.stops.TimedCachedValue
+import busTrackerApi.routing.stops.buildJson
+import busTrackerApi.routing.stops.getStopNameById
 import busTrackerApi.routing.stops.timed
 import io.github.reactivecircus.cache4k.Cache
 import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response
+import ru.gildor.coroutines.okhttp.await
 import simpleJson.*
 import kotlin.time.Duration.Companion.hours
 
@@ -25,7 +28,7 @@ fun urlBuilder() = HttpUrl.Builder()
     .addPathSegment("rest")
     .addPathSegment("teleindicadores")
 
-fun getMetroTimesResponse(id: String? = null): Response {
+suspend fun getMetroTimesResponse(id: String? = null): Response {
     val url = urlBuilder()
         .also { if (id != null) it.addPathSegment(id) }
         .build()
@@ -36,23 +39,23 @@ fun getMetroTimesResponse(id: String? = null): Response {
         .addHeader("Accept", "application/json")
         .build()
 
-    return httpClient.newCall(request).execute()
+    return httpClient.newCall(request).await()
 }
 
-suspend fun getTimesByQuery(query: String) = either {
-    val response = getTimesBase(query).bind().timed()
-    cache.put(query, response)
+suspend fun getTimesByQuery(id: String, codMode: String) = either {
+    val response = getTimesBase(id, codMode).bind().timed()
+    cache.put(id, response)
     response
 }
 
-suspend fun getTimesByQueryCached(query: String) = either {
-    cache.get(query) ?: shift<Nothing>(BusTrackerException.NotFound("No stops found for query $query"))
+suspend fun getTimesByQueryCached(id: String, codMode: String) = either {
+    cache.get(id) ?: shift<Nothing>(BusTrackerException.NotFound("No stops found for query $id"))
 }
 
-suspend fun getTimesBase(filter: String, id: String? = null) = either {
+suspend fun getTimesBase(id: String, codMode: String) = either {
     val response = getMetroTimesResponse(id)
 
-    response.use { it ->
+    response.use {
         if (it.code == 404) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
         if (it.code in 500..600) shift<BusTrackerException.InternalServerError>(
             BusTrackerException.InternalServerError(
@@ -60,20 +63,15 @@ suspend fun getTimesBase(filter: String, id: String? = null) = either {
             )
         )
         val body = it.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
+
         val json = body.deserialized()
             .get("Vtelindicadores")
             .asArray()
+            .getOrElse { jArray() }
+
+        parseMetroToStopTimes(json, codMode)
             .bindMap()
-
-        val filtered = json.filter {
-            it["nombreest"].asString()
-                .bindMap()
-                .removeNonSpacingMarks()
-                .contains(filter.removeNonSpacingMarks(), true)
-        }.asJson()
-
-        if(filtered.isEmpty()) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
-
-        buildMetroJson(filtered)
+            .copy(stopName = getStopNameById(id).bind()) //When no times are available, the stop name is not returned, so we need to get it from the stops list
+            .let(::buildJson)
     }
 }

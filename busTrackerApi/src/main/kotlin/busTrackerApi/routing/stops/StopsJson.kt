@@ -1,50 +1,66 @@
 package busTrackerApi.routing.stops
 
-import busTrackerApi.extensions.removeNonSpacingMarks
+import busTrackerApi.extensions.toMiliseconds
+import busTrackerApi.routing.stops.bus.busCodMode
 import crtm.soap.IncidentsAffectationsResponse
-import crtm.soap.ShortStopTimesResponse
-import crtm.soap.StopsByGeoLocationResponse
-import crtm.utils.getCodModeFromLineCode
-import crtm.utils.getCodStopFromStopCode
-import simpleJson.*
+import crtm.soap.StopTimesResponse
+import simpleJson.JsonNode
+import simpleJson.asJson
+import simpleJson.jArray
+import simpleJson.jObject
 
-fun buildStopsJson(stops: JsonNode) = jArray {
-    stops.asArray().getOrNull()?.forEach { stop ->
+fun parseStopTimesResponseToStopTimes(response: StopTimesResponse): StopTimes {
+    val stopName = response.stopTimes.stop.name
+    val arrives = response.stopTimes.times.time.map {
+        Arrive(
+            line = it.line.shortDescription,
+            destination = it.destination,
+            codMode = it.line.codMode.toInt(),
+            estimatedArrive = it.time.toMiliseconds()
+        )
+    }
+
+    return StopTimes(busCodMode.toInt(), stopName, arrives.sortedBy { it.line.toIntOrNull() }, emptyList())
+}
+
+
+fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
+    alerts.incidentsAffectations.incidentAffectation.forEach {
         addObject {
-            "codStop" += stop["codStop"].asString().getOrNull()
-            "simpleCodStop" += getCodStopFromStopCode(stop["codStop"].asString().getOrNull()!!)
-            "codMode" += stop["codMode"].asString().getOrNull()
-            "name" += stop["name"].asString().getOrNull()?.removeNonSpacingMarks()
-            "latitude" += stop["coordinates"]["latitude"].asNumber().getOrNull()
-            "longitude" += stop["coordinates"]["longitude"].asNumber().getOrNull()
-            "lines" += stop["lines"].asArray().getOrNull() ?: jArray {}
+            "description" += it.description
+            "codMode" += it.codMode.toInt()
+            "codLine" += it.codLine
+            "stops" += it.stopsAffectated.shortStop.map { it.codStop.asJson() }.asJson()
         }
     }
 }
 
-fun buildStopLocationsJson(stops: StopsByGeoLocationResponse) = jArray {
-    stops.stops.stop.forEach { stop ->
-        addObject {
-            "codStop" += stop.codStop
-            "simpleCodStop" += getCodStopFromStopCode(stop.codStop)
-            "codMode" += stop.codMode
-            "name" += stop.name
-            "latitude" += stop.coordinates.latitude
-            "longitude" += stop.coordinates.longitude
+fun buildJson(stopTimes: StopTimes) = jObject {
+    "codMode" += stopTimes.codMode
+    "stopName" += stopTimes.stopName
+    val arrivesGroupedByLineAndDest = stopTimes.arrives.groupBy { Pair(it.line, it.destination) }
+    "arrives" to jArray {
+        arrivesGroupedByLineAndDest.forEach { arrive ->
+            if (arrive.value.isEmpty()) return@forEach
+            +jObject {
+                "codMode" += arrive.value.first().codMode
+                "line" += arrive.value.first().line
+                "anden" += arrive.value.first().anden
+                "destination" += arrive.value.first().destination
+                "estimatedArrives" += arrive.value.map { it.estimatedArrive.asJson() }.asJson()
+            }
         }
     }
-}
-
-fun buildStopTimesJson(times: ShortStopTimesResponse) = jObject {
-    "name" += times.stopTimes.stop.name
-    "times" += jArray {
-        times.stopTimes?.times?.shortTime?.forEach {
-            addObject {
-                "lineCode" += it.codLine
-                "codMode" += getCodModeFromLineCode(it.codLine)
-                "destination" += it.destination
-                "codVehicle" += it.codVehicle
-                "time" += it.time.toGregorianCalendar().time.toInstant().toEpochMilli()
+    "incidents" to jArray {
+        stopTimes.incidents.forEach {
+            +jObject {
+                "title" += it.title
+                "description" += it.description
+                "from" += it.from
+                "to" += it.to
+                "cause" += it.cause
+                "effect" += it.effect
+                "url" += it.url
             }
         }
     }
@@ -53,15 +69,4 @@ fun buildStopTimesJson(times: ShortStopTimesResponse) = jObject {
 fun buildCachedJson(json: JsonNode, createdAt: Long) = jObject {
     "data" += json
     "lastTime" += createdAt
-}
-
-fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
-    alerts.incidentsAffectations.incidentAffectation.forEach {
-        addObject {
-            "description" += it.description
-            "codMode" += it.codMode
-            "codLine" += it.codLine
-            "stops" += it.stopsAffectated.shortStop.map { it.codStop.asJson() }.asJson()
-        }
-    }
 }

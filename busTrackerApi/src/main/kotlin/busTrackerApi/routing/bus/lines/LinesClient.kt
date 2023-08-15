@@ -14,7 +14,7 @@ import simpleJson.asJson
 suspend fun Call.getLocations() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
     val codMode = getCodModeFromLineCode(lineCode)
-    if(!isValidLineCode(lineCode)) shift<Nothing>(BadRequest("Line code is not valid"))
+    if (!isValidLineCode(lineCode)) shift<Nothing>(BadRequest("Line code is not valid"))
 
     val locations = getItinerariesResponse(lineCode).bind()
         .itineraries
@@ -31,7 +31,7 @@ suspend fun Call.getLocations() = either {
 suspend fun Call.getStops() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
     val codMode = getCodModeFromLineCode(lineCode)
-    if(!isValidLineCode(lineCode)) shift<Nothing>(BadRequest("Line code is not valid"))
+    if (!isValidLineCode(lineCode)) shift<Nothing>(BadRequest("Line code is not valid"))
 
     val stops = getStopsResponse(lineCode, codMode).bind()
     val json = stops.stops.stop.map(::buildStopsJson).asJson()
@@ -41,7 +41,7 @@ suspend fun Call.getStops() = either {
 
 suspend fun Call.getItineraries() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
-    if(!isValidLineCode(lineCode)) shift<Nothing>(BadRequest("Line code is not valid"))
+    if (!isValidLineCode(lineCode)) shift<Nothing>(BadRequest("Line code is not valid"))
 
     val itineraries = getItinerariesResponse(lineCode).bind()
     val json = itineraries.itineraries.lineItinerary.map(::buildItinerariesJson).asJson()

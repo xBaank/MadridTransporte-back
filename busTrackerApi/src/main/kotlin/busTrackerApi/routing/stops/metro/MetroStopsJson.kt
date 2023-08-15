@@ -1,23 +1,43 @@
 package busTrackerApi.routing.stops.metro
 
+import arrow.core.continuations.either
+import busTrackerApi.routing.stops.Arrive
+import busTrackerApi.routing.stops.StopTimes
 import simpleJson.*
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
-fun buildMetroJson(array: JsonArray) = jObject {
-    "name" += array.firstOrNull()?.get("nombreest")?.asString()?.getOrNull()
-    "times" += jArray {
-        array.forEach {
-            addObject {
-                "id" += it["idnumerica"].asNumber().getOrNull()
-                "idTeleindicador" += it["estaciontel"].asNumber().getOrNull()
-                "nombreEstacion" += it["nombreest"].asString().getOrNull()
-                "linea" += it["linea"].asNumber().getOrNull()
-                "anden" += it["anden"].asNumber().getOrNull()
-                "sentido" += it["sentido"].asString().getOrNull()
-                val proximo = it["proximo"].asNumber().getOrNull()
-                val siguiente = it["siguiente"].asNumber().getOrNull()
-                val proximos = listOfNotNull(proximo, siguiente).map(Number::asJson).asJson()
-                "proximos" += proximos
-            }
-        }
+suspend fun parseMetroToStopTimes(json: JsonNode, codMode: String) = either {
+    val arrives = json.asArray().bind()
+    if (arrives.isEmpty()) return@either StopTimes(codMode.toInt(), "", emptyList(), emptyList())
+    val stopName = arrives[0]["nombreest"].asString().bind()
+
+    val arrivesMapped = arrives.flatMap { arrive ->
+        val proximo = arrive["proximo"].asLong().getOrNull()
+        val siguiente = arrive["siguiente"].asLong().getOrNull()
+
+        if ((proximo == 0L || proximo == null) && (siguiente == 0L || siguiente == null)) return@flatMap emptyList()
+
+        val proximoEstimatedArrive = proximo
+            ?.let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
+            ?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
+
+        val siguienteEstimatedArrive = siguiente
+            ?.let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
+            ?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
+
+        val first = Arrive(
+            line = arrive["linea"].asNumber().bind().toString(),
+            destination = arrive["sentido"].asString().bind(),
+            anden = arrive["anden"].asInt().getOrNull(),
+            codMode = metroCodMode.toInt(),
+            estimatedArrive = proximoEstimatedArrive ?: -1
+        )
+
+        val second = first.copy(estimatedArrive = siguienteEstimatedArrive ?: -1)
+
+        listOf(first, second).filter { it.estimatedArrive != -1L }
     }
+
+    StopTimes(codMode.toInt(), stopName, arrivesMapped, emptyList())
 }

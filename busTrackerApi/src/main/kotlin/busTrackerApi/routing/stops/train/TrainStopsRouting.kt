@@ -1,11 +1,19 @@
 package busTrackerApi.routing.stops.train
 
+import busTrackerApi.extensions.handle
 import busTrackerApi.routing.stops.alertsConfigF
-import busTrackerApi.routing.stops.timesConfigF
 import io.ktor.server.routing.*
 
 const val trainCodMode = "5"
 fun Route.trainStopsRouting() = route("/train") {
-    timesConfigF(trainCodMode)
+
+    get("/times") {
+        handle { getTrainTimes() }
+    }
+
+    get("/times/cached") {
+        handle { getTrainTimesCached() }
+    }
+
     alertsConfigF(trainCodMode)
 }
