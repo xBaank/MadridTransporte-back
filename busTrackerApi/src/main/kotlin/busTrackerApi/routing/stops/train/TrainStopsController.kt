@@ -56,6 +56,10 @@ private suspend fun getRealTrainTimes(origin: String, destination: String) = eit
     }).await()
 
     if (!response.isSuccessful) shift<Nothing>(BadRequest("Renfe server not responding"))
-    val json = response.body?.string() ?: shift<Nothing>(BadRequest("Renfe server returned empty response"))
+    val json = response.body?.bytes()
+        ?.let { String(it, Charsets.ISO_8859_1) }
+        ?.toByteArray(Charsets.ISO_8859_1)
+        ?.toString(Charsets.UTF_8)
+        ?: shift<Nothing>(BadRequest("Renfe server returned empty response"))
     json.deserialized().bindMap()
 }
