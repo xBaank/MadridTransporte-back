@@ -67,7 +67,7 @@ suspend fun getStopTimesResponse(stopId: String) = either {
         if (!response.isSuccessful) shift<Nothing>(InternalServerError("EMT getStopTimes failed"))
         val body =
             response.body?.string()?.deserialized()?.bindMap() ?: shift<Nothing>(InternalServerError("Body is null"))
-        val result = parseEMTToStopTimes(body).bindMap().let(::buildJson).timed()
+        val result = parseEMTToStopTimes(body).bind().let(::buildJson).timed()
         stopTimesCache.put(stopId, result)
         return@either result
 
