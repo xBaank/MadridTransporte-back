@@ -1,22 +1,7 @@
 version: "3.9"
 services:
-  mongo:
-    image: mongo
-    restart: always
   api:
-    depends_on:
-      - mongo
     image: xbank/bus_tracker_api:latest
-    environment:
-      - MONGO_CONNECTION_STRING
-      - MONGO_DATABASE_NAME
-      - JWT_SECRET
-      - JWT_AUDIENCE
-      - JWT_ISSUER
-      - STMP_HOST
-      - STMP_PORT
-      - STMP_USERNAME
-      - STMP_PASSWORD
   nginx:
     depends_on:
       - api
