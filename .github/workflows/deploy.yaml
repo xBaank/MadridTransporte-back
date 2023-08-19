@@ -64,9 +64,9 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           script: |
-            docker compose -f ./bus-tracker-back/docker-compose.yml stop
-            docker compose -f ./bus-tracker-back/docker-compose.yml rm -f
-            docker compose -f ./bus-tracker-back/docker-compose.yml pull
+            docker compose -f ./bus-tracker-back/.deploy/docker-compose.yml stop
+            docker compose -f ./bus-tracker-back/.deploy/docker-compose.yml rm -f
+            docker compose -f ./bus-tracker-back/.deploy/docker-compose.yml pull
             rm -r ./bus-tracker-back
             git clone https://github.com/xBaank/bus-tracker-back.git
-            docker compose -f ./bus-tracker-back/docker-compose.yml up -d --force-recreate --build       
+            docker compose -f ./bus-tracker-back/.deploy/docker-compose.yml up -d --force-recreate --build       
