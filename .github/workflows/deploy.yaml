@@ -7,14 +7,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
-      JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
-      STMP_HOST: ${{ secrets.STMP_HOST }}
-      STMP_PORT: ${{ secrets.STMP_PORT }}
-      STMP_USERNAME: ${{ secrets.STMP_USERNAME }}
-      STMP_PASSWORD: ${{ secrets.STMP_PASSWORD }}
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -63,39 +55,15 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: push_to_registry
-    env:
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
-      JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
-      STMP_HOST: ${{ secrets.STMP_HOST }}
-      STMP_PORT: ${{ secrets.STMP_PORT }}
-      STMP_USERNAME: ${{ secrets.STMP_USERNAME }}
-      STMP_PASSWORD: ${{ secrets.STMP_PASSWORD }}
-      MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
-      MONGO_DATABASE_NAME: ${{ secrets.MONGO_DATABASE_NAME }}
-      MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
-      MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
     steps:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v0.1.10
         with:
-          envs: JWT_SECRET,JWT_AUDIENCE,JWT_ISSUER,STMP_HOST,STMP_PORT,STMP_USERNAME,STMP_PASSWORD,MONGO_CONNECTION_STRING,MONGO_DATABASE_NAME,MONGO_INITDB_ROOT_USERNAME,MONGO_INITDB_ROOT_PASSWORD
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           script: |
-            export JWT_SECRET=$JWT_SECRET
-            export JWT_AUDIENCE=$JWT_AUDIENCE
-            export JWT_ISSUER=$JWT_ISSUER
-            export STMP_HOST=$STMP_HOST
-            export STMP_PORT=$STMP_PORT
-            export STMP_USERNAME=$STMP_USERNAME
-            export STMP_PASSWORD=$STMP_PASSWORD
-            export MONGO_CONNECTION_STRING=$MONGO_CONNECTION_STRING
-            export MONGO_DATABASE_NAME=$MONGO_DATABASE_NAME
-            export MONGO_INITDB_ROOT_USERNAME=MONGO_INITDB_ROOT_USERNAME
-            export MONGO_INITDB_ROOT_PASSWORD=MONGO_INITDB_ROOT_PASSWORD
             docker compose -f ./bus-tracker-back/docker-compose.yml stop
             docker compose -f ./bus-tracker-back/docker-compose.yml rm -f
             docker compose -f ./bus-tracker-back/docker-compose.yml pull
