@@ -51,22 +51,3 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           name: remote ssh command
-  deploy:
-    name: Build
-    runs-on: ubuntu-latest
-    needs: push_to_registry
-    steps:
-      - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          script: |
-            docker compose -f ./bus-tracker-back/.deploy/docker-compose.yml stop
-            docker compose -f ./bus-tracker-back/.deploy/docker-compose.yml rm -f
-            docker compose -f ./bus-tracker-back/.deploy/docker-compose.yml pull
-            rm -r ./bus-tracker-back
-            git clone https://github.com/xBaank/bus-tracker-back.git
-            docker compose -f ./bus-tracker-back/.deploy/docker-compose.yml up -d --force-recreate --build       
