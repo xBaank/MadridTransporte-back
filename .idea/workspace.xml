@@ -7,12 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Emt doesn't want to use http with status codes">
-      <change beforePath="$PROJECT_DIR$/.deploy/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.deploy/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.deploy/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.deploy/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/.deploy/nginx.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="577aca3d-395c-4ca3-a195-e3a09f7e8e34" name="Changes" comment="Fix context" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -588,7 +583,7 @@
       <option name="project" value="LOCAL" />
       <updated>1687181447717</updated>
     </task>
-    <option name="localTasksCounter" value="152" />
+    <option name="localTasksCounter" value="155" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -603,9 +598,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Move `Metro` to `Stops` so it gets unified" />
-    <MESSAGE value="Add `Alerts` poc" />
-    <MESSAGE value="Add `Alerts` endpoint" />
     <MESSAGE value="Remove accents in json" />
     <MESSAGE value="Remove test" />
     <MESSAGE value="Remove `User` part" />
@@ -628,7 +620,10 @@
     <MESSAGE value="`codMode` as number" />
     <MESSAGE value="Increase timeout to server" />
     <MESSAGE value="Some fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Some fixes" />
+    <MESSAGE value="Move Dockerfile" />
+    <MESSAGE value="Remove CD" />
+    <MESSAGE value="Fix context" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix context" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>
