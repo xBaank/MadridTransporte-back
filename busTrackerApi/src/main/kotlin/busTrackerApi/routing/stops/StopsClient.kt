@@ -8,7 +8,9 @@ import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.utils.Call
 import crtm.utils.createStopCode
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.cachingheaders.*
 import simpleJson.JsonNode
 
 
@@ -17,8 +19,9 @@ suspend fun getAlertsByCodMode(codMode: String) = either {
     ResponseJson(buildAlertsJson(alerts.value), HttpStatusCode.OK)
 }
 
-suspend fun getAllStops() = either {
+suspend fun Call.getAllStops() = either {
     val stops = getAllStopsResponse().bind()
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
     ResponseJson(stops, HttpStatusCode.OK)
 }
 

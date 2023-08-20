@@ -6,6 +6,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.plugins.cors.routing.*
 
 fun main() {
@@ -27,5 +28,6 @@ fun Application.startUp() {
         allowHeader(HttpHeaders.Authorization)
         anyHost()
     }
+    install(CachingHeaders)
     configureRoutingV1()
 }

@@ -44,7 +44,7 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     implementation("io.github.pdvrieze.xmlutil:core:0.86.0")
     implementation("io.github.pdvrieze.xmlutil:serialization:0.86.0")
-
+    implementation("io.ktor:ktor-server-caching-headers:$ktor_version")
     implementation(project(":crtm"))
 }
 
