@@ -7,5 +7,5 @@
     <root level="trace">
         <appender-ref ref="STDOUT"/>
     </root>
-    <logger name="io.netty" level="ERROR"/>
+    <logger name="io.netty" level="TRACE"/>
 </configuration>
