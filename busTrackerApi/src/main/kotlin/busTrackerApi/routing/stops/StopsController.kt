@@ -33,7 +33,6 @@ val stopTimesCache = Cache.Builder()
     .build<String, TimedCachedValue<JsonNode>>()
 
 val allStopsCache = Cache.Builder()
-    .expireAfterWrite(1.hours)
     .build<String, JsonNode>()
 
 val cachedAlerts = Cache.Builder()
