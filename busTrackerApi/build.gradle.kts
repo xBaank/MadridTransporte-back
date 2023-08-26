@@ -29,7 +29,7 @@ dependencies {
     //arrow kt
     implementation("io.arrow-kt:arrow-core:1.1.5")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
-    implementation("io.github.xbaank:simpleJson-core:2.1.3")
+    implementation("io.github.xbaank:simpleJson-core:3.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("io.github.reactivecircus.cache4k:cache4k:0.10.0")
     // https://mvnrepository.com/artifact/io.insert-koin/koin-ktor
