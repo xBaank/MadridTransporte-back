@@ -17,7 +17,7 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
             ?.getOrNull()
     if (description != null) shift<Nothing>(BusTrackerException.NotFound(description))
     val stopName = json["data"][0]["StopInfo"][0]["stopName"].asString().bindMap()
-    val coordinates = json["data"][0]["StopInfo"]["geometry"]["coordinates"].asArray().bindMap()
+    val coordinates = json["data"][0]["StopInfo"][0]["geometry"]["coordinates"].asArray().bindMap()
         .let { Coordinates(it[1].asDouble().bindMap(), it[0].asDouble().bindMap()) }
     val arrives = json["data"][0]["Arrive"].asArray().bindMap()
     val incidents = json["data"][0]["Incident"]["ListaIncident"]["data"].asArray().getOrNull()
