@@ -4,6 +4,7 @@ import arrow.core.continuations.either
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.routing.stops.Arrive
+import busTrackerApi.routing.stops.Coordinates
 import busTrackerApi.routing.stops.Incident
 import busTrackerApi.routing.stops.StopTimes
 import simpleJson.*
@@ -16,6 +17,8 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
             ?.getOrNull()
     if (description != null) shift<Nothing>(BusTrackerException.NotFound(description))
     val stopName = json["data"][0]["StopInfo"][0]["stopName"].asString().bindMap()
+    val coordinates = json["data"][0]["StopInfo"]["geometry"]["coordinates"].asArray().bindMap()
+        .let { Coordinates(it[1].asDouble().bindMap(), it[0].asDouble().bindMap()) }
     val arrives = json["data"][0]["Arrive"].asArray().bindMap()
     val incidents = json["data"][0]["Incident"]["ListaIncident"]["data"].asArray().getOrNull()
     val arrivesMapped = arrives.map {
@@ -39,5 +42,5 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
             url = it["moreInfo"]["@url"].asString().bindMap()
         )
     } ?: emptyList()
-    StopTimes(emtCodMode.toInt(), stopName, arrivesMapped, incidentsMapped)
+    StopTimes(emtCodMode.toInt(), stopName, coordinates, arrivesMapped, incidentsMapped)
 }

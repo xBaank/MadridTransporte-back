@@ -64,8 +64,8 @@ suspend fun getTimesResponse(stopCode: String) = either {
 
     if (stopTimes == null) shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
 
-    val result = parseStopTimesResponseToStopTimes(stopTimes)
-        .copy(stopName = getStopNameByStopCode(stopCode).bind())//We need this because names are not updated in the soap responses
+    val result = parseStopTimesResponseToStopTimes(stopTimes, getCoordinatesByStopCode(stopCode).bind())
+        .copy(stopName = getStopNameByStopCode(stopCode).bind()) //We need this because names differ from the static ones
         .let(::buildJson)
         .timed()
 
@@ -132,12 +132,31 @@ suspend fun getIdByStopCode(stopCode: String) = either {
         ?: shift<Nothing>(NotFound("Stop with stopCode $stopCode not found"))
 }
 
+suspend fun getStopCodeById(id: String) = either {
+    getAllStopsInfoResponse().bind().asArray().bindMap()
+        .firstOrNull { it["CODIGOEMPRESA"].asNumberOrString() == id }
+        ?.get("IDESTACION")?.asString()?.bindMap()
+        ?: shift<Nothing>(NotFound("Stop with id $id not found"))
+}
+
 suspend fun getStopNameById(id: String) = either {
     val stopCode = getAllStopsInfoResponse().bind().asArray().bindMap()
         .firstOrNull { it["CODIGOEMPRESA"].asNumberOrString() == id }
         ?.get("IDESTACION")?.asNumberOrString()
         ?: shift<Nothing>(NotFound("Stop with id $id not found"))
     getStopNameByStopCode(stopCode).bind()
+}
+
+suspend fun getCoordinatesByStopCode(id: String): Either<BusTrackerException, Coordinates> = either {
+    getAllStopsResponse().bind().asArray().bindMap()
+        .firstOrNull { it["full_stop_code"].asNumberOrString() == id }
+        ?.let {
+            Coordinates(
+                it["stop_lat"].asNumberOrString().toDouble(),
+                it["stop_lon"].asNumberOrString().toDouble()
+            )
+        }
+        ?: shift<Nothing>(NotFound("Stop with id $id not found"))
 }
 
 suspend fun getStopNameByStopCode(id: String) = either {

@@ -5,10 +5,7 @@ import arrow.core.getOrElse
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
-import busTrackerApi.routing.stops.TimedCachedValue
-import busTrackerApi.routing.stops.buildJson
-import busTrackerApi.routing.stops.getStopNameById
-import busTrackerApi.routing.stops.timed
+import busTrackerApi.routing.stops.*
 import io.github.reactivecircus.cache4k.Cache
 import okhttp3.HttpUrl
 import okhttp3.Request
@@ -54,6 +51,8 @@ suspend fun getTimesByQueryCached(id: String, codMode: String) = either {
 
 suspend fun getTimesBase(id: String, codMode: String) = either {
     val response = getMetroTimesResponse(id)
+    val stopCode = getStopCodeById(id).bind()
+    val coordinates = getCoordinatesByStopCode(stopCode).bind()
 
     response.use {
         if (it.code == 404) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
@@ -69,7 +68,7 @@ suspend fun getTimesBase(id: String, codMode: String) = either {
             .asArray()
             .getOrElse { jArray() }
 
-        parseMetroToStopTimes(json, codMode)
+        parseMetroToStopTimes(json, codMode, coordinates)
             .bindMap()
             .copy(stopName = getStopNameById(id).bind()) //When no times are available, the stop name is not returned, so we need to get it from the stops list
             .let(::buildJson)

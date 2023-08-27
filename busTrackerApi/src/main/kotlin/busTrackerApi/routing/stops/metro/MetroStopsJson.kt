@@ -2,14 +2,15 @@ package busTrackerApi.routing.stops.metro
 
 import arrow.core.continuations.either
 import busTrackerApi.routing.stops.Arrive
+import busTrackerApi.routing.stops.Coordinates
 import busTrackerApi.routing.stops.StopTimes
 import simpleJson.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-suspend fun parseMetroToStopTimes(json: JsonNode, codMode: String) = either {
+suspend fun parseMetroToStopTimes(json: JsonNode, codMode: String, coordinates: Coordinates) = either {
     val arrives = json.asArray().bind()
-    if (arrives.isEmpty()) return@either StopTimes(codMode.toInt(), "", emptyList(), emptyList())
+    if (arrives.isEmpty()) return@either StopTimes(codMode.toInt(), "", coordinates, emptyList(), emptyList())
     val stopName = arrives[0]["nombreest"].asString().bind()
 
     val arrivesMapped = arrives.flatMap { arrive ->
@@ -39,5 +40,5 @@ suspend fun parseMetroToStopTimes(json: JsonNode, codMode: String) = either {
         listOf(first, second).filter { it.estimatedArrive != -1L }
     }
 
-    StopTimes(codMode.toInt(), stopName, arrivesMapped, emptyList())
+    StopTimes(codMode.toInt(), stopName, coordinates, arrivesMapped, emptyList())
 }

@@ -9,7 +9,7 @@ import simpleJson.asJson
 import simpleJson.jArray
 import simpleJson.jObject
 
-fun parseStopTimesResponseToStopTimes(response: StopTimesResponse): StopTimes {
+fun parseStopTimesResponseToStopTimes(response: StopTimesResponse, coordinates: Coordinates): StopTimes {
     val stopName = response.stopTimes.stop.name
     val arrives = response.stopTimes.times.time.map {
         Arrive(
@@ -20,7 +20,7 @@ fun parseStopTimesResponseToStopTimes(response: StopTimesResponse): StopTimes {
         )
     }
 
-    return StopTimes(busCodMode.toInt(), stopName, arrives.sortedBy { it.line.toIntOrNull() }, emptyList())
+    return StopTimes(busCodMode.toInt(), stopName, coordinates, arrives.sortedBy { it.line.toIntOrNull() }, emptyList())
 }
 
 

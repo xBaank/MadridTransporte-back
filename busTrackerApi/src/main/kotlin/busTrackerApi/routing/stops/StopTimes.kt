@@ -3,6 +3,7 @@ package busTrackerApi.routing.stops
 data class StopTimes(
     val codMode: Int,
     val stopName: String,
+    val coordinates: Coordinates,
     val arrives: List<Arrive>,
     val incidents: List<Incident>
 )
@@ -23,6 +24,11 @@ data class Incident(
     val cause: String,
     val effect: String,
     val url: String,
+)
+
+data class Coordinates(
+    val latitude: Double,
+    val longitude: Double,
 )
 
 
