@@ -38,6 +38,10 @@ fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
 fun buildJson(stopTimes: StopTimes) = jObject {
     "codMode" += stopTimes.codMode
     "stopName" += stopTimes.stopName
+    "coordinates" += jObject {
+        "latitude" += stopTimes.coordinates.latitude
+        "longitude" += stopTimes.coordinates.longitude
+    }
     val arrivesGroupedByLineAndDest = stopTimes.arrives.groupBy { Pair(it.line, it.destination) }
     "arrives" to jArray {
         arrivesGroupedByLineAndDest.forEach { arrive ->
