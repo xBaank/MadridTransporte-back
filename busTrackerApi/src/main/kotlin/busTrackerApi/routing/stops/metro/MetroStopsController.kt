@@ -11,12 +11,15 @@ import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response
 import ru.gildor.coroutines.okhttp.await
-import simpleJson.*
+import simpleJson.asArray
+import simpleJson.deserialized
+import simpleJson.get
+import simpleJson.jArray
 import kotlin.time.Duration.Companion.hours
 
 private val cache = Cache.Builder()
     .expireAfterWrite(1.hours)
-    .build<String, TimedCachedValue<JsonNode>>()
+    .build<String, TimedCachedValue<StopTimes>>()
 
 fun urlBuilder() = HttpUrl.Builder()
     .scheme("https")
@@ -71,6 +74,5 @@ suspend fun getTimesBase(id: String, codMode: String) = either {
         parseMetroToStopTimes(json, codMode, coordinates)
             .bindMap()
             .copy(stopName = getStopNameById(id).bind()) //When no times are available, the stop name is not returned, so we need to get it from the stops list
-            .let(::buildJson)
     }
 }

@@ -8,6 +8,7 @@ import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.post
 import busTrackerApi.routing.stops.TimedCachedValue
 import busTrackerApi.routing.stops.timed
+import busTrackerApi.utils.hourFormatter
 import io.github.reactivecircus.cache4k.Cache
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.JsonNode
@@ -23,7 +24,6 @@ private val trainTimesCache = Cache.Builder()
     .build<String, TimedCachedValue<JsonNode>>()
 
 private val outputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-private val hourFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private val timeZoneMadrid = TimeZone.getTimeZone("Europe/Madrid")
 
 private const val horariosUrl = "https://horarios.renfe.com/cer/HorariosServlet"

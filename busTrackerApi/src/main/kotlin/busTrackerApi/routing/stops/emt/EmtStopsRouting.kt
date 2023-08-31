@@ -2,7 +2,7 @@ package busTrackerApi.routing.stops.emt
 
 import arrow.core.getOrElse
 import busTrackerApi.extensions.handle
-import busTrackerApi.routing.stops.alertsConfigF
+import busTrackerApi.routing.stops.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.runBlocking
 
@@ -17,6 +17,7 @@ fun Route.emtStopsRouting() = route("/emt") {
     get("/{stopCode}/times/cached") {
         handle { getStopTimesCached() }
     }
+    subConfigF(emtCodMode) { getStopTimesResponse(it).map(TimedCachedValue<StopTimes>::value) }
 
     alertsConfigF(emtCodMode)
 }

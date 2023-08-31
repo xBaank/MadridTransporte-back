@@ -8,3 +8,8 @@ suspend fun <A> List<A>.onEachAsync(f: suspend (A) -> Unit) = coroutineScope {
     map { launch { f(it) } }.joinAll()
     this@onEachAsync
 }
+
+suspend fun <K, V> Map<K, V>.forEachAsync(f: suspend (Map.Entry<K, V>) -> Unit) = coroutineScope {
+    map { launch { f(it) } }.joinAll()
+    this@forEachAsync
+}

@@ -7,12 +7,11 @@ import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
 import busTrackerApi.extensions.post
+import busTrackerApi.routing.stops.StopTimes
 import busTrackerApi.routing.stops.TimedCachedValue
-import busTrackerApi.routing.stops.buildJson
 import busTrackerApi.routing.stops.timed
 import io.github.reactivecircus.cache4k.Cache
 import ru.gildor.coroutines.okhttp.await
-import simpleJson.JsonNode
 import simpleJson.deserialized
 import simpleJson.jObject
 import java.text.SimpleDateFormat
@@ -21,7 +20,7 @@ import kotlin.time.Duration.Companion.hours
 
 val stopTimesCache = Cache.Builder()
     .expireAfterWrite(1.hours)
-    .build<String, TimedCachedValue<JsonNode>>()
+    .build<String, TimedCachedValue<StopTimes>>()
 
 lateinit var currentLoginResponse: LoginResponse
 private val dateFormatter = SimpleDateFormat("yyyy-MM-dd")
@@ -67,7 +66,7 @@ suspend fun getStopTimesResponse(stopId: String) = either {
         if (!response.isSuccessful) shift<Nothing>(InternalServerError("EMT getStopTimes failed"))
         val body =
             response.body?.string()?.deserialized()?.bindMap() ?: shift<Nothing>(InternalServerError("Body is null"))
-        val result = parseEMTToStopTimes(body).bind().let(::buildJson).timed()
+        val result = parseEMTToStopTimes(body).bind().timed()
         stopTimesCache.put(stopId, result)
         return@either result
 

@@ -30,7 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 
 val stopTimesCache = Cache.Builder()
     .expireAfterWrite(1.hours)
-    .build<String, TimedCachedValue<JsonNode>>()
+    .build<String, TimedCachedValue<StopTimes>>()
 
 val allStopsCache = Cache.Builder()
     .build<String, JsonNode>()
@@ -66,7 +66,6 @@ suspend fun getTimesResponse(stopCode: String) = either {
 
     val result = parseStopTimesResponseToStopTimes(stopTimes, getCoordinatesByStopCode(stopCode).bind())
         .copy(stopName = getStopNameByStopCode(stopCode).bind()) //We need this because names differ from the static ones
-        .let(::buildJson)
         .timed()
 
     stopTimesCache.put(stopCode, result)
