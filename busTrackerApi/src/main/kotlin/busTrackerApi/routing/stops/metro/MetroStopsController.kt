@@ -43,7 +43,8 @@ suspend fun getMetroTimesResponse(id: String? = null): Response {
 }
 
 suspend fun getTimesByQuery(id: String, codMode: String) = either {
-    val response = getTimesBase(id, codMode).bind().timed()
+    val stationCode = getIdByStopCode(id).bind()
+    val response = getTimesBase(stationCode, codMode).bind().timed()
     cache.put(id, response)
     response
 }

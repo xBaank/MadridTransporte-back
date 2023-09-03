@@ -17,7 +17,9 @@ fun Route.emtStopsRouting() = route("/emt") {
     get("/{stopCode}/times/cached") {
         handle { getStopTimesCached() }
     }
-    subConfigF(emtCodMode) { getStopTimesResponse(it).map(TimedCachedValue<StopTimes>::value) }
+    subConfigF(emtCodMode) {
+        getStopTimesResponse(it).map(TimedCachedValue<StopTimes>::value)
+    }
 
     alertsConfigF(emtCodMode)
 }

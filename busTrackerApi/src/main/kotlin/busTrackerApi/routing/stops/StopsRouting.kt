@@ -24,14 +24,17 @@ val timesConfigF: Route.(codMode: String) -> Unit = { codMode ->
 
 val subConfigF: Route.(codMode: String, f: suspend (String) -> Either<BusTrackerException, StopTimes>) -> Unit =
     { codMode, f ->
-        post("/{stopCode}/times/subscribe") {
+        post("/times/subscribe") {
             handle { subscribeStopTime(codMode, f) }
         }
-        post("/{stopCode}/times/isSubscribed") {
-            handle { isSubscribed(codMode) }
+        post("/times/subscriptions") {
+            handle { getSubscriptions(codMode) }
         }
-        post("/{stopCode}/times/unsubscribe") {
+        post("/times/unsubscribe") {
             handle { unsubscribeStopTime(codMode) }
+        }
+        post("/times/unsubscribe/all") {
+            handle { unsubscribeAllStopTime(codMode) }
         }
     }
 

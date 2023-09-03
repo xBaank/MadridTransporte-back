@@ -22,6 +22,6 @@ private suspend fun getStopTimesBase(
 ) = either {
     val stopCode = createStopCode(emtCodMode, simpleStopCode.bind())
     checkStopExists(stopCode).bind()
-    val json = f(simpleStopCode.bind()).bind()
+    val json = f(stopCode).bind()
     ResponseJson(buildCachedJson(buildJson(json.value), json.createdAt.toEpochMilli()), HttpStatusCode.OK)
 }

@@ -10,6 +10,7 @@ import busTrackerApi.extensions.post
 import busTrackerApi.routing.stops.StopTimes
 import busTrackerApi.routing.stops.TimedCachedValue
 import busTrackerApi.routing.stops.timed
+import crtm.utils.getCodStopFromStopCode
 import io.github.reactivecircus.cache4k.Cache
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.deserialized
@@ -41,7 +42,8 @@ suspend fun login() = either {
     currentLoginResponse = parseLoginResponse(body).bindMap()
 }
 
-suspend fun getStopTimesResponse(stopId: String) = either {
+suspend fun getStopTimesResponse(stopCode: String) = either {
+    val stopId = getCodStopFromStopCode(stopCode)
     var tries = 3
     do {
         val url = "https://openapi.emtmadrid.es/v2/transport/busemtmad/stops/$stopId/arrives/"

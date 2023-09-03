@@ -14,10 +14,7 @@ import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
-import simpleJson.asString
-import simpleJson.deserialized
-import simpleJson.get
-import simpleJson.jObject
+import simpleJson.*
 
 
 suspend fun getAlertsByCodMode(codMode: String) = either {
@@ -54,22 +51,37 @@ suspend fun Call.subscribeStopTime(codMode: String, f: suspend (String) -> Eithe
         val body = call.receiveText().deserialized().bindMap()
         val deviceToken = body["deviceToken"].asString().bindMap()
         val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
-        subscribeDevice(deviceToken, stopCode) { f(stopCode) }
+        val line = body["line"].asString().bindMap()
+        subscribeLineDevice(deviceToken, stopCode, line, codMode) { f(stopCode) }
         ResponseRaw(HttpStatusCode.OK)
     }
 
-suspend fun Call.isSubscribed(codMode: String) = either {
+suspend fun Call.getSubscriptions(codMode: String) = either {
     val body = call.receiveText().deserialized().bindMap()
     val deviceToken = body["deviceToken"].asString().bindMap()
     val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
-    val isSubscribed = isSubscribed(deviceToken, stopCode)
-    ResponseJson(jObject { "isSubscribed" += isSubscribed }, HttpStatusCode.OK)
+    val subscription = getSubscriptionsByStopCode(deviceToken, stopCode) ?: shift<Nothing>(
+        BusTrackerException.NotFound("No subscriptions found for device $deviceToken and stop $stopCode")
+    )
+    ResponseJson(jObject {
+        "stopCode" += subscription.stopCode
+        "lines" += subscription.lines.map(String::asJson).asJson()
+        "codMode" += subscription.codMode.toInt()
+    }, HttpStatusCode.OK)
 }
 
 suspend fun Call.unsubscribeStopTime(codMode: String) = either {
     val body = call.receiveText().deserialized().bindMap()
     val deviceToken = body["deviceToken"].asString().bindMap()
     val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
-    unsubscribeDevice(deviceToken, stopCode)
+    val line = body["line"].asString().bindMap()
+    unsubscribeLineDevice(deviceToken, line, stopCode)
+    ResponseRaw(HttpStatusCode.OK)
+}
+
+suspend fun Call.unsubscribeAllStopTime(codMode: String) = either {
+    val body = call.receiveText().deserialized().bindMap()
+    val deviceToken = body["deviceToken"].asString().bindMap()
+    unsubscribeAllDevice(deviceToken)
     ResponseRaw(HttpStatusCode.OK)
 }

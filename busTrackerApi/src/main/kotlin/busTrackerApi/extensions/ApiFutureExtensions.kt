@@ -28,8 +28,5 @@ suspend fun <T> ApiFuture<T>.await(): T {
             }
         }
         ApiFutures.addCallback(this, callback, MoreExecutors.directExecutor())
-        cont.invokeOnCancellation {
-            cancel(false)
-        }
     }
 }
