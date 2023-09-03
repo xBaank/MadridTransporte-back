@@ -51,8 +51,7 @@ suspend fun Call.subscribeStopTime(codMode: String, f: suspend (String) -> Eithe
         val body = call.receiveText().deserialized().bindMap()
         val deviceToken = body["deviceToken"].asString().bindMap()
         val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
-        val line = body["line"].asString().bindMap()
-        subscribeLineDevice(deviceToken, stopCode, line, codMode) { f(stopCode) }
+        subscribeDevice(deviceToken, stopCode, codMode) { f(stopCode) }
         ResponseRaw(HttpStatusCode.OK)
     }
 
@@ -60,22 +59,15 @@ suspend fun Call.getSubscriptions(codMode: String) = either {
     val body = call.receiveText().deserialized().bindMap()
     val deviceToken = body["deviceToken"].asString().bindMap()
     val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
-    val subscription = getSubscriptionsByStopCode(deviceToken, stopCode) ?: shift<Nothing>(
-        BusTrackerException.NotFound("No subscriptions found for device $deviceToken and stop $stopCode")
-    )
-    ResponseJson(jObject {
-        "stopCode" += subscription.stopCode
-        "lines" += subscription.lines.map(String::asJson).asJson()
-        "codMode" += subscription.codMode.toInt()
-    }, HttpStatusCode.OK)
+    val stopCodes = getSubscriptionsByStopCode(deviceToken, stopCode).map { it.stopCode.asJson() }
+    ResponseJson(stopCodes.asJson(), HttpStatusCode.OK)
 }
 
 suspend fun Call.unsubscribeStopTime(codMode: String) = either {
     val body = call.receiveText().deserialized().bindMap()
     val deviceToken = body["deviceToken"].asString().bindMap()
     val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
-    val line = body["line"].asString().bindMap()
-    unsubscribeLineDevice(deviceToken, line, stopCode)
+    unsubscribeDevice(deviceToken, stopCode)
     ResponseRaw(HttpStatusCode.OK)
 }
 
