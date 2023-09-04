@@ -69,7 +69,7 @@ suspend fun getEmtStopTimesResponse(stopCode: String) = either {
         val body =
             response.body?.string()?.deserialized()?.bindMap() ?: shift<Nothing>(InternalServerError("Body is null"))
         val result = parseEMTToStopTimes(body).bind().timed()
-        stopTimesCache.put(stopId, result)
+        stopTimesCache.put(stopCode, result)
         return@either result
 
     } while (tries > 0)

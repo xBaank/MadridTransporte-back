@@ -14,6 +14,7 @@ val httpClient = OkHttpClient.Builder()
     .build()
 
 fun setupFirebase() {
+    if (FirebaseApp.getApps().isNotEmpty()) return
     val options: FirebaseOptions = FirebaseOptions.builder()
         .setCredentials(GoogleCredentials.getApplicationDefault())
         .build()

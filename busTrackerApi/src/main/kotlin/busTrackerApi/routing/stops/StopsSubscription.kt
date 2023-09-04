@@ -32,7 +32,7 @@ val subscribedDevices = mutableListOf<StopsSubscription>()
 private suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, StopTimesF> = either {
     when (codMode) {
         metroCodMode -> {
-            { getMetroTimesResponse(it, metroCodMode).map(TimedCachedValue<StopTimes>::value) }
+            { getMetroTimesResponse(it, codMode).map(TimedCachedValue<StopTimes>::value) }
         }
 
         busCodMode -> {

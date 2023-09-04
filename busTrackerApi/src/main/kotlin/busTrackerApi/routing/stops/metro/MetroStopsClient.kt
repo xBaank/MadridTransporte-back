@@ -15,7 +15,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 
 suspend fun Call.getMetroTimes(codMode: String) =
-    getMetroTimesBase(::busTrackerApi.routing.stops.metro.getMetroTimesResponse, codMode, call.parameters.getWrapped("stopCode"))
+    getMetroTimesBase(::getMetroTimesResponse, codMode, call.parameters.getWrapped("stopCode"))
 
 suspend fun Call.getMetroTimesCached(codMode: String) =
     getMetroTimesBase(::getMetroTimesResponseCached, codMode, call.parameters.getWrapped("stopCode"))
