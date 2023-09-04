@@ -1,5 +1,7 @@
 package busTrackerApi.config
 
+import arrow.core.continuations.either
+import busTrackerApi.utils.getenvWrapped
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
@@ -13,10 +15,14 @@ val httpClient = OkHttpClient.Builder()
     .readTimeout(20.seconds.toJavaDuration())
     .build()
 
-fun setupFirebase() {
-    if (FirebaseApp.getApps().isNotEmpty()) return
+fun setupFirebase() = either.eager {
+    if (FirebaseApp.getApps().isNotEmpty()) return@eager
     val options: FirebaseOptions = FirebaseOptions.builder()
-        .setCredentials(GoogleCredentials.getApplicationDefault())
+        .setCredentials(
+            GoogleCredentials.fromStream(
+                getenvWrapped("SERVICE_JSON").bind().byteInputStream()
+            )
+        )
         .build()
 
     FirebaseApp.initializeApp(options)

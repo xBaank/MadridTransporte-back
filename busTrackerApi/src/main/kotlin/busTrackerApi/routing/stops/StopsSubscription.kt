@@ -10,6 +10,7 @@ import busTrackerApi.routing.stops.emt.emtCodMode
 import busTrackerApi.routing.stops.emt.getEmtStopTimesResponse
 import busTrackerApi.routing.stops.metro.getMetroTimesResponse
 import busTrackerApi.routing.stops.metro.metroCodMode
+import com.google.firebase.cloud.FirestoreClient
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import kotlinx.coroutines.*
@@ -28,6 +29,8 @@ data class StopsSubscription(
 
 val mutex = Mutex()
 val subscribedDevices = mutableListOf<StopsSubscription>()
+private val collection by lazy { FirestoreClient.getFirestore().collection("subscribers") }
+
 
 private suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, StopTimesF> = either {
     when (codMode) {

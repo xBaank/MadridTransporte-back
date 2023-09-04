@@ -1,5 +1,6 @@
 package busTrackerApi
 
+import arrow.core.getOrElse
 import busTrackerApi.config.configureRoutingV1
 import busTrackerApi.config.setupFirebase
 import busTrackerApi.routing.stops.notifyStopTimesOnBackground
@@ -32,7 +33,7 @@ fun Application.startUp() {
         anyHost()
     }
     install(CachingHeaders)
-    setupFirebase()
+    setupFirebase().getOrElse { throw it }
     notifyStopTimesOnBackground()
     configureRoutingV1()
 }
