@@ -10,11 +10,12 @@ import busTrackerApi.routing.Response.ResponseRaw
 import busTrackerApi.utils.Call
 import crtm.utils.createStopCode
 import io.ktor.http.*
-import io.ktor.http.content.*
 import io.ktor.server.application.*
-import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
-import simpleJson.*
+import simpleJson.asJson
+import simpleJson.asString
+import simpleJson.deserialized
+import simpleJson.get
 
 
 suspend fun getAlertsByCodMode(codMode: String) = either {
@@ -28,7 +29,7 @@ suspend fun Call.getAllStops() = either {
 }
 
 suspend fun Call.getStopTimes(codMode: String) =
-    getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getTimesResponse)
+    getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getBusTimesResponse)
 
 suspend fun Call.getStopTimesCached(codMode: String) =
     getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getTimesResponseCached)
@@ -45,12 +46,12 @@ private suspend fun getStopTimesBase(
     ResponseJson(json, HttpStatusCode.OK)
 }
 
-suspend fun Call.subscribeStopTime(codMode: String, f: suspend (String) -> Either<BusTrackerException, StopTimes>) =
+suspend fun Call.subscribeStopTime(codMode: String) =
     either {
         val body = call.receiveText().deserialized().bindMap()
         val deviceToken = body["deviceToken"].asString().bindMap()
         val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
-        subscribeDevice(deviceToken = deviceToken, stopId = stopCode, codMode = codMode) { f(stopCode) }
+        subscribeDevice(deviceToken = deviceToken, stopId = stopCode, codMode = codMode)
         ResponseRaw(HttpStatusCode.OK)
     }
 
@@ -58,7 +59,8 @@ suspend fun Call.getSubscriptions(codMode: String) = either {
     val body = call.receiveText().deserialized().bindMap()
     val deviceToken = body["deviceToken"].asString().bindMap()
     val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
-    val stopCodes = getSubscriptionsByStopCode(deviceToken = deviceToken, stopCode = stopCode).map { it.stopCode.asJson() }
+    val stopCodes =
+        getSubscriptionsByStopCode(deviceToken = deviceToken, stopCode = stopCode).map { it.stopCode.asJson() }
     ResponseJson(stopCodes.asJson(), HttpStatusCode.OK)
 }
 

@@ -54,7 +54,7 @@ private fun getStopTimesResponse(stopCode: String) = Either.catch {
     defaultClient.getStopTimes(request)
 }.mapLeft(mapExceptionsF)
 
-suspend fun getTimesResponse(stopCode: String) = either {
+suspend fun getBusTimesResponse(stopCode: String) = either {
     val stopTimes = withTimeoutOrNull(timeoutSeconds) {
         CoroutineScope(Dispatchers.IO)
             .async { getStopTimesResponse(stopCode) }

@@ -42,14 +42,14 @@ suspend fun getMetroTimesResponse(id: String? = null): Response {
     return httpClient.newCall(request).await()
 }
 
-suspend fun getTimesByQuery(id: String, codMode: String) = either {
+suspend fun getMetroTimesResponse(id: String, codMode: String) = either {
     val stationCode = getIdByStopCode(id).bind()
     val response = getTimesBase(stationCode, codMode).bind().timed()
     cache.put(id, response)
     response
 }
 
-suspend fun getTimesByQueryCached(id: String, codMode: String) = either {
+suspend fun getMetroTimesResponseCached(id: String, codMode: String) = either {
     cache.get(id) ?: shift<Nothing>(BusTrackerException.NotFound("No stops found for query $id"))
 }
 

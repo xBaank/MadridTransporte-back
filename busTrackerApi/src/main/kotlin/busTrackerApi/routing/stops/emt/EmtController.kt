@@ -42,7 +42,7 @@ suspend fun login() = either {
     currentLoginResponse = parseLoginResponse(body).bindMap()
 }
 
-suspend fun getStopTimesResponse(stopCode: String) = either {
+suspend fun getEmtStopTimesResponse(stopCode: String) = either {
     val stopId = getCodStopFromStopCode(stopCode)
     var tries = 3
     do {

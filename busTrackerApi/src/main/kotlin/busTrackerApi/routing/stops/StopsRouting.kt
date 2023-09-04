@@ -1,7 +1,5 @@
 package busTrackerApi.routing.stops
 
-import arrow.core.Either
-import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.handle
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -27,10 +25,10 @@ val timesConfigF: Route.(codMode: String) -> Unit = { codMode ->
     }
 }
 
-val subConfigF: Route.(codMode: String, f: suspend (String) -> Either<BusTrackerException, StopTimes>) -> Unit =
-    { codMode, f ->
+val subConfigF: Route.(codMode: String) -> Unit =
+    { codMode ->
         post("/times/subscribe") {
-            handle { subscribeStopTime(codMode, f) }
+            handle { subscribeStopTime(codMode) }
         }
         post("/times/subscriptions") {
             handle { getSubscriptions(codMode) }

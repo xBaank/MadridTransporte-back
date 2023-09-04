@@ -11,7 +11,7 @@ import crtm.utils.createStopCode
 import io.ktor.http.*
 import io.ktor.server.application.*
 
-suspend fun Call.getStopTimes() = getStopTimesBase(::getStopTimesResponse, call.parameters.getWrapped("stopCode"))
+suspend fun Call.getStopTimes() = getStopTimesBase(::getEmtStopTimesResponse, call.parameters.getWrapped("stopCode"))
 
 suspend fun Call.getStopTimesCached() =
     getStopTimesBase(::getStopTimesResponseCached, call.parameters.getWrapped("stopCode"))
