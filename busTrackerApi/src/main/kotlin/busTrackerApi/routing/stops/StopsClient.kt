@@ -12,10 +12,7 @@ import crtm.utils.createStopCode
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
-import simpleJson.asJson
-import simpleJson.asString
-import simpleJson.deserialized
-import simpleJson.get
+import simpleJson.*
 
 
 suspend fun getAlertsByCodMode(codMode: String) = either {
@@ -61,7 +58,10 @@ suspend fun Call.getSubscriptions(codMode: String) = either {
     val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
     val stopCodes =
         getSubscriptionsByStopCode(deviceToken = deviceToken, stopCode = stopCode).map { it.stopCode.asJson() }
-    ResponseJson(stopCodes.asJson(), HttpStatusCode.OK)
+    ResponseJson(jObject {
+        "stopCodes" += stopCodes.asJson()
+        "codMode" += codMode.toInt().asJson()
+    }, HttpStatusCode.OK)
 }
 
 suspend fun Call.unsubscribeStopTime(codMode: String) = either {

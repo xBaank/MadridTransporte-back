@@ -10,6 +10,7 @@ import busTrackerApi.routing.stops.emt.emtCodMode
 import busTrackerApi.routing.stops.emt.getEmtStopTimesResponse
 import busTrackerApi.routing.stops.metro.getMetroTimesResponse
 import busTrackerApi.routing.stops.metro.metroCodMode
+import com.google.cloud.firestore.Filter
 import com.google.firebase.cloud.FirestoreClient
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
@@ -17,18 +18,18 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import simpleJson.serialized
+import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 private typealias StopTimesF = suspend (String) -> Either<BusTrackerException, StopTimes>
 
 data class StopsSubscription(
-    val deviceTokens: MutableList<String>,
-    val stopCode: String,
-    val codMode: String
+    val deviceTokens: MutableList<String> = mutableListOf(),
+    val stopCode: String = "",
+    val codMode: String = "",
 )
 
 val mutex = Mutex()
-val subscribedDevices = mutableListOf<StopsSubscription>()
 private val collection by lazy { FirestoreClient.getFirestore().collection("subscribers") }
 
 
@@ -52,35 +53,52 @@ private suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerExce
     }
 }
 
-suspend fun unsubscribeDevice(deviceToken: String, stopCode: String) =
-    subscribedDevices.filter { it.deviceTokens.contains(deviceToken) && it.stopCode == stopCode }
-        .forEachAsync { it.deviceTokens -= deviceToken }
+suspend fun unsubscribeDevice(deviceToken: String, stopCode: String) {
+    collection.where(Filter.arrayContains("deviceTokens", deviceToken)).whereEqualTo("stopCode", stopCode).get().await()
+        .documents.forEachAsync { it.reference.delete().await() }
+}
 
 suspend fun unsubscribeAllDevice(deviceToken: String) {
-    subscribedDevices.forEachAsync { subscription ->
-        if (deviceToken in subscription.deviceTokens)
-            subscription.deviceTokens -= deviceToken
-
+    collection.where(Filter.arrayContains("deviceTokens", deviceToken)).get().await().documents.forEachAsync {
+        it.reference.delete().await()
     }
 }
 
-fun getSubscriptionsByStopCode(deviceToken: String, stopCode: String) =
-    subscribedDevices.filter { deviceToken in it.deviceTokens && it.stopCode == stopCode }
+suspend fun getSubscriptionsByStopCode(deviceToken: String, stopCode: String) =
+    collection.whereEqualTo("stopCode", stopCode).whereArrayContains("deviceTokens", deviceToken).get().await()
+        .documents.map { it.toObject(StopsSubscription::class.java) }
 
 suspend fun subscribeDevice(
     deviceToken: String,
     stopId: String,
     codMode: String
 ) = either {
-    val subscription = subscribedDevices.find { it.stopCode == stopId && it.codMode == codMode }
-    if (subscription != null && deviceToken in subscription.deviceTokens) shift<Nothing>(BusTrackerException.Conflict("Device already subscribed"))
-    if (subscription != null) mutex.withLock { subscription.deviceTokens += deviceToken }
-    if (subscription == null) mutex.withLock {
-        subscribedDevices += StopsSubscription(
-            mutableListOf(deviceToken),
-            stopId,
-            codMode
+    mutex.withLock {
+        val subscription = collection
+            .whereEqualTo("stopCode", stopId)
+            .whereEqualTo("codMode", codMode)
+            .get()
+            .await()
+            .documents
+            .firstOrNull()
+            ?.toObject(StopsSubscription::class.java)
+        if (subscription != null && deviceToken in subscription.deviceTokens) shift<Nothing>(
+            BusTrackerException.Conflict(
+                "Device already subscribed"
+            )
         )
+        if (subscription != null) {
+            subscription.deviceTokens += deviceToken
+            collection.document(subscription.stopCode).set(subscription).await()
+        }
+        if (subscription == null) {
+            val newSubscription = StopsSubscription(
+                deviceTokens = mutableListOf(deviceToken),
+                stopCode = stopId,
+                codMode = codMode
+            )
+            collection.document(newSubscription.stopCode).set(newSubscription).await()
+        }
     }
 }
 
@@ -88,7 +106,8 @@ fun notifyStopTimesOnBackground() {
     val coroutine = CoroutineScope(Dispatchers.IO)
     coroutine.launch {
         while (isActive) {
-            subscribedDevices.forEachAsync { subscription ->
+            collection.get().await().documents.forEachAsync {
+                val subscription = it.toObject(StopsSubscription::class.java)
                 try {
                     val function = getFunctionByCodMode(subscription.codMode).getOrNull() ?: return@forEachAsync
                     val stopTimes = function(subscription.stopCode).getOrNull() ?: return@forEachAsync
