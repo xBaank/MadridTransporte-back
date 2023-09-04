@@ -7,6 +7,7 @@ import busTrackerApi.extensions.await
 import busTrackerApi.extensions.forEachAsync
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
+import com.google.firebase.messaging.WebpushConfig
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -57,10 +58,13 @@ fun notifyStopTimesOnBackground() {
             subscribedDevices.forEachAsync { subscription ->
                 try {
                     val stopTimes = subscription.f(subscription.stopCode).getOrNull() ?: return@forEachAsync
-                    val message = Message.builder()
-                        .putData("stopTimes", buildJson(stopTimes).serialized())
-                        .build()
-                    FirebaseMessaging.getInstance().sendAsync(message).await()
+                    val messages = subscription.deviceTokens.map {
+                        Message.builder()
+                            .putData("stopTimes", buildJson(stopTimes).serialized())
+                            .setToken(it)
+                            .build()
+                    }
+                    messages.forEachAsync { FirebaseMessaging.getInstance().sendAsync(it).await() }
                 }
                 catch (e: Exception) {
                     println(e)

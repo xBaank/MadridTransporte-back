@@ -11,6 +11,7 @@ import io.ktor.server.routing.*
 
 fun Route.stopsRouting() {
     get("/all") {
+        call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
         handle { getAllStops() }
     }
 }

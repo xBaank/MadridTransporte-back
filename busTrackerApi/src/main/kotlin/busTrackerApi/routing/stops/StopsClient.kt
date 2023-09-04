@@ -24,7 +24,6 @@ suspend fun getAlertsByCodMode(codMode: String) = either {
 
 suspend fun Call.getAllStops() = either {
     val stops = getAllStopsResponse().bind()
-    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
     ResponseJson(stops, HttpStatusCode.OK)
 }
 
@@ -51,7 +50,7 @@ suspend fun Call.subscribeStopTime(codMode: String, f: suspend (String) -> Eithe
         val body = call.receiveText().deserialized().bindMap()
         val deviceToken = body["deviceToken"].asString().bindMap()
         val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
-        subscribeDevice(deviceToken, stopCode, codMode) { f(stopCode) }
+        subscribeDevice(deviceToken = deviceToken, stopId = stopCode, codMode = codMode) { f(stopCode) }
         ResponseRaw(HttpStatusCode.OK)
     }
 
@@ -59,7 +58,7 @@ suspend fun Call.getSubscriptions(codMode: String) = either {
     val body = call.receiveText().deserialized().bindMap()
     val deviceToken = body["deviceToken"].asString().bindMap()
     val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
-    val stopCodes = getSubscriptionsByStopCode(deviceToken, stopCode).map { it.stopCode.asJson() }
+    val stopCodes = getSubscriptionsByStopCode(deviceToken = deviceToken, stopCode = stopCode).map { it.stopCode.asJson() }
     ResponseJson(stopCodes.asJson(), HttpStatusCode.OK)
 }
 
