@@ -20,7 +20,14 @@ fun parseStopTimesResponseToStopTimes(response: StopTimesResponse, coordinates: 
         )
     }
 
-    return StopTimes(busCodMode.toInt(), stopName, coordinates, arrives.sortedBy { it.line.toIntOrNull() }, emptyList())
+    return StopTimes(
+        busCodMode.toInt(),
+        stopName,
+        coordinates,
+        arrives.sortedBy { it.line.toIntOrNull() },
+        emptyList(),
+        response.stopTimes.stop.codStop
+    )
 }
 
 
@@ -38,6 +45,8 @@ fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
 fun buildJson(stopTimes: StopTimes) = jObject {
     "codMode" += stopTimes.codMode
     "stopName" += stopTimes.stopName
+    "simpleStopCode" += stopTimes.simpleStopCode
+    "stopCode" += stopTimes.stopCode
     "coordinates" += jObject {
         "latitude" += stopTimes.coordinates.latitude
         "longitude" += stopTimes.coordinates.longitude

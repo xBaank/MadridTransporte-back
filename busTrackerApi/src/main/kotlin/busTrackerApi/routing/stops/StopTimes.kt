@@ -5,7 +5,9 @@ data class StopTimes(
     val stopName: String,
     val coordinates: Coordinates,
     val arrives: List<Arrive>,
-    val incidents: List<Incident>
+    val incidents: List<Incident>,
+    val simpleStopCode: String,
+    val stopCode: String = "${codMode}_${simpleStopCode}",
 )
 
 data class Arrive(

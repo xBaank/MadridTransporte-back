@@ -25,6 +25,7 @@ private typealias StopTimesF = suspend (String) -> Either<BusTrackerException, S
 
 data class StopsSubscription(
     val deviceTokens: MutableList<String> = mutableListOf(),
+    val linesByDeviceToken: MutableMap<String, List<String>> = mutableMapOf(),
     val stopCode: String = "",
     val codMode: String = "",
 )
@@ -55,12 +56,20 @@ private suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerExce
 
 suspend fun unsubscribeDevice(deviceToken: String, stopCode: String) {
     collection.where(Filter.arrayContains("deviceTokens", deviceToken)).whereEqualTo("stopCode", stopCode).get().await()
-        .documents.forEachAsync { it.reference.delete().await() }
+        .documents.forEachAsync {
+            val subscription = it.toObject(StopsSubscription::class.java)
+            subscription.deviceTokens -= deviceToken
+            if (subscription.deviceTokens.isEmpty()) it.reference.delete().await()
+            else it.reference.set(subscription).await()
+        }
 }
 
 suspend fun unsubscribeAllDevice(deviceToken: String) {
     collection.where(Filter.arrayContains("deviceTokens", deviceToken)).get().await().documents.forEachAsync {
-        it.reference.delete().await()
+        val subscription = it.toObject(StopsSubscription::class.java)
+        subscription.deviceTokens -= deviceToken
+        if (subscription.deviceTokens.isEmpty()) it.reference.delete().await()
+        else it.reference.set(subscription).await()
     }
 }
 
