@@ -23,11 +23,13 @@ import kotlin.time.Duration.Companion.minutes
 
 private typealias StopTimesF = suspend (String) -> Either<BusTrackerException, StopTimes>
 
+data class LineDestination(val line: String = "", val destination: String = "", val codMode: Int = 0)
 data class StopsSubscription(
     val deviceTokens: MutableList<String> = mutableListOf(),
-    val linesByDeviceToken: MutableMap<String, List<String>> = mutableMapOf(),
+    val linesByDeviceToken: MutableMap<String, List<LineDestination>> = mutableMapOf(),
     val stopCode: String = "",
     val codMode: String = "",
+    val stopName: String = ""
 )
 
 val mutex = Mutex()
@@ -54,11 +56,14 @@ private suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerExce
     }
 }
 
-suspend fun unsubscribeDevice(deviceToken: String, stopCode: String) {
+suspend fun unsubscribeDevice(deviceToken: String, stopCode: String, lineDestination: LineDestination) {
     collection.where(Filter.arrayContains("deviceTokens", deviceToken)).whereEqualTo("stopCode", stopCode).get().await()
         .documents.forEachAsync {
             val subscription = it.toObject(StopsSubscription::class.java)
             subscription.deviceTokens -= deviceToken
+            subscription.linesByDeviceToken[deviceToken] = subscription.linesByDeviceToken[deviceToken]?.filter {
+                it != lineDestination
+            } ?: emptyList()
             if (subscription.deviceTokens.isEmpty()) it.reference.delete().await()
             else it.reference.set(subscription).await()
         }
@@ -73,13 +78,28 @@ suspend fun unsubscribeAllDevice(deviceToken: String) {
     }
 }
 
-suspend fun getSubscriptionsByStopCode(deviceToken: String, stopCode: String) =
-    collection.whereEqualTo("stopCode", stopCode).whereArrayContains("deviceTokens", deviceToken).get().await()
-        .documents.map { it.toObject(StopsSubscription::class.java) }
+suspend fun getSubscriptions(deviceToken: String) = collection
+    .whereArrayContains("deviceTokens", deviceToken)
+    .get().await()
+    .documents
+    .map { it.toObject(StopsSubscription::class.java) }
+
+suspend fun getSubscription(deviceToken: String, stopCode: String) = either {
+    collection
+        .whereArrayContains("deviceTokens", deviceToken)
+        .whereEqualTo("stopCode", stopCode)
+        .get().await()
+        .documents
+        .map { it.toObject(StopsSubscription::class.java) }
+        .firstOrNull()
+        ?: shift(BusTrackerException.NotFound("Subscription not found"))
+}
+
 
 suspend fun subscribeDevice(
     deviceToken: String,
     stopId: String,
+    lineDestination: LineDestination,
     codMode: String
 ) = either {
     mutex.withLock {
@@ -91,20 +111,25 @@ suspend fun subscribeDevice(
             .documents
             .firstOrNull()
             ?.toObject(StopsSubscription::class.java)
-        if (subscription != null && deviceToken in subscription.deviceTokens) shift<Nothing>(
-            BusTrackerException.Conflict(
-                "Device already subscribed"
-            )
-        )
+        if (subscription != null
+            &&
+            deviceToken in subscription.deviceTokens
+            &&
+            subscription.linesByDeviceToken[deviceToken]?.contains(lineDestination) == true
+        ) shift<Nothing>(BusTrackerException.Conflict("Device already subscribed"))
         if (subscription != null) {
             subscription.deviceTokens += deviceToken
+            subscription.linesByDeviceToken[deviceToken] =
+                subscription.linesByDeviceToken[deviceToken]?.plus(lineDestination) ?: listOf(lineDestination)
             collection.document(subscription.stopCode).set(subscription).await()
         }
         if (subscription == null) {
             val newSubscription = StopsSubscription(
                 deviceTokens = mutableListOf(deviceToken),
+                linesByDeviceToken = mutableMapOf(deviceToken to listOf(lineDestination)),
                 stopCode = stopId,
-                codMode = codMode
+                codMode = codMode,
+                stopName = getStopNameByStopCode(stopId).bind()
             )
             collection.document(newSubscription.stopCode).set(newSubscription).await()
         }
@@ -112,7 +137,7 @@ suspend fun subscribeDevice(
 }
 
 fun notifyStopTimesOnBackground() {
-    val coroutine = CoroutineScope(Dispatchers.IO)
+    val coroutine = CoroutineScope(Dispatchers.Default)
     coroutine.launch {
         while (isActive) {
             collection.get().await().documents.forEachAsync {
@@ -121,8 +146,15 @@ fun notifyStopTimesOnBackground() {
                     val function = getFunctionByCodMode(subscription.codMode).getOrNull() ?: return@forEachAsync
                     val stopTimes = function(subscription.stopCode).getOrNull() ?: return@forEachAsync
                     val messages = subscription.deviceTokens.map {
+                        val selectedTimes = stopTimes.copy(
+                            arrives = stopTimes.arrives.filter { arrive ->
+                                subscription.linesByDeviceToken[it]?.any { lineDestination ->
+                                    lineDestination.line == arrive.line && lineDestination.destination == arrive.destination
+                                } == true
+                            }
+                        )
                         Message.builder()
-                            .putData("stopTimes", buildJson(stopTimes).serialized())
+                            .putData("stopTimes", buildJson(selectedTimes).serialized())
                             .setToken(it)
                             .build()
                     }

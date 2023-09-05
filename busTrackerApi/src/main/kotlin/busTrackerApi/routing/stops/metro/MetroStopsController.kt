@@ -65,7 +65,9 @@ suspend fun getTimesBase(id: String, codMode: String) = either {
                 "Internal server error"
             )
         )
-        val body = it.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
+        val body = it
+            .body
+            .use { it?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response")) }
 
         val json = body.deserialized()
             .get("Vtelindicadores")

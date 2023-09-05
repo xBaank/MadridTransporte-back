@@ -12,6 +12,9 @@ fun Route.stopsRouting() {
         call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
         handle { getAllStops() }
     }
+    post("/times/subscriptions") {
+        handle { getAllSubscriptions() }
+    }
 }
 
 val timesConfigF: Route.(codMode: String) -> Unit = { codMode ->
@@ -30,8 +33,8 @@ val subConfigF: Route.(codMode: String) -> Unit =
         post("/times/subscribe") {
             handle { subscribeStopTime(codMode) }
         }
-        post("/times/subscriptions") {
-            handle { getSubscriptions(codMode) }
+        post("/times/subscription") {
+            handle { getSubscription(codMode) }
         }
         post("/times/unsubscribe") {
             handle { unsubscribeStopTime(codMode) }

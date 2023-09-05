@@ -79,6 +79,21 @@ fun buildJson(stopTimes: StopTimes) = jObject {
     }
 }
 
+fun buildSubscription(subscription: StopsSubscription, deviceToken: String) = jObject {
+    "stopCode" += subscription.stopCode.asJson()
+    "codMode" += subscription.codMode.toInt().asJson()
+    "stopName" += subscription.stopName.asJson()
+    "linesDestinations" += jArray {
+        subscription.linesByDeviceToken[deviceToken]?.forEach {
+            addObject {
+                "line" += it.line.asJson()
+                "destination" += it.destination.asJson()
+                "codMode" += it.codMode.asJson()
+            }
+        }
+    }
+}
+
 fun buildCachedJson(json: JsonNode, createdAt: Long) = jObject {
     "data" += json
     "lastTime" += createdAt
