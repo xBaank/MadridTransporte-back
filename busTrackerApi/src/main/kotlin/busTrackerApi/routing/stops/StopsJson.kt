@@ -26,7 +26,7 @@ fun parseStopTimesResponseToStopTimes(response: StopTimesResponse, coordinates: 
         coordinates,
         arrives.sortedBy { it.line.toIntOrNull() },
         emptyList(),
-        response.stopTimes.stop.codStop
+        response.stopTimes.stop.shortCodStop
     )
 }
 
@@ -83,6 +83,7 @@ fun buildSubscription(subscription: StopsSubscription, deviceToken: String) = jO
     "stopCode" += subscription.stopCode.asJson()
     "codMode" += subscription.codMode.toInt().asJson()
     "stopName" += subscription.stopName.asJson()
+    "simpleStopCode" += subscription.stopCode.split("_").getOrNull(1)?.asJson()
     "linesDestinations" += jArray {
         subscription.linesByDeviceToken[deviceToken]?.forEach {
             addObject {
