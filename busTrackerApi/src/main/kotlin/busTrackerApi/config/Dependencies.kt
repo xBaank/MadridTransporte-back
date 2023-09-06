@@ -5,6 +5,8 @@ import busTrackerApi.utils.getenvWrapped
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
+import io.grpc.LoadBalancerRegistry
+import io.grpc.internal.PickFirstLoadBalancerProvider
 import okhttp3.OkHttpClient
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
@@ -16,6 +18,8 @@ val httpClient = OkHttpClient.Builder()
     .build()
 
 fun setupFirebase() = either.eager {
+    //Fix bug `pick_first` in jar
+    LoadBalancerRegistry.getDefaultRegistry().register(PickFirstLoadBalancerProvider())
     if (FirebaseApp.getApps().isNotEmpty()) return@eager
     if (getenvWrapped("SERVICE_JSON").isLeft()) {
         println("SERVICE_JSON not found, skipping firebase setup") //TODO add logging
