@@ -19,7 +19,7 @@ class StopsTests {
         body.shouldBeInstanceOf<JsonArray>()
         body.shouldNotBeEmpty()
         body.forEach {
-            it["stop_code"].getOrElse { throw it }.shouldBeInstanceOf<JsonNumber>()
+            it["stop_code"].getOrElse { throw it }.shouldBeInstanceOf<JsonString>()
             it["cod_mode"].getOrElse { throw it }.shouldBeInstanceOf<JsonNumber>()
             it["stop_name"].getOrElse { throw it }.shouldBeInstanceOf<JsonString>()
             it["stop_lat"].getOrElse { throw it }.shouldBeInstanceOf<JsonNumber>()

@@ -100,8 +100,7 @@ suspend fun getAllStopsResponse() = either {
                     it["cod_mode"].asNumber().bindMap().toString() + "_" + it["stop_code"].asNumberOrString()
             }
             .onEachAsync {
-                //This is a hack to map some codes that are not numbers
-                it["stop_code"] = it["stop_code"].asNumberOrString().toInt()
+                it["stop_code"] = it["stop_code"].asNumberOrString()
             }
             //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
             .distinctBy {
