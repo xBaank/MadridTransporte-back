@@ -18,7 +18,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import simpleJson.serialized
-import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 private typealias StopTimesF = suspend (String) -> Either<BusTrackerException, StopTimes>
@@ -39,15 +38,15 @@ private val collection by lazy { FirestoreClient.getFirestore().collection("subs
 private suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, StopTimesF> = either {
     when (codMode) {
         metroCodMode -> {
-            { getMetroTimesResponse(it, codMode).map(TimedCachedValue<StopTimes>::value) }
+            { getMetroTimesResponse(it, codMode) }
         }
 
         busCodMode -> {
-            { getBusTimesResponse(it).map(TimedCachedValue<StopTimes>::value) }
+            { getBusTimesResponse(it) }
         }
 
         emtCodMode -> {
-            { getEmtStopTimesResponse(it).map(TimedCachedValue<StopTimes>::value) }
+            { getEmtStopTimesResponse(it) }
         }
 
         else -> {
@@ -154,7 +153,7 @@ fun notifyStopTimesOnBackground() {
                             }
                         )
                         Message.builder()
-                            .putData("stopTimes", buildJson(selectedTimes).serialized())
+                            .putData("stopTimes", buildStopTimesJson(selectedTimes).serialized())
                             .setToken(it)
                             .build()
                     }

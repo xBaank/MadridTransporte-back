@@ -16,9 +16,5 @@ fun Route.trainStopsRouting() = route("/train") {
         handle { getTrainTimes() }
     }
 
-    get("/times/cached") {
-        handle { getTrainTimesCached() }
-    }
-
     alertsConfigF(trainCodMode)
 }

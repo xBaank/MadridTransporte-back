@@ -42,7 +42,7 @@ fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
     }
 }
 
-fun buildJson(stopTimes: StopTimes) = jObject {
+fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
     "codMode" += stopTimes.codMode
     "stopName" += stopTimes.stopName
     "simpleStopCode" += stopTimes.simpleStopCode

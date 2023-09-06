@@ -28,16 +28,12 @@ import java.util.UUID.randomUUID
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
-val stopTimesCache = Cache.Builder()
-    .expireAfterWrite(1.hours)
-    .build<String, TimedCachedValue<StopTimes>>()
-
 val allStopsCache = Cache.Builder()
     .build<String, JsonNode>()
 
 val cachedAlerts = Cache.Builder()
     .expireAfterWrite(24.hours)
-    .build<String, TimedCachedValue<IncidentsAffectationsResponse>>()
+    .build<String, IncidentsAffectationsResponse>()
 
 const val allStopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json"
 const val allStopsInfoUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/StopsInfo.json"
@@ -66,14 +62,8 @@ suspend fun getBusTimesResponse(stopCode: String) = either {
 
     val result = parseStopTimesResponseToStopTimes(stopTimes, getCoordinatesByStopCode(stopCode).bind())
         .copy(stopName = getStopNameByStopCode(stopCode).bind()) //We need this because names differ from the static ones
-        .timed()
 
-    stopTimesCache.put(stopCode, result)
     result
-}
-
-suspend fun getTimesResponseCached(stopCode: String) = either {
-    stopTimesCache.get(stopCode) ?: shift<Nothing>(NotFound("Stop with id $stopCode not found"))
 }
 
 suspend fun getAllStopsInfoResponse() = either {
@@ -108,6 +98,10 @@ suspend fun getAllStopsResponse() = either {
             .onEachAsync {
                 it["full_stop_code"] =
                     it["cod_mode"].asNumber().bindMap().toString() + "_" + it["stop_code"].asNumberOrString()
+            }
+            .onEachAsync {
+                //This is a hack to map some codes that are not numbers
+                it["stop_code"] = it["stop_code"].asNumberOrString().toInt()
             }
             //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
             .distinctBy {
@@ -183,7 +177,7 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
 
     val result = withTimeoutOrNull(timeoutSeconds) {
         CoroutineScope(Dispatchers.IO)
-            .async { defaultClient.getIncidentsAffectations(request).timed() }
+            .async { defaultClient.getIncidentsAffectations(request) }
             .await()
     }
 

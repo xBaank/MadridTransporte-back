@@ -17,6 +17,10 @@ val httpClient = OkHttpClient.Builder()
 
 fun setupFirebase() = either.eager {
     if (FirebaseApp.getApps().isNotEmpty()) return@eager
+    if (getenvWrapped("SERVICE_JSON").isLeft()) {
+        println("SERVICE_JSON not found, skipping firebase setup") //TODO add logging
+        return@eager
+    }
     val options: FirebaseOptions = FirebaseOptions.builder()
         .setCredentials(
             GoogleCredentials.fromStream(
@@ -24,6 +28,5 @@ fun setupFirebase() = either.eager {
             )
         )
         .build()
-
     FirebaseApp.initializeApp(options)
 }

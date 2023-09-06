@@ -22,10 +22,6 @@ val timesConfigF: Route.(codMode: String) -> Unit = { codMode ->
         call.caching = CachingOptions(cacheControl = CacheControl.MaxAge(maxAgeSeconds = 30))
         handle { getStopTimes(codMode) }
     }
-
-    get("/{stopCode}/times/cached") {
-        handle { getStopTimesCached(codMode) }
-    }
 }
 
 val subConfigF: Route.(codMode: String) -> Unit =

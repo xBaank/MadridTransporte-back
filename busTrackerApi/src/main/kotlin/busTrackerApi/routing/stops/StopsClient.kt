@@ -17,7 +17,7 @@ import simpleJson.*
 
 suspend fun getAlertsByCodMode(codMode: String) = either {
     val alerts = getAlertsByCodModeResponse(codMode).bind()
-    ResponseJson(buildAlertsJson(alerts.value), HttpStatusCode.OK)
+    ResponseJson(buildAlertsJson(alerts), HttpStatusCode.OK)
 }
 
 suspend fun Call.getAllStops() = either {
@@ -28,19 +28,15 @@ suspend fun Call.getAllStops() = either {
 suspend fun Call.getStopTimes(codMode: String) =
     getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getBusTimesResponse)
 
-suspend fun Call.getStopTimesCached(codMode: String) =
-    getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getTimesResponseCached)
-
 private suspend fun getStopTimesBase(
     codMode: String,
     simpleStopCode: Either<BusTrackerException, String>,
-    f: suspend (String) -> Either<BusTrackerException, TimedCachedValue<StopTimes>>
+    f: suspend (String) -> Either<BusTrackerException, StopTimes>
 ) = either {
     val stopCode = createStopCode(codMode, simpleStopCode.bind())
     checkStopExists(stopCode).bind()
-    val cached = f(stopCode).bind()
-    val json = buildCachedJson(buildJson(cached.value), cached.createdAt.toEpochMilli())
-    ResponseJson(json, HttpStatusCode.OK)
+    val times = f(stopCode).bind()
+    ResponseJson(buildStopTimesJson(times), HttpStatusCode.OK)
 }
 
 suspend fun Call.subscribeStopTime(codMode: String) =

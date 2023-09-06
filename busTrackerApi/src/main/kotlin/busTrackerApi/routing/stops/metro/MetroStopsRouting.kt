@@ -27,10 +27,5 @@ private val metroConfigF: Route.(String) -> Unit = { codMode ->
         call.caching = CachingOptions(cacheControl = CacheControl.MaxAge(maxAgeSeconds = 30))
         handle { getMetroTimes(codMode) }
     }
-
-    get("/{stopCode}/times/cached") {
-        handle { getMetroTimesCached(codMode) }
-    }
-
     alertsConfigF(codMode)
 }

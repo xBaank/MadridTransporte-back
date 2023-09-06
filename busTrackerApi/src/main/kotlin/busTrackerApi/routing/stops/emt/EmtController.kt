@@ -8,20 +8,12 @@ import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
 import busTrackerApi.extensions.post
 import busTrackerApi.routing.stops.StopTimes
-import busTrackerApi.routing.stops.TimedCachedValue
-import busTrackerApi.routing.stops.timed
 import crtm.utils.getCodStopFromStopCode
-import io.github.reactivecircus.cache4k.Cache
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.deserialized
 import simpleJson.jObject
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.time.Duration.Companion.hours
-
-val stopTimesCache = Cache.Builder()
-    .expireAfterWrite(1.hours)
-    .build<String, TimedCachedValue<StopTimes>>()
 
 lateinit var currentLoginResponse: LoginResponse
 private val dateFormatter = SimpleDateFormat("yyyy-MM-dd")
@@ -68,15 +60,9 @@ suspend fun getEmtStopTimesResponse(stopCode: String) = either {
         if (!response.isSuccessful) shift<Nothing>(InternalServerError("EMT getStopTimes failed"))
         val body =
             response.body?.string()?.deserialized()?.bindMap() ?: shift<Nothing>(InternalServerError("Body is null"))
-        val result = parseEMTToStopTimes(body).bind().timed()
-        stopTimesCache.put(stopCode, result)
-        return@either result
+        return@either parseEMTToStopTimes(body).bind<StopTimes>()
 
     } while (tries > 0)
 
     shift<Nothing>(InternalServerError("EMT getStopTimes failed"))
-}
-
-suspend fun getStopTimesResponseCached(stopId: String) = either {
-    stopTimesCache.get(stopId) ?: shift<Nothing>(NotFound("No stop times found for stop $stopId"))
 }

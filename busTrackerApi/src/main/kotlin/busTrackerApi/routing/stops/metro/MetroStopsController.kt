@@ -5,8 +5,10 @@ import arrow.core.getOrElse
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
-import busTrackerApi.routing.stops.*
-import io.github.reactivecircus.cache4k.Cache
+import busTrackerApi.routing.stops.getCoordinatesByStopCode
+import busTrackerApi.routing.stops.getIdByStopCode
+import busTrackerApi.routing.stops.getStopCodeById
+import busTrackerApi.routing.stops.getStopNameById
 import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response
@@ -15,11 +17,6 @@ import simpleJson.asArray
 import simpleJson.deserialized
 import simpleJson.get
 import simpleJson.jArray
-import kotlin.time.Duration.Companion.hours
-
-private val cache = Cache.Builder()
-    .expireAfterWrite(1.hours)
-    .build<String, TimedCachedValue<StopTimes>>()
 
 fun urlBuilder() = HttpUrl.Builder()
     .scheme("https")
@@ -44,13 +41,8 @@ suspend fun getMetroTimesResponse(id: String? = null): Response {
 
 suspend fun getMetroTimesResponse(id: String, codMode: String) = either {
     val stationCode = getIdByStopCode(id).bind()
-    val response = getTimesBase(stationCode, codMode).bind().timed()
-    cache.put(id, response)
+    val response = getTimesBase(stationCode, codMode).bind()
     response
-}
-
-suspend fun getMetroTimesResponseCached(id: String, codMode: String) = either {
-    cache.get(id) ?: shift<Nothing>(BusTrackerException.NotFound("No stops found for query $id"))
 }
 
 suspend fun getTimesBase(id: String, codMode: String) = either {

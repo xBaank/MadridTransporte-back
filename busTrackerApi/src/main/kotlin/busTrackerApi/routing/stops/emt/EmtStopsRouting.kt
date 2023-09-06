@@ -20,9 +20,6 @@ fun Route.emtStopsRouting() = route("/emt") {
         handle { getStopTimes() }
     }
 
-    get("/{stopCode}/times/cached") {
-        handle { getStopTimesCached() }
-    }
     subConfigF(emtCodMode)
     alertsConfigF(emtCodMode)
 }
