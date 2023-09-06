@@ -42,5 +42,12 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
             url = it["moreInfo"]["@url"].asString().bindMap()
         )
     } ?: emptyList()
-    StopTimes(emtCodMode.toInt(), stopName, coordinates, arrivesMapped, incidentsMapped)
+    StopTimes(
+        emtCodMode.toInt(),
+        stopName,
+        coordinates,
+        arrivesMapped,
+        incidentsMapped,
+        json["data"][0]["StopInfo"][0]["stopId"].asString().bindMap()
+    )
 }

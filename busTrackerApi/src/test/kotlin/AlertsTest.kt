@@ -1,3 +1,4 @@
+import arrow.core.continuations.either
 import arrow.core.getOrElse
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -6,8 +7,7 @@ import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import simpleJson.JsonArray
-import simpleJson.deserialized
+import simpleJson.*
 import utils.testApplicationBusTracker
 
 
@@ -24,9 +24,17 @@ class AlertsTest {
     @EnumSource(Alerts::class)
     fun `should get alerts`(code: Alerts) = testApplicationBusTracker {
         val response = client.get(code.url)
-        val body = response.bodyAsText().deserialized()
+        val body = response.bodyAsText().deserialized().getOrElse { throw it }
 
         response.status.isSuccess().shouldBe(true)
-        body.getOrElse { throw it }.shouldBeInstanceOf<JsonArray>()
+        body.shouldBeInstanceOf<JsonArray>()
+        either {
+            body.asArray().bind().forEach {
+                it["codMode"].bind().shouldBeInstanceOf<JsonNumber>()
+                it["codLine"].bind().shouldBeInstanceOf<JsonString>()
+                it["description"].bind().shouldBeInstanceOf<JsonString>()
+                it["stops"].bind().shouldBeInstanceOf<JsonArray>()
+            }
+        }.getOrElse { throw it }
     }
 }

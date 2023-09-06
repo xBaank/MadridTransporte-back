@@ -7,21 +7,13 @@ import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
 import busTrackerApi.extensions.post
-import busTrackerApi.routing.stops.TimedCachedValue
-import busTrackerApi.routing.stops.buildJson
-import busTrackerApi.routing.stops.timed
-import io.github.reactivecircus.cache4k.Cache
+import busTrackerApi.routing.stops.StopTimes
+import crtm.utils.getCodStopFromStopCode
 import ru.gildor.coroutines.okhttp.await
-import simpleJson.JsonNode
 import simpleJson.deserialized
 import simpleJson.jObject
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.time.Duration.Companion.hours
-
-val stopTimesCache = Cache.Builder()
-    .expireAfterWrite(1.hours)
-    .build<String, TimedCachedValue<JsonNode>>()
 
 lateinit var currentLoginResponse: LoginResponse
 private val dateFormatter = SimpleDateFormat("yyyy-MM-dd")
@@ -42,7 +34,8 @@ suspend fun login() = either {
     currentLoginResponse = parseLoginResponse(body).bindMap()
 }
 
-suspend fun getStopTimesResponse(stopId: String) = either {
+suspend fun getEmtStopTimesResponse(stopCode: String) = either {
+    val stopId = getCodStopFromStopCode(stopCode)
     var tries = 3
     do {
         val url = "https://openapi.emtmadrid.es/v2/transport/busemtmad/stops/$stopId/arrives/"
@@ -67,15 +60,9 @@ suspend fun getStopTimesResponse(stopId: String) = either {
         if (!response.isSuccessful) shift<Nothing>(InternalServerError("EMT getStopTimes failed"))
         val body =
             response.body?.string()?.deserialized()?.bindMap() ?: shift<Nothing>(InternalServerError("Body is null"))
-        val result = parseEMTToStopTimes(body).bind().let(::buildJson).timed()
-        stopTimesCache.put(stopId, result)
-        return@either result
+        return@either parseEMTToStopTimes(body).bind<StopTimes>()
 
     } while (tries > 0)
 
     shift<Nothing>(InternalServerError("EMT getStopTimes failed"))
-}
-
-suspend fun getStopTimesResponseCached(stopId: String) = either {
-    stopTimesCache.get(stopId) ?: shift<Nothing>(NotFound("No stop times found for stop $stopId"))
 }

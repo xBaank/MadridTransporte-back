@@ -20,7 +20,14 @@ fun parseStopTimesResponseToStopTimes(response: StopTimesResponse, coordinates: 
         )
     }
 
-    return StopTimes(busCodMode.toInt(), stopName, coordinates, arrives.sortedBy { it.line.toIntOrNull() }, emptyList())
+    return StopTimes(
+        busCodMode.toInt(),
+        stopName,
+        coordinates,
+        arrives.sortedBy { it.line.toIntOrNull() },
+        emptyList(),
+        response.stopTimes.stop.shortCodStop
+    )
 }
 
 
@@ -35,9 +42,11 @@ fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
     }
 }
 
-fun buildJson(stopTimes: StopTimes) = jObject {
+fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
     "codMode" += stopTimes.codMode
     "stopName" += stopTimes.stopName
+    "simpleStopCode" += stopTimes.simpleStopCode
+    "stopCode" += stopTimes.stopCode
     "coordinates" += jObject {
         "latitude" += stopTimes.coordinates.latitude
         "longitude" += stopTimes.coordinates.longitude
@@ -65,6 +74,22 @@ fun buildJson(stopTimes: StopTimes) = jObject {
                 "cause" += it.cause
                 "effect" += it.effect
                 "url" += it.url
+            }
+        }
+    }
+}
+
+fun buildSubscription(subscription: StopsSubscription, deviceToken: String) = jObject {
+    "stopCode" += subscription.stopCode.asJson()
+    "codMode" += subscription.codMode.toInt().asJson()
+    "stopName" += subscription.stopName.asJson()
+    "simpleStopCode" += subscription.stopCode.split("_").getOrNull(1)?.asJson()
+    "linesDestinations" += jArray {
+        subscription.linesByDeviceToken[deviceToken]?.forEach {
+            addObject {
+                "line" += it.line.asJson()
+                "destination" += it.destination.asJson()
+                "codMode" += it.codMode.asJson()
             }
         }
     }

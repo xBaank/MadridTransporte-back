@@ -5,8 +5,6 @@ import arrow.core.continuations.either
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.ResponseJson
-import busTrackerApi.routing.stops.TimedCachedValue
-import busTrackerApi.routing.stops.buildCachedJson
 import busTrackerApi.routing.stops.getIdByStopCode
 import busTrackerApi.utils.Call
 import crtm.utils.createStopCode
@@ -21,14 +19,8 @@ suspend fun Call.getTrainTimes() = getTrainTimesBase(
     call.request.queryParameters.getWrapped("destinationStopCode")
 )
 
-suspend fun Call.getTrainTimesCached() = getTrainTimesBase(
-    ::getTrainTimesResponseCached,
-    call.request.queryParameters.getWrapped("originStopCode"),
-    call.request.queryParameters.getWrapped("destinationStopCode")
-)
-
 private suspend fun getTrainTimesBase(
-    f: suspend (String, String) -> Either<BusTrackerException, TimedCachedValue<JsonNode>>,
+    f: suspend (String, String) -> Either<BusTrackerException, JsonNode>,
     originId: Either<BusTrackerException, String>,
     destinationId: Either<BusTrackerException, String>
 ) = either {
@@ -40,5 +32,5 @@ private suspend fun getTrainTimesBase(
         stopInfoOriginStationCode,
         stopInfoDestinationStationCode
     ).bind()
-    ResponseJson(buildCachedJson(json.value, json.createdAt.toEpochMilli()), HttpStatusCode.OK)
+    ResponseJson(json, HttpStatusCode.OK)
 }
