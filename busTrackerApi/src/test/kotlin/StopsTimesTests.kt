@@ -1,3 +1,4 @@
+import arrow.core.continuations.either
 import arrow.core.getOrElse
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -7,9 +8,7 @@ import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import simpleJson.JsonObject
-import simpleJson.deserialized
-import utils.buildStopTimesFromJson
+import simpleJson.*
 import utils.testApplicationBusTracker
 
 const val busStopCode = "08242"
@@ -40,7 +39,30 @@ class StopsRoutingTests {
 
         response.status.isSuccess().shouldBe(true)
         body.shouldBeInstanceOf<JsonObject>()
-        buildStopTimesFromJson(body).getOrElse { throw it }
+        either {
+            body["codMode"].asInt().bind()
+            body["stopName"].asString().bind()
+            body["simpleStopCode"].asString().bind()
+            body["stopCode"].asString().bind()
+            body["coordinates"]["latitude"].asDouble().bind()
+            body["coordinates"]["longitude"].asDouble().bind()
+            body["arrives"].asArray().bind().forEach {
+                it["codMode"].asInt().bind()
+                it["line"].asString().bind()
+                it["anden"].asInt().getOrNull()
+                it["destination"].asString().bind()
+                it["estimatedArrives"].asArray().bind().map { it.asLong().bind() }.first()
+            }
+            body["incidents"].asArray().bind().forEach {
+                it["title"].asString().bind()
+                it["description"].asString().bind()
+                it["from"].asString().bind()
+                it["to"].asString().bind()
+                it["cause"].asString().bind()
+                it["effect"].asString().bind()
+                it["url"].asString().bind()
+            }
+        }.getOrElse { throw it }
     }
 
     @ParameterizedTest

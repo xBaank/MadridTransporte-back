@@ -14,6 +14,7 @@ import com.google.cloud.firestore.Filter
 import com.google.firebase.cloud.FirestoreClient
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
+import io.ktor.util.logging.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -21,6 +22,8 @@ import simpleJson.serialized
 import kotlin.time.Duration.Companion.minutes
 
 private typealias StopTimesF = suspend (String) -> Either<BusTrackerException, StopTimes>
+
+private val LOGGER = KtorSimpleLogger("Subscriptions")
 
 data class LineDestination(val line: String = "", val destination: String = "", val codMode: Int = 0)
 data class StopsSubscription(
@@ -158,8 +161,9 @@ fun notifyStopTimesOnBackground() {
                             .build()
                     }
                     messages.forEachAsync { FirebaseMessaging.getInstance().sendAsync(it).await() }
+                    LOGGER.info("Sent ${messages.size} messages")
                 } catch (e: Exception) {
-                    println(e)
+                    LOGGER.error(e)
                 }
             }
             delay(1.minutes)
