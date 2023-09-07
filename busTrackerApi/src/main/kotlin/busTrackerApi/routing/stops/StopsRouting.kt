@@ -36,7 +36,7 @@ val subConfigF: Route.(codMode: String) -> Unit =
             handle { unsubscribeStopTime(codMode) }
         }
         post("/times/unsubscribe/all") {
-            handle { unsubscribeAllStopTime(codMode) }
+            handle { unsubscribeAllStopTime() }
         }
     }
 

@@ -65,8 +65,7 @@ suspend fun Call.handleError(ex: BusTrackerException) = when (ex) {
 
 suspend fun Call.handleResponse(response: Response): Unit = when (response) {
     is Response.ResponseJson -> call.respondText(response.json.serialized(), ContentType.Application.Json)
+    is Response.ResponseJsonCached -> call.respondText(response.json.serializedMemo(), ContentType.Application.Json)
     is Response.ResponseRaw -> call.respond(response.status)
     is Response.ResponseRedirect -> call.respondRedirect(response.url)
 }
-
-

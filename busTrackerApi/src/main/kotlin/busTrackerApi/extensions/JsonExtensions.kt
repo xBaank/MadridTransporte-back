@@ -1,9 +1,12 @@
 package busTrackerApi.extensions
 
-import simpleJson.jObject
+import io.github.reactivecircus.cache4k.Cache
+import simpleJson.JsonNode
+import simpleJson.serialized
 
-fun Map<String, String>.asJson() = jObject {
-    forEach { (k, v) ->
-        k.trim() += v
-    }
+private val cacheJson = Cache.Builder()
+    .build<JsonNode, String>()
+
+suspend fun JsonNode.serializedMemo() = cacheJson.get(this) {
+    serialized()
 }

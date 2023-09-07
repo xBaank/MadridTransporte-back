@@ -5,8 +5,7 @@ import arrow.core.continuations.either
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.getWrapped
-import busTrackerApi.routing.Response.ResponseJson
-import busTrackerApi.routing.Response.ResponseRaw
+import busTrackerApi.routing.Response.*
 import busTrackerApi.utils.Call
 import crtm.utils.createStopCode
 import io.ktor.http.*
@@ -14,15 +13,14 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import simpleJson.*
 
-
 suspend fun getAlertsByCodMode(codMode: String) = either {
     val alerts = getAlertsByCodModeResponse(codMode).bind()
-    ResponseJson(buildAlertsJson(alerts), HttpStatusCode.OK)
+    ResponseJsonCached(buildAlertsJson(alerts), HttpStatusCode.OK)
 }
 
 suspend fun Call.getAllStops() = either {
     val stops = getAllStopsResponse().bind()
-    ResponseJson(stops, HttpStatusCode.OK)
+    ResponseJsonCached(stops, HttpStatusCode.OK)
 }
 
 suspend fun Call.getStopTimes(codMode: String) =
@@ -88,7 +86,7 @@ suspend fun Call.unsubscribeStopTime(codMode: String) = either {
     ResponseRaw(HttpStatusCode.OK)
 }
 
-suspend fun Call.unsubscribeAllStopTime(codMode: String) = either {
+suspend fun Call.unsubscribeAllStopTime() = either {
     val body = call.receiveText().deserialized().bindMap()
     val deviceToken = body["deviceToken"].asString().bindMap()
     unsubscribeAllDevice(deviceToken)

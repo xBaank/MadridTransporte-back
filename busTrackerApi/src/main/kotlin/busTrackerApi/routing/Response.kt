@@ -7,6 +7,7 @@ sealed interface Response {
     val status: HttpStatusCode
 
     data class ResponseJson(val json: JsonNode, override val status: HttpStatusCode) : Response
+    data class ResponseJsonCached(val json: JsonNode, override val status: HttpStatusCode) : Response
     data class ResponseRaw(override val status: HttpStatusCode) : Response
     data class ResponseRedirect(
         val url: String,
