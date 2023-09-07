@@ -22,7 +22,7 @@ application {
 dependencies {
     implementation("ch.qos.logback:logback-classic:1.4.7")
     implementation("io.ktor:ktor-server-core:$ktor_version")
-    implementation("io.ktor:ktor-server-cio:$ktor_version")
+    implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("io.ktor:ktor-server-websockets:$ktor_version")
     implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0")
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.1") // for JVM platform
