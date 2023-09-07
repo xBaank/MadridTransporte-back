@@ -4,11 +4,12 @@ import com.google.api.core.ApiFuture
 import com.google.api.core.ApiFutureCallback
 import com.google.api.core.ApiFutures
 import com.google.common.util.concurrent.MoreExecutors
-import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.*
 import java.util.concurrent.ExecutionException
+import java.util.concurrent.Future
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.time.Duration.Companion.seconds
 
 suspend fun <T> ApiFuture<T>.await(): T {
     try {
@@ -29,4 +30,12 @@ suspend fun <T> ApiFuture<T>.await(): T {
         }
         ApiFutures.addCallback(this, callback, MoreExecutors.directExecutor())
     }
+}
+
+suspend fun <T> Future<T>.wait(): T = coroutineScope {
+    while (!isDone) {
+        if (isCancelled) cancel()
+        delay(0.5.seconds)
+    }
+    get()
 }

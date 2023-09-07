@@ -24,6 +24,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("io.ktor:ktor-server-websockets:$ktor_version")
+    implementation("com.sun.xml.ws:jaxws-tools:4.0.1")
     implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0")
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.1") // for JVM platform
     //arrow kt

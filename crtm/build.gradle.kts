@@ -16,6 +16,7 @@ plugins {
 
 dependencies {
     jaxws("com.sun.xml.ws:jaxws-tools:4.0.0")
+
     implementation("com.sun.xml.ws:jaxws-tools:4.0.1")
     //junit 5
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
@@ -68,6 +69,7 @@ task("wsimport-myservice-buses") {
             )
 
             "wsimport"(
+                "binding" to "$projectDir/src/main/resources/async.xml",
                 "keep" to true,
                 "sourcedestdir" to sourceDestDir,
                 //"destDir" to destDir, alreaddy compiled java classes, not needed
@@ -96,6 +98,7 @@ task("wsimport-myservice-abono") {
             )
 
             "wsimport"(
+                "binding" to "$projectDir/src/main/resources/async.xml",
                 "keep" to true,
                 "sourcedestdir" to sourceDestDir,
                 //"destDir" to destDir, alreaddy compiled java classes, not needed
