@@ -18,7 +18,7 @@ suspend fun getAlertsByCodMode(codMode: String) = either {
     ResponseJsonCached(buildAlertsJson(alerts), HttpStatusCode.OK)
 }
 
-suspend fun Call.getAllStops() = either {
+suspend fun getAllStops() = either {
     val stops = getAllStopsResponse().bind()
     ResponseJsonCached(stops, HttpStatusCode.OK)
 }
