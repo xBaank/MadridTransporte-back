@@ -33,9 +33,15 @@ suspend fun <T> ApiFuture<T>.await(): T {
 }
 
 suspend fun <T> Future<T>.wait(): T = coroutineScope {
-    while (!isDone) {
-        if (isCancelled) cancel()
-        delay(0.5.seconds)
+    try {
+        while (!isDone) {
+            if (!isActive) this@wait.cancel(true)
+            if (isCancelled) cancel()
+            delay(0.5.seconds)
+        }
+        get()
+    } catch (e: CancellationException) {
+        this@wait.cancel(true)
+        throw e
     }
-    get()
 }
