@@ -66,11 +66,10 @@ suspend fun unsubscribeDevice(deviceToken: String, stopCode: String, lineDestina
     collection.where(Filter.arrayContains("deviceTokens", deviceToken)).whereEqualTo("stopCode", stopCode).get().await()
         .documents.forEachAsync {
             val subscription = it.toObject(StopsSubscription::class.java)
-            subscription.deviceTokens -= deviceToken
             subscription.linesByDeviceToken[deviceToken] = subscription.linesByDeviceToken[deviceToken]?.filter {
                 it != lineDestination
             } ?: emptyList()
-            if (subscription.deviceTokens.isEmpty()) it.reference.delete().await()
+            if (subscription.linesByDeviceToken[deviceToken].isNullOrEmpty()) it.reference.delete().await()
             else it.reference.set(subscription).await()
         }
 }
