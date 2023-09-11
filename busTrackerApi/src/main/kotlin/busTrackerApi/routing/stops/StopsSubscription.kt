@@ -152,11 +152,11 @@ fun notifyStopTimesOnBackground() {
                     val stopTimes = function(subscription.stopCode).getOrNull() ?: return@forEachAsync
                     subscription.deviceTokens.forEachAsync {
                         val selectedTimes = stopTimes.copy(
-                            arrives = stopTimes.arrives.filter { arrive ->
+                            arrives = stopTimes.arrives?.filter { arrive ->
                                 subscription.linesByDeviceToken[it]?.any { lineDestination ->
                                     lineDestination.line == arrive.line && lineDestination.destination == arrive.destination
                                 } == true
-                            }
+                            } ?: emptyList()
                         )
                         val message = Message.builder()
                             .putData("stopTimes", buildStopTimesJson(selectedTimes).serialized())
@@ -171,6 +171,8 @@ fun notifyStopTimesOnBackground() {
                             if (e.errorCode == INVALID_ARGUMENT || e.errorCode == NOT_FOUND || e.messagingErrorCode == UNREGISTERED) {
                                 unsubscribeAllDevice(it)
                             }
+                        } catch (e: Exception) {
+                            LOGGER.error(e)
                         }
                     }
                 } catch (e: Exception) {

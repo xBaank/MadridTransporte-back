@@ -8,18 +8,23 @@ import simpleJson.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-suspend fun parseMetroToStopTimes(json: JsonNode, codMode: String, coordinates: Coordinates, simpleStopCode: String) =
+suspend fun parseMetroToStopTimes(
+    json: JsonNode,
+    codMode: String,
+    coordinates: Coordinates,
+    name: String,
+    simpleStopCode: String
+) =
     either {
         val arrives = json.asArray().bind()
         if (arrives.isEmpty()) return@either StopTimes(
             codMode.toInt(),
-            "",
+            name,
             coordinates,
             emptyList(),
             emptyList(),
             simpleStopCode
         )
-        val stopName = arrives[0]["nombreest"].asString().bind()
 
         val arrivesMapped = arrives.flatMap { arrive ->
             val proximo = arrive["proximo"].asLong().getOrNull()
@@ -48,5 +53,5 @@ suspend fun parseMetroToStopTimes(json: JsonNode, codMode: String, coordinates: 
             listOf(first, second).filter { it.estimatedArrive != -1L }
         }
 
-        StopTimes(codMode.toInt(), stopName, coordinates, arrivesMapped, emptyList(), simpleStopCode)
+        StopTimes(codMode.toInt(), name, coordinates, arrivesMapped, emptyList(), simpleStopCode)
     }

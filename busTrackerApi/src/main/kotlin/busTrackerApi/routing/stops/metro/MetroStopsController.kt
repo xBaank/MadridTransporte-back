@@ -9,6 +9,7 @@ import busTrackerApi.routing.stops.getCoordinatesByStopCode
 import busTrackerApi.routing.stops.getIdByStopCode
 import busTrackerApi.routing.stops.getStopCodeById
 import busTrackerApi.routing.stops.getStopNameById
+import crtm.utils.getCodStopFromStopCode
 import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response
@@ -59,15 +60,15 @@ suspend fun getTimesBase(id: String, codMode: String) = either {
         )
         val body = it
             .body
-            .use { it?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response")) }
+            .use { it?.string() }
 
-        val json = body.deserialized()
-            .get("Vtelindicadores")
-            .asArray()
-            .getOrElse { jArray() }
+        val json = body?.deserialized()
+            ?.get("Vtelindicadores")
+            ?.asArray()
+            ?.getOrElse { jArray() }
+            ?: jArray()
 
-        parseMetroToStopTimes(json, codMode, coordinates, stopCode.split("_").getOrNull(1) ?: "")
+        parseMetroToStopTimes(json, codMode, coordinates, getStopNameById(id).bind(), getCodStopFromStopCode(stopCode))
             .bindMap()
-            .copy(stopName = getStopNameById(id).bind()) //When no times are available, the stop name is not returned, so we need to get it from the stops list
     }
 }

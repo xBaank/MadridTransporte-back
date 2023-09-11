@@ -17,6 +17,7 @@ import crtm.soap.ArrayOfString
 import crtm.soap.IncidentsAffectationsRequest
 import crtm.soap.IncidentsAffectationsResponse
 import crtm.soap.StopTimesRequest
+import crtm.utils.getCodStopFromStopCode
 import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,8 +61,12 @@ suspend fun getBusTimesResponse(stopCode: String) = either {
 
     if (stopTimes == null) shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
 
-    val result = parseStopTimesResponseToStopTimes(stopTimes, getCoordinatesByStopCode(stopCode).bind())
-        .copy(stopName = getStopNameByStopCode(stopCode).bind()) //We need this because names differ from the static ones
+    val result = parseStopTimesResponseToStopTimes(
+        stopTimes,
+        getCoordinatesByStopCode(stopCode).bind(),
+        getStopNameByStopCode(stopCode).getOrNull(),
+        getCodStopFromStopCode(stopCode)
+    )
 
     result
 }
