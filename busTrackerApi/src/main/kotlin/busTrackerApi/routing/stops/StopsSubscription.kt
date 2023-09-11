@@ -11,9 +11,13 @@ import busTrackerApi.routing.stops.emt.getEmtStopTimesResponse
 import busTrackerApi.routing.stops.metro.getMetroTimesResponse
 import busTrackerApi.routing.stops.metro.metroCodMode
 import com.google.cloud.firestore.Filter
+import com.google.firebase.ErrorCode.INVALID_ARGUMENT
+import com.google.firebase.ErrorCode.NOT_FOUND
 import com.google.firebase.cloud.FirestoreClient
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.FirebaseMessagingException
 import com.google.firebase.messaging.Message
+import com.google.firebase.messaging.MessagingErrorCode.UNREGISTERED
 import io.ktor.util.logging.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -120,7 +124,7 @@ suspend fun subscribeDevice(
             subscription.linesByDeviceToken[deviceToken]?.contains(lineDestination) == true
         ) shift<Nothing>(BusTrackerException.Conflict("Device already subscribed"))
         if (subscription != null) {
-            subscription.deviceTokens += deviceToken
+            if (deviceToken !in subscription.deviceTokens) subscription.deviceTokens += deviceToken
             subscription.linesByDeviceToken[deviceToken] =
                 subscription.linesByDeviceToken[deviceToken]?.plus(lineDestination) ?: listOf(lineDestination)
             collection.document(subscription.stopCode).set(subscription).await()
@@ -142,12 +146,12 @@ fun notifyStopTimesOnBackground() {
     val coroutine = CoroutineScope(Dispatchers.Default)
     coroutine.launch {
         while (isActive) {
-            collection.get().await().documents.forEachAsync {
-                val subscription = it.toObject(StopsSubscription::class.java)
+            collection.get().await().documents.forEachAsync { document ->
+                val subscription = document.toObject(StopsSubscription::class.java)
                 try {
                     val function = getFunctionByCodMode(subscription.codMode).getOrNull() ?: return@forEachAsync
                     val stopTimes = function(subscription.stopCode).getOrNull() ?: return@forEachAsync
-                    val messages = subscription.deviceTokens.map {
+                    subscription.deviceTokens.forEachAsync {
                         val selectedTimes = stopTimes.copy(
                             arrives = stopTimes.arrives.filter { arrive ->
                                 subscription.linesByDeviceToken[it]?.any { lineDestination ->
@@ -155,13 +159,21 @@ fun notifyStopTimesOnBackground() {
                                 } == true
                             }
                         )
-                        Message.builder()
+                        val message = Message.builder()
                             .putData("stopTimes", buildStopTimesJson(selectedTimes).serialized())
                             .setToken(it)
                             .build()
+
+                        try {
+                            LOGGER.info("Sending message to $it")
+                            FirebaseMessaging.getInstance().sendAsync(message).await()
+                        } catch (e: FirebaseMessagingException) {
+                            LOGGER.error(e)
+                            if (e.errorCode == INVALID_ARGUMENT || e.errorCode == NOT_FOUND || e.messagingErrorCode == UNREGISTERED) {
+                                unsubscribeAllDevice(it)
+                            }
+                        }
                     }
-                    messages.forEachAsync { FirebaseMessaging.getInstance().sendAsync(it).await() }
-                    LOGGER.info("Sent ${messages.size} messages")
                 } catch (e: Exception) {
                     LOGGER.error(e)
                 }
