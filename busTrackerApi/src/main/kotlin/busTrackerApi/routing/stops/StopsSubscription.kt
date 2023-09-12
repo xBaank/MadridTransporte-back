@@ -38,6 +38,7 @@ data class StopsSubscription(
     val stopName: String = ""
 )
 
+var delayTime = 1.minutes
 val mutex = Mutex()
 private val collection by lazy { FirestoreClient.getFirestore().collection("subscribers") }
 
@@ -179,7 +180,7 @@ fun notifyStopTimesOnBackground() {
                     LOGGER.error(e)
                 }
             }
-            delay(1.minutes)
+            delay(delayTime)
         }
     }
 }
