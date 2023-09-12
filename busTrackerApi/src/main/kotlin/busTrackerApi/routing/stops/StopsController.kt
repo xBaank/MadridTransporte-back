@@ -56,10 +56,8 @@ suspend fun getBusTimesResponse(stopCode: String) = either {
         CoroutineScope(Dispatchers.IO)
             .async { getStopTimesResponse(stopCode) }
             .await()
-            .bind()
+            .getOrNull()
     }
-
-    if (stopTimes == null) shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
 
     val result = parseStopTimesResponseToStopTimes(
         stopTimes,
