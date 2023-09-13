@@ -87,10 +87,3 @@ suspend fun Call.unsubscribeStopTime(codMode: String) = either {
     unsubscribeDevice(deviceToken = deviceToken, stopCode = stopCode, lineDestination = lineDestination)
     ResponseRaw(HttpStatusCode.OK)
 }
-
-suspend fun Call.unsubscribeAllStopTime() = either {
-    val body = call.receiveText().deserialized().bindMap()
-    val deviceToken = body["deviceToken"].asString().bindMap()
-    unsubscribeAllDevice(deviceToken)
-    ResponseRaw(HttpStatusCode.OK)
-}

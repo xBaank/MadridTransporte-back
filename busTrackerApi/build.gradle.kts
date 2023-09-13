@@ -42,6 +42,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
+    testImplementation("io.mockk:mockk:1.13.7")
     implementation("io.github.pdvrieze.xmlutil:core:0.86.0")
     implementation("io.github.pdvrieze.xmlutil:serialization:0.86.0")
     implementation("io.ktor:ktor-server-caching-headers:$ktor_version")// https://mvnrepository.com/artifact/com.google.firebase/firebase-messaging
