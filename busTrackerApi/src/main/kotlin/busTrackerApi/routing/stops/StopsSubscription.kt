@@ -25,7 +25,7 @@ import kotlinx.coroutines.sync.withLock
 import simpleJson.serialized
 import kotlin.time.Duration.Companion.minutes
 
-private typealias StopTimesF = suspend (String) -> Either<BusTrackerException, StopTimes>
+typealias StopTimesF = suspend (String) -> Either<BusTrackerException, StopTimes>
 
 private val LOGGER = KtorSimpleLogger("Subscriptions")
 
@@ -43,7 +43,7 @@ val mutex = Mutex()
 private val collection by lazy { FirestoreClient.getFirestore().collection("subscribers") }
 
 
-private suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, StopTimesF> = either {
+suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, StopTimesF> = either {
     when (codMode) {
         metroCodMode -> {
             { getMetroTimesResponse(it, codMode) }
