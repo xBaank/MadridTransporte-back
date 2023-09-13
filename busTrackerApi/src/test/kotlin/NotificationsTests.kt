@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import simpleJson.jObject
 import simpleJson.serialized
 import utils.testApplicationBusTracker
+import java.util.*
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
@@ -56,8 +57,8 @@ class NotificationsTest {
                 "subscription" += jObject {
                     "stopCode" += subscription.stopcode
                     "lineDestination" += jObject {
-                        "line" += "8"
-                        "destination" += "asd"
+                        "line" += UUID.randomUUID().toString()
+                        "destination" += UUID.randomUUID().toString()
                         "codMode" += 8
                     }
                 }
@@ -110,8 +111,8 @@ class NotificationsTest {
                 "subscription" += jObject {
                     "stopCode" += subscription.stopcode
                     "lineDestination" += jObject {
-                        "line" += "8"
-                        "destination" += "asd"
+                        "line" += UUID.randomUUID().toString()
+                        "destination" += UUID.randomUUID().toString()
                         "codMode" += 8
                     }
                 }
