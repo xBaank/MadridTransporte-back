@@ -3,8 +3,6 @@
 
 This is the backend for the bus tracker app.
 
-To see how to use it, go to the [Docs](./.docs/Home.md).
-
 ## Features
 - Abono data
 - Bus locations
