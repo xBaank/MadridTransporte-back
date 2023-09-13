@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0
+
+- Release version 1.0.0
+
 ## 1.0.0-RC13
 
 - Fixed an issue where the app would not return stop info if the soap request failed instead of giving a timeout
