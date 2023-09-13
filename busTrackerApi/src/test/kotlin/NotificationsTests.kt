@@ -135,4 +135,30 @@ class NotificationsTest {
             subscribedResponse.status.isSuccess().shouldBe(true)
             subscriptionsResponse.status.shouldBe(HttpStatusCode.NotFound)
         }
+
+    @ParameterizedTest
+    @EnumSource(Subscriptions::class)
+    fun `should not subscribe to line times`(subscription: Subscriptions) =
+        testApplicationBusTracker {
+            delayTime = 5.seconds
+
+            val body = jObject {
+                "deviceToken" += "token"
+                "subscription" += jObject {
+                    "stopCode" += "88888"
+                    "lineDestination" += jObject {
+                        "line" += "8"
+                        "destination" += "asd"
+                        "codMode" += 8
+                    }
+                }
+            }.serialized()
+
+            val subscribedResponse = client.post(subscription.url + "/subscribe") {
+                setBody(body)
+            }
+
+            subscribedResponse.status.shouldBe(HttpStatusCode.NotFound)
+
+        }
 }
