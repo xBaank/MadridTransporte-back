@@ -40,6 +40,7 @@ val subConfigF: Route.(codMode: String) -> Unit =
 
 val alertsConfigF: Route.(codMode: String) -> Unit = { codMode ->
     get("/alerts") {
+        call.caching = CachingOptions(cacheControl = CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
         handle { getAlertsByCodMode(codMode) }
     }
 }
