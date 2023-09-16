@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+- Log ALL
+
 ## 1.0.1
 
 - Improve cache
