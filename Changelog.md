@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+- Timeout for soap requests
+
 ## 1.0.3
 
 - Use Dispatcher IO for notifications
