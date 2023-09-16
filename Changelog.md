@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6-RC
+
+- Make all soap request with dispatcher IO
+
 ## 1.0.5
 
 - Global scope for notifications
