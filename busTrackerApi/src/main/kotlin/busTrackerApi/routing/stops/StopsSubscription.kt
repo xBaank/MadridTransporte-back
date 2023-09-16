@@ -143,7 +143,7 @@ suspend fun subscribeDevice(
 }
 
 fun notifyStopTimesOnBackground() {
-    val coroutine = CoroutineScope(Dispatchers.Default)
+    val coroutine = CoroutineScope(Dispatchers.IO)
     coroutine.launch {
         while (isActive) {
             collection.get().await().documents.forEachAsync { document ->

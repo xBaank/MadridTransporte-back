@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- Use Dispatcher IO for notifications
+
 ## 1.0.2
 
 - Log ALL
