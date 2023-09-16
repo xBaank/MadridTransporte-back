@@ -38,7 +38,7 @@ val cachedAlerts = Cache.Builder()
 
 const val allStopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json"
 const val allStopsInfoUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/StopsInfo.json"
-private val timeoutSeconds = 30.seconds
+val timeoutSeconds = 30.seconds
 
 private fun getStopTimesResponse(stopCode: String) = Either.catch {
     val request = StopTimesRequest().apply {
