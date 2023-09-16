@@ -142,9 +142,9 @@ suspend fun subscribeDevice(
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 fun notifyStopTimesOnBackground() {
-    val coroutine = CoroutineScope(Dispatchers.IO)
-    coroutine.launch {
+    GlobalScope.launch(Dispatchers.IO) {
         while (isActive) {
             collection.get().await().documents.forEachAsync { document ->
                 val subscription = document.toObject(StopsSubscription::class.java)
