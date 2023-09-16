@@ -58,6 +58,7 @@ task("wsimport-myservice-buses") {
     val destDir = file("$projectDir/src/main/java")
     destDir.mkdirs()
     val sourceDestDir = file("$projectDir/src/main/java")
+    val async = file("$projectDir/src/main/resources/async.xml")
     sourceDestDir.mkdirs()
     doLast {
         ant.withGroovyBuilder {
@@ -68,6 +69,7 @@ task("wsimport-myservice-buses") {
             )
 
             "wsimport"(
+                "binding" to async,
                 "keep" to true,
                 "sourcedestdir" to sourceDestDir,
                 //"destDir" to destDir, alreaddy compiled java classes, not needed
@@ -86,6 +88,7 @@ task("wsimport-myservice-abono") {
     val destDir = file("$projectDir/src/main/java")
     destDir.mkdirs()
     val sourceDestDir = file("$projectDir/src/main/java")
+    val async = file("$projectDir/src/main/resources/async.xml")
     sourceDestDir.mkdirs()
     doLast {
         ant.withGroovyBuilder {
@@ -96,6 +99,7 @@ task("wsimport-myservice-abono") {
             )
 
             "wsimport"(
+                "binding" to async,
                 "keep" to true,
                 "sourcedestdir" to sourceDestDir,
                 //"destDir" to destDir, alreaddy compiled java classes, not needed

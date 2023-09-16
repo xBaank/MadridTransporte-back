@@ -10,18 +10,17 @@ import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
 import busTrackerApi.extensions.onEachAsync
 import busTrackerApi.routing.stops.metro.metroCodMode
+import busTrackerApi.utils.auth
+import busTrackerApi.utils.defaultClient
 import busTrackerApi.utils.mapExceptionsF
-import crtm.auth
-import crtm.defaultClient
 import crtm.soap.ArrayOfString
 import crtm.soap.IncidentsAffectationsRequest
 import crtm.soap.IncidentsAffectationsResponse
 import crtm.soap.StopTimesRequest
 import crtm.utils.getCodStopFromStopCode
 import io.github.reactivecircus.cache4k.Cache
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.*
@@ -40,22 +39,20 @@ const val allStopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-st
 const val allStopsInfoUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/StopsInfo.json"
 val timeoutSeconds = 30.seconds
 
-private fun getStopTimesResponse(stopCode: String) = Either.catch {
+private suspend fun getStopTimesResponse(stopCode: String) = Either.catch {
     val request = StopTimesRequest().apply {
         codStop = stopCode
         type = 1
         orderBy = 2
         stopTimesByIti = 3
-        authentication = defaultClient.auth()
+        authentication = defaultClient.await().auth()
     }
-    defaultClient.getStopTimes(request)
+    defaultClient.await().getStopTimes(request)
 }.mapLeft(mapExceptionsF)
 
 suspend fun getBusTimesResponse(stopCode: String) = either {
     val stopTimes = withTimeoutOrNull(timeoutSeconds) {
-        CoroutineScope(Dispatchers.IO)
-            .async { getStopTimesResponse(stopCode) }
-            .await()
+        withContext(Dispatchers.IO) { getStopTimesResponse(stopCode) }
             .getOrNull()
     }
 
@@ -174,13 +171,11 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
     val request = IncidentsAffectationsRequest().apply {
         this.codMode = codMode
         codLines = ArrayOfString()
-        authentication = defaultClient.auth()
+        authentication = defaultClient.await().auth()
     }
 
     val result = withTimeoutOrNull(timeoutSeconds) {
-        CoroutineScope(Dispatchers.IO)
-            .async { defaultClient.getIncidentsAffectations(request) }
-            .await()
+        withContext(Dispatchers.IO) { defaultClient.await().getIncidentsAffectations(request) }
     }
 
     if (result == null) throw BusTrackerException.InternalServerError("Got empty response")
