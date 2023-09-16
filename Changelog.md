@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5
+
+- Global scope for notifications
+
 ## 1.0.4
 
 - Timeout for soap requests
