@@ -45,9 +45,9 @@ private suspend fun getStopTimesResponse(stopCode: String) = Either.catch {
         type = 1
         orderBy = 2
         stopTimesByIti = 3
-        authentication = defaultClient.await().auth()
+        authentication = defaultClient.value().auth()
     }
-    defaultClient.await().getStopTimes(request)
+    defaultClient.value().getStopTimes(request)
 }.mapLeft(mapExceptionsF)
 
 suspend fun getBusTimesResponse(stopCode: String) = either {
@@ -168,14 +168,14 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
     val cached = cachedAlerts.get(codMode)
     if (cached != null) return@catch cached
 
-    val request = IncidentsAffectationsRequest().apply {
-        this.codMode = codMode
-        codLines = ArrayOfString()
-        authentication = defaultClient.await().auth()
-    }
-
     val result = withTimeoutOrNull(timeoutSeconds) {
-        withContext(Dispatchers.IO) { defaultClient.await().getIncidentsAffectations(request) }
+        val request = IncidentsAffectationsRequest().apply {
+            this.codMode = codMode
+            codLines = ArrayOfString()
+            authentication = defaultClient.value().auth()
+        }
+
+        withContext(Dispatchers.IO) { defaultClient.value().getIncidentsAffectations(request) }
     }
 
     if (result == null) throw BusTrackerException.InternalServerError("Got empty response")

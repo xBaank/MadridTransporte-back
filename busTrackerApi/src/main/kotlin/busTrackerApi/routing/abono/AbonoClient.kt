@@ -20,7 +20,7 @@ val xml = XML { autoPolymorphic = true }
 suspend fun Call.getAbono() = either {
     val id = call.parameters.getWrapped("id").bind()
     val response = withTimeoutOrNull(timeoutSeconds) {
-        withContext(Dispatchers.IO) { abonoClient.await().consultaSaldo1(id) }
+        withContext(Dispatchers.IO) { abonoClient.value().consultaSaldo1(id) }
     } ?: shift<Nothing>(SoapError("No locations found for line $id"))
 
     val result = xml.decodeFromString<SS_prepagoConsultaSaldo>(response.sResulXMLField)

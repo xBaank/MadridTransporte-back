@@ -22,24 +22,24 @@ suspend fun getLocationsResponse(itinerary: LineItinerary, lineCode: String, cod
         codVehicle = ""
         codItinerary = itinerary.codItinerary
         direction = itinerary.direction
-        authentication = defaultClient.await().auth()
+        authentication = defaultClient.value().auth()
         codStop = itinerary.stops.shortStop.first().codStop
     }
     withTimeoutOrNull(timeoutSeconds) {
-        withContext(Dispatchers.IO) { defaultClient.await().getLineLocation(lineRequest) }
+        withContext(Dispatchers.IO) { defaultClient.value().getLineLocation(lineRequest) }
     } ?: throw SoapError("Server error")
 }.mapLeft(mapExceptionsF)
 
 suspend fun getItinerariesResponse(lineCode: String) = Either.catch {
     val itineraryRequest = LineItineraryRequest().apply {
         codLine = lineCode
-        authentication = defaultClient.await().auth()
+        authentication = defaultClient.value().auth()
         active = 1
     }
 
     withTimeoutOrNull(timeoutSeconds) {
         withContext(Dispatchers.IO) {
-            defaultClient.await().getLineItineraries(itineraryRequest)
+            defaultClient.value().getLineItineraries(itineraryRequest)
                 .takeIf { it.itineraries.lineItinerary.isNotEmpty() }
         }
             ?: throw NotFound("No locations found for line $lineCode")
@@ -51,10 +51,10 @@ suspend fun getStopsResponse(lineCode: String, codMode: String) = Either.catch {
     val request = StopRequest().apply {
         codLine = lineCode
         this.codMode = codMode
-        authentication = defaultClient.await().auth()
+        authentication = defaultClient.value().auth()
     }
     withTimeoutOrNull(timeoutSeconds) {
-        withContext(Dispatchers.IO) { defaultClient.await().getStops(request).takeIf { it.stops.stop.isNotEmpty() } }
+        withContext(Dispatchers.IO) { defaultClient.value().getStops(request).takeIf { it.stops.stop.isNotEmpty() } }
             ?: throw NotFound("No stops found for line $lineCode")
     } ?: throw SoapError("Server error")
 }.mapLeft(mapExceptionsF)

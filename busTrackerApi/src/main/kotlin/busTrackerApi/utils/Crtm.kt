@@ -8,15 +8,13 @@ import crtm.soap.MultimodalInformation
 import crtm.soap.MultimodalInformation_Service
 import crtm.soap.PublicKeyRequest
 import crtm.utils.authHeader
-import kotlinx.coroutines.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-
-val defaultClient =
-    GlobalScope.async(Dispatchers.IO, start = CoroutineStart.LAZY) { MultimodalInformation_Service().basicHttp }
-val abonoClient = GlobalScope.async(
-    Dispatchers.IO,
-    start = CoroutineStart.LAZY
-) { VentaPrepagoTitulo().basicHttpBindingIVentaPrepagoTitulo }
+val defaultClient = SuspendingLazy { withContext(Dispatchers.IO) { MultimodalInformation_Service().basicHttp } }
+val abonoClient =
+    SuspendingLazy { withContext(Dispatchers.IO) { VentaPrepagoTitulo().basicHttpBindingIVentaPrepagoTitulo } }
 
 private val privateKey = "pruebapruebapruebapruebaprueba12".toByteArray()
 suspend fun MultimodalInformation.auth(): AuthHeader = withContext(Dispatchers.IO) {
