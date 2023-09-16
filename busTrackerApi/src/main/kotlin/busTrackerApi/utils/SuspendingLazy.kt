@@ -3,7 +3,6 @@ package busTrackerApi.utils
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-// Please criticize.
 class SuspendingLazy<T>(initializer: suspend () -> T) {
     private var initializer: (suspend () -> T)? = initializer
     private var mutex: Mutex? = Mutex()
