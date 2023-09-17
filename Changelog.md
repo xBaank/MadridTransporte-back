@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.7
+
+- Update dependencies
+
 ## 1.0.6
 
 - Fix deadlock when CRTM Soap Server gives a timeout
