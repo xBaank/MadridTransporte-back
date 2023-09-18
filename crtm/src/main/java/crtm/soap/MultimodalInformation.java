@@ -1,12 +1,15 @@
 
 package crtm.soap;
 
+import java.util.concurrent.Future;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
 import jakarta.jws.WebResult;
 import jakarta.jws.WebService;
 import jakarta.jws.soap.SOAPBinding;
 import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Response;
 
 
 /**
@@ -27,6 +30,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.PublicKeyResponse>
+     */
+    @WebMethod(operationName = "GetPublicKey", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetPublicKey")
+    public Response<PublicKeyResponse> getPublicKeyAsync(
+        @WebParam(name = "PublicKeyRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        PublicKeyRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetPublicKey", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetPublicKey")
+    public Future<?> getPublicKeyAsync(
+        @WebParam(name = "PublicKeyRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        PublicKeyRequest parameters,
+        @WebParam(name = "GetPublicKeyResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<PublicKeyResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.PublicKeyResponse
      */
     @WebMethod(operationName = "GetPublicKey", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetPublicKey")
@@ -34,6 +62,31 @@ public interface MultimodalInformation {
     public PublicKeyResponse getPublicKey(
         @WebParam(name = "PublicKeyRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         PublicKeyRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.BannerResponse>
+     */
+    @WebMethod(operationName = "GetBanner", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetBanner")
+    public Response<BannerResponse> getBannerAsync(
+        @WebParam(name = "BannerRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        BannerRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetBanner", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetBanner")
+    public Future<?> getBannerAsync(
+        @WebParam(name = "BannerRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        BannerRequest parameters,
+        @WebParam(name = "GetBannerResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<BannerResponse> asyncHandler);
 
     /**
      * 
@@ -51,6 +104,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.TimeResponse>
+     */
+    @WebMethod(operationName = "GetTime", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetTime")
+    public Response<TimeResponse> getTimeAsync(
+        @WebParam(name = "TimeRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        TimeRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetTime", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetTime")
+    public Future<?> getTimeAsync(
+        @WebParam(name = "TimeRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        TimeRequest parameters,
+        @WebParam(name = "GetTimeResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<TimeResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.TimeResponse
      */
     @WebMethod(operationName = "GetTime", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetTime")
@@ -58,6 +136,31 @@ public interface MultimodalInformation {
     public TimeResponse getTime(
         @WebParam(name = "TimeRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         TimeRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.LastDatesUpdateResponse>
+     */
+    @WebMethod(operationName = "GetLastDatesUpdate", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLastDatesUpdate")
+    public Response<LastDatesUpdateResponse> getLastDatesUpdateAsync(
+        @WebParam(name = "LastDatesUpdateRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LastDatesUpdateRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetLastDatesUpdate", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLastDatesUpdate")
+    public Future<?> getLastDatesUpdateAsync(
+        @WebParam(name = "LastDatesUpdateRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LastDatesUpdateRequest parameters,
+        @WebParam(name = "GetLastDatesUpdateResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<LastDatesUpdateResponse> asyncHandler);
 
     /**
      * 
@@ -75,6 +178,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.ModeResponse>
+     */
+    @WebMethod(operationName = "GetModes", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetModes")
+    public Response<ModeResponse> getModesAsync(
+        @WebParam(name = "ModeRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        ModeRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetModes", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetModes")
+    public Future<?> getModesAsync(
+        @WebParam(name = "ModeRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        ModeRequest parameters,
+        @WebParam(name = "GetModesResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<ModeResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.ModeResponse
      */
     @WebMethod(operationName = "GetModes", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetModes")
@@ -82,6 +210,31 @@ public interface MultimodalInformation {
     public ModeResponse getModes(
         @WebParam(name = "ModeRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         ModeRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.LineResponse>
+     */
+    @WebMethod(operationName = "GetLines", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLines")
+    public Response<LineResponse> getLinesAsync(
+        @WebParam(name = "LineRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LineRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetLines", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLines")
+    public Future<?> getLinesAsync(
+        @WebParam(name = "LineRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LineRequest parameters,
+        @WebParam(name = "GetLinesResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<LineResponse> asyncHandler);
 
     /**
      * 
@@ -99,6 +252,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.LineItineraryResponse>
+     */
+    @WebMethod(operationName = "GetLineItineraries", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLineItineraries")
+    public Response<LineItineraryResponse> getLineItinerariesAsync(
+        @WebParam(name = "LineItineraryRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LineItineraryRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetLineItineraries", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLineItineraries")
+    public Future<?> getLineItinerariesAsync(
+        @WebParam(name = "LineItineraryRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LineItineraryRequest parameters,
+        @WebParam(name = "GetLineItinerariesResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<LineItineraryResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.LineItineraryResponse
      */
     @WebMethod(operationName = "GetLineItineraries", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLineItineraries")
@@ -106,6 +284,31 @@ public interface MultimodalInformation {
     public LineItineraryResponse getLineItineraries(
         @WebParam(name = "LineItineraryRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         LineItineraryRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.StopResponse>
+     */
+    @WebMethod(operationName = "GetStops", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStops")
+    public Response<StopResponse> getStopsAsync(
+        @WebParam(name = "StopRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetStops", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStops")
+    public Future<?> getStopsAsync(
+        @WebParam(name = "StopRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopRequest parameters,
+        @WebParam(name = "GetStopsResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<StopResponse> asyncHandler);
 
     /**
      * 
@@ -123,6 +326,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.StopResponse>
+     */
+    @WebMethod(operationName = "GetStopsV2", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopsV2")
+    public Response<StopResponse> getStopsV2Async(
+        @WebParam(name = "StopRequestV2", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopRequestV2 parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetStopsV2", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopsV2")
+    public Future<?> getStopsV2Async(
+        @WebParam(name = "StopRequestV2", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopRequestV2 parameters,
+        @WebParam(name = "GetStopsV2Response", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<StopResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.StopResponse
      */
     @WebMethod(operationName = "GetStopsV2", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopsV2")
@@ -130,6 +358,31 @@ public interface MultimodalInformation {
     public StopResponse getStopsV2(
         @WebParam(name = "StopRequestV2", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         StopRequestV2 parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.StopGTFSResponse>
+     */
+    @WebMethod(operationName = "GetStopsGTFS", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopsGTFS")
+    public Response<StopGTFSResponse> getStopsGTFSAsync(
+        @WebParam(name = "StopGTFSRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopGTFSRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetStopsGTFS", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopsGTFS")
+    public Future<?> getStopsGTFSAsync(
+        @WebParam(name = "StopGTFSRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopGTFSRequest parameters,
+        @WebParam(name = "GetStopsGTFSResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<StopGTFSResponse> asyncHandler);
 
     /**
      * 
@@ -147,6 +400,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.StopInformationResponse>
+     */
+    @WebMethod(operationName = "GetStopsInformation", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopsInformation")
+    public Response<StopInformationResponse> getStopsInformationAsync(
+        @WebParam(name = "StopInformationRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopInformationRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetStopsInformation", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopsInformation")
+    public Future<?> getStopsInformationAsync(
+        @WebParam(name = "StopInformationRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopInformationRequest parameters,
+        @WebParam(name = "GetStopsInformationResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<StopInformationResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.StopInformationResponse
      */
     @WebMethod(operationName = "GetStopsInformation", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopsInformation")
@@ -154,6 +432,31 @@ public interface MultimodalInformation {
     public StopInformationResponse getStopsInformation(
         @WebParam(name = "StopInformationRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         StopInformationRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.MunicipalityResponse>
+     */
+    @WebMethod(operationName = "GetMunicipalities", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetMunicipalities")
+    public Response<MunicipalityResponse> getMunicipalitiesAsync(
+        @WebParam(name = "MunicipalityRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        MunicipalityRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetMunicipalities", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetMunicipalities")
+    public Future<?> getMunicipalitiesAsync(
+        @WebParam(name = "MunicipalityRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        MunicipalityRequest parameters,
+        @WebParam(name = "GetMunicipalitiesResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<MunicipalityResponse> asyncHandler);
 
     /**
      * 
@@ -171,6 +474,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.CompanyResponse>
+     */
+    @WebMethod(operationName = "GetCompanies", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetCompanies")
+    public Response<CompanyResponse> getCompaniesAsync(
+        @WebParam(name = "CompanyRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        CompanyRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetCompanies", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetCompanies")
+    public Future<?> getCompaniesAsync(
+        @WebParam(name = "CompanyRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        CompanyRequest parameters,
+        @WebParam(name = "GetCompaniesResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<CompanyResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.CompanyResponse
      */
     @WebMethod(operationName = "GetCompanies", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetCompanies")
@@ -178,6 +506,31 @@ public interface MultimodalInformation {
     public CompanyResponse getCompanies(
         @WebParam(name = "CompanyRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         CompanyRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.LineInformationResponse>
+     */
+    @WebMethod(operationName = "GetLinesInformation", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLinesInformation")
+    public Response<LineInformationResponse> getLinesInformationAsync(
+        @WebParam(name = "LineInformationRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LineInformationRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetLinesInformation", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLinesInformation")
+    public Future<?> getLinesInformationAsync(
+        @WebParam(name = "LineInformationRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LineInformationRequest parameters,
+        @WebParam(name = "GetLinesInformationResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<LineInformationResponse> asyncHandler);
 
     /**
      * 
@@ -195,6 +548,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.StopsByGeoLocationResponse>
+     */
+    @WebMethod(operationName = "GetNearestStopsByGeoLocation", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetNearestStopsByGeoLocation")
+    public Response<StopsByGeoLocationResponse> getNearestStopsByGeoLocationAsync(
+        @WebParam(name = "StopsByGeoLocationRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopsByGeoLocationRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetNearestStopsByGeoLocation", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetNearestStopsByGeoLocation")
+    public Future<?> getNearestStopsByGeoLocationAsync(
+        @WebParam(name = "StopsByGeoLocationRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopsByGeoLocationRequest parameters,
+        @WebParam(name = "GetNearestStopsByGeoLocationResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<StopsByGeoLocationResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.StopsByGeoLocationResponse
      */
     @WebMethod(operationName = "GetNearestStopsByGeoLocation", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetNearestStopsByGeoLocation")
@@ -202,6 +580,31 @@ public interface MultimodalInformation {
     public StopsByGeoLocationResponse getNearestStopsByGeoLocation(
         @WebParam(name = "StopsByGeoLocationRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         StopsByGeoLocationRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.LinesByStopResponse>
+     */
+    @WebMethod(operationName = "GetLinesByStopCod", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLinesByStopCod")
+    public Response<LinesByStopResponse> getLinesByStopCodAsync(
+        @WebParam(name = "LinesByStopRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LinesByStopRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetLinesByStopCod", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLinesByStopCod")
+    public Future<?> getLinesByStopCodAsync(
+        @WebParam(name = "LinesByStopRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LinesByStopRequest parameters,
+        @WebParam(name = "GetLinesByStopCodResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<LinesByStopResponse> asyncHandler);
 
     /**
      * 
@@ -219,6 +622,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.OfficeResponse>
+     */
+    @WebMethod(operationName = "GetOffices", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetOffices")
+    public Response<OfficeResponse> getOfficesAsync(
+        @WebParam(name = "OfficeRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        OfficeRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetOffices", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetOffices")
+    public Future<?> getOfficesAsync(
+        @WebParam(name = "OfficeRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        OfficeRequest parameters,
+        @WebParam(name = "GetOfficesResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<OfficeResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.OfficeResponse
      */
     @WebMethod(operationName = "GetOffices", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetOffices")
@@ -226,6 +654,31 @@ public interface MultimodalInformation {
     public OfficeResponse getOffices(
         @WebParam(name = "OfficeRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         OfficeRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.OfficeResponse>
+     */
+    @WebMethod(operationName = "GetOfficesV2", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetOfficesV2")
+    public Response<OfficeResponse> getOfficesV2Async(
+        @WebParam(name = "OfficeRequestV2", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        OfficeRequestV2 parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetOfficesV2", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetOfficesV2")
+    public Future<?> getOfficesV2Async(
+        @WebParam(name = "OfficeRequestV2", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        OfficeRequestV2 parameters,
+        @WebParam(name = "GetOfficesV2Response", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<OfficeResponse> asyncHandler);
 
     /**
      * 
@@ -243,6 +696,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.StopTimesResponse>
+     */
+    @WebMethod(operationName = "GetStopTimes", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopTimes")
+    public Response<StopTimesResponse> getStopTimesAsync(
+        @WebParam(name = "StopTimesRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopTimesRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetStopTimes", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopTimes")
+    public Future<?> getStopTimesAsync(
+        @WebParam(name = "StopTimesRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopTimesRequest parameters,
+        @WebParam(name = "GetStopTimesResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<StopTimesResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.StopTimesResponse
      */
     @WebMethod(operationName = "GetStopTimes", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopTimes")
@@ -250,6 +728,31 @@ public interface MultimodalInformation {
     public StopTimesResponse getStopTimes(
         @WebParam(name = "StopTimesRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         StopTimesRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.ShortStopTimesResponse>
+     */
+    @WebMethod(operationName = "GetShortStopTimes", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetShortStopTimes")
+    public Response<ShortStopTimesResponse> getShortStopTimesAsync(
+        @WebParam(name = "ShortStopTimesRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        ShortStopTimesRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetShortStopTimes", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetShortStopTimes")
+    public Future<?> getShortStopTimesAsync(
+        @WebParam(name = "ShortStopTimesRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        ShortStopTimesRequest parameters,
+        @WebParam(name = "GetShortStopTimesResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<ShortStopTimesResponse> asyncHandler);
 
     /**
      * 
@@ -267,6 +770,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.StopTimesDateResponse>
+     */
+    @WebMethod(operationName = "GetStopTimesByDate", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopTimesByDate")
+    public Response<StopTimesDateResponse> getStopTimesByDateAsync(
+        @WebParam(name = "StopTimesDateRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopTimesDateRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetStopTimesByDate", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopTimesByDate")
+    public Future<?> getStopTimesByDateAsync(
+        @WebParam(name = "StopTimesDateRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        StopTimesDateRequest parameters,
+        @WebParam(name = "GetStopTimesByDateResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<StopTimesDateResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.StopTimesDateResponse
      */
     @WebMethod(operationName = "GetStopTimesByDate", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetStopTimesByDate")
@@ -274,6 +802,31 @@ public interface MultimodalInformation {
     public StopTimesDateResponse getStopTimesByDate(
         @WebParam(name = "StopTimesDateRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         StopTimesDateRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.LineLocationResponse>
+     */
+    @WebMethod(operationName = "GetLineLocation", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLineLocation")
+    public Response<LineLocationResponse> getLineLocationAsync(
+        @WebParam(name = "LineLocationRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LineLocationRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetLineLocation", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLineLocation")
+    public Future<?> getLineLocationAsync(
+        @WebParam(name = "LineLocationRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LineLocationRequest parameters,
+        @WebParam(name = "GetLineLocationResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<LineLocationResponse> asyncHandler);
 
     /**
      * 
@@ -291,6 +844,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.IncidentsAffectationsResponse>
+     */
+    @WebMethod(operationName = "GetIncidentsAffectations", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetIncidentsAffectations")
+    public Response<IncidentsAffectationsResponse> getIncidentsAffectationsAsync(
+        @WebParam(name = "IncidentsAffectationsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        IncidentsAffectationsRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetIncidentsAffectations", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetIncidentsAffectations")
+    public Future<?> getIncidentsAffectationsAsync(
+        @WebParam(name = "IncidentsAffectationsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        IncidentsAffectationsRequest parameters,
+        @WebParam(name = "GetIncidentsAffectationsResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<IncidentsAffectationsResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.IncidentsAffectationsResponse
      */
     @WebMethod(operationName = "GetIncidentsAffectations", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetIncidentsAffectations")
@@ -298,6 +876,31 @@ public interface MultimodalInformation {
     public IncidentsAffectationsResponse getIncidentsAffectations(
         @WebParam(name = "IncidentsAffectationsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         IncidentsAffectationsRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.LinesTimePlanningResponse>
+     */
+    @WebMethod(operationName = "GetLinesTimePlanning", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLinesTimePlanning")
+    public Response<LinesTimePlanningResponse> getLinesTimePlanningAsync(
+        @WebParam(name = "LinesTimePlanningRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LinesTimePlanningRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetLinesTimePlanning", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLinesTimePlanning")
+    public Future<?> getLinesTimePlanningAsync(
+        @WebParam(name = "LinesTimePlanningRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LinesTimePlanningRequest parameters,
+        @WebParam(name = "GetLinesTimePlanningResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<LinesTimePlanningResponse> asyncHandler);
 
     /**
      * 
@@ -315,6 +918,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.TimePlanningResponse>
+     */
+    @WebMethod(operationName = "GetTimePlanning", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetTimePlanning")
+    public Response<TimePlanningResponse> getTimePlanningAsync(
+        @WebParam(name = "TimePlanningRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        TimePlanningRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetTimePlanning", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetTimePlanning")
+    public Future<?> getTimePlanningAsync(
+        @WebParam(name = "TimePlanningRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        TimePlanningRequest parameters,
+        @WebParam(name = "GetTimePlanningResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<TimePlanningResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.TimePlanningResponse
      */
     @WebMethod(operationName = "GetTimePlanning", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetTimePlanning")
@@ -322,6 +950,31 @@ public interface MultimodalInformation {
     public TimePlanningResponse getTimePlanning(
         @WebParam(name = "TimePlanningRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         TimePlanningRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.PlatformsResponse>
+     */
+    @WebMethod(operationName = "GetPlatforms", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetPlatforms")
+    public Response<PlatformsResponse> getPlatformsAsync(
+        @WebParam(name = "PlatformsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        PlatformsRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetPlatforms", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetPlatforms")
+    public Future<?> getPlatformsAsync(
+        @WebParam(name = "PlatformsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        PlatformsRequest parameters,
+        @WebParam(name = "GetPlatformsResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<PlatformsResponse> asyncHandler);
 
     /**
      * 
@@ -339,6 +992,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.LinesByPlatformResponse>
+     */
+    @WebMethod(operationName = "GetLinesByPlatform", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLinesByPlatform")
+    public Response<LinesByPlatformResponse> getLinesByPlatformAsync(
+        @WebParam(name = "LinesByPlatformRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LinesByPlatformRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetLinesByPlatform", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLinesByPlatform")
+    public Future<?> getLinesByPlatformAsync(
+        @WebParam(name = "LinesByPlatformRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        LinesByPlatformRequest parameters,
+        @WebParam(name = "GetLinesByPlatformResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<LinesByPlatformResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.LinesByPlatformResponse
      */
     @WebMethod(operationName = "GetLinesByPlatform", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetLinesByPlatform")
@@ -346,6 +1024,31 @@ public interface MultimodalInformation {
     public LinesByPlatformResponse getLinesByPlatform(
         @WebParam(name = "LinesByPlatformRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         LinesByPlatformRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.SponsorResponse>
+     */
+    @WebMethod(operationName = "GetSponsors", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetSponsors")
+    public Response<SponsorResponse> getSponsorsAsync(
+        @WebParam(name = "SponsorRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        SponsorRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetSponsors", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetSponsors")
+    public Future<?> getSponsorsAsync(
+        @WebParam(name = "SponsorRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        SponsorRequest parameters,
+        @WebParam(name = "GetSponsorsResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<SponsorResponse> asyncHandler);
 
     /**
      * 
@@ -363,6 +1066,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.PoiResponse>
+     */
+    @WebMethod(operationName = "GetPois", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetPois")
+    public Response<PoiResponse> getPoisAsync(
+        @WebParam(name = "PoiRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        PoiRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetPois", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetPois")
+    public Future<?> getPoisAsync(
+        @WebParam(name = "PoiRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        PoiRequest parameters,
+        @WebParam(name = "GetPoisResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<PoiResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.PoiResponse
      */
     @WebMethod(operationName = "GetPois", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetPois")
@@ -370,6 +1098,31 @@ public interface MultimodalInformation {
     public PoiResponse getPois(
         @WebParam(name = "PoiRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         PoiRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.EstimationsResponse>
+     */
+    @WebMethod(operationName = "GetEstimations", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetEstimations")
+    public Response<EstimationsResponse> getEstimationsAsync(
+        @WebParam(name = "EstimationsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        EstimationsRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetEstimations", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetEstimations")
+    public Future<?> getEstimationsAsync(
+        @WebParam(name = "EstimationsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        EstimationsRequest parameters,
+        @WebParam(name = "GetEstimationsResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<EstimationsResponse> asyncHandler);
 
     /**
      * 
@@ -387,6 +1140,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.AppsKMLsResponse>
+     */
+    @WebMethod(operationName = "GetAppsKMLs", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetAppsKMLs")
+    public Response<AppsKMLsResponse> getAppsKMLsAsync(
+        @WebParam(name = "AppsKMLsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        AppsKMLsRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetAppsKMLs", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetAppsKMLs")
+    public Future<?> getAppsKMLsAsync(
+        @WebParam(name = "AppsKMLsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        AppsKMLsRequest parameters,
+        @WebParam(name = "GetAppsKMLsResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<AppsKMLsResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.AppsKMLsResponse
      */
     @WebMethod(operationName = "GetAppsKMLs", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetAppsKMLs")
@@ -394,6 +1172,31 @@ public interface MultimodalInformation {
     public AppsKMLsResponse getAppsKMLs(
         @WebParam(name = "AppsKMLsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         AppsKMLsRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.CalendarsResponse>
+     */
+    @WebMethod(operationName = "GetCalendars", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetCalendars")
+    public Response<CalendarsResponse> getCalendarsAsync(
+        @WebParam(name = "CalendarsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        CalendarsRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetCalendars", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetCalendars")
+    public Future<?> getCalendarsAsync(
+        @WebParam(name = "CalendarsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        CalendarsRequest parameters,
+        @WebParam(name = "GetCalendarsResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<CalendarsResponse> asyncHandler);
 
     /**
      * 
@@ -411,6 +1214,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.TripsResponse>
+     */
+    @WebMethod(operationName = "GetTrips", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetTrips")
+    public Response<TripsResponse> getTripsAsync(
+        @WebParam(name = "TripsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        TripsRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetTrips", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetTrips")
+    public Future<?> getTripsAsync(
+        @WebParam(name = "TripsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        TripsRequest parameters,
+        @WebParam(name = "GetTripsResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<TripsResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.TripsResponse
      */
     @WebMethod(operationName = "GetTrips", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetTrips")
@@ -418,6 +1246,31 @@ public interface MultimodalInformation {
     public TripsResponse getTrips(
         @WebParam(name = "TripsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         TripsRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.FrequencyTripsResponse>
+     */
+    @WebMethod(operationName = "GetFrequencyTrips", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetFrequencyTrips")
+    public Response<FrequencyTripsResponse> getFrequencyTripsAsync(
+        @WebParam(name = "FrequencyTripsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        FrequencyTripsRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "GetFrequencyTrips", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/GetFrequencyTrips")
+    public Future<?> getFrequencyTripsAsync(
+        @WebParam(name = "FrequencyTripsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        FrequencyTripsRequest parameters,
+        @WebParam(name = "GetFrequencyTripsResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<FrequencyTripsResponse> asyncHandler);
 
     /**
      * 
@@ -435,6 +1288,31 @@ public interface MultimodalInformation {
      * 
      * @param parameters
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.TripUpdatesResponse>
+     */
+    @WebMethod(operationName = "CheckTripUpdates", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/CheckTripUpdates")
+    public Response<TripUpdatesResponse> checkTripUpdatesAsync(
+        @WebParam(name = "TripUpdatesRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        TripUpdatesRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "CheckTripUpdates", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/CheckTripUpdates")
+    public Future<?> checkTripUpdatesAsync(
+        @WebParam(name = "TripUpdatesRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        TripUpdatesRequest parameters,
+        @WebParam(name = "CheckTripUpdatesResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<TripUpdatesResponse> asyncHandler);
+
+    /**
+     * 
+     * @param parameters
+     * @return
      *     returns crtm.soap.TripUpdatesResponse
      */
     @WebMethod(operationName = "CheckTripUpdates", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/CheckTripUpdates")
@@ -442,6 +1320,31 @@ public interface MultimodalInformation {
     public TripUpdatesResponse checkTripUpdates(
         @WebParam(name = "TripUpdatesRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
         TripUpdatesRequest parameters);
+
+    /**
+     * 
+     * @param parameters
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.soap.AlertsResponse>
+     */
+    @WebMethod(operationName = "CheckAlerts", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/CheckAlerts")
+    public Response<AlertsResponse> checkAlertsAsync(
+        @WebParam(name = "AlertsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        AlertsRequest parameters);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param parameters
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "CheckAlerts", action = "GEIS.MultimodalInfoWebService/MultimodalInformation/CheckAlerts")
+    public Future<?> checkAlertsAsync(
+        @WebParam(name = "AlertsRequest", targetNamespace = "GEIS.MultimodalInfoWebService", partName = "parameters")
+        AlertsRequest parameters,
+        @WebParam(name = "CheckAlertsResponse", targetNamespace = "", partName = "asyncHandler")
+        AsyncHandler<AlertsResponse> asyncHandler);
 
     /**
      * 

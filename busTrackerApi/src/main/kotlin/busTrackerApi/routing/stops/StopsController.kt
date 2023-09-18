@@ -5,28 +5,20 @@ import arrow.core.continuations.either
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.BusTrackerException.NotFound
-import busTrackerApi.extensions.asNumberOrString
-import busTrackerApi.extensions.bindMap
-import busTrackerApi.extensions.get
-import busTrackerApi.extensions.onEachAsync
+import busTrackerApi.extensions.*
 import busTrackerApi.routing.stops.metro.metroCodMode
-import busTrackerApi.utils.auth
-import busTrackerApi.utils.defaultClient
-import busTrackerApi.utils.mapExceptionsF
+import busTrackerApi.utils.*
 import crtm.soap.ArrayOfString
 import crtm.soap.IncidentsAffectationsRequest
 import crtm.soap.IncidentsAffectationsResponse
 import crtm.soap.StopTimesRequest
 import crtm.utils.getCodStopFromStopCode
 import io.github.reactivecircus.cache4k.Cache
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.*
 import java.util.UUID.randomUUID
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.seconds
 
 val allStopsCache = Cache.Builder()
     .build<String, JsonNode>()
@@ -34,10 +26,6 @@ val allStopsCache = Cache.Builder()
 val cachedAlerts = Cache.Builder()
     .expireAfterWrite(24.hours)
     .build<String, IncidentsAffectationsResponse>()
-
-const val allStopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json"
-const val allStopsInfoUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/StopsInfo.json"
-val timeoutSeconds = 30.seconds
 
 private suspend fun getStopTimesResponse(stopCode: String) = Either.catch {
     val request = StopTimesRequest().apply {
@@ -47,13 +35,12 @@ private suspend fun getStopTimesResponse(stopCode: String) = Either.catch {
         stopTimesByIti = 3
         authentication = defaultClient.value().auth()
     }
-    defaultClient.value().getStopTimes(request)
+    getSuspend(request, defaultClient.value()::getStopTimesAsync)
 }.mapLeft(mapExceptionsF)
 
 suspend fun getBusTimesResponse(stopCode: String) = either {
     val stopTimes = withTimeoutOrNull(timeoutSeconds) {
-        withContext(Dispatchers.IO) { getStopTimesResponse(stopCode) }
-            .getOrNull()
+        getStopTimesResponse(stopCode).getOrNull()
     }
 
     val result = parseStopTimesResponseToStopTimes(
@@ -175,7 +162,7 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
             authentication = defaultClient.value().auth()
         }
 
-        withContext(Dispatchers.IO) { defaultClient.value().getIncidentsAffectations(request) }
+        getSuspend(request, defaultClient.value()::getIncidentsAffectationsAsync)
     }
 
     if (result == null) throw BusTrackerException.InternalServerError("Got empty response")
