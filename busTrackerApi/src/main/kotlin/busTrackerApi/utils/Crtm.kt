@@ -13,6 +13,11 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.seconds
+
+const val allStopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json"
+const val allStopsInfoUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/StopsInfo.json"
+val timeoutSeconds = 30.seconds
 
 val defaultClient = SuspendingLazy {
     withContext(Dispatchers.IO) {

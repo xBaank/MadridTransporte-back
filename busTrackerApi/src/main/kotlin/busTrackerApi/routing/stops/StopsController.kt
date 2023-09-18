@@ -7,9 +7,7 @@ import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.*
 import busTrackerApi.routing.stops.metro.metroCodMode
-import busTrackerApi.utils.auth
-import busTrackerApi.utils.defaultClient
-import busTrackerApi.utils.mapExceptionsF
+import busTrackerApi.utils.*
 import crtm.soap.ArrayOfString
 import crtm.soap.IncidentsAffectationsRequest
 import crtm.soap.IncidentsAffectationsResponse
@@ -21,7 +19,6 @@ import ru.gildor.coroutines.okhttp.await
 import simpleJson.*
 import java.util.UUID.randomUUID
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.seconds
 
 val allStopsCache = Cache.Builder()
     .build<String, JsonNode>()
@@ -29,10 +26,6 @@ val allStopsCache = Cache.Builder()
 val cachedAlerts = Cache.Builder()
     .expireAfterWrite(24.hours)
     .build<String, IncidentsAffectationsResponse>()
-
-const val allStopsUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/Stops.json"
-const val allStopsInfoUrl = "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/StopsInfo.json"
-val timeoutSeconds = 30.seconds
 
 private suspend fun getStopTimesResponse(stopCode: String) = Either.catch {
     val request = StopTimesRequest().apply {

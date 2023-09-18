@@ -4,10 +4,10 @@ import arrow.core.Either
 import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.exceptions.BusTrackerException.SoapError
 import busTrackerApi.extensions.getSuspend
-import busTrackerApi.routing.stops.timeoutSeconds
 import busTrackerApi.utils.auth
 import busTrackerApi.utils.defaultClient
 import busTrackerApi.utils.mapExceptionsF
+import busTrackerApi.utils.timeoutSeconds
 import crtm.soap.LineItinerary
 import crtm.soap.LineItineraryRequest
 import crtm.soap.LineLocationRequest

@@ -6,10 +6,10 @@ import busTrackerApi.exceptions.BusTrackerException.SoapError
 import busTrackerApi.extensions.getSuspend
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.ResponseJson
-import busTrackerApi.routing.stops.timeoutSeconds
 import busTrackerApi.utils.Call
 import busTrackerApi.utils.abonoClient
 import busTrackerApi.utils.mapExceptionsF
+import busTrackerApi.utils.timeoutSeconds
 import io.ktor.http.*
 import io.ktor.server.application.*
 import kotlinx.coroutines.withTimeoutOrNull

@@ -20,4 +20,3 @@ suspend inline fun <T, R : Any?> getSuspend(
         }
         continuation.invokeOnCancellation { future.cancel(true) }
     }
-
