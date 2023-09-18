@@ -1,12 +1,15 @@
 
 package crtm.abono;
 
+import java.util.concurrent.Future;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
 import jakarta.jws.WebResult;
 import jakarta.jws.WebService;
 import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.ws.AsyncHandler;
 import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.Response;
 import jakarta.xml.ws.ResponseWrapper;
 
 
@@ -27,6 +30,35 @@ public interface IVentaPrepagoTitulo {
      * 
      * @param sNumeroTTP
      * @return
+     *     returns jakarta.xml.ws.Response<crtm.abono.ConsultaSaldo1Response>
+     */
+    @WebMethod(operationName = "ConsultaSaldo1", action = "http://tempuri.org/IVentaPrepagoTitulo/ConsultaSaldo1")
+    @RequestWrapper(localName = "ConsultaSaldo1", targetNamespace = "http://tempuri.org/", className = "crtm.abono.ConsultaSaldo1")
+    @ResponseWrapper(localName = "ConsultaSaldo1Response", targetNamespace = "http://tempuri.org/", className = "crtm.abono.ConsultaSaldo1Response")
+    public Response<ConsultaSaldo1Response> consultaSaldo1Async(
+        @WebParam(name = "sNumeroTTP", targetNamespace = "http://tempuri.org/")
+        String sNumeroTTP);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param sNumeroTTP
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "ConsultaSaldo1", action = "http://tempuri.org/IVentaPrepagoTitulo/ConsultaSaldo1")
+    @RequestWrapper(localName = "ConsultaSaldo1", targetNamespace = "http://tempuri.org/", className = "crtm.abono.ConsultaSaldo1")
+    @ResponseWrapper(localName = "ConsultaSaldo1Response", targetNamespace = "http://tempuri.org/", className = "crtm.abono.ConsultaSaldo1Response")
+    public Future<?> consultaSaldo1Async(
+        @WebParam(name = "sNumeroTTP", targetNamespace = "http://tempuri.org/")
+        String sNumeroTTP,
+        @WebParam(name = "asyncHandler", targetNamespace = "")
+        AsyncHandler<ConsultaSaldo1Response> asyncHandler);
+
+    /**
+     * 
+     * @param sNumeroTTP
+     * @return
      *     returns crtm.abono.RespuestaVentaPrepagoTituloConsultaSaldo1
      */
     @WebMethod(operationName = "ConsultaSaldo1", action = "http://tempuri.org/IVentaPrepagoTitulo/ConsultaSaldo1")
@@ -36,6 +68,47 @@ public interface IVentaPrepagoTitulo {
     public RespuestaVentaPrepagoTituloConsultaSaldo1 consultaSaldo1(
         @WebParam(name = "sNumeroTTP", targetNamespace = "http://tempuri.org/")
         String sNumeroTTP);
+
+    /**
+     * 
+     * @param sLenguaje
+     * @param sNumeroTP
+     * @param sTipoApp
+     * @return
+     *     returns jakarta.xml.ws.Response<crtm.abono.ConsultaSaldoTarjeta1Response>
+     */
+    @WebMethod(operationName = "ConsultaSaldoTarjeta1", action = "http://tempuri.org/IVentaPrepagoTitulo/ConsultaSaldoTarjeta1")
+    @RequestWrapper(localName = "ConsultaSaldoTarjeta1", targetNamespace = "http://tempuri.org/", className = "crtm.abono.ConsultaSaldoTarjeta1")
+    @ResponseWrapper(localName = "ConsultaSaldoTarjeta1Response", targetNamespace = "http://tempuri.org/", className = "crtm.abono.ConsultaSaldoTarjeta1Response")
+    public Response<ConsultaSaldoTarjeta1Response> consultaSaldoTarjeta1Async(
+        @WebParam(name = "sNumeroTP", targetNamespace = "http://tempuri.org/")
+        String sNumeroTP,
+        @WebParam(name = "sLenguaje", targetNamespace = "http://tempuri.org/")
+        String sLenguaje,
+        @WebParam(name = "sTipoApp", targetNamespace = "http://tempuri.org/")
+        String sTipoApp);
+
+    /**
+     * 
+     * @param asyncHandler
+     * @param sLenguaje
+     * @param sNumeroTP
+     * @param sTipoApp
+     * @return
+     *     returns java.util.concurrent.Future<? extends java.lang.Object>
+     */
+    @WebMethod(operationName = "ConsultaSaldoTarjeta1", action = "http://tempuri.org/IVentaPrepagoTitulo/ConsultaSaldoTarjeta1")
+    @RequestWrapper(localName = "ConsultaSaldoTarjeta1", targetNamespace = "http://tempuri.org/", className = "crtm.abono.ConsultaSaldoTarjeta1")
+    @ResponseWrapper(localName = "ConsultaSaldoTarjeta1Response", targetNamespace = "http://tempuri.org/", className = "crtm.abono.ConsultaSaldoTarjeta1Response")
+    public Future<?> consultaSaldoTarjeta1Async(
+        @WebParam(name = "sNumeroTP", targetNamespace = "http://tempuri.org/")
+        String sNumeroTP,
+        @WebParam(name = "sLenguaje", targetNamespace = "http://tempuri.org/")
+        String sLenguaje,
+        @WebParam(name = "sTipoApp", targetNamespace = "http://tempuri.org/")
+        String sTipoApp,
+        @WebParam(name = "asyncHandler", targetNamespace = "")
+        AsyncHandler<ConsultaSaldoTarjeta1Response> asyncHandler);
 
     /**
      * 

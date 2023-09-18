@@ -3,6 +3,7 @@ package busTrackerApi.routing.bus.lines
 import arrow.core.Either
 import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.exceptions.BusTrackerException.SoapError
+import busTrackerApi.extensions.getSuspend
 import busTrackerApi.routing.stops.timeoutSeconds
 import busTrackerApi.utils.auth
 import busTrackerApi.utils.defaultClient
@@ -11,8 +12,6 @@ import crtm.soap.LineItinerary
 import crtm.soap.LineItineraryRequest
 import crtm.soap.LineLocationRequest
 import crtm.soap.StopRequest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 
 suspend fun getLocationsResponse(itinerary: LineItinerary, lineCode: String, codMode: String) = Either.catch {
@@ -26,7 +25,7 @@ suspend fun getLocationsResponse(itinerary: LineItinerary, lineCode: String, cod
         codStop = itinerary.stops.shortStop.first().codStop
     }
     withTimeoutOrNull(timeoutSeconds) {
-        withContext(Dispatchers.IO) { defaultClient.value().getLineLocation(lineRequest) }
+        getSuspend(lineRequest, defaultClient.value()::getLineLocationAsync)
     } ?: throw SoapError("Server error")
 }.mapLeft(mapExceptionsF)
 
@@ -38,10 +37,8 @@ suspend fun getItinerariesResponse(lineCode: String) = Either.catch {
     }
 
     withTimeoutOrNull(timeoutSeconds) {
-        withContext(Dispatchers.IO) {
-            defaultClient.value().getLineItineraries(itineraryRequest)
-                .takeIf { it.itineraries.lineItinerary.isNotEmpty() }
-        }
+        getSuspend(itineraryRequest, defaultClient.value()::getLineItinerariesAsync)
+            .takeIf { it.itineraries.lineItinerary.isNotEmpty() }
             ?: throw NotFound("No locations found for line $lineCode")
     } ?: throw SoapError("Server error")
 
@@ -54,7 +51,8 @@ suspend fun getStopsResponse(lineCode: String, codMode: String) = Either.catch {
         authentication = defaultClient.value().auth()
     }
     withTimeoutOrNull(timeoutSeconds) {
-        withContext(Dispatchers.IO) { defaultClient.value().getStops(request).takeIf { it.stops.stop.isNotEmpty() } }
+        getSuspend(request, defaultClient.value()::getStopsAsync)
+            .takeIf { it.stops.stop.isNotEmpty() }
             ?: throw NotFound("No stops found for line $lineCode")
     } ?: throw SoapError("Server error")
 }.mapLeft(mapExceptionsF)
