@@ -2,21 +2,22 @@ package busTrackerApi.extensions
 
 import jakarta.xml.ws.AsyncHandler
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.util.concurrent.Future
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-suspend inline fun <T, R : Any?, K> getSuspend(
+suspend inline fun <T, R : Any?> getSuspend(
     request: T,
-    crossinline f: (T, AsyncHandler<R>) -> K
+    crossinline f: (T, AsyncHandler<R>) -> Future<*>
 ): R =
     suspendCancellableCoroutine { continuation ->
-        f(request) { result ->
-            continuation.invokeOnCancellation { result.cancel(true) }
+        val future = f(request) { result ->
             try {
                 continuation.resume(result.get())
             } catch (e: Throwable) {
                 continuation.resumeWithException(e)
             }
         }
+        continuation.invokeOnCancellation { future.cancel(true) }
     }
 
