@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.8
+
+- Make soap **Fully async**
+
 ## 1.0.7
 
 - Update dependencies
