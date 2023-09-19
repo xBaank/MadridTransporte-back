@@ -54,7 +54,7 @@ server {
     limit_req zone=one burst=20;
     listen                  443 ssl;
     listen                  [::]:443 ssl;
-    server_name             api.server.com; //Your api domain
+    server_name             api.server.com; #Your api domain
     ssl_certificate         /root/ssl/cert.pem;
     ssl_certificate_key     /root/ssl/key.pem;
     location / {  
