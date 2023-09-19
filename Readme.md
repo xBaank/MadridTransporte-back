@@ -22,7 +22,7 @@ version: "3.9"
 services:
   api:
     environment:
-      - SERVICE_JSON=WRITE HERE YOUR SERVICE JSON, NOT THE FILE PATH, You can get it from https://console.firebase.google.com/u/0/project/YOUR_PROJECT/settings/serviceaccounts/adminsdk
+      - SERVICE_JSON= #WRITE HERE YOUR SERVICE JSON, NOT THE FILE PATH, You can get it from https://console.firebase.google.com/u/0/project/YOUR_PROJECT/settings/serviceaccounts/adminsdk
     image: xbank/bus_tracker_api:latest
   nginx:
     depends_on:
@@ -31,10 +31,10 @@ services:
     ports:
       - "7777:443"
     volumes:
-      - yourNginxConfFilePath:/etc/nginx/conf.d/default.conf //Example below
-      - yourPrivateKeyFilePath:/root/ssl/key.pem //You can generate it using letsencrypt
-      - yourFullchainFilePath:/root/ssl/cert.pem //You can generate it using letsencrypt
-      - yourNginxCacheFolderPath:/data/nginx/cache //You can use a volume to persist cache
+      - yourNginxConfFilePath:/etc/nginx/conf.d/default.conf #Example below
+      - yourPrivateKeyFilePath:/root/ssl/key.pem #You can generate it using letsencrypt
+      - yourFullchainFilePath:/root/ssl/cert.pem #You can generate it using letsencrypt
+      - yourNginxCacheFolderPath:/data/nginx/cache #You can use a volume to persist cache
     command: [ "nginx", "-g", "daemon off;" ]
 ```
 
