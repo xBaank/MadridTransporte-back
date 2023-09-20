@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- If a dependency fails for the route `times`, the app will respond with a 424 instead of a 200. But arrives will be
+  null like before. This change is for cache purposes as nginx or other proxies will not cache the response if the
+  dependency fails.
+
 ## 1.0.8
 
 - Make soap **Fully async**
