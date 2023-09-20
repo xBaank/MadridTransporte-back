@@ -2,7 +2,7 @@
 
 ## 1.0.10
 
-- Disable cache for 40x and 50x responses
+- Disable cache for 424 responses
 
 ## 1.0.9
 
