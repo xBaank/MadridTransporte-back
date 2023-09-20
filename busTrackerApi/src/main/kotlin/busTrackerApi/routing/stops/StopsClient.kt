@@ -34,7 +34,7 @@ private suspend fun getStopTimesBase(
     val stopCode = createStopCode(codMode, simpleStopCode.bind())
     checkStopExists(stopCode).bind()
     val times = f(stopCode).bind()
-    val statusCode = if (times.arrives == null) HttpStatusCode.BadRequest else HttpStatusCode.OK
+    val statusCode = if (times.arrives == null) HttpStatusCode.FailedDependency else HttpStatusCode.OK
     ResponseJson(buildStopTimesJson(times), statusCode)
 }
 

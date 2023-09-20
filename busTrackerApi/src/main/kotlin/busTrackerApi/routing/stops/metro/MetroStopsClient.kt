@@ -22,7 +22,7 @@ private suspend fun getMetroTimesBase(
 ) = either {
     val stopCode = createStopCode(codMode, id.bind())
     val times = f(stopCode, codMode).bind()
-    val statusCode = if (times.arrives == null) HttpStatusCode.BadRequest else HttpStatusCode.OK
+    val statusCode = if (times.arrives == null) HttpStatusCode.FailedDependency else HttpStatusCode.OK
     ResponseJson(buildStopTimesJson(times), statusCode)
 }
 
