@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.11
+
+- Update status codes to work with nginx cache stale
+
 ## 1.0.10
 
 - Disable cache for 424 responses
