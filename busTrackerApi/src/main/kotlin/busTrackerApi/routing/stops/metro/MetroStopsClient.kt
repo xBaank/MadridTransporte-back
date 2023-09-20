@@ -25,7 +25,7 @@ private suspend fun Call.getMetroTimesBase(
     val stopCode = createStopCode(codMode, id.bind())
     val times = f(stopCode, codMode).bind()
     if (times.arrives != null) call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 30))
-    val statusCode = if (times.arrives == null) HttpStatusCode.FailedDependency else HttpStatusCode.OK
+    val statusCode = if (times.arrives == null) HttpStatusCode.ServiceUnavailable else HttpStatusCode.OK
     ResponseJson(buildStopTimesJson(times), statusCode)
 }
 

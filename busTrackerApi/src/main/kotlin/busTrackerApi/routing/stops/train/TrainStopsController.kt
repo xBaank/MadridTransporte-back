@@ -2,7 +2,7 @@ package busTrackerApi.routing.stops.train
 
 import arrow.core.continuations.either
 import busTrackerApi.config.httpClient
-import busTrackerApi.exceptions.BusTrackerException.BadRequest
+import busTrackerApi.exceptions.BusTrackerException.InternalServerError
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.post
 import busTrackerApi.utils.hourFormatter
@@ -33,11 +33,11 @@ suspend fun getTrainTimesResponse(origin: String, destination: String) = either 
         "accesibilidadTrenes" += true
     }).await()
 
-    if (!response.isSuccessful) shift<Nothing>(BadRequest("Renfe server not responding"))
+    if (!response.isSuccessful) shift<Nothing>(InternalServerError("Renfe server not responding"))
     val json = response.body?.bytes()
         ?.let { String(it, Charsets.ISO_8859_1) }
         ?.toByteArray(Charsets.ISO_8859_1)
         ?.toString(Charsets.UTF_8)
-        ?: shift<Nothing>(BadRequest("Renfe server returned empty response"))
+        ?: shift<Nothing>(InternalServerError("Renfe server returned empty response"))
     json.deserialized().bindMap()
 }

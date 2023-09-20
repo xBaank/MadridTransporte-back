@@ -12,8 +12,11 @@ const val trainCodMode = "5"
 fun Route.trainStopsRouting() = route("/train") {
 
     get("/times") {
-        call.caching = CachingOptions(cacheControl = CacheControl.MaxAge(maxAgeSeconds = 30))
-        handle { getTrainTimes() }
+        handle {
+            getTrainTimes().onRight {
+                call.caching = CachingOptions(cacheControl = CacheControl.MaxAge(maxAgeSeconds = 30))
+            }
+        }
     }
 
     alertsConfigF(trainCodMode)

@@ -2,7 +2,7 @@ package busTrackerApi.routing.abono
 
 import arrow.core.Either
 import arrow.core.continuations.either
-import busTrackerApi.exceptions.BusTrackerException.SoapError
+import busTrackerApi.exceptions.BusTrackerException.InternalServerError
 import busTrackerApi.extensions.getSuspend
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.ResponseJson
@@ -24,7 +24,7 @@ suspend fun Call.getAbono() = either {
         Either.catch {
             getSuspend(id, abonoClient.value()::consultaSaldo1Async)
         }.mapLeft(mapExceptionsF)
-    }?.bind() ?: shift<Nothing>(SoapError("Server error"))
+    }?.bind() ?: shift<Nothing>(InternalServerError("Server error"))
 
     val result = xml.decodeFromString<SS_prepagoConsultaSaldo>(response.consultaSaldo1Result.value.sResulXMLField)
     isFound(result).bind()
