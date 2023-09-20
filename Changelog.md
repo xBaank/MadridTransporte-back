@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.10
+
+- Disable cache for 40x and 50x responses
+
 ## 1.0.9
 
 - If a dependency fails for the route `times`, the app will respond with a 424 instead of a 200. But arrives will be
