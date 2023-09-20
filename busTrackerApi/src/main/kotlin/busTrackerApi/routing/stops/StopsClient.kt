@@ -9,7 +9,9 @@ import busTrackerApi.routing.Response.*
 import busTrackerApi.utils.Call
 import crtm.utils.createStopCode
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
 import simpleJson.*
 
@@ -26,7 +28,7 @@ suspend fun getAllStops() = either {
 suspend fun Call.getStopTimes(codMode: String) =
     getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getBusTimesResponse)
 
-private suspend fun getStopTimesBase(
+private suspend fun Call.getStopTimesBase(
     codMode: String,
     simpleStopCode: Either<BusTrackerException, String>,
     f: suspend (String) -> Either<BusTrackerException, StopTimes>
@@ -34,6 +36,7 @@ private suspend fun getStopTimesBase(
     val stopCode = createStopCode(codMode, simpleStopCode.bind())
     checkStopExists(stopCode).bind()
     val times = f(stopCode).bind()
+    if (times.arrives != null) call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 30))
     val statusCode = if (times.arrives == null) HttpStatusCode.FailedDependency else HttpStatusCode.OK
     ResponseJson(buildStopTimesJson(times), statusCode)
 }

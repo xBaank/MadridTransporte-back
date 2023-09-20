@@ -9,8 +9,7 @@ import io.ktor.server.routing.*
 
 fun Route.stopsRouting() {
     get("/all") {
-        call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
-        handle { getAllStops() }
+        handle { getAllStops().onRight { call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60)) } }
     }
     post("/times/subscriptions") {
         handle { getAllSubscriptions() }
@@ -19,7 +18,6 @@ fun Route.stopsRouting() {
 
 val timesConfigF: Route.(codMode: String) -> Unit = { codMode ->
     get("/{stopCode}/times") {
-        call.caching = CachingOptions(cacheControl = CacheControl.MaxAge(maxAgeSeconds = 30))
         handle { getStopTimes(codMode) }
     }
 }
