@@ -7,6 +7,7 @@ import busTrackerApi.routing.stops.Arrive
 import busTrackerApi.routing.stops.Coordinates
 import busTrackerApi.routing.stops.Incident
 import busTrackerApi.routing.stops.StopTimes
+import crtm.utils.getCodStopFromStopCode
 import simpleJson.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -51,3 +52,12 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
         json["data"][0]["StopInfo"][0]["stopId"].asString().bindMap()
     )
 }
+
+fun createFailedTimes(name: String, coordinates: Coordinates) = StopTimes(
+    codMode = emtCodMode.toInt(),
+    stopName = name,
+    coordinates = coordinates,
+    arrives = null,
+    incidents = emptyList(),
+    simpleStopCode = getCodStopFromStopCode(name)
+)

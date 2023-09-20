@@ -8,6 +8,8 @@ import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
 import busTrackerApi.extensions.post
 import busTrackerApi.routing.stops.StopTimes
+import busTrackerApi.routing.stops.getCoordinatesByStopCode
+import busTrackerApi.routing.stops.getStopNameByStopCode
 import crtm.utils.getCodStopFromStopCode
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.deserialized
@@ -57,9 +59,12 @@ suspend fun getEmtStopTimesResponse(stopCode: String) = either {
             continue
         }
 
-        if (!response.isSuccessful) shift<Nothing>(InternalServerError("EMT getStopTimes failed"))
-        val body =
-            response.body?.string()?.deserialized()?.bindMap() ?: shift<Nothing>(InternalServerError("Body is null"))
+
+        val body = (if (response.isSuccessful) response.body?.string()?.deserialized()?.bindMap() else null)
+            ?: return@either createFailedTimes(
+                name = getStopNameByStopCode(stopCode).bind(),
+                coordinates = getCoordinatesByStopCode(stopCode).bind()
+            )
         return@either parseEMTToStopTimes(body).bind<StopTimes>()
 
     } while (tries > 0)
