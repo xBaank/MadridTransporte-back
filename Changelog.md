@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.14
+
+- Improve calculation of time left for metro
+
+## 1.0.13
+
+- Improve calculation of time left for metro
+
+## 1.0.12
+
+- Reduce cache time for metro and emt
+
 ## 1.0.11
 
 - Update status codes to work with nginx cache stale
