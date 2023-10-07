@@ -1,12 +1,14 @@
 package busTrackerApi.routing.stops.metro
 
 import arrow.core.continuations.either
+import busTrackerApi.extensions.toZoneOffset
 import busTrackerApi.routing.stops.Arrive
 import busTrackerApi.routing.stops.Coordinates
 import busTrackerApi.routing.stops.StopTimes
+import busTrackerApi.utils.timeZoneMadrid
 import simpleJson.*
 import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 suspend fun parseMetroToStopTimes(
     json: JsonNode,
@@ -27,18 +29,24 @@ suspend fun parseMetroToStopTimes(
         )
 
         val arrivesMapped = arrives.flatMap { arrive ->
-            val proximo = arrive["proximo"].asLong().bind()
+            val proximo = arrive["proximo"].asLong().getOrNull()
             val siguiente = arrive["siguiente"].asLong().getOrNull()
 
-            if (proximo == 0L && siguiente == null) return@flatMap emptyList()
+            val fecharHoraEmision = arrive["fechaHoraEmisionPrevision"].asString().bind()
+            val fecharHoraEmisionParsed = LocalDateTime.parse(fecharHoraEmision, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            val now = LocalDateTime.now(timeZoneMadrid.toZoneId())
 
-            val proximoEstimatedArrive = proximo
-                .let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
-                ?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
+            val diffInMinutes = fecharHoraEmisionParsed.until(now, java.time.temporal.ChronoUnit.MINUTES)
+            val proximoDiff = proximo?.let { it - diffInMinutes }?.takeIf { it >= 0 }
+            val siguienteDiff = siguiente?.let { it - diffInMinutes }?.takeIf { it >= 0 }
 
-            val siguienteEstimatedArrive = siguiente
-                ?.let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
-                ?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
+            val proximoEstimatedArrive = proximoDiff
+                ?.let { fecharHoraEmisionParsed.plusMinutes(it) }
+                ?.toInstant(timeZoneMadrid.toZoneOffset())?.toEpochMilli()
+
+            val siguienteEstimatedArrive = siguienteDiff
+                ?.let { fecharHoraEmisionParsed.plusMinutes(it) }
+                ?.toInstant(timeZoneMadrid.toZoneOffset())?.toEpochMilli()
 
             val first = Arrive(
                 line = arrive["linea"].asNumber().bind().toString(),
@@ -48,9 +56,15 @@ suspend fun parseMetroToStopTimes(
                 estimatedArrive = proximoEstimatedArrive ?: -1
             )
 
-            val second = first.copy(estimatedArrive = siguienteEstimatedArrive ?: -1)
+            val second = Arrive(
+                line = arrive["linea"].asNumber().bind().toString(),
+                destination = arrive["sentido"].asString().bind(),
+                anden = arrive["anden"].asInt().getOrNull(),
+                codMode = metroCodMode.toInt(),
+                estimatedArrive = siguienteEstimatedArrive ?: -1
+            )
 
-            listOf(first, second).filter { it.estimatedArrive != -1L }
+            listOf(first, second).filter { it.estimatedArrive >= 0 }
         }
 
         StopTimes(codMode.toInt(), name, coordinates, arrivesMapped, emptyList(), simpleStopCode)
