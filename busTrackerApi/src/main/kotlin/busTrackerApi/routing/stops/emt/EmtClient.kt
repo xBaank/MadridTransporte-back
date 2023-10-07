@@ -24,7 +24,7 @@ private suspend fun Call.getStopTimesBase(
     val stopCode = createStopCode(emtCodMode, simpleStopCode.bind())
     checkStopExists(stopCode).bind()
     val times = f(stopCode).bind()
-    if (times.arrives != null) call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 30))
+    if (times.arrives != null) call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 10))
     val statusCode = if (times.arrives == null) HttpStatusCode.ServiceUnavailable else HttpStatusCode.OK
     ResponseJson(buildStopTimesJson(times), statusCode)
 }

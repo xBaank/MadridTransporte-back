@@ -27,13 +27,13 @@ suspend fun parseMetroToStopTimes(
         )
 
         val arrivesMapped = arrives.flatMap { arrive ->
-            val proximo = arrive["proximo"].asLong().getOrNull()
+            val proximo = arrive["proximo"].asLong().bind()
             val siguiente = arrive["siguiente"].asLong().getOrNull()
 
-            if ((proximo == null) && (siguiente == null)) return@flatMap emptyList()
+            if (proximo == 0L && siguiente == null) return@flatMap emptyList()
 
             val proximoEstimatedArrive = proximo
-                ?.let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
+                .let { LocalDateTime.now(ZoneOffset.UTC).plusMinutes(it) }
                 ?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
 
             val siguienteEstimatedArrive = siguiente
