@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.15
+
+- Improve performance
+
 ## 1.0.14
 
 - Improve calculation of time left for metro

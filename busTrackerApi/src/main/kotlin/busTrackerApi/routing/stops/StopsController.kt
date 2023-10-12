@@ -5,8 +5,10 @@ import arrow.core.continuations.either
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.BusTrackerException.NotFound
-import busTrackerApi.extensions.*
-import busTrackerApi.routing.stops.metro.metroCodMode
+import busTrackerApi.extensions.asNumberOrString
+import busTrackerApi.extensions.bindMap
+import busTrackerApi.extensions.get
+import busTrackerApi.extensions.getSuspend
 import busTrackerApi.utils.*
 import crtm.soap.ArrayOfString
 import crtm.soap.IncidentsAffectationsRequest
@@ -17,7 +19,6 @@ import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.withTimeoutOrNull
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.*
-import java.util.UUID.randomUUID
 import kotlin.time.Duration.Companion.hours
 
 val allStopsCache = Cache.Builder()
@@ -74,30 +75,7 @@ suspend fun getAllStopsResponse() = either {
     val response = httpClient.get(allStopsUrl).await().use { response ->
         val json =
             response.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Got empty response"))
-        json
-            .deserialized()
-            .asArray()
-            .bindMap()
-            .mapNotNull { if (!it["stop_id"].asString().bindMap().contains("par")) null else it }
-            .onEachAsync {
-                it["cod_mode"] = it["stop_id"].asString().bindMap().substringAfter("_").substringBefore("_").toInt()
-            }
-            .onEachAsync {
-                it["full_stop_code"] =
-                    it["cod_mode"].asNumber().bindMap().toString() + "_" + it["stop_code"].asNumberOrString()
-            }
-            .onEachAsync {
-                it["stop_code"] = it["stop_code"].asNumberOrString()
-            }
-            //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
-            .distinctBy {
-                Pair(
-                    if (it["cod_mode"].asNumber().bindMap().toString() == metroCodMode) 1 else randomUUID().toString(),
-                    it["stop_name"].asString().bindMap()
-                )
-            }
-            .distinctBy { it["stop_id"].asString().bindMap() }
-            .asJson()
+        json.deserialized().asArray().bindMap()
     }
 
     allStopsCache.put(allStopsUrl, response)
