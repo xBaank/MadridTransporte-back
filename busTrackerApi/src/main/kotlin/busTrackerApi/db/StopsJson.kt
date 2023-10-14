@@ -25,17 +25,3 @@ suspend fun parseStopsInfo(json: JsonArray) = either {
         )
     }
 }
-
-fun buildStopJson(stop: Stop) = jObject {
-    "stopCode" += stop.stopCode
-    "stopName" += stop.stopName
-    "stopLat" += stop.stopLat
-    "stopLon" += stop.stopLon
-    "codMode" += stop.codMode
-    "fullStopCode" += stop.fullStopCode
-}
-
-fun buildStopsInfoJson(stop: StopsInfo) = jObject {
-    "idEstacion" += stop.idEstacion
-    "codigoEmpresa" += stop.codigoEmpresa
-}

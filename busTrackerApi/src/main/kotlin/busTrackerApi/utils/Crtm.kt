@@ -1,5 +1,3 @@
-@file:OptIn(DelicateCoroutinesApi::class)
-
 package busTrackerApi.utils
 
 import busTrackerApi.extensions.getSuspend
@@ -9,7 +7,6 @@ import crtm.soap.MultimodalInformation
 import crtm.soap.MultimodalInformation_Service
 import crtm.soap.PublicKeyRequest
 import crtm.utils.authHeader
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.withContext
