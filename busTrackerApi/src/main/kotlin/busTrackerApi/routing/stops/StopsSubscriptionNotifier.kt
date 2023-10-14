@@ -7,6 +7,7 @@ import busTrackerApi.db.getSubscriptions
 import busTrackerApi.db.unsubscribeAllDevice
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.await
+import busTrackerApi.extensions.batched
 import busTrackerApi.extensions.forEachAsync
 import busTrackerApi.routing.stops.bus.busCodMode
 import busTrackerApi.routing.stops.emt.emtCodMode
@@ -53,10 +54,11 @@ suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, S
 fun notifyStopTimesOnBackground() {
     GlobalScope.launch(Dispatchers.IO) {
         while (isActive) {
-            getSubscriptions().collect { subscription ->
+            getSubscriptions().batched(100).forEachAsync { subscription ->
                 try {
-                    val function = getFunctionByCodMode(subscription.codMode).getOrNull() ?: return@collect
-                    val stopTimes = function(subscription.stopCode).getOrNull() ?: return@collect
+                    val function = getFunctionByCodMode(subscription.codMode).getOrNull() ?: return@forEachAsync
+                    val stopTimes = function(subscription.stopCode).getOrNull() ?: return@forEachAsync
+
                     subscription.deviceTokens.forEachAsync {
                         val selectedTimes = stopTimes.copy(
                             arrives = stopTimes.arrives?.filter { arrive ->
@@ -65,6 +67,7 @@ fun notifyStopTimesOnBackground() {
                                 } == true
                             } ?: emptyList()
                         )
+                        
                         val message = Message.builder()
                             .putData("stopTimes", buildStopTimesJson(selectedTimes).serialized())
                             .setToken(it.token)
