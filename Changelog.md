@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
+- Improve performance
+
 ## 2.0.0
 
 - Removed `v1/stops/all` endpoint
