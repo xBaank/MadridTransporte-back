@@ -87,13 +87,12 @@ class NotificationsTest {
                 }.serialized())
             }
 
-            delay(delayTime * 2)
+            verify(timeout = delayTime.inWholeMilliseconds, atLeast = 1) { firebaseMessaging.sendAsync(any()) }
 
             val unsubscribeResponse = client.post(subscription.url + "/unsubscribe") {
                 setBody(body)
             }
 
-            verify(timeout = delayTime.inWholeMilliseconds) { firebaseMessaging.sendAsync(any()) }
             subscribedResponse.status.isSuccess().shouldBe(true)
             subscriptionsResponse.status.isSuccess().shouldBe(true)
             unsubscribeResponse.status.isSuccess().shouldBe(true)
@@ -133,7 +132,8 @@ class NotificationsTest {
                 setBody(body)
             }
 
-            delay(delayTime * 2)
+            verify(timeout = delayTime.inWholeMilliseconds, atLeast = 1) { firebaseMessaging.sendAsync(any()) }
+            delay(delayTime.inWholeMilliseconds) //TODO We need this to wait for the subscription to be removed after sending the message failed
 
             val subscriptionsResponse = client.post(subscription.url + "/subscription") {
                 setBody(jObject {
@@ -143,7 +143,6 @@ class NotificationsTest {
             }
 
 
-            verify(timeout = delayTime.inWholeMilliseconds) { firebaseMessaging.sendAsync(any()) }
             subscribedResponse.status.isSuccess().shouldBe(true)
             subscriptionsResponse.status.shouldBe(HttpStatusCode.NotFound)
         }
