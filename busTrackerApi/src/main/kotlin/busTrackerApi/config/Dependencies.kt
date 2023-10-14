@@ -1,10 +1,15 @@
 package busTrackerApi.config
 
 import arrow.core.continuations.either
-import busTrackerApi.utils.getenvWrapped
+import busTrackerApi.db.Stop
+import busTrackerApi.db.StopsInfo
+import busTrackerApi.db.StopsSubscription
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
+import com.mongodb.kotlin.client.coroutine.MongoClient
+import com.mongodb.kotlin.client.coroutine.MongoCollection
+import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import io.grpc.LoadBalancerRegistry
 import io.grpc.internal.PickFirstLoadBalancerProvider
 import okhttp3.OkHttpClient
@@ -17,18 +22,26 @@ val httpClient = OkHttpClient.Builder()
     .readTimeout(20.seconds.toJavaDuration())
     .build()
 
-fun setupFirebase() = either.eager {
-    //Fix bug `pick_first` in jar
+private lateinit var db: MongoDatabase
+val stopsCollection: MongoCollection<Stop> by lazy { db.getCollection("stops") }
+val stopsInfoCollection: MongoCollection<StopsInfo> by lazy { db.getCollection("stopsInfo") }
+val stopsSubscriptionsCollection: MongoCollection<StopsSubscription> by lazy { db.getCollection("stopsSubscriptions") }
+
+suspend fun setupMongo() = either {
+    db = MongoClient.create(EnvVariables.mongoConnectionString.bind()).getDatabase("busTracker")
+}
+
+suspend fun setupFirebase() = either {
     LoadBalancerRegistry.getDefaultRegistry().register(PickFirstLoadBalancerProvider())
-    if (FirebaseApp.getApps().isNotEmpty()) return@eager
-    if (getenvWrapped("SERVICE_JSON").isLeft()) {
+    if (FirebaseApp.getApps().isNotEmpty()) return@either
+    if (EnvVariables.serviceJson.isLeft()) {
         println("SERVICE_JSON not found, skipping firebase setup") //TODO add logging
-        return@eager
+        return@either
     }
     val options: FirebaseOptions = FirebaseOptions.builder()
         .setCredentials(
             GoogleCredentials.fromStream(
-                getenvWrapped("SERVICE_JSON").bind().byteInputStream()
+                EnvVariables.serviceJson.bind().byteInputStream()
             )
         )
         .build()

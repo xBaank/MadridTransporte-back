@@ -3,12 +3,12 @@ package busTrackerApi.routing.stops.metro
 import arrow.core.continuations.either
 import arrow.core.getOrElse
 import busTrackerApi.config.httpClient
+import busTrackerApi.db.getCoordinatesByStopCode
+import busTrackerApi.db.getIdByStopCode
+import busTrackerApi.db.getStopCodeById
+import busTrackerApi.db.getStopNameById
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
-import busTrackerApi.routing.stops.getCoordinatesByStopCode
-import busTrackerApi.routing.stops.getIdByStopCode
-import busTrackerApi.routing.stops.getStopCodeById
-import busTrackerApi.routing.stops.getStopNameById
 import crtm.utils.getCodStopFromStopCode
 import okhttp3.HttpUrl
 import okhttp3.Request

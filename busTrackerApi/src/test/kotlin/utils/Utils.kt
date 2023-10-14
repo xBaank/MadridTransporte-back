@@ -21,7 +21,10 @@ suspend fun ApplicationTestBuilder.getStops(line: String) =
     client.get("/v1/bus/lines/$line/stops")
 
 fun testApplicationBusTracker(
-    startUpF: Application.() -> Unit = { startUp() },
+    startUpF: Application.() -> Unit = {
+        MongoContainer.start()
+        startUp()
+    },
     block: suspend ApplicationTestBuilder.(client: HttpClient) -> Unit
 ) = testApplication {
     val newClient = createClient {

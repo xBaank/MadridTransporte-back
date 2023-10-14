@@ -2,6 +2,7 @@ package busTrackerApi.routing.stops.metro
 
 import arrow.core.Either
 import arrow.core.continuations.either
+import busTrackerApi.db.checkStopExists
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.ResponseJson
@@ -23,6 +24,7 @@ private suspend fun Call.getMetroTimesBase(
     id: Either<BusTrackerException, String>
 ) = either {
     val stopCode = createStopCode(codMode, id.bind())
+    checkStopExists(stopCode).bind()
     val times = f(stopCode, codMode).bind()
     if (times.arrives != null) call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 10))
     val statusCode = if (times.arrives == null) HttpStatusCode.ServiceUnavailable else HttpStatusCode.OK

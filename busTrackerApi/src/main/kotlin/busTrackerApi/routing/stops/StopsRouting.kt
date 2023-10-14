@@ -8,9 +8,6 @@ import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.routing.*
 
 fun Route.stopsRouting() {
-    get("/all") {
-        handle { getAllStops().onRight { call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60)) } }
-    }
     post("/times/subscriptions") {
         handle { getAllSubscriptions() }
     }

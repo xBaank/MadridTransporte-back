@@ -1,5 +1,7 @@
 package busTrackerApi.routing.stops
 
+import busTrackerApi.db.DeviceToken
+import busTrackerApi.db.StopsSubscription
 import busTrackerApi.extensions.toMiliseconds
 import busTrackerApi.routing.stops.bus.busCodMode
 import crtm.soap.IncidentsAffectationsResponse
@@ -87,13 +89,13 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
 
 }
 
-fun buildSubscription(subscription: StopsSubscription, deviceToken: String) = jObject {
+fun buildSubscription(subscription: StopsSubscription, deviceToken: DeviceToken) = jObject {
     "stopCode" += subscription.stopCode.asJson()
     "codMode" += subscription.codMode.toInt().asJson()
     "stopName" += subscription.stopName.asJson()
     "simpleStopCode" += subscription.stopCode.split("_").getOrNull(1)?.asJson()
     "linesDestinations" += jArray {
-        subscription.linesByDeviceToken[deviceToken]?.forEach {
+        subscription.linesByDeviceToken[deviceToken.token]?.forEach {
             addObject {
                 "line" += it.line.asJson()
                 "destination" += it.destination.asJson()

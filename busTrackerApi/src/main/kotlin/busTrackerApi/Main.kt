@@ -1,25 +1,28 @@
 package busTrackerApi
 
 import arrow.core.getOrElse
+import busTrackerApi.config.EnvVariables
 import busTrackerApi.config.configureRoutingV1
 import busTrackerApi.config.setupFirebase
+import busTrackerApi.config.setupMongo
+import busTrackerApi.db.loadDataIntoDb
 import busTrackerApi.routing.stops.notifyStopTimesOnBackground
-import busTrackerApi.utils.getenvOrNull
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.plugins.cors.routing.*
+import kotlinx.coroutines.runBlocking
 
 
 fun main() {
-    embeddedServer(Netty, port = getenvOrNull("PORT")?.toIntOrNull() ?: 8080) {
+    embeddedServer(Netty, port = EnvVariables.port) {
         startUp()
     }.start(wait = true)
 }
 
-fun Application.startUp() {
+fun Application.startUp() = runBlocking {
     install(CORS) {
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Post)
@@ -34,6 +37,8 @@ fun Application.startUp() {
     }
     install(CachingHeaders)
     setupFirebase().getOrElse { throw it }
+    setupMongo().getOrElse { throw it }
+    loadDataIntoDb().getOrElse { throw it }
     notifyStopTimesOnBackground()
     configureRoutingV1()
 }

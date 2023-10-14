@@ -42,6 +42,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
+    testImplementation("org.testcontainers:mongodb:1.19.1")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     testImplementation("io.mockk:mockk:1.13.7")
     implementation("io.github.pdvrieze.xmlutil:core:0.86.0")
@@ -51,6 +52,7 @@ dependencies {
     implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-guava
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.7.3")
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.11.0")
     implementation(project(":crtm"))
 }
 
