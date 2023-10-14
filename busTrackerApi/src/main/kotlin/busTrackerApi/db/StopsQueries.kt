@@ -1,0 +1,64 @@
+package busTrackerApi.db
+
+import arrow.core.Either
+import arrow.core.continuations.either
+import busTrackerApi.config.stopsCollection
+import busTrackerApi.config.stopsInfoCollection
+import busTrackerApi.exceptions.BusTrackerException
+import busTrackerApi.routing.stops.Coordinates
+import com.mongodb.client.model.Filters
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
+
+suspend fun getStops() = stopsCollection.find().toList()
+
+suspend fun getIdByStopCode(stopCode: String) = either {
+    stopsInfoCollection.find(Filters.eq("idEstacion", stopCode))
+        .firstOrNull()
+        ?.codigoEmpresa
+        ?: shift<Nothing>(BusTrackerException.NotFound("Stop with stopCode $stopCode not found"))
+}
+
+suspend fun getStopCodeById(id: String) = either {
+    stopsInfoCollection.find(Filters.eq("codigoEmpresa", id))
+        .firstOrNull()
+        ?.idEstacion
+        ?: shift<Nothing>(BusTrackerException.NotFound("Stop with id $id not found"))
+}
+
+suspend fun getStopNameById(id: String) = either {
+    val id = stopsInfoCollection.find(Filters.eq("codigoEmpresa", id))
+        .firstOrNull()
+        ?.idEstacion
+        ?: shift<Nothing>(BusTrackerException.NotFound("Stop with id $id not found"))
+
+    stopsCollection.find(Filters.eq("fullStopCode", id))
+        .firstOrNull()
+        ?.stopName
+        ?: shift<Nothing>(BusTrackerException.NotFound("Stop with id $id not found"))
+}
+
+suspend fun getCoordinatesByStopCode(id: String): Either<BusTrackerException, Coordinates> = either {
+    stopsCollection.find(Filters.eq("fullStopCode", id))
+        .firstOrNull()
+        ?.let {
+            Coordinates(
+                it.stopLat,
+                it.stopLon
+            )
+        }
+        ?: shift<Nothing>(BusTrackerException.NotFound("Stop with id $id not found"))
+}
+
+suspend fun getStopNameByStopCode(id: String) = either {
+    stopsCollection.find(Filters.eq("fullStopCode", id))
+        .firstOrNull()
+        ?.stopName
+        ?: shift<Nothing>(BusTrackerException.NotFound("Stop with id $id not found"))
+}
+
+suspend fun checkStopExists(stopCode: String) = either {
+    stopsCollection.find(Filters.eq("fullStopCode", stopCode))
+        .firstOrNull()
+        ?: shift<Nothing>(BusTrackerException.NotFound("Stop with id $stopCode not found"))
+}

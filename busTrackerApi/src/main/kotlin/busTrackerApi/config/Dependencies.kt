@@ -1,10 +1,15 @@
 package busTrackerApi.config
 
 import arrow.core.continuations.either
+import busTrackerApi.db.Stop
+import busTrackerApi.db.StopsInfo
 import busTrackerApi.utils.getenvWrapped
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
+import com.mongodb.kotlin.client.coroutine.MongoClient
+import com.mongodb.kotlin.client.coroutine.MongoCollection
+import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import io.grpc.LoadBalancerRegistry
 import io.grpc.internal.PickFirstLoadBalancerProvider
 import okhttp3.OkHttpClient
@@ -16,6 +21,14 @@ val httpClient = OkHttpClient.Builder()
     .connectTimeout(20.seconds.toJavaDuration())
     .readTimeout(20.seconds.toJavaDuration())
     .build()
+
+private lateinit var db: MongoDatabase
+val stopsCollection: MongoCollection<Stop> by lazy { db.getCollection("stops") }
+val stopsInfoCollection: MongoCollection<StopsInfo> by lazy { db.getCollection("stopsInfo") }
+
+fun setupMongo() = either.eager {
+    db = MongoClient.create(getenvWrapped("MONGO_CONNECTION_STRING").bind()).getDatabase("busTracker")
+}
 
 fun setupFirebase() = either.eager {
     //Fix bug `pick_first` in jar

@@ -3,6 +3,8 @@ package busTrackerApi
 import arrow.core.getOrElse
 import busTrackerApi.config.configureRoutingV1
 import busTrackerApi.config.setupFirebase
+import busTrackerApi.config.setupMongo
+import busTrackerApi.db.loadDataIntoDb
 import busTrackerApi.routing.stops.notifyStopTimesOnBackground
 import busTrackerApi.utils.getenvOrNull
 import io.ktor.http.*
@@ -11,6 +13,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.plugins.cors.routing.*
+import kotlinx.coroutines.runBlocking
 
 
 fun main() {
@@ -34,6 +37,8 @@ fun Application.startUp() {
     }
     install(CachingHeaders)
     setupFirebase().getOrElse { throw it }
+    setupMongo().getOrElse { throw it }
+    runBlocking { loadDataIntoDb().getOrElse { throw it } }
     notifyStopTimesOnBackground()
     configureRoutingV1()
 }

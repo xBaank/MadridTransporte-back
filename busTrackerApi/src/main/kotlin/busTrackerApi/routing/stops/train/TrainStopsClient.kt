@@ -2,10 +2,10 @@ package busTrackerApi.routing.stops.train
 
 import arrow.core.Either
 import arrow.core.continuations.either
+import busTrackerApi.db.getIdByStopCode
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.ResponseJson
-import busTrackerApi.routing.stops.getIdByStopCode
 import busTrackerApi.utils.Call
 import crtm.utils.createStopCode
 import io.ktor.http.*

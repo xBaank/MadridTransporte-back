@@ -2,6 +2,9 @@ package busTrackerApi.routing.stops
 
 import arrow.core.Either
 import arrow.core.continuations.either
+import busTrackerApi.db.buildStopJson
+import busTrackerApi.db.checkStopExists
+import busTrackerApi.db.getStops
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.getWrapped
@@ -15,14 +18,17 @@ import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
 import simpleJson.*
 
+private var stopsChanged = true
+
 suspend fun getAlertsByCodMode(codMode: String) = either {
     val alerts = getAlertsByCodModeResponse(codMode).bind()
     ResponseJsonCached(buildAlertsJson(alerts), HttpStatusCode.OK)
 }
 
-suspend fun getAllStops() = either {
-    val stops = getAllStopsResponse().bind()
-    ResponseJsonCached(stops, HttpStatusCode.OK)
+suspend fun Call.getAllStops(): ResponseJsonCached {
+    val stops = getStops().map(::buildStopJson).asJson()
+    call.caching = CachingOptions(CacheControl.NoCache(CacheControl.Visibility.Public))
+    return ResponseJsonCached(stops, HttpStatusCode.OK)
 }
 
 suspend fun Call.getStopTimes(codMode: String) =

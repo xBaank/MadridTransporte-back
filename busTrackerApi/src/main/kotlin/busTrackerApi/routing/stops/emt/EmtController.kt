@@ -2,14 +2,14 @@ package busTrackerApi.routing.stops.emt
 
 import arrow.core.continuations.either
 import busTrackerApi.config.httpClient
+import busTrackerApi.db.getCoordinatesByStopCode
+import busTrackerApi.db.getStopNameByStopCode
 import busTrackerApi.exceptions.BusTrackerException.InternalServerError
 import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
 import busTrackerApi.extensions.post
 import busTrackerApi.routing.stops.StopTimes
-import busTrackerApi.routing.stops.getCoordinatesByStopCode
-import busTrackerApi.routing.stops.getStopNameByStopCode
 import crtm.utils.getCodStopFromStopCode
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.deserialized
