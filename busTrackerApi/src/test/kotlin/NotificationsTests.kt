@@ -87,7 +87,7 @@ class NotificationsTest {
                 }.serialized())
             }
 
-            delay(delayTime)
+            delay(delayTime * 2)
 
             val unsubscribeResponse = client.post(subscription.url + "/unsubscribe") {
                 setBody(body)
@@ -133,7 +133,7 @@ class NotificationsTest {
                 setBody(body)
             }
 
-            delay(delayTime)
+            delay(delayTime * 2)
 
             val subscriptionsResponse = client.post(subscription.url + "/subscription") {
                 setBody(jObject {
