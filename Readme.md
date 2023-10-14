@@ -20,9 +20,21 @@ I recommend using docker-compose to deploy the backend.
 ```yaml
 version: "3.9"
 services:
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
   api:
+    depends_on:
+      - mongo
     environment:
       - SERVICE_JSON= #WRITE HERE YOUR SERVICE JSON, NOT THE FILE PATH, You can get it from https://console.firebase.google.com/u/0/project/YOUR_PROJECT/settings/serviceaccounts/adminsdk
+      - MONGO_CONNECTION_STRING= #WRITE HERE YOUR MONGO CONNECTION STRING
+      - NOTIFICATION_DELAY_TIME_SECONDS= #WRITE HERE THE DELAY TIME IN SECONDS FOR THE NOTIFICATION SERVICE, DEFAULT IS 60
+      - ALL_STOPS_URL= #WRITE HERE THE URL FOR THE ALL STOPS FILE, DEFAULT IS https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/stops.json
+      - ALL_STOPS_INFO_URL= #WRITE HERE THE URL FOR THE ALL STOPS INFO FILE, DEFAULT IS https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/stops-info.json
     image: xbank/bus_tracker_api:latest
   nginx:
     depends_on:
