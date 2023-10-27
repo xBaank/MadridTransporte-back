@@ -16,13 +16,13 @@ import io.ktor.server.plugins.cors.routing.*
 import kotlinx.coroutines.runBlocking
 
 
-fun main() {
+fun main(args: Array<String>) {
     embeddedServer(Netty, port = EnvVariables.port) {
-        startUp()
+        startUp(args)
     }.start(wait = true)
 }
 
-fun Application.startUp() = runBlocking {
+fun Application.startUp(args: Array<String>) = runBlocking {
     install(CORS) {
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Post)
@@ -38,7 +38,7 @@ fun Application.startUp() = runBlocking {
     install(CachingHeaders)
     setupFirebase().getOrElse { throw it }
     setupMongo().getOrElse { throw it }
-    loadDataIntoDb().getOrElse { throw it }
+    loadDataIntoDb(args.contains("--reload")).getOrElse { throw it }
     notifyStopTimesOnBackground()
     configureRoutingV1()
 }

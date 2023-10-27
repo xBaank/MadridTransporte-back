@@ -25,3 +25,13 @@ suspend fun parseStopsInfo(json: JsonArray) = either {
         )
     }
 }
+
+suspend fun parseItineraries(json: JsonArray) = either {
+    json.map {
+        Itinerary(
+            itineraryCode = it["itineraryCode"].asString().bindMap(),
+            direction = it["direction"].asInt().bindMap(),
+            fullLineCode = it["lineCode"].asString().bindMap()
+        )
+    }
+}
