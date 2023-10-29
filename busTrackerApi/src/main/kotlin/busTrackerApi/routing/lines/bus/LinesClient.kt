@@ -1,7 +1,8 @@
-package busTrackerApi.routing.bus.lines
+package busTrackerApi.routing.lines.bus
 
 import arrow.core.continuations.either
 import busTrackerApi.db.getItinerariesByFullLineCode
+import busTrackerApi.db.getItineraryByFullLineCode
 import busTrackerApi.exceptions.BusTrackerException.BadRequest
 import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.getWrapped
@@ -10,14 +11,14 @@ import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.utils.Call
 import crtm.utils.getCodModeFromLineCode
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.cachingheaders.*
 import simpleJson.asJson
 
 suspend fun Call.getLocations() = either {
-
     val lineCode = call.parameters.getWrapped("lineCode").bind()
-    val direction =
-        call.request.queryParameters.getWrapped("direction").bind().toIntOrNull() ?: shift<Nothing>(BadRequest())
+    val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: shift<Nothing>(BadRequest())
 
     val codMode = getCodModeFromLineCode(lineCode)
 
@@ -34,17 +35,20 @@ suspend fun Call.getLocations() = either {
         .map(::buildVehicleLocationJson)
         .asJson()
 
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 10))
     ResponseJson(json, HttpStatusCode.OK)
 }
 
 suspend fun Call.getItineraries() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
-    val direction = call.request.queryParameters.getWrapped("direction").bind().toIntOrNull() ?:
-    shift<Nothing>(BadRequest("direction is not null"))
+    val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: shift<Nothing>(BadRequest())
 
-    val itineraries = getItinerariesByFullLineCode(lineCode, direction - 1)
 
-    val json = itineraries.map(::buildItinerariesJson).asJson()
+    val itineraries =
+        getItineraryByFullLineCode(lineCode, direction - 1) ?: shift<Nothing>(NotFound("Itinerary not found"))
 
+    val json = itineraries.let(::buildItinerariesJson).asJson()
+
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60))
     ResponseJson(json, HttpStatusCode.OK)
 }

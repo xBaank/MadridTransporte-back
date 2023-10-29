@@ -49,7 +49,6 @@ suspend fun parseMetroToStopTimes(
                 ?.toInstant(timeZoneMadrid.toZoneOffset())?.toEpochMilli()
 
             val first = Arrive(
-                lineCode = "",
                 line = arrive["linea"].asNumber().bind().toString(),
                 destination = arrive["sentido"].asString().bind(),
                 anden = arrive["anden"].asInt().getOrNull(),
@@ -58,7 +57,6 @@ suspend fun parseMetroToStopTimes(
             )
 
             val second = Arrive(
-                lineCode = "",
                 line = arrive["linea"].asNumber().bind().toString(),
                 destination = arrive["sentido"].asString().bind(),
                 anden = arrive["anden"].asInt().getOrNull(),

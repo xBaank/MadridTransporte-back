@@ -1,4 +1,4 @@
-package busTrackerApi.routing.bus.lines
+package busTrackerApi.routing.lines.bus
 
 import arrow.core.Either
 import busTrackerApi.db.Itinerary

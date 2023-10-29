@@ -1,4 +1,4 @@
-package busTrackerApi.routing.bus.lines
+package busTrackerApi.routing.lines.bus
 
 import busTrackerApi.db.Itinerary
 import crtm.soap.VehicleLocation
@@ -17,7 +17,7 @@ fun buildVehicleLocationJson(vehicleLocation: VehicleLocation) = jObject {
 
 fun buildItinerariesJson(itinerary: Itinerary) = jObject {
     "codItinerary" += itinerary.itineraryCode
-    "direction" += itinerary.direction
+    "direction" += itinerary.direction + 1
     "stops" += simpleJson.jArray {
         itinerary.stops.forEach {
             addObject {
