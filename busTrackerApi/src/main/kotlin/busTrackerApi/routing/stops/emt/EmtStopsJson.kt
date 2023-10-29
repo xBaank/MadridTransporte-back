@@ -26,10 +26,11 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
         val secondsToArrive = it["estimateArrive"].asLong().bindMap()
         val estimatedArrive = LocalDateTime.now().plusSeconds(secondsToArrive)
         Arrive(
+            lineCode = "",
             line = it["line"].asString().bindMap(),
             destination = it["destination"].asString().bindMap(),
             codMode = emtCodMode.toInt(),
-            estimatedArrive = estimatedArrive.toInstant(ZoneOffset.UTC).toEpochMilli(),
+            estimatedArrive = estimatedArrive.toInstant(ZoneOffset.UTC).toEpochMilli()
         )
     }
     val incidentsMapped = incidents?.map {

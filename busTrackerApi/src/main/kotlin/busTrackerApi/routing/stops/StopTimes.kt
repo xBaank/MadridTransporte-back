@@ -12,6 +12,7 @@ data class StopTimes(
 
 data class Arrive(
     val line: String,
+    val lineCode: String,
     val codMode: Int,
     val anden: Int? = null,
     val destination: String,

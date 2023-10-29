@@ -8,10 +8,6 @@ fun Route.linesRouting() = route("/lines") {
         handle { getLocations() }
     }
 
-    get("/{lineCode}/stops") {
-        handle { getStops() }
-    }
-
     get("/{lineCode}/itineraries") {
         handle { getItineraries() }
     }

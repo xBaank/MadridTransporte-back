@@ -28,10 +28,17 @@ suspend fun parseStopsInfo(json: JsonArray) = either {
 
 suspend fun parseItineraries(json: JsonArray) = either {
     json.map {
+        val stops = it["stops"].asArray().bindMap().map {
+            StopOrder(
+                it["stopCode"].asString().bindMap(),
+                it["order"].asInt().bindMap()
+            )
+        }
         Itinerary(
             itineraryCode = it["itineraryCode"].asString().bindMap(),
             direction = it["direction"].asInt().bindMap(),
-            fullLineCode = it["lineCode"].asString().bindMap()
+            fullLineCode = it["lineCode"].asString().bindMap(),
+            stops = stops
         )
     }
 }
