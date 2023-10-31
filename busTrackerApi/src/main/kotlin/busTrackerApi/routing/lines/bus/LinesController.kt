@@ -19,7 +19,7 @@ suspend fun getLocationsResponse(itinerary: Itinerary, lineCode: String, codMode
             codItinerary = itinerary.itineraryCode
             direction = itinerary.direction + 1
             authentication = defaultClient.value().auth()
-            codStop = stopCode ?: "8_" //In fact, it is optional, but we need to write something
+            codStop = stopCode ?: "8_"
         }
         withTimeoutOrNull(timeoutSeconds) {
             getSuspend(lineRequest, defaultClient.value()::getLineLocationAsync)
