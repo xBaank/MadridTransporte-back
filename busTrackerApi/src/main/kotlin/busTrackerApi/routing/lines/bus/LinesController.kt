@@ -11,16 +11,15 @@ import busTrackerApi.utils.timeoutSeconds
 import crtm.soap.LineLocationRequest
 import kotlinx.coroutines.withTimeoutOrNull
 
-suspend fun getLocationsResponse(itinerary: Itinerary, lineCode: String, codMode: String) =
+suspend fun getLocationsResponse(itinerary: Itinerary, lineCode: String, codMode: String, stopCode: String?) =
     Either.catch {
         val lineRequest = LineLocationRequest().apply {
             this.codMode = codMode
             codLine = lineCode
-            codVehicle = ""
             codItinerary = itinerary.itineraryCode
             direction = itinerary.direction + 1
             authentication = defaultClient.value().auth()
-            codStop = "8_" //In fact, it is optional, but we need to write something
+            codStop = stopCode ?: "8_" //In fact, it is optional, but we need to write something
         }
         withTimeoutOrNull(timeoutSeconds) {
             getSuspend(lineRequest, defaultClient.value()::getLineLocationAsync)

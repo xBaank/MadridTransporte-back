@@ -8,7 +8,9 @@ import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.extensions.mapAsync
 import busTrackerApi.routing.Response.ResponseJson
+import busTrackerApi.routing.stops.bus.busCodMode
 import busTrackerApi.utils.Call
+import crtm.utils.createStopCode
 import crtm.utils.getCodModeFromLineCode
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -19,14 +21,16 @@ import simpleJson.asJson
 suspend fun Call.getLocations() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
     val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: shift<Nothing>(BadRequest())
+    val stopCode = call.request.queryParameters["stopCode"]
 
+    val fullStopCode = if (stopCode != null) createStopCode(busCodMode, stopCode) else null
     val codMode = getCodModeFromLineCode(lineCode)
 
     val itineraries = getItinerariesByFullLineCode(lineCode, direction - 1)
     if (itineraries.isEmpty()) shift<Nothing>(NotFound())
 
     val locations = itineraries.mapAsync {
-        getLocationsResponse(it, lineCode, codMode).bind()
+        getLocationsResponse(it, lineCode, codMode, fullStopCode).bind()
     }
 
     val json = locations
