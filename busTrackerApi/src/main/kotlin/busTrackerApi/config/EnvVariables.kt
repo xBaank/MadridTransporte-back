@@ -10,6 +10,8 @@ private const val defaultAllStopsUrl =
     "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/stops.json"
 private const val defaultAllStopsInfoUrl =
     "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/stops-info.json"
+private const val defaultTtinerariesUrl =
+    "https://raw.githubusercontent.com/xBaank/bus-tracker-static/main/itineraries.json"
 
 object EnvVariables {
     val notificationDelayTimeSeconds by lazy {
@@ -20,6 +22,8 @@ object EnvVariables {
     val serviceJson by lazy { getenvWrapped("SERVICE_JSON") }
     val allStopsUrl by lazy { getenvWrapped("ALL_STOPS_URL").getOrElse { defaultAllStopsUrl } }
     val allStopsInfoUrl by lazy { getenvWrapped("ALL_STOPS_INFO_URL").getOrElse { defaultAllStopsInfoUrl } }
+    val itinerariesUrl by lazy { getenvWrapped("BUS_ITINERARIES_URL").getOrElse { defaultTtinerariesUrl } }
+    val reloadDb by lazy { getenvWrapped("RELOAD_DB").map(String::toBoolean).getOrElse { true } }
 
     private fun getenvOrNull(key: String): String? =
         System.getenv(key) ?: System.getProperty(key) ?: null

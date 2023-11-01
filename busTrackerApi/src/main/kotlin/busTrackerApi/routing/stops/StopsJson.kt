@@ -18,6 +18,8 @@ fun parseStopTimesResponseToStopTimes(
 ): StopTimes {
     val arrives = response?.stopTimes?.times?.time?.map {
         Arrive(
+            direction = it.direction,
+            lineCode = it.line.codLine,
             line = it.line.shortDescription,
             destination = it.destination,
             codMode = it.line.codMode.toInt(),
@@ -80,6 +82,8 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
             +jObject {
                 "codMode" += arrive.value.first().codMode
                 "line" += arrive.value.first().line
+                "lineCode" += arrive.value.first().lineCode
+                "direction" += arrive.value.first().direction
                 "anden" += arrive.value.first().anden
                 "destination" += arrive.value.first().destination
                 "estimatedArrives" += arrive.value.map { it.estimatedArrive.asJson() }.asJson()

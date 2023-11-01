@@ -1,6 +1,7 @@
 package busTrackerApi.config
 
 import arrow.core.continuations.either
+import busTrackerApi.db.Itinerary
 import busTrackerApi.db.Stop
 import busTrackerApi.db.StopsInfo
 import busTrackerApi.db.StopsSubscription
@@ -26,6 +27,7 @@ private lateinit var db: MongoDatabase
 val stopsCollection: MongoCollection<Stop> by lazy { db.getCollection("stops") }
 val stopsInfoCollection: MongoCollection<StopsInfo> by lazy { db.getCollection("stopsInfo") }
 val stopsSubscriptionsCollection: MongoCollection<StopsSubscription> by lazy { db.getCollection("stopsSubscriptions") }
+val itinerariesCollection: MongoCollection<Itinerary> by lazy { db.getCollection("itineraries") }
 
 suspend fun setupMongo() = either {
     db = MongoClient.create(EnvVariables.mongoConnectionString.bind()).getDatabase("busTracker")

@@ -1,10 +1,8 @@
 package busTrackerApi.db
 
 import arrow.core.continuations.either
-import busTrackerApi.config.EnvVariables
-import busTrackerApi.config.httpClient
-import busTrackerApi.config.stopsCollection
-import busTrackerApi.config.stopsInfoCollection
+import busTrackerApi.config.*
+import busTrackerApi.config.EnvVariables.reloadDb
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
@@ -15,17 +13,23 @@ import simpleJson.asJson
 import simpleJson.deserialized
 
 suspend fun loadDataIntoDb() = either {
+    if (!reloadDb) return@either
+
     val allStopsUrl = EnvVariables.allStopsUrl
     val allStopsInfoUrl = EnvVariables.allStopsInfoUrl
+    val itinerariesUrl = EnvVariables.itinerariesUrl
 
     val allStops = parseStops(getAsJson(allStopsUrl).bind()).bind()
     val allStopsInfo = parseStopsInfo(getAsJson(allStopsInfoUrl).bind()).bind()
+    val itineraries = parseItineraries(getAsJson(itinerariesUrl).bind()).bind()
 
     stopsCollection.deleteMany(filter = Filters.empty())
     stopsInfoCollection.deleteMany(filter = Filters.empty())
+    itinerariesCollection.deleteMany(filter = Filters.empty())
 
     stopsCollection.insertMany(allStops)
     stopsInfoCollection.insertMany(allStopsInfo)
+    itinerariesCollection.insertMany(itineraries)
 }
 
 
