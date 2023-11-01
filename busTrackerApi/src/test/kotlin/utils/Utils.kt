@@ -11,14 +11,11 @@ import io.ktor.server.testing.*
 suspend fun ApplicationTestBuilder.getAbono(id: String) =
     client.get("/v1/abono/$id")
 
-suspend fun ApplicationTestBuilder.getLineLocation(line: String) =
-    client.get("/v1/bus/lines/$line/locations")
+suspend fun ApplicationTestBuilder.getLineLocation(line: String, direction: Int) =
+    client.get("/v1/lines/bus/$line/locations/$direction")
 
-suspend fun ApplicationTestBuilder.getItineraries(line: String) =
-    client.get("/v1/bus/lines/$line/itineraries")
-
-suspend fun ApplicationTestBuilder.getStops(line: String) =
-    client.get("/v1/bus/lines/$line/stops")
+suspend fun ApplicationTestBuilder.getItineraries(line: String, direction: Int) =
+    client.get("/v1/lines/bus/$line/itineraries/$direction")
 
 fun testApplicationBusTracker(
     startUpF: Application.() -> Unit = {

@@ -2,6 +2,7 @@ package busTrackerApi.db
 
 import arrow.core.continuations.either
 import busTrackerApi.config.*
+import busTrackerApi.config.EnvVariables.reloadDb
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.get
@@ -11,8 +12,8 @@ import simpleJson.asArray
 import simpleJson.asJson
 import simpleJson.deserialized
 
-suspend fun loadDataIntoDb(reload: Boolean = false) = either {
-    if (!reload) return@either
+suspend fun loadDataIntoDb() = either {
+    if (!reloadDb) return@either
 
     val allStopsUrl = EnvVariables.allStopsUrl
     val allStopsInfoUrl = EnvVariables.allStopsInfoUrl

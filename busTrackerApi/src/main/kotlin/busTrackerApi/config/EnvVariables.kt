@@ -23,6 +23,7 @@ object EnvVariables {
     val allStopsUrl by lazy { getenvWrapped("ALL_STOPS_URL").getOrElse { defaultAllStopsUrl } }
     val allStopsInfoUrl by lazy { getenvWrapped("ALL_STOPS_INFO_URL").getOrElse { defaultAllStopsInfoUrl } }
     val itinerariesUrl by lazy { getenvWrapped("BUS_ITINERARIES_URL").getOrElse { defaultTtinerariesUrl } }
+    val reloadDb by lazy { getenvWrapped("RELOAD_DB").map(String::toBoolean).getOrElse { true } }
 
     private fun getenvOrNull(key: String): String? =
         System.getenv(key) ?: System.getProperty(key) ?: null
