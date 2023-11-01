@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.0
+
+- Removed `v1/bus/lines/stops`
+- Removed `v1/bus/lines/ocations`
+- Removed `v1/bus/lines/itineraries`
+- Added `v1/lines/bus/locations`
+- Added `v1/lines/bus/itineraries`
+
 ## 2.0.1
 
 - Improve performance
