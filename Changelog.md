@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1
+
+- Fixed a bug that didn't allow the user to see certain line locations
+
 ## 3.0.0
 
 - Removed `v1/bus/lines/stops`
