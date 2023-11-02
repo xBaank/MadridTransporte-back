@@ -15,7 +15,8 @@ import utils.testApplicationBusTracker
 
 enum class LineCodes(val code: String, val direction: Int) {
     Interurban("8__450___", 1),
-    Urban("9__1__074_", 1)
+    Urban("9__1__074_", 1),
+    WeirdUrban("9__1__058_", 1)
 }
 
 class BusLinesTests {

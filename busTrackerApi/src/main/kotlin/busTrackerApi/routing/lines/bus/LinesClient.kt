@@ -26,8 +26,9 @@ suspend fun Call.getLocations() = either {
     val fullStopCode = if (stopCode != null) createStopCode(busCodMode, stopCode) else null
     val codMode = getCodModeFromLineCode(lineCode)
 
-    val itineraries = getItinerariesByFullLineCode(lineCode, direction - 1)
-    if (itineraries.isEmpty()) shift<Nothing>(NotFound())
+    var itineraries = getItinerariesByFullLineCode(lineCode, direction - 1)
+    if (itineraries.isEmpty()) itineraries =
+        getItinerariesResponse(lineCode).bind().filter { it.direction == direction - 1 }
 
     val locations = itineraries.mapAsync {
         getLocationsResponse(it, lineCode, codMode, fullStopCode).bind()
@@ -49,7 +50,11 @@ suspend fun Call.getItineraries() = either {
 
 
     val itineraries =
-        getItineraryByFullLineCode(lineCode, direction - 1) ?: shift<Nothing>(NotFound("Itinerary not found"))
+        getItineraryByFullLineCode(lineCode, direction - 1)
+            ?: getItinerariesResponse(lineCode).bind()
+                .sortedBy { it.stops.count() }
+                .firstOrNull { it.direction == direction - 1 }
+            ?: shift<Nothing>(NotFound("Itinerary not found"))
 
     val json = itineraries.let(::buildItinerariesJson).asJson()
 
