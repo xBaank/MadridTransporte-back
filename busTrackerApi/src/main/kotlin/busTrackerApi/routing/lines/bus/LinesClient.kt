@@ -27,6 +27,7 @@ suspend fun Call.getLocations() = either {
     val codMode = getCodModeFromLineCode(lineCode)
 
     var itineraries = getItinerariesByFullLineCode(lineCode, direction - 1)
+    //TODO save in db so we don't have to ask the shitty server again
     if (itineraries.isEmpty()) itineraries =
         getItinerariesResponse(lineCode).bind().filter { it.direction == direction - 1 }
 
