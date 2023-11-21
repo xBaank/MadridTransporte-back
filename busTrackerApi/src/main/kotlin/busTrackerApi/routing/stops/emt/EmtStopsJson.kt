@@ -7,6 +7,7 @@ import busTrackerApi.routing.stops.Arrive
 import busTrackerApi.routing.stops.Coordinates
 import busTrackerApi.routing.stops.Incident
 import busTrackerApi.routing.stops.StopTimes
+import crtm.utils.createLineCode
 import crtm.utils.getCodStopFromStopCode
 import simpleJson.*
 import java.time.LocalDateTime
@@ -25,9 +26,10 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
     val arrivesMapped = arrives.map {
         val secondsToArrive = it["estimateArrive"].asLong().bindMap()
         val estimatedArrive = LocalDateTime.now().plusSeconds(secondsToArrive)
+        val line = it["line"].asString().bindMap()
         Arrive(
-            lineCode = "",
-            line = it["line"].asString().bindMap(),
+            lineCode = createLineCode(emtCodMode, line),
+            line = line,
             destination = it["destination"].asString().bindMap(),
             codMode = emtCodMode.toInt(),
             estimatedArrive = estimatedArrive.toInstant(ZoneOffset.UTC).toEpochMilli()
