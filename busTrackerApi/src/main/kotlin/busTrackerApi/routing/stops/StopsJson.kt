@@ -1,7 +1,7 @@
 package busTrackerApi.routing.stops
 
-import busTrackerApi.db.DeviceToken
-import busTrackerApi.db.StopsSubscription
+import busTrackerApi.db.models.DeviceToken
+import busTrackerApi.db.models.StopsSubscription
 import busTrackerApi.extensions.toMiliseconds
 import busTrackerApi.routing.stops.bus.busCodMode
 import crtm.soap.IncidentsAffectationsResponse

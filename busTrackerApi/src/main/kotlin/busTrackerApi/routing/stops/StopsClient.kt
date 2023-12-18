@@ -3,6 +3,8 @@ package busTrackerApi.routing.stops
 import arrow.core.Either
 import arrow.core.continuations.either
 import busTrackerApi.db.*
+import busTrackerApi.db.models.LineDestination
+import busTrackerApi.db.models.toDeviceToken
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.getWrapped

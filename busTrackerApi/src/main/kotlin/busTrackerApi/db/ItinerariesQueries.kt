@@ -1,6 +1,7 @@
 package busTrackerApi.db
 
 import busTrackerApi.config.itinerariesCollection
+import busTrackerApi.db.models.Itinerary
 import com.mongodb.client.model.Filters
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList

@@ -4,6 +4,8 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import busTrackerApi.config.stopsCollection
 import busTrackerApi.config.stopsInfoCollection
+import busTrackerApi.db.models.Stop
+import busTrackerApi.db.models.StopsInfo
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.routing.stops.Coordinates
 import com.mongodb.client.model.Filters

@@ -1,10 +1,10 @@
 package busTrackerApi.config
 
 import arrow.core.continuations.either
-import busTrackerApi.db.Itinerary
-import busTrackerApi.db.Stop
-import busTrackerApi.db.StopsInfo
-import busTrackerApi.db.StopsSubscription
+import busTrackerApi.db.models.Itinerary
+import busTrackerApi.db.models.Stop
+import busTrackerApi.db.models.StopsInfo
+import busTrackerApi.db.models.StopsSubscription
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions

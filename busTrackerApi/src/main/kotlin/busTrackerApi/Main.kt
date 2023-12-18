@@ -38,7 +38,7 @@ fun Application.startUp() = runBlocking {
     install(CachingHeaders)
     setupFirebase().getOrElse { throw it }
     setupMongo().getOrElse { throw it }
-    loadDataIntoDb().getOrElse { throw it }
+    loadDataIntoDb()
     notifyStopTimesOnBackground()
     configureRoutingV1()
 }

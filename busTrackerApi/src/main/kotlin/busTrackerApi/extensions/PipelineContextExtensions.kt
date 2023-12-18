@@ -1,5 +1,6 @@
 package busTrackerApi.extensions
 
+import arrow.core.Either
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.routing.Response
 import busTrackerApi.utils.Call
@@ -79,3 +80,6 @@ suspend fun Call.handleResponse(response: Response): Unit = when (response) {
     is Response.ResponseRaw -> call.respond(response.status)
     is Response.ResponseRedirect -> call.respondRedirect(response.url)
 }
+
+suspend inline fun Call.handle(f: () -> Either<BusTrackerException, Response>) =
+    f().fold({ handleError(it) }, { handleResponse(it) })

@@ -1,10 +1,10 @@
-package busTrackerApi.db
+package busTrackerApi.db.models
 
 data class Itinerary(
     val itineraryCode: String,
     val fullLineCode: String,
     val direction: Int,
-    val stops: List<StopOrder>
+    val tripId: String
 )
 
 data class StopOrder(

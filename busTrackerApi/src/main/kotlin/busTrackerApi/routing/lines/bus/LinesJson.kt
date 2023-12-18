@@ -1,6 +1,6 @@
 package busTrackerApi.routing.lines.bus
 
-import busTrackerApi.db.Itinerary
+import busTrackerApi.db.models.Itinerary
 import crtm.soap.VehicleLocation
 import simpleJson.jObject
 

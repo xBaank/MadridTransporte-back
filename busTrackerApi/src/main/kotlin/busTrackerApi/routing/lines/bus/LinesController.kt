@@ -1,8 +1,7 @@
 package busTrackerApi.routing.lines.bus
 
 import arrow.core.Either
-import busTrackerApi.db.Itinerary
-import busTrackerApi.db.StopOrder
+import busTrackerApi.db.models.Itinerary
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.BusTrackerException.SoapError
 import busTrackerApi.extensions.getSuspend
@@ -49,12 +48,10 @@ suspend fun getItinerariesResponse(lineCode: String) = Either.catch {
     .map { itinerary ->
         itinerary.itineraries.lineItinerary.map {
             Itinerary(
+                itineraryCode = it.codItinerary,
                 fullLineCode = lineCode,
                 direction = it.direction - 1,
-                itineraryCode = it.codItinerary,
-                stops = it.stops.shortStop.mapIndexed { index, stop ->
-                    StopOrder(stop.codStop, index)
-                }
+                tripId = data["trip_id"].toString()
             )
         }
     }
