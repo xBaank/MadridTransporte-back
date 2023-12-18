@@ -1,6 +1,6 @@
 package busTrackerApi.db.models
 
-data class StopsInfo(
+data class StopInfo(
     val codigoEmpresa: String,
     val idEstacion: String,
 )

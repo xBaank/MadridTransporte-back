@@ -3,6 +3,7 @@ package busTrackerApi.db
 import busTrackerApi.config.*
 import busTrackerApi.config.EnvVariables.reloadDb
 import busTrackerApi.extensions.get
+import busTrackerApi.extensions.removeFirstLine
 import busTrackerApi.extensions.toEnumeration
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.mongodb.client.model.Filters
@@ -16,7 +17,11 @@ import kotlin.io.path.createTempFile
 private val reader = csvReader {
     escapeChar = '\''
     skipEmptyLine = true
+    autoRenameDuplicateHeaders = true
 }
+
+private val infoReader = csvReader {}
+
 
 private const val sequenceChunkSize = 1000
 
@@ -24,6 +29,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
     if (!reloadDb) return@coroutineScope
 
     val allStopsStream = getFileAsStreamFromGtfs("stops.txt")
+    val allStopsTimesStream = getFileAsStreamFromGtfs("stop_times.txt")
     val allItinerariesStream = getFileAsStreamFromGtfs("trips.txt")
     val allStopsInfoStream = getFileAsStreamFromInfo()
 
@@ -43,17 +49,17 @@ suspend fun loadDataIntoDb() = coroutineScope {
             }
         },
         async {
-            reader.openAsync(allStopsInfoStream) {
-                val stops = readAllWithHeaderAsSequence().map(::parseStopsInfo).chunked(sequenceChunkSize)
+            infoReader.openAsync(allStopsInfoStream) {
+                val stops = readAllWithHeaderAsSequence().map(::parseStopsInfo).distinct().chunked(sequenceChunkSize)
                 stopsInfoCollection.deleteMany(filter = Filters.empty())
                 stops.forEach { stopsInfoCollection.insertMany(it) }
             }
         },
         async {
-            reader.openAsync(allStopsInfoStream) {
-                val stops = readAllWithHeaderAsSequence().map(::parseStopsInfo).chunked(sequenceChunkSize)
-                stopsInfoCollection.deleteMany(filter = Filters.empty())
-                stops.forEach { stopsInfoCollection.insertMany(it) }
+            reader.openAsync(allStopsTimesStream) {
+                val stops = readAllWithHeaderAsSequence().map(::parseStopsOrder).chunked(sequenceChunkSize)
+                stopsOrder.deleteMany(filter = Filters.empty())
+                stops.forEach { stopsOrder.insertMany(it) }
             }
         }
     )
@@ -61,24 +67,30 @@ suspend fun loadDataIntoDb() = coroutineScope {
 
 fun downloadToTempFile(url: String): File = httpClient.get(url).execute().use { response ->
     val tempFile = createTempFile().toFile()
-    response.body?.byteStream()?.copyTo(tempFile.outputStream())
+    tempFile.deleteOnExit()
+    response.body?.byteStream()?.use { download ->
+        tempFile.outputStream().use {
+            download.copyTo(it)
+        }
+    }
     return@use tempFile
 }
 
 fun getFileAsStreamFromGtfs(file: String) = SequenceInputStream(
     listOf(
         File("${EnvVariables.metroGtfs}/$file").inputStream(),
-        File("${EnvVariables.trainGtfs}/$file").inputStream(),
-        File("${EnvVariables.tranviaGtfs}/$file").inputStream(),
-        File("${EnvVariables.interurbanGtfs}/$file").inputStream(),
-        File("${EnvVariables.urbanGtfs}/$file").inputStream(),
-        File("${EnvVariables.emtGtfs}/$file").inputStream()
+        File("${EnvVariables.trainGtfs}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.tranviaGtfs}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.interurbanGtfs}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.urbanGtfs}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.emtGtfs}/$file").removeFirstLine().inputStream()
     ).toEnumeration()
 )
 
 fun getFileAsStreamFromInfo() = SequenceInputStream(
     listOf(
         File(EnvVariables.metroInfo).inputStream(),
-        File(EnvVariables.trainInfo).inputStream(),
+        File(EnvVariables.trainInfo).removeFirstLine().inputStream(),
+        File(EnvVariables.tranviaInfo).removeFirstLine().inputStream(),
     ).toEnumeration()
 )

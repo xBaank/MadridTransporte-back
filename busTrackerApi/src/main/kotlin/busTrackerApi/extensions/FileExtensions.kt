@@ -3,8 +3,31 @@ package busTrackerApi.extensions
 import java.io.*
 import java.util.zip.ZipFile
 import kotlin.io.path.createTempDirectory
+import kotlin.io.path.createTempFile
 
-fun File.unzip() = unzip(createTempDirectory().toString())
+fun File.removeFirstLine(): File {
+    var index = 0
+    val newFile = createTempFile().toFile()
+    newFile.deleteOnExit()
+    useLines { lines ->
+        lines.forEach {
+            if (index == 0) {
+                index++
+                return@useLines
+            }
+            newFile.appendText(it)
+            index += 1
+        }
+    }
+    return newFile
+}
+
+fun File.unzip(): String {
+    val dir = createTempDirectory().toString()
+    unzip(dir)
+    return dir
+}
+
 fun File.unzip(destDirectory: String) {
     File(destDirectory).run {
         if (!exists()) {

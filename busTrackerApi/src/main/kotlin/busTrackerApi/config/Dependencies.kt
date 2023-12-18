@@ -1,10 +1,7 @@
 package busTrackerApi.config
 
 import arrow.core.continuations.either
-import busTrackerApi.db.models.Itinerary
-import busTrackerApi.db.models.Stop
-import busTrackerApi.db.models.StopsInfo
-import busTrackerApi.db.models.StopsSubscription
+import busTrackerApi.db.models.*
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
@@ -24,10 +21,11 @@ val httpClient = OkHttpClient.Builder()
     .build()
 
 private lateinit var db: MongoDatabase
-val stopsCollection: MongoCollection<Stop> by lazy { db.getCollection("stops") }
-val stopsInfoCollection: MongoCollection<StopsInfo> by lazy { db.getCollection("stopsInfo") }
-val stopsSubscriptionsCollection: MongoCollection<StopsSubscription> by lazy { db.getCollection("stopsSubscriptions") }
-val itinerariesCollection: MongoCollection<Itinerary> by lazy { db.getCollection("itineraries") }
+val stopsCollection: MongoCollection<Stop> by lazy { db.getCollection(Stop::class.simpleName!!) }
+val stopsInfoCollection: MongoCollection<StopInfo> by lazy { db.getCollection(StopInfo::class.simpleName!!) }
+val stopsSubscriptionsCollection: MongoCollection<StopsSubscription> by lazy { db.getCollection(StopsSubscription::class.simpleName!!) }
+val itinerariesCollection: MongoCollection<Itinerary> by lazy { db.getCollection(Itinerary::class.simpleName!!) }
+val stopsOrder: MongoCollection<StopOrder> by lazy { db.getCollection(StopOrder::class.simpleName!!) }
 
 suspend fun setupMongo() = either {
     db = MongoClient.create(EnvVariables.mongoConnectionString.bind()).getDatabase("busTracker")

@@ -16,6 +16,7 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
+import kotlinx.coroutines.flow.toList
 import simpleJson.asJson
 
 suspend fun Call.getLocations() = either {
@@ -26,7 +27,7 @@ suspend fun Call.getLocations() = either {
     val fullStopCode = if (stopCode != null) createStopCode(busCodMode, stopCode) else null
     val codMode = getCodModeFromLineCode(lineCode)
 
-    var itineraries = getItinerariesByFullLineCode(lineCode, direction - 1)
+    var itineraries = getItinerariesByFullLineCode(lineCode, direction - 1).toList()
     //TODO save in db so we don't have to ask the shitty server again
     if (itineraries.isEmpty()) itineraries =
         getItinerariesResponse(lineCode).bind().filter { it.direction == direction - 1 }
@@ -50,12 +51,11 @@ suspend fun Call.getItineraries() = either {
     val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: shift<Nothing>(BadRequest())
 
 
-    val itineraries =
-        getItineraryByFullLineCode(lineCode, direction - 1)
-            ?: getItinerariesResponse(lineCode).bind()
-                .sortedBy { it.stops.count() }
-                .firstOrNull { it.direction == direction - 1 }
-            ?: shift<Nothing>(NotFound("Itinerary not found"))
+    val itineraries = getItineraryByFullLineCode(lineCode, direction - 1)
+        ?: getItinerariesResponse(lineCode).bind()
+            .sortedBy { it.stops.count() }
+            .firstOrNull { it.direction == direction - 1 }
+        ?: shift<Nothing>(NotFound("Itinerary not found"))
 
     val json = itineraries.let(::buildItinerariesJson).asJson()
 

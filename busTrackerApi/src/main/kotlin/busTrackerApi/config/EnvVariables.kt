@@ -24,6 +24,8 @@ private const val defaultMetroInfo =
     "https://opendata.arcgis.com/api/v3/datasets/f3859438e5504a6b9ca745880f72ef1b_3/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
 private const val defaultTrainInfo =
     "https://opendata.arcgis.com/api/v3/datasets/9e353bbf4c5d4bea87f01d6d579d06ab_5/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
+private const val defaultTranviaInfo =
+    "https://opendata.arcgis.com/api/v3/datasets/624dfeafb4d64580aa2ac5f24d8e8614_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
 
 object EnvVariables {
     val notificationDelayTimeSeconds by lazy {
@@ -38,8 +40,9 @@ object EnvVariables {
     val trainGtfs by lazy { getenvWrapped("TRAIN_GTFS").getOrElse { downloadToTempFile(defaultTrainGtfs).unzip() } }
     val interurbanGtfs by lazy { getenvWrapped("INTERURBAN_GTFS").getOrElse { downloadToTempFile(defaultInterurbanGtfs).unzip() } }
     val urbanGtfs by lazy { getenvWrapped("URBAN_GTFS").getOrElse { downloadToTempFile(defaultUrbanGtfs).unzip() } }
-    val metroInfo by lazy { getenvWrapped("METRO_INFO").getOrElse { defaultMetroInfo } }
-    val trainInfo by lazy { getenvWrapped("TRAIN_INFO").getOrElse { defaultTrainInfo } }
+    val metroInfo by lazy { getenvWrapped("METRO_INFO").getOrElse { downloadToTempFile(defaultMetroInfo).path } }
+    val trainInfo by lazy { getenvWrapped("TRAIN_INFO").getOrElse { downloadToTempFile(defaultTrainInfo).path } }
+    val tranviaInfo by lazy { getenvWrapped("TRAIN_INFO").getOrElse { downloadToTempFile(defaultTranviaInfo).path } }
     val reloadDb by lazy { getenvWrapped("RELOAD_DB").map(String::toBoolean).getOrElse { true } }
 
     private fun getenvOrNull(key: String): String? =
