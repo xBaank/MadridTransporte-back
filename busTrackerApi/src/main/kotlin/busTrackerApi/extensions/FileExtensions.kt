@@ -9,15 +9,19 @@ fun File.removeFirstLine(): File {
     var index = 0
     val newFile = createTempFile().toFile()
     newFile.deleteOnExit()
-    useLines { lines ->
-        lines.forEach {
-            if (index == 0) {
-                index++
-                return@useLines
+    val writer = newFile.writer()
+    writer.use {
+        useLines { lines ->
+            lines.forEach {
+                if (index == 0) {
+                    index++
+                    return@forEach
+                }
+                writer.appendLine(it)
+                index += 1
             }
-            newFile.appendText(it)
-            index += 1
         }
+        writer.flush()
     }
     return newFile
 }
@@ -39,13 +43,14 @@ fun File.unzip(destDirectory: String) {
         zip.entries().asSequence().forEach { entry ->
             zip.getInputStream(entry).use { input ->
                 val filePath = destDirectory + File.separator + entry.name
+                val dir = File(filePath)
+                dir.deleteOnExit()
 
                 if (!entry.isDirectory) {
                     // if the entry is a file, extracts it
                     extractFile(input, filePath)
                 } else {
                     // if the entry is a directory, make the directory
-                    val dir = File(filePath)
                     dir.mkdir()
                 }
             }
