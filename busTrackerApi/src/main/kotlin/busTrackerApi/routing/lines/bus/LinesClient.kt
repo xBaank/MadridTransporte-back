@@ -50,7 +50,6 @@ suspend fun Call.getItineraries() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
     val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: shift<Nothing>(BadRequest())
 
-
     val itineraries = getItineraryByFullLineCode(lineCode, direction - 1)
         ?: getItinerariesResponse(lineCode).bind()
             .sortedBy { it.stops.count() }

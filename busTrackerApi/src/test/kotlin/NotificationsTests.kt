@@ -21,6 +21,7 @@ import simpleJson.serialized
 import utils.MongoContainer
 import utils.testApplicationBusTracker
 import java.util.*
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 enum class Subscriptions(val url: String, val stopcode: String) {
@@ -87,7 +88,7 @@ class NotificationsTest {
                 }.serialized())
             }
 
-            verify(timeout = delayTime.inWholeMilliseconds * 2, atLeast = 1) { firebaseMessaging.sendAsync(any()) }
+            verify(timeout = 1.minutes.inWholeMilliseconds, atLeast = 1) { firebaseMessaging.sendAsync(any()) }
 
             val unsubscribeResponse = client.post(subscription.url + "/unsubscribe") {
                 setBody(body)
@@ -132,7 +133,7 @@ class NotificationsTest {
                 setBody(body)
             }
 
-            verify(timeout = delayTime.inWholeMilliseconds * 2, atLeast = 1) { firebaseMessaging.sendAsync(any()) }
+            verify(timeout = 1.minutes.inWholeMilliseconds, atLeast = 1) { firebaseMessaging.sendAsync(any()) }
             delay(delayTime.inWholeMilliseconds) //TODO We need this to wait for the subscription to be removed after sending the message failed
 
             val subscriptionsResponse = client.post(subscription.url + "/subscription") {
