@@ -29,6 +29,7 @@ fun File.removeFirstLine(): File {
 fun File.unzip(): String {
     val dir = createTempDirectory().toString()
     unzip(dir)
+    delete()
     return dir
 }
 

@@ -36,7 +36,6 @@ private val infoReader = csvReader {
 private const val sequenceChunkSize = 100_000
 
 suspend fun loadDataIntoDb() = coroutineScope {
-
     itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name))
     stopsOrder.createIndex(Indexes.ascending(StopOrder::tripId.name))
 
@@ -50,7 +49,10 @@ suspend fun loadDataIntoDb() = coroutineScope {
     awaitAll(
         async {
             reader.openAsync(allStopsStream) {
-                val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
+                val stops = readAllWithHeaderAsSequence()
+                    .filter { it["stop_id"]?.contains("par") == true }
+                    .distinctBy { it["stop_id"] }
+                    .chunked(sequenceChunkSize)
                 stopsCollection.drop()
                 stops.forEach {
                     val parsed = it.mapAsync(::parseStops).toList()

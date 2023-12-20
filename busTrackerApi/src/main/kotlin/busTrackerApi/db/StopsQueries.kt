@@ -11,6 +11,7 @@ import busTrackerApi.routing.stops.Coordinates
 import com.mongodb.client.model.Filters
 import kotlinx.coroutines.flow.firstOrNull
 
+fun getAllStops() = stopsCollection.find()
 suspend fun getIdByStopCode(stopCode: String) = either {
     stopsInfoCollection.find(Filters.eq(StopInfo::idEstacion.name, stopCode))
         .firstOrNull()
