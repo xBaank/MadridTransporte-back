@@ -11,7 +11,9 @@ import busTrackerApi.utils.abonoClient
 import busTrackerApi.utils.mapExceptionsF
 import busTrackerApi.utils.timeoutSeconds
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.cachingheaders.*
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.decodeFromString
 import nl.adaptivity.xmlutil.serialization.XML
@@ -29,5 +31,6 @@ suspend fun Call.getAbono() = either {
     val result = xml.decodeFromString<SS_prepagoConsultaSaldo>(response.consultaSaldo1Result.value.sResulXMLField)
     isFound(result).bind()
 
+    call.caching = CachingOptions(cacheControl = CacheControl.MaxAge(maxAgeSeconds = 30))
     ResponseJson(buildAbonoJson(result), HttpStatusCode.OK)
 }

@@ -1,4 +1,4 @@
-package busTrackerApi.db
+package busTrackerApi.db.models
 
 data class LineDestination(val line: String = "", val destination: String = "", val codMode: Int = 0)
 data class DeviceToken(val token: String = "")

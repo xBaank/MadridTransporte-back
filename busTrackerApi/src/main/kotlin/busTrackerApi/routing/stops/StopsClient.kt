@@ -3,6 +3,8 @@ package busTrackerApi.routing.stops
 import arrow.core.Either
 import arrow.core.continuations.either
 import busTrackerApi.db.*
+import busTrackerApi.db.models.LineDestination
+import busTrackerApi.db.models.toDeviceToken
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindMap
 import busTrackerApi.extensions.getWrapped
@@ -16,10 +18,18 @@ import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
 import kotlinx.coroutines.flow.toList
 import simpleJson.*
+import busTrackerApi.db.getAllStops as getAllStopsFromDb
 
 
-suspend fun getAlertsByCodMode(codMode: String) = either {
+fun Call.getAllStops(): ResponseFlowJson {
+    val stops = getAllStopsFromDb()
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
+    return ResponseFlowJson(buildStops(stops), HttpStatusCode.OK)
+}
+
+suspend fun Call.getAlertsByCodMode(codMode: String) = either {
     val alerts = getAlertsByCodModeResponse(codMode).bind()
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
     ResponseJsonCached(buildAlertsJson(alerts), HttpStatusCode.OK)
 }
 

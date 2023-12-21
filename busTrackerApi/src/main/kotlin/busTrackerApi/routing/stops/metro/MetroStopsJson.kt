@@ -41,11 +41,11 @@ suspend fun parseMetroToStopTimes(
             val siguienteDiff = siguiente?.let { it - diffInMinutes }?.takeIf { it >= 0 }
 
             val proximoEstimatedArrive = proximoDiff
-                ?.let { now.plusMinutes(it) }
+                ?.let { now.plusMinutes(it + 1).minusSeconds(1) }
                 ?.toInstant(timeZoneMadrid.toZoneOffset())?.toEpochMilli()
 
             val siguienteEstimatedArrive = siguienteDiff
-                ?.let { now.plusMinutes(it) }
+                ?.let { now.plusMinutes(it + 1).minusSeconds(1) }
                 ?.toInstant(timeZoneMadrid.toZoneOffset())?.toEpochMilli()
 
             val first = Arrive(

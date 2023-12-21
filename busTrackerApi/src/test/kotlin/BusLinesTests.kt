@@ -1,14 +1,15 @@
+import arrow.core.continuations.either
 import arrow.core.getOrElse
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeInstanceOf
+import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeGreaterOrEqualTo
+import org.amshove.kluent.shouldNotBeEmpty
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import simpleJson.JsonArray
-import simpleJson.asArray
-import simpleJson.deserialized
+import simpleJson.*
 import utils.getItineraries
 import utils.getLineLocation
 import utils.testApplicationBusTracker
@@ -24,9 +25,19 @@ class BusLinesTests {
     @EnumSource(LineCodes::class)
     fun `should get interurban line location`(code: LineCodes) = testApplicationBusTracker {
         val response = getLineLocation(code.code, code.direction)
-        val json = response.bodyAsText().deserialized().asArray().getOrElse { throw it }
+        val json = response.bodyAsText().deserialized().asArray()
+
         response.status.shouldBe(HttpStatusCode.OK)
-        json.shouldBeInstanceOf<JsonArray>()
+        either {
+            json.bind().forEach {
+                it["lineCode"].asString().bind().shouldBeEqualTo(code.code)
+                it["codVehicle"].asString().bind()
+                it["direction"].asInt().bind().shouldBeEqualTo(code.direction)
+                it["service"].asString().bind()
+                it["coordinates"]["latitude"].asDouble().bind()
+                it["coordinates"]["longitude"].asDouble().bind()
+            }
+        }.getOrElse { throw it }
     }
 
     @Test
@@ -39,7 +50,19 @@ class BusLinesTests {
     @EnumSource(LineCodes::class)
     fun `should get interUrban itineraries from line`(code: LineCodes) = testApplicationBusTracker {
         val response = getItineraries(code.code, code.direction)
+        val json = response.bodyAsText().deserialized()
+
+
         response.status.shouldBe(HttpStatusCode.OK)
+        either {
+            json["codItinerary"].asString().bind()
+            json["direction"].asInt().bind().shouldBeEqualTo(code.direction)
+            json["stops"].asArray().bind().shouldNotBeEmpty()
+            json["stops"].asArray().bind().forEach {
+                it["fullStopCode"].asString().bind()
+                it["order"].asInt().bind().shouldBeGreaterOrEqualTo(0)
+            }
+        }.getOrElse { throw it }
     }
 
     @Test

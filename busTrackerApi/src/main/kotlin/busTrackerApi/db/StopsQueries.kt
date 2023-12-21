@@ -4,27 +4,30 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import busTrackerApi.config.stopsCollection
 import busTrackerApi.config.stopsInfoCollection
+import busTrackerApi.db.models.Stop
+import busTrackerApi.db.models.StopInfo
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.routing.stops.Coordinates
 import com.mongodb.client.model.Filters
 import kotlinx.coroutines.flow.firstOrNull
 
+fun getAllStops() = stopsCollection.find()
 suspend fun getIdByStopCode(stopCode: String) = either {
-    stopsInfoCollection.find(Filters.eq(StopsInfo::idEstacion.name, stopCode))
+    stopsInfoCollection.find(Filters.eq(StopInfo::idEstacion.name, stopCode))
         .firstOrNull()
         ?.codigoEmpresa
         ?: shift<Nothing>(BusTrackerException.NotFound("Stop with stopCode $stopCode not found"))
 }
 
 suspend fun getStopCodeById(id: String) = either {
-    stopsInfoCollection.find(Filters.eq(StopsInfo::codigoEmpresa.name, id))
+    stopsInfoCollection.find(Filters.eq(StopInfo::codigoEmpresa.name, id))
         .firstOrNull()
         ?.idEstacion
         ?: shift<Nothing>(BusTrackerException.NotFound("Stop with id $id not found"))
 }
 
 suspend fun getStopNameById(id: String) = either {
-    val id = stopsInfoCollection.find(Filters.eq(StopsInfo::codigoEmpresa.name, id))
+    val id = stopsInfoCollection.find(Filters.eq(StopInfo::codigoEmpresa.name, id))
         .firstOrNull()
         ?.idEstacion
         ?: shift<Nothing>(BusTrackerException.NotFound("Stop with id $id not found"))

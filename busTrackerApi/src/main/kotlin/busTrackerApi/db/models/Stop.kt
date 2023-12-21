@@ -1,4 +1,4 @@
-package busTrackerApi.db
+package busTrackerApi.db.models
 
 data class Stop(
     val stopCode: String,

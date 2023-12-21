@@ -1,5 +1,6 @@
 package busTrackerApi.extensions
 
+import arrow.core.Either
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.routing.Response
 import busTrackerApi.utils.Call
@@ -7,6 +8,8 @@ import busTrackerApi.utils.errorObject
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
+import io.ktor.utils.io.*
+import kotlinx.coroutines.flow.withIndex
 import simpleJson.serialized
 
 suspend fun Call.badRequest(message: String?) {
@@ -78,4 +81,21 @@ suspend fun Call.handleResponse(response: Response): Unit = when (response) {
 
     is Response.ResponseRaw -> call.respond(response.status)
     is Response.ResponseRedirect -> call.respondRedirect(response.url)
+    is Response.ResponseFlowJson -> {
+        call.respondBytesWriter(status = response.status, contentType = ContentType.Application.Json) {
+            writeStringUtf8("[")
+            response.json.withIndex().collect {
+                if (it.index == 0) {
+                    writeStringUtf8(it.value.serialized())
+                    return@collect
+                }
+                writeStringUtf8(",")
+                writeStringUtf8(it.value.serialized())
+            }
+            writeStringUtf8("]")
+        }
+    }
 }
+
+suspend inline fun Call.handle(f: () -> Either<BusTrackerException, Response>) =
+    f().fold({ handleError(it) }, { handleResponse(it) })

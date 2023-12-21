@@ -1,13 +1,13 @@
 package busTrackerApi.routing.stops
 
+import arrow.core.right
 import busTrackerApi.extensions.handle
-import io.ktor.http.*
-import io.ktor.http.content.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.routing.*
 
 fun Route.stopsRouting() {
+    get("/all") {
+        handle { getAllStops().right() }
+    }
     post("/times/subscriptions") {
         handle { getAllSubscriptions() }
     }
@@ -35,10 +35,6 @@ val subConfigF: Route.(codMode: String) -> Unit =
 
 val alertsConfigF: Route.(codMode: String) -> Unit = { codMode ->
     get("/alerts") {
-        handle {
-            getAlertsByCodMode(codMode).onRight {
-                call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
-            }
-        }
+        handle { getAlertsByCodMode(codMode) }
     }
 }

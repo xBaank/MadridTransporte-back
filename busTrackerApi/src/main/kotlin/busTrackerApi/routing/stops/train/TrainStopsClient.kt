@@ -9,7 +9,9 @@ import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.utils.Call
 import crtm.utils.createStopCode
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.cachingheaders.*
 import simpleJson.JsonNode
 
 
@@ -19,7 +21,7 @@ suspend fun Call.getTrainTimes() = getTrainTimesBase(
     call.request.queryParameters.getWrapped("destinationStopCode")
 )
 
-private suspend fun getTrainTimesBase(
+private suspend fun Call.getTrainTimesBase(
     f: suspend (String, String) -> Either<BusTrackerException, JsonNode>,
     originId: Either<BusTrackerException, String>,
     destinationId: Either<BusTrackerException, String>
@@ -32,5 +34,6 @@ private suspend fun getTrainTimesBase(
         stopInfoOriginStationCode,
         stopInfoDestinationStationCode
     ).bind()
+    call.caching = CachingOptions(cacheControl = CacheControl.MaxAge(maxAgeSeconds = 30))
     ResponseJson(json, HttpStatusCode.OK)
 }

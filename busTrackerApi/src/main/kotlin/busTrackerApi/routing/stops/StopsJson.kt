@@ -1,11 +1,14 @@
 package busTrackerApi.routing.stops
 
-import busTrackerApi.db.DeviceToken
-import busTrackerApi.db.StopsSubscription
+import busTrackerApi.db.models.DeviceToken
+import busTrackerApi.db.models.Stop
+import busTrackerApi.db.models.StopsSubscription
 import busTrackerApi.extensions.toMiliseconds
 import busTrackerApi.routing.stops.bus.busCodMode
 import crtm.soap.IncidentsAffectationsResponse
 import crtm.soap.StopTimesResponse
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import simpleJson.asJson
 import simpleJson.jArray
 import simpleJson.jObject
@@ -46,6 +49,17 @@ fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
             "codLine" += it.codLine
             "stops" += it.stopsAffectated.shortStop.map { it.codStop.asJson() }.asJson()
         }
+    }
+}
+
+fun buildStops(data: Flow<Stop>) = data.map {
+    jObject {
+        "stopCode" += it.stopCode
+        "stopName" += it.stopName
+        "stopLat" += it.stopLat
+        "stopLon" += it.stopLon
+        "codMode" += it.codMode
+        "fullStopCode" += it.fullStopCode
     }
 }
 

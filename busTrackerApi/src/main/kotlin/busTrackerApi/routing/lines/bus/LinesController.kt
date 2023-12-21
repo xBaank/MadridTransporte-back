@@ -1,8 +1,8 @@
 package busTrackerApi.routing.lines.bus
 
 import arrow.core.Either
-import busTrackerApi.db.Itinerary
-import busTrackerApi.db.StopOrder
+import busTrackerApi.db.models.ItineraryWithStops
+import busTrackerApi.db.models.StopOrder
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.BusTrackerException.SoapError
 import busTrackerApi.extensions.getSuspend
@@ -16,7 +16,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
 
 val locationsTimeout = 10.seconds
-suspend fun getLocationsResponse(itinerary: Itinerary, lineCode: String, codMode: String, stopCode: String?) =
+suspend fun getLocationsResponse(itinerary: ItineraryWithStops, lineCode: String, codMode: String, stopCode: String?) =
     Either.catch {
         val lineRequest = LineLocationRequest().apply {
             this.codMode = codMode
@@ -48,13 +48,14 @@ suspend fun getItinerariesResponse(lineCode: String) = Either.catch {
     .mapLeft(mapExceptionsF)
     .map { itinerary ->
         itinerary.itineraries.lineItinerary.map {
-            Itinerary(
+            ItineraryWithStops(
+                itineraryCode = it.codItinerary,
                 fullLineCode = lineCode,
                 direction = it.direction - 1,
-                itineraryCode = it.codItinerary,
                 stops = it.stops.shortStop.mapIndexed { index, stop ->
-                    StopOrder(stop.codStop, index)
-                }
+                    StopOrder(stop.codStop, null, index)
+                },
+                tripId = null
             )
         }
     }
