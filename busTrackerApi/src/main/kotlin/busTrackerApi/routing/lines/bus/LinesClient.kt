@@ -59,6 +59,6 @@ suspend fun Call.getItineraries() = either {
     val itinerariesOrdered = itineraries.copy(stops = itineraries.stops.sortedBy { it.order })
     val json = itinerariesOrdered.let(::buildItinerariesJson).asJson()
 
-    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60))
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
     ResponseJson(json, HttpStatusCode.OK)
 }
