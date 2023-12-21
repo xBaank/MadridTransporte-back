@@ -5,6 +5,7 @@ import io.ktor.http.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeGreaterOrEqualTo
+import org.amshove.kluent.shouldNotBeEmpty
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -56,6 +57,7 @@ class BusLinesTests {
         either {
             json["codItinerary"].asString().bind()
             json["direction"].asInt().bind().shouldBeEqualTo(code.direction)
+            json["stops"].asArray().bind().shouldNotBeEmpty()
             json["stops"].asArray().bind().forEach {
                 it["fullStopCode"].asString().bind()
                 it["order"].asInt().bind().shouldBeGreaterOrEqualTo(0)
