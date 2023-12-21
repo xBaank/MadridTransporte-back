@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.1.0
+
+- Performance optimizations.
+- readd  `v1/stops/all` endpoint
+
 ## 3.0.1
 
 - Fixed a bug that didn't allow the user to see certain line locations
