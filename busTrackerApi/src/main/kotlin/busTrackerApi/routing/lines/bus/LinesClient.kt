@@ -56,7 +56,8 @@ suspend fun Call.getItineraries() = either {
             .firstOrNull { it.direction == direction - 1 }
         ?: shift<Nothing>(NotFound("Itinerary not found"))
 
-    val json = itineraries.let(::buildItinerariesJson).asJson()
+    val itinerariesOrdered = itineraries.copy(stops = itineraries.stops.sortedBy { it.order })
+    val json = itinerariesOrdered.let(::buildItinerariesJson).asJson()
 
     call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60))
     ResponseJson(json, HttpStatusCode.OK)
