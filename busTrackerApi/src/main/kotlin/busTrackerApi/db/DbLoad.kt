@@ -38,9 +38,6 @@ private val infoReader = csvReader {
 private const val sequenceChunkSize = 10_000
 
 suspend fun loadDataIntoDb() = coroutineScope {
-    itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name))
-    stopsOrder.createIndex(Indexes.ascending(StopOrder::tripId.name))
-
     if (!reloadDb || alreadyLoadedDb) return@coroutineScope
 
     val allStopsStream = getFileAsStreamFromGtfs("stops.txt")
@@ -93,6 +90,8 @@ suspend fun loadDataIntoDb() = coroutineScope {
             }
         }
     )
+    itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name))
+    stopsOrder.createIndex(Indexes.ascending(StopOrder::tripId.name))
     alreadyLoadedDb = true
 }
 
