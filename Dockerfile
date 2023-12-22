@@ -3,7 +3,7 @@ COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN gradle build -x test
 
-FROM openjdk:20-jdk-slim-buster
+FROM amazoncorretto:21.0.1
 COPY . /build
 RUN mkdir /app
 

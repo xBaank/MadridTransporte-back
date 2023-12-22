@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.2
+
+- Index data after inserting it to db and not before (Improves loading times)
+
 ## 3.1.1
 
 - Memory optimization when loading db data
@@ -7,7 +11,7 @@
 ## 3.1.0
 
 - Performance optimizations
-- Readd  `v1/stops/all` endpoint
+- Re-add  `v1/stops/all` endpoint
 
 ## 3.0.1
 
