@@ -13,9 +13,11 @@ import com.github.doyaaaaaken.kotlincsv.dsl.context.ExcessFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.context.InsufficientFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.mongodb.client.model.Indexes
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import ru.gildor.coroutines.okhttp.await
 import java.io.File
 import java.io.SequenceInputStream
 import kotlin.io.path.createTempFile
@@ -33,7 +35,7 @@ private val infoReader = csvReader {
 }
 
 
-private const val sequenceChunkSize = 100_000
+private const val sequenceChunkSize = 10_000
 
 suspend fun loadDataIntoDb() = coroutineScope {
     itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name))
@@ -47,7 +49,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
     val allStopsInfoStream = getFileAsStreamFromInfo()
 
     awaitAll(
-        async {
+        async(Dispatchers.IO) {
             reader.openAsync(allStopsStream) {
                 val stops = readAllWithHeaderAsSequence()
                     .filter { it["stop_id"]?.contains("par") == true }
@@ -60,7 +62,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 }
             }
         },
-        async {
+        async(Dispatchers.IO) {
             reader.openAsync(allItinerariesStream) {
                 val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 itinerariesCollection.drop()
@@ -70,7 +72,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 }
             }
         },
-        async {
+        async(Dispatchers.IO) {
             infoReader.openAsync(allStopsInfoStream) {
                 val stops = readAllWithHeaderAsSequence().distinct().chunked(sequenceChunkSize)
                 stopsInfoCollection.drop()
@@ -80,7 +82,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 }
             }
         },
-        async {
+        async(Dispatchers.IO) {
             reader.openAsync(allStopsTimesStream) {
                 val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 stopsOrder.drop()
@@ -94,7 +96,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
     alreadyLoadedDb = true
 }
 
-fun downloadToTempFile(url: String): File = httpClient.get(url).execute().use { response ->
+suspend fun downloadToTempFile(url: String): File = httpClient.get(url).await().use { response ->
     val tempFile = createTempFile().toFile()
     tempFile.deleteOnExit()
     response.body?.byteStream()?.use { download ->
@@ -105,28 +107,28 @@ fun downloadToTempFile(url: String): File = httpClient.get(url).execute().use { 
     return@use tempFile
 }
 
-fun getFileAsStreamFromGtfs(file: String) = SequenceInputStream(
+suspend fun getFileAsStreamFromGtfs(file: String) = SequenceInputStream(
     listOf(
-        File("${EnvVariables.metroGtfs}/$file").inputStream(),
-        File("${EnvVariables.trainGtfs}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.tranviaGtfs}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.interurbanGtfs}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.urbanGtfs}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.emtGtfs}/$file").removeFirstLine().inputStream()
+        File("${EnvVariables.metroGtfs.value()}/$file").inputStream(),
+        File("${EnvVariables.trainGtfs.value()}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.tranviaGtfs.value()}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.interurbanGtfs.value()}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.emtGtfs.value()}/$file").removeFirstLine().inputStream()
     ).toEnumeration()
 )
 
-fun getStopTimesFileAsStreamFromGtfs(file: String = "stop_times.txt") = SequenceInputStream(
+suspend fun getStopTimesFileAsStreamFromGtfs(file: String = "stop_times.txt") = SequenceInputStream(
     listOf(
-        File("${EnvVariables.interurbanGtfs}/$file").inputStream(),
-        File("${EnvVariables.urbanGtfs}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.interurbanGtfs.value()}/$file").inputStream(),
+        File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream(),
     ).toEnumeration()
 )
 
-fun getFileAsStreamFromInfo() = SequenceInputStream(
+suspend fun getFileAsStreamFromInfo() = SequenceInputStream(
     listOf(
-        File(EnvVariables.metroInfo).inputStream(),
-        File(EnvVariables.trainInfo).removeFirstLine().inputStream(),
-        File(EnvVariables.tranviaInfo).removeFirstLine().inputStream(),
+        File(EnvVariables.metroInfo.value()).inputStream(),
+        File(EnvVariables.trainInfo.value()).removeFirstLine().inputStream(),
+        File(EnvVariables.tranviaInfo.value()).removeFirstLine().inputStream(),
     ).toEnumeration()
 )

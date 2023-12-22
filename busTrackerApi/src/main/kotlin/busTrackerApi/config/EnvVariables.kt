@@ -7,6 +7,7 @@ import arrow.core.right
 import busTrackerApi.db.downloadToTempFile
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.unzip
+import busTrackerApi.utils.SuspendingLazy
 
 private const val defaultMetroGtfs =
     "https://www.arcgis.com/sharing/rest/content/items/5c7f2951962540d69ffe8f640d94c246/data"
@@ -34,17 +35,27 @@ object EnvVariables {
     val port by lazy { getenvWrapped("PORT").map(String::toInt).getOrElse { 8080 } }
     val mongoConnectionString by lazy { getenvWrapped("MONGO_CONNECTION_STRING") }
     val serviceJson by lazy { getenvWrapped("SERVICE_JSON") }
-    val metroGtfs by lazy { getenvWrapped("METRO_GTFS").getOrElse { downloadToTempFile(defaultMetroGtfs).unzip() } }
-    val tranviaGtfs by lazy { getenvWrapped("TRANVIA_GTFS").getOrElse { downloadToTempFile(defaultTranviaGtfs).unzip() } }
-    val emtGtfs by lazy { getenvWrapped("EMT_GTFS").getOrElse { downloadToTempFile(defaultEmtGtfs).unzip() } }
-    val trainGtfs by lazy { getenvWrapped("TRAIN_GTFS").getOrElse { downloadToTempFile(defaultTrainGtfs).unzip() } }
-    val interurbanGtfs by lazy { getenvWrapped("INTERURBAN_GTFS").getOrElse { downloadToTempFile(defaultInterurbanGtfs).unzip() } }
-    val urbanGtfs by lazy { getenvWrapped("URBAN_GTFS").getOrElse { downloadToTempFile(defaultUrbanGtfs).unzip() } }
-    val metroInfo by lazy { getenvWrapped("METRO_INFO").getOrElse { downloadToTempFile(defaultMetroInfo).path } }
-    val trainInfo by lazy { getenvWrapped("TRAIN_INFO").getOrElse { downloadToTempFile(defaultTrainInfo).path } }
-    val tranviaInfo by lazy { getenvWrapped("TRAIN_INFO").getOrElse { downloadToTempFile(defaultTranviaInfo).path } }
     val reloadDb by lazy { getenvWrapped("RELOAD_DB").map(String::toBoolean).getOrElse { true } }
     var alreadyLoadedDb: Boolean = false
+    val metroGtfs =
+        SuspendingLazy { getenvWrapped("METRO_GTFS").getOrElse { downloadToTempFile(defaultMetroGtfs).unzip() } }
+    val tranviaGtfs =
+        SuspendingLazy { getenvWrapped("TRANVIA_GTFS").getOrElse { downloadToTempFile(defaultTranviaGtfs).unzip() } }
+    val emtGtfs =
+        SuspendingLazy { getenvWrapped("EMT_GTFS").getOrElse { downloadToTempFile(defaultEmtGtfs).unzip() } }
+    val trainGtfs =
+        SuspendingLazy { getenvWrapped("TRAIN_GTFS").getOrElse { downloadToTempFile(defaultTrainGtfs).unzip() } }
+    val interurbanGtfs =
+        SuspendingLazy { getenvWrapped("INTERURBAN_GTFS").getOrElse { downloadToTempFile(defaultInterurbanGtfs).unzip() } }
+    val urbanGtfs =
+        SuspendingLazy { getenvWrapped("URBAN_GTFS").getOrElse { downloadToTempFile(defaultUrbanGtfs).unzip() } }
+    val metroInfo =
+        SuspendingLazy { getenvWrapped("METRO_INFO").getOrElse { downloadToTempFile(defaultMetroInfo).path } }
+    val trainInfo =
+        SuspendingLazy { getenvWrapped("TRAIN_INFO").getOrElse { downloadToTempFile(defaultTrainInfo).path } }
+    val tranviaInfo =
+        SuspendingLazy { getenvWrapped("TRAIN_INFO").getOrElse { downloadToTempFile(defaultTranviaInfo).path } }
+
 
     private fun getenvOrNull(key: String): String? =
         System.getenv(key) ?: System.getProperty(key) ?: null

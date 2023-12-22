@@ -30,7 +30,7 @@ enum class TimesNotFound(val url: String) {
     TRAM("/v1/stops/tram/asdasd/times")
 }
 
-class StopsRoutingTests {
+class StopsTimesTests {
     @ParameterizedTest
     @EnumSource(Times::class)
     fun `should get stop times`(code: Times) = testApplicationBusTracker {

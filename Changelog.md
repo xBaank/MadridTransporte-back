@@ -1,9 +1,13 @@
 # Changelog
 
+## 3.1.1
+
+- Memory optimization when loading db data
+
 ## 3.1.0
 
-- Performance optimizations.
-- readd  `v1/stops/all` endpoint
+- Performance optimizations
+- Readd  `v1/stops/all` endpoint
 
 ## 3.0.1
 

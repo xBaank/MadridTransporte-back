@@ -12,7 +12,7 @@ import utils.testApplicationBusTracker
 const val trainStopCode = "41"
 const val destinationStopCode = "53"
 
-class StopTrainsTimesTests {
+class StopsTrainsTimesTests {
     @Test
     fun `should get stop times`() = testApplicationBusTracker {
         val url = "/v1/stops/train/times?originStopCode=$trainStopCode&destinationStopCode=$destinationStopCode"
