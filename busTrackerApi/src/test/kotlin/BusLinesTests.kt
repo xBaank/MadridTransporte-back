@@ -1,5 +1,6 @@
+
 import arrow.core.continuations.either
-import arrow.core.getOrElse
+import busTrackerApi.extensions.getOrThrow
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.amshove.kluent.shouldBe
@@ -37,7 +38,7 @@ class BusLinesTests {
                 it["coordinates"]["latitude"].asDouble().bind()
                 it["coordinates"]["longitude"].asDouble().bind()
             }
-        }.getOrElse { throw it }
+        }.getOrThrow()
     }
 
     @Test
@@ -62,7 +63,7 @@ class BusLinesTests {
                 it["fullStopCode"].asString().bind()
                 it["order"].asInt().bind().shouldBeGreaterOrEqualTo(0)
             }
-        }.getOrElse { throw it }
+        }.getOrThrow()
     }
 
     @Test

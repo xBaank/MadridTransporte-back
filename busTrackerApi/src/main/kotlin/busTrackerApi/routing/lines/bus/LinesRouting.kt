@@ -11,5 +11,9 @@ fun Route.busLinesRouting() = route("/bus") {
     get("/{lineCode}/itineraries/{direction}") {
         handle { getItineraries() }
     }
+
+    get("/shapes/{itineraryCode}") {
+        handle { getShapes() }
+    }
 }
 

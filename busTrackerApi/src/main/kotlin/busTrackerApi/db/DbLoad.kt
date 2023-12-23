@@ -4,6 +4,7 @@ import busTrackerApi.config.*
 import busTrackerApi.config.EnvVariables.alreadyLoadedDb
 import busTrackerApi.config.EnvVariables.reloadDb
 import busTrackerApi.db.models.Itinerary
+import busTrackerApi.db.models.Shape
 import busTrackerApi.db.models.StopOrder
 import busTrackerApi.extensions.get
 import busTrackerApi.extensions.mapAsync
@@ -42,6 +43,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
 
     val allStopsStream = getFileAsStreamFromGtfs("stops.txt")
     val allStopsTimesStream = getStopTimesFileAsStreamFromGtfs()
+    val allShapesStream = getShapesFileAsStreamFromGtfs()
     val allItinerariesStream = getFileAsStreamFromGtfs("trips.txt")
     val allStopsInfoStream = getFileAsStreamFromInfo()
 
@@ -64,8 +66,18 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 itinerariesCollection.drop()
                 itineraries.forEach {
-                    val parsed = it.mapAsync(::parseItineraries).toList()
+                    val parsed = it.mapAsync(::parseItinerary).toList()
                     itinerariesCollection.insertMany(parsed)
+                }
+            }
+        },
+        async(Dispatchers.IO) {
+            reader.openAsync(allShapesStream) {
+                val shapes = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
+                shapesCollection.drop()
+                shapes.forEach {
+                    val parsed = it.mapAsync(::parseShape).toList()
+                    shapesCollection.insertMany(parsed)
                 }
             }
         },
@@ -90,7 +102,8 @@ suspend fun loadDataIntoDb() = coroutineScope {
             }
         }
     )
-    itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name))
+    shapesCollection.createIndex(Indexes.ascending(Shape::itineraryId.name))
+    itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name, Itinerary::itineraryCode.name))
     stopsOrder.createIndex(Indexes.ascending(StopOrder::tripId.name))
     alreadyLoadedDb = true
 }
@@ -118,6 +131,13 @@ suspend fun getFileAsStreamFromGtfs(file: String) = SequenceInputStream(
 )
 
 suspend fun getStopTimesFileAsStreamFromGtfs(file: String = "stop_times.txt") = SequenceInputStream(
+    listOf(
+        File("${EnvVariables.interurbanGtfs.value()}/$file").inputStream(),
+        File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream(),
+    ).toEnumeration()
+)
+
+suspend fun getShapesFileAsStreamFromGtfs(file: String = "shapes.txt") = SequenceInputStream(
     listOf(
         File("${EnvVariables.interurbanGtfs.value()}/$file").inputStream(),
         File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream(),

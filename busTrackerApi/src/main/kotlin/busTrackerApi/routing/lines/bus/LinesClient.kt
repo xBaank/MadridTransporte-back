@@ -3,10 +3,12 @@ package busTrackerApi.routing.lines.bus
 import arrow.core.continuations.either
 import busTrackerApi.db.getItinerariesByFullLineCode
 import busTrackerApi.db.getItineraryByFullLineCode
+import busTrackerApi.db.getShapesByItineraryCode
 import busTrackerApi.exceptions.BusTrackerException.BadRequest
 import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.extensions.mapAsync
+import busTrackerApi.routing.Response.ResponseFlowJson
 import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.routing.stops.bus.busCodMode
 import busTrackerApi.utils.Call
@@ -16,6 +18,7 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import simpleJson.asJson
 
@@ -57,8 +60,18 @@ suspend fun Call.getItineraries() = either {
         ?: shift<Nothing>(NotFound("Itinerary not found"))
 
     val itinerariesOrdered = itineraries.copy(stops = itineraries.stops.sortedBy { it.order })
-    val json = itinerariesOrdered.let(::buildItinerariesJson).asJson()
 
+    val json = itinerariesOrdered.let(::buildItineraryJson).asJson()
     call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
     ResponseJson(json, HttpStatusCode.OK)
+}
+
+suspend fun Call.getShapes() = either {
+    val itineraryCode = call.parameters.getWrapped("itineraryCode").bind()
+
+    val itineraries = getShapesByItineraryCode(itineraryCode)
+
+    val json = itineraries.map(::buildShapeJson)
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
+    ResponseFlowJson(json, HttpStatusCode.OK)
 }
