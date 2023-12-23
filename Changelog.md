@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.0
+
+- Add `v1/lines/shapes/{id}` endpoint.
+
 ## 3.1.2
 
 - Index data after inserting it to db and not before (Improves loading times)
