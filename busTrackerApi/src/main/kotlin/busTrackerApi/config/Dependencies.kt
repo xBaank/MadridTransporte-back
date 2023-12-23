@@ -25,6 +25,7 @@ val stopsCollection: MongoCollection<Stop> by lazy { db.getCollection(Stop::clas
 val stopsInfoCollection: MongoCollection<StopInfo> by lazy { db.getCollection(StopInfo::class.simpleName!!) }
 val stopsSubscriptionsCollection: MongoCollection<StopsSubscription> by lazy { db.getCollection(StopsSubscription::class.simpleName!!) }
 val itinerariesCollection: MongoCollection<Itinerary> by lazy { db.getCollection(Itinerary::class.simpleName!!) }
+val shapesCollection: MongoCollection<Shape> by lazy { db.getCollection(Shape::class.simpleName!!) }
 val stopsOrder: MongoCollection<StopOrder> by lazy { db.getCollection(StopOrder::class.simpleName!!) }
 
 suspend fun setupMongo() = either {

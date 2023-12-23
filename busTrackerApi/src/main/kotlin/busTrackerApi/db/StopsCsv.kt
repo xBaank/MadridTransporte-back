@@ -1,9 +1,6 @@
 package busTrackerApi.db
 
-import busTrackerApi.db.models.Itinerary
-import busTrackerApi.db.models.Stop
-import busTrackerApi.db.models.StopInfo
-import busTrackerApi.db.models.StopOrder
+import busTrackerApi.db.models.*
 import crtm.utils.createStopCode
 
 fun parseStops(data: Map<String, String>): Stop {
@@ -24,11 +21,18 @@ fun parseStopsInfo(data: Map<String, String>): StopInfo = StopInfo(
     codigoEmpresa = data["CODIGOEMPRESA"].toString()
 )
 
-fun parseItineraries(data: Map<String, String>) = Itinerary(
+fun parseItinerary(data: Map<String, String>) = Itinerary(
     itineraryCode = data["shape_id"].toString(),
     direction = data["direction_id"]?.toIntOrNull() ?: 0,
     fullLineCode = data["route_id"].toString(),
     tripId = data["trip_id"].toString()
+)
+
+fun parseShape(data: Map<String, String>) = Shape(
+    itineraryId = data["shape_id"].toString(),
+    latitude = data["shape_pt_lat"]?.toDoubleOrNull() ?: 0.0,
+    longitude = data["shape_pt_lon"]?.toDoubleOrNull() ?: 0.0,
+    sequence = data["shape_pt_sequence"]?.toIntOrNull() ?: 0
 )
 
 fun parseStopsOrder(data: Map<String, String>) = StopOrder(
