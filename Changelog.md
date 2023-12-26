@@ -1,8 +1,12 @@
 # Changelog
 
+## 3.2.1
+
+- Remove repeated stops when getting itineraries
+
 ## 3.2.0
 
-- Add `v1/lines/shapes/{id}` endpoint.
+- Add `v1/lines/shapes/{itineraryCode}` endpoint
 
 ## 3.1.2
 
