@@ -33,23 +33,38 @@ object EnvVariables {
     val notificationDelayTimeSeconds by lazy {
         getenvWrapped("NOTIFICATION_DELAY_TIME_SECONDS").map(String::toLong).getOrElse { 60 }
     }
+    val subscriptionsLimit by lazy {
+        getenvWrapped("SUBSCRIPTIONS_LIMIT").map(String::toLong).getOrElse { 5 }
+    }
     val port by lazy { getenvWrapped("PORT").map(String::toInt).getOrElse { 8080 } }
     val mongoConnectionString by lazy { getenvWrapped("MONGO_CONNECTION_STRING") }
     val serviceJson by lazy { getenvWrapped("SERVICE_JSON") }
     val reloadDb by lazy { getenvWrapped("RELOAD_DB").map(String::toBoolean).getOrElse { true } }
     var alreadyLoadedDb: Boolean = false
     val metroGtfs =
-        SuspendingLazy { getenvWrapped("METRO_GTFS").map(::File).getOrElse { downloadToTempFile(defaultMetroGtfs) }.unzip() }
+        SuspendingLazy {
+            getenvWrapped("METRO_GTFS").map(::File).getOrElse { downloadToTempFile(defaultMetroGtfs) }.unzip()
+        }
     val tranviaGtfs =
-        SuspendingLazy { getenvWrapped("TRANVIA_GTFS").map(::File).getOrElse { downloadToTempFile(defaultTranviaGtfs) }.unzip() }
+        SuspendingLazy {
+            getenvWrapped("TRANVIA_GTFS").map(::File).getOrElse { downloadToTempFile(defaultTranviaGtfs) }.unzip()
+        }
     val emtGtfs =
-        SuspendingLazy { getenvWrapped("EMT_GTFS").map(::File).getOrElse { downloadToTempFile(defaultEmtGtfs) }.unzip() }
+        SuspendingLazy {
+            getenvWrapped("EMT_GTFS").map(::File).getOrElse { downloadToTempFile(defaultEmtGtfs) }.unzip()
+        }
     val trainGtfs =
-        SuspendingLazy { getenvWrapped("TRAIN_GTFS").map(::File).getOrElse { downloadToTempFile(defaultTrainGtfs) }.unzip() }
+        SuspendingLazy {
+            getenvWrapped("TRAIN_GTFS").map(::File).getOrElse { downloadToTempFile(defaultTrainGtfs) }.unzip()
+        }
     val interurbanGtfs =
-        SuspendingLazy { getenvWrapped("INTERURBAN_GTFS").map(::File).getOrElse { downloadToTempFile(defaultInterurbanGtfs) }.unzip() }
+        SuspendingLazy {
+            getenvWrapped("INTERURBAN_GTFS").map(::File).getOrElse { downloadToTempFile(defaultInterurbanGtfs) }.unzip()
+        }
     val urbanGtfs =
-        SuspendingLazy { getenvWrapped("URBAN_GTFS").map(::File).getOrElse { downloadToTempFile(defaultUrbanGtfs) }.unzip() }
+        SuspendingLazy {
+            getenvWrapped("URBAN_GTFS").map(::File).getOrElse { downloadToTempFile(defaultUrbanGtfs) }.unzip()
+        }
     val metroInfo =
         SuspendingLazy { getenvWrapped("METRO_INFO").getOrElse { downloadToTempFile(defaultMetroInfo).path } }
     val trainInfo =

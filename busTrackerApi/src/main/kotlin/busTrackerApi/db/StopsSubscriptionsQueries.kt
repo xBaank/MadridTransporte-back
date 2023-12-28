@@ -1,6 +1,7 @@
 package busTrackerApi.db
 
 import arrow.core.continuations.either
+import busTrackerApi.config.EnvVariables
 import busTrackerApi.config.stopsSubscriptionsCollection
 import busTrackerApi.db.models.DeviceToken
 import busTrackerApi.db.models.LineDestination
@@ -77,7 +78,8 @@ suspend fun subscribeDevice(
     lineDestination: LineDestination,
     codMode: String
 ) = either {
-    if (getSubscriptions(deviceToken).count() > 5) return@either TooManyRequests("Limit of subscriptions reached")
+    if (getSubscriptions(deviceToken).count() > EnvVariables.subscriptionsLimit)
+        return@either TooManyRequests("Limit of subscriptions reached")
 
     mutex.withLock {
         val subscription = stopsSubscriptionsCollection
