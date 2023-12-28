@@ -6,7 +6,9 @@ import busTrackerApi.db.models.DeviceToken
 import busTrackerApi.db.models.LineDestination
 import busTrackerApi.db.models.StopsSubscription
 import busTrackerApi.exceptions.BusTrackerException
+import busTrackerApi.exceptions.BusTrackerException.TooManyRequests
 import com.mongodb.client.model.Filters
+import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -69,13 +71,14 @@ suspend fun getSubscription(deviceToken: DeviceToken, stopCode: String) = either
     sub ?: shift<Nothing>(BusTrackerException.NotFound("Subscription not found"))
 }
 
-
 suspend fun subscribeDevice(
     deviceToken: DeviceToken,
     stopId: String,
     lineDestination: LineDestination,
     codMode: String
 ) = either {
+    if (getSubscriptions(deviceToken).count() > 5) return@either TooManyRequests("Limit of subscriptions reached")
+
     mutex.withLock {
         val subscription = stopsSubscriptionsCollection
             .find(

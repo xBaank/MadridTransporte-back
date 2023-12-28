@@ -70,9 +70,9 @@ suspend fun Call.getItineraries() = either {
 suspend fun Call.getShapes() = either {
     val itineraryCode = call.parameters.getWrapped("itineraryCode").bind()
 
-    val itineraries = getShapesByItineraryCode(itineraryCode)
+    val shapes = getShapesByItineraryCode(itineraryCode)
 
-    val json = itineraries.map(::buildShapeJson)
+    val json = shapes.map(::buildShapeJson)
     call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
     ResponseFlowJson(json, HttpStatusCode.OK)
 }

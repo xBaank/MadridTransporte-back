@@ -10,5 +10,6 @@ sealed class BusTrackerException : Exception() {
     class InternalServerError(override val message: String? = null) : BusTrackerException()
     class BadRequest(override val message: String? = null) : BusTrackerException()
     class Conflict(override val message: String? = null) : BusTrackerException()
+    class TooManyRequests(override val message: String? = null) : BusTrackerException()
 }
 

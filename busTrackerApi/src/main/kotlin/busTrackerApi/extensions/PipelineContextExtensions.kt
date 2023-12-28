@@ -40,6 +40,13 @@ private suspend fun Call.conflict(ex: BusTrackerException.Conflict) {
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.Conflict)
 }
 
+private suspend fun Call.tooManyRequests(ex: BusTrackerException.TooManyRequests) {
+    val messageResponse = ex.message ?: "Too many requests"
+    val messageResponseJson = errorObject(messageResponse).serialized()
+
+    call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.TooManyRequests)
+}
+
 private suspend fun Call.soapError(ex: BusTrackerException.SoapError) {
     val messageResponse = ex.message ?: "Soap Error"
     val messageResponseJson = errorObject(messageResponse).serialized()
@@ -64,6 +71,7 @@ suspend fun Call.handleError(ex: BusTrackerException) = when (ex) {
     is BusTrackerException.ValidationException -> badRequest(ex.message)
     is BusTrackerException.BadRequest -> badRequest(ex.message)
     is BusTrackerException.Conflict -> conflict(ex)
+    is BusTrackerException.TooManyRequests -> tooManyRequests(ex)
 }
 
 suspend fun Call.handleResponse(response: Response): Unit = when (response) {
