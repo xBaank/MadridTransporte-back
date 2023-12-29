@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.2
+
+- Add `SOAP_TIMEOUT` and `SUBSCRIPTIONS_LIMIT` as environment variables
+
 ## 3.2.1
 
 - Remove repeated stops when getting itineraries

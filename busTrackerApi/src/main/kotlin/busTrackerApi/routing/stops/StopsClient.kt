@@ -55,7 +55,7 @@ suspend fun Call.subscribeStopTime(codMode: String) =
         val deviceToken = body["deviceToken"].asString().bindJson()
         val subscription = body["subscription"].bindJson()
         val stopCode = createStopCode(codMode, subscription["stopCode"].asString().bindJson())
-        checkStopExists(stopCode)
+        checkStopExists(stopCode).bind()
         val lineDestination = LineDestination(
             subscription["lineDestination"]["line"].asString().bindJson(),
             subscription["lineDestination"]["destination"].asString().bindJson(),
