@@ -24,7 +24,6 @@ import com.google.firebase.messaging.MessagingErrorCode.UNREGISTERED
 import io.ktor.util.logging.*
 import kotlinx.coroutines.*
 import simpleJson.serialized
-import kotlin.time.Duration.Companion.seconds
 
 
 private val LOGGER = KtorSimpleLogger("Subscriptions")
@@ -59,7 +58,7 @@ fun notifyStopTimesOnBackground() {
                     val function = getFunctionByCodMode(subscription.codMode).getOrNull() ?: return@forEachAsync
                     val stopTimes = function(subscription.stopCode).getOrNull() ?: return@forEachAsync
 
-                    subscription.deviceTokens.forEachAsync {
+                    subscription.deviceTokens.distinctBy { it.token }.forEachAsync {
                         val selectedTimes = stopTimes.copy(
                             arrives = stopTimes.arrives?.filter { arrive ->
                                 subscription.linesByDeviceToken[it.token]?.any { lineDestination ->
@@ -67,7 +66,7 @@ fun notifyStopTimesOnBackground() {
                                 } == true
                             } ?: emptyList()
                         )
-                        
+
                         val message = Message.builder()
                             .putData("stopTimes", buildStopTimesJson(selectedTimes).serialized())
                             .setToken(it.token)
@@ -89,7 +88,7 @@ fun notifyStopTimesOnBackground() {
                     LOGGER.error(e)
                 }
             }
-            delay(EnvVariables.notificationDelayTimeSeconds.seconds)
+            delay(EnvVariables.notificationDelayTimeSeconds)
         }
     }
 }

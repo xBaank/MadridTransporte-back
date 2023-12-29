@@ -1,5 +1,6 @@
 package busTrackerApi.db
 
+import arrow.core.Either
 import arrow.core.continuations.either
 import busTrackerApi.config.EnvVariables
 import busTrackerApi.config.stopsSubscriptionsCollection
@@ -11,10 +12,6 @@ import busTrackerApi.exceptions.BusTrackerException.TooManyRequests
 import com.mongodb.client.model.Filters
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-
-val mutex = Mutex()
 
 fun getSubscriptions() = stopsSubscriptionsCollection.find()
 suspend fun unsubscribeDevice(deviceToken: DeviceToken, stopCode: String, lineDestination: LineDestination) {
@@ -77,41 +74,40 @@ suspend fun subscribeDevice(
     stopId: String,
     lineDestination: LineDestination,
     codMode: String
-) = either {
+): Either<BusTrackerException, Unit> = either {
     if (getSubscriptions(deviceToken).count() > EnvVariables.subscriptionsLimit)
-        return@either TooManyRequests("Limit of subscriptions reached")
+        shift<Nothing>(TooManyRequests("Limit of subscriptions reached"))
 
-    mutex.withLock {
-        val subscription = stopsSubscriptionsCollection
-            .find(
-                Filters.and(
-                    Filters.eq(StopsSubscription::stopCode.name, stopId),
-                    Filters.eq(StopsSubscription::codMode.name, codMode)
-                )
+    val subscription = stopsSubscriptionsCollection
+        .find(
+            Filters.and(
+                Filters.eq(StopsSubscription::stopCode.name, stopId),
+                Filters.eq(StopsSubscription::codMode.name, codMode)
             )
-            .firstOrNull()
+        )
+        .firstOrNull()
 
-        if (subscription != null
-            &&
-            deviceToken in subscription.deviceTokens
-            &&
-            subscription.linesByDeviceToken[deviceToken.token]?.contains(lineDestination) == true
-        ) shift<Nothing>(BusTrackerException.Conflict("Device already subscribed"))
-        if (subscription != null) {
-            if (deviceToken !in subscription.deviceTokens) subscription.deviceTokens += deviceToken
-            subscription.linesByDeviceToken[deviceToken.token] =
-                subscription.linesByDeviceToken[deviceToken.token]?.plus(lineDestination) ?: listOf(lineDestination)
-            stopsSubscriptionsCollection.replaceOne(Filters.eq(StopsSubscription::stopCode.name, stopId), subscription)
-        }
-        if (subscription == null) {
-            val newSubscription = StopsSubscription(
-                deviceTokens = mutableListOf(deviceToken),
-                linesByDeviceToken = mutableMapOf(deviceToken.token to listOf(lineDestination)),
-                stopCode = stopId,
-                codMode = codMode,
-                stopName = getStopNameByStopCode(stopId).bind()
-            )
-            stopsSubscriptionsCollection.insertOne(newSubscription)
-        }
+    if (subscription != null
+        &&
+        deviceToken in subscription.deviceTokens
+        &&
+        subscription.linesByDeviceToken[deviceToken.token]?.contains(lineDestination) == true
+    ) shift<Nothing>(BusTrackerException.Conflict("Device already subscribed"))
+
+    if (subscription != null) {
+        if (deviceToken !in subscription.deviceTokens) subscription.deviceTokens += deviceToken
+        subscription.linesByDeviceToken[deviceToken.token] =
+            subscription.linesByDeviceToken[deviceToken.token]?.plus(lineDestination) ?: listOf(lineDestination)
+        stopsSubscriptionsCollection.replaceOne(Filters.eq(StopsSubscription::stopCode.name, stopId), subscription)
+        return@either
     }
+
+    val newSubscription = StopsSubscription(
+        deviceTokens = mutableListOf(deviceToken),
+        linesByDeviceToken = mutableMapOf(deviceToken.token to listOf(lineDestination)),
+        stopCode = stopId,
+        codMode = codMode,
+        stopName = getStopNameByStopCode(stopId).bind()
+    )
+    stopsSubscriptionsCollection.insertOne(newSubscription)
 }

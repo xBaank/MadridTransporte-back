@@ -2,7 +2,7 @@ package busTrackerApi.routing.stops.emt
 
 import arrow.core.continuations.either
 import busTrackerApi.exceptions.BusTrackerException
-import busTrackerApi.extensions.bindMap
+import busTrackerApi.extensions.bindJson
 import busTrackerApi.routing.stops.Arrive
 import busTrackerApi.routing.stops.Coordinates
 import busTrackerApi.routing.stops.Incident
@@ -18,32 +18,32 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
         json["description"].asArray().getOrNull()?.firstOrNull { it["ES"].isRight() }?.get("ES")?.asString()
             ?.getOrNull()
     if (description != null) shift<Nothing>(BusTrackerException.NotFound(description))
-    val stopName = json["data"][0]["StopInfo"][0]["stopName"].asString().bindMap()
-    val coordinates = json["data"][0]["StopInfo"][0]["geometry"]["coordinates"].asArray().bindMap()
-        .let { Coordinates(it[1].asDouble().bindMap(), it[0].asDouble().bindMap()) }
-    val arrives = json["data"][0]["Arrive"].asArray().bindMap()
+    val stopName = json["data"][0]["StopInfo"][0]["stopName"].asString().bindJson()
+    val coordinates = json["data"][0]["StopInfo"][0]["geometry"]["coordinates"].asArray().bindJson()
+        .let { Coordinates(it[1].asDouble().bindJson(), it[0].asDouble().bindJson()) }
+    val arrives = json["data"][0]["Arrive"].asArray().bindJson()
     val incidents = json["data"][0]["Incident"]["ListaIncident"]["data"].asArray().getOrNull()
     val arrivesMapped = arrives.map {
-        val secondsToArrive = it["estimateArrive"].asLong().bindMap()
+        val secondsToArrive = it["estimateArrive"].asLong().bindJson()
         val estimatedArrive = LocalDateTime.now().plusSeconds(secondsToArrive)
-        val line = it["line"].asString().bindMap()
+        val line = it["line"].asString().bindJson()
         Arrive(
             lineCode = createLineCode(emtCodMode, line),
             line = line,
-            destination = it["destination"].asString().bindMap(),
+            destination = it["destination"].asString().bindJson(),
             codMode = emtCodMode.toInt(),
             estimatedArrive = estimatedArrive.toInstant(ZoneOffset.UTC).toEpochMilli()
         )
     }
     val incidentsMapped = incidents?.map {
         Incident(
-            title = it["title"].asString().bindMap(),
-            description = it["description"].asString().bindMap(),
-            cause = it["cause"].asString().bindMap(),
-            effect = it["effect"].asString().bindMap(),
-            from = it["rssFrom"].asString().bindMap(),
-            to = it["rssTo"].asString().bindMap(),
-            url = it["moreInfo"]["@url"].asString().bindMap()
+            title = it["title"].asString().bindJson(),
+            description = it["description"].asString().bindJson(),
+            cause = it["cause"].asString().bindJson(),
+            effect = it["effect"].asString().bindJson(),
+            from = it["rssFrom"].asString().bindJson(),
+            to = it["rssTo"].asString().bindJson(),
+            url = it["moreInfo"]["@url"].asString().bindJson()
         )
     } ?: emptyList()
     StopTimes(
@@ -52,7 +52,7 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
         coordinates,
         arrivesMapped,
         incidentsMapped,
-        json["data"][0]["StopInfo"][0]["stopId"].asString().bindMap()
+        json["data"][0]["StopInfo"][0]["stopId"].asString().bindJson()
     )
 }
 

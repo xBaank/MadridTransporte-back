@@ -9,6 +9,7 @@ import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.unzip
 import busTrackerApi.utils.SuspendingLazy
 import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
 private const val defaultMetroGtfs =
     "https://www.arcgis.com/sharing/rest/content/items/5c7f2951962540d69ffe8f640d94c246/data"
@@ -31,7 +32,10 @@ private const val defaultTranviaInfo =
 
 object EnvVariables {
     val notificationDelayTimeSeconds by lazy {
-        getenvWrapped("NOTIFICATION_DELAY_TIME_SECONDS").map(String::toLong).getOrElse { 60 }
+        getenvWrapped("NOTIFICATION_DELAY_TIME_SECONDS").map(String::toLong).getOrElse { 60 }.seconds
+    }
+    val timeoutSeconds by lazy {
+        getenvWrapped("SOAP_TIMEOUT").map(String::toLong).getOrElse { 30 }.seconds
     }
     val subscriptionsLimit by lazy {
         getenvWrapped("SUBSCRIPTIONS_LIMIT").map(String::toLong).getOrElse { 5 }

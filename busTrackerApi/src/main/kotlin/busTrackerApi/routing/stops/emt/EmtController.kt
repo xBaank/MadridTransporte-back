@@ -6,7 +6,7 @@ import busTrackerApi.db.getCoordinatesByStopCode
 import busTrackerApi.db.getStopNameByStopCode
 import busTrackerApi.exceptions.BusTrackerException.InternalServerError
 import busTrackerApi.exceptions.BusTrackerException.NotFound
-import busTrackerApi.extensions.bindMap
+import busTrackerApi.extensions.bindJson
 import busTrackerApi.extensions.get
 import busTrackerApi.extensions.post
 import busTrackerApi.routing.stops.StopTimes
@@ -32,8 +32,9 @@ suspend fun login() = either {
     ).await()
 
     if (!response.isSuccessful) shift<Nothing>(InternalServerError("EMT login failed"))
-    val body = response.body?.string()?.deserialized()?.bindMap() ?: shift<Nothing>(InternalServerError("Body is null"))
-    currentLoginResponse = parseLoginResponse(body).bindMap()
+    val body =
+        response.body?.string()?.deserialized()?.bindJson() ?: shift<Nothing>(InternalServerError("Body is null"))
+    currentLoginResponse = parseLoginResponse(body).bindJson()
 }
 
 suspend fun getEmtStopTimesResponse(stopCode: String) = either {
@@ -60,7 +61,7 @@ suspend fun getEmtStopTimesResponse(stopCode: String) = either {
         }
 
 
-        val body = (if (response.isSuccessful) response.body?.string()?.deserialized()?.bindMap() else null)
+        val body = (if (response.isSuccessful) response.body?.string()?.deserialized()?.bindJson() else null)
             ?: return@either createFailedTimes(
                 name = getStopNameByStopCode(stopCode).bind(),
                 coordinates = getCoordinatesByStopCode(stopCode).bind()

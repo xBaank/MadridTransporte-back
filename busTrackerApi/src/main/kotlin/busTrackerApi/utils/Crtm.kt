@@ -12,10 +12,7 @@ import jakarta.xml.ws.BindingProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration.Companion.seconds
 
-
-val timeoutSeconds = 30.seconds
 
 val defaultClient = SuspendingLazy {
     withContext(Dispatchers.IO) {

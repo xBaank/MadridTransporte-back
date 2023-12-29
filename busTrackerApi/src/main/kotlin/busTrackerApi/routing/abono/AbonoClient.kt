@@ -2,6 +2,7 @@ package busTrackerApi.routing.abono
 
 import arrow.core.Either
 import arrow.core.continuations.either
+import busTrackerApi.config.EnvVariables.timeoutSeconds
 import busTrackerApi.exceptions.BusTrackerException.InternalServerError
 import busTrackerApi.extensions.getSuspend
 import busTrackerApi.extensions.getWrapped
@@ -9,7 +10,6 @@ import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.utils.Call
 import busTrackerApi.utils.abonoClient
 import busTrackerApi.utils.mapExceptionsF
-import busTrackerApi.utils.timeoutSeconds
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*

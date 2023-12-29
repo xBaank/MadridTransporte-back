@@ -3,7 +3,7 @@ package busTrackerApi.routing.stops.train
 import arrow.core.continuations.either
 import busTrackerApi.config.httpClient
 import busTrackerApi.exceptions.BusTrackerException.InternalServerError
-import busTrackerApi.extensions.bindMap
+import busTrackerApi.extensions.bindJson
 import busTrackerApi.extensions.post
 import busTrackerApi.utils.hourFormatter
 import busTrackerApi.utils.timeZoneMadrid
@@ -39,5 +39,5 @@ suspend fun getTrainTimesResponse(origin: String, destination: String) = either 
         ?.toByteArray(Charsets.ISO_8859_1)
         ?.toString(Charsets.UTF_8)
         ?: shift<Nothing>(InternalServerError("Renfe server returned empty response"))
-    json.deserialized().bindMap()
+    json.deserialized().bindJson()
 }

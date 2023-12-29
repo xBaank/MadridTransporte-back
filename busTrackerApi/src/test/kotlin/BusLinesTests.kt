@@ -1,4 +1,3 @@
-
 import arrow.core.continuations.either
 import busTrackerApi.extensions.getOrThrow
 import io.ktor.client.statement.*
@@ -24,7 +23,7 @@ enum class LineCodes(val code: String, val direction: Int) {
 class BusLinesTests {
     @ParameterizedTest
     @EnumSource(LineCodes::class)
-    fun `should get interurban line location`(code: LineCodes) = testApplicationBusTracker {
+    fun `should get line location`(code: LineCodes) = testApplicationBusTracker {
         val response = getLineLocation(code.code, code.direction)
         val json = response.bodyAsText().deserialized().asArray()
 
@@ -42,14 +41,14 @@ class BusLinesTests {
     }
 
     @Test
-    fun `should not get urban line location`() = testApplicationBusTracker {
+    fun `should not get line location`() = testApplicationBusTracker {
         val response = getLineLocation("asdasd", 2)
         response.status.shouldBe(HttpStatusCode.NotFound)
     }
 
     @ParameterizedTest
     @EnumSource(LineCodes::class)
-    fun `should get interUrban itineraries from line`(code: LineCodes) = testApplicationBusTracker {
+    fun `should get itineraries from line`(code: LineCodes) = testApplicationBusTracker {
         val response = getItineraries(code.code, code.direction)
         val json = response.bodyAsText().deserialized()
 

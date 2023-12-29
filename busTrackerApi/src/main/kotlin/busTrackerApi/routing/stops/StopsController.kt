@@ -2,6 +2,7 @@ package busTrackerApi.routing.stops
 
 import arrow.core.Either
 import arrow.core.continuations.either
+import busTrackerApi.config.EnvVariables.timeoutSeconds
 import busTrackerApi.db.getCoordinatesByStopCode
 import busTrackerApi.db.getStopNameByStopCode
 import busTrackerApi.exceptions.BusTrackerException
@@ -9,7 +10,6 @@ import busTrackerApi.extensions.getSuspend
 import busTrackerApi.utils.auth
 import busTrackerApi.utils.defaultClient
 import busTrackerApi.utils.mapExceptionsF
-import busTrackerApi.utils.timeoutSeconds
 import crtm.soap.ArrayOfString
 import crtm.soap.IncidentsAffectationsRequest
 import crtm.soap.IncidentsAffectationsResponse

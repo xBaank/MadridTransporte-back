@@ -6,7 +6,7 @@ import busTrackerApi.db.*
 import busTrackerApi.db.models.LineDestination
 import busTrackerApi.db.models.toDeviceToken
 import busTrackerApi.exceptions.BusTrackerException
-import busTrackerApi.extensions.bindMap
+import busTrackerApi.extensions.bindJson
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.*
 import busTrackerApi.utils.Call
@@ -51,50 +51,50 @@ private suspend fun Call.getStopTimesBase(
 
 suspend fun Call.subscribeStopTime(codMode: String) =
     either {
-        val body = call.receiveText().deserialized().bindMap()
-        val deviceToken = body["deviceToken"].asString().bindMap()
-        val subscription = body["subscription"].bindMap()
-        val stopCode = createStopCode(codMode, subscription["stopCode"].asString().bindMap())
+        val body = call.receiveText().deserialized().bindJson()
+        val deviceToken = body["deviceToken"].asString().bindJson()
+        val subscription = body["subscription"].bindJson()
+        val stopCode = createStopCode(codMode, subscription["stopCode"].asString().bindJson())
         checkStopExists(stopCode)
         val lineDestination = LineDestination(
-            subscription["lineDestination"]["line"].asString().bindMap(),
-            subscription["lineDestination"]["destination"].asString().bindMap(),
-            subscription["lineDestination"]["codMode"].asInt().bindMap()
+            subscription["lineDestination"]["line"].asString().bindJson(),
+            subscription["lineDestination"]["destination"].asString().bindJson(),
+            subscription["lineDestination"]["codMode"].asInt().bindJson()
         )
         subscribeDevice(
             deviceToken = deviceToken.toDeviceToken(),
             stopId = stopCode,
-            codMode = codMode,
-            lineDestination = lineDestination
+            lineDestination = lineDestination,
+            codMode = codMode
         ).bind()
 
         ResponseRaw(HttpStatusCode.OK)
     }
 
 suspend fun Call.getSubscription(codMode: String) = either {
-    val body = call.receiveText().deserialized().bindMap()
-    val deviceToken = body["deviceToken"].asString().bindMap().toDeviceToken()
-    val stopCode = createStopCode(codMode, body["stopCode"].asString().bindMap())
+    val body = call.receiveText().deserialized().bindJson()
+    val deviceToken = body["deviceToken"].asString().bindJson().toDeviceToken()
+    val stopCode = createStopCode(codMode, body["stopCode"].asString().bindJson())
     val subscription = getSubscription(deviceToken = deviceToken, stopCode = stopCode).bind()
     ResponseJson(buildSubscription(subscription, deviceToken), HttpStatusCode.OK)
 }
 
 suspend fun Call.getAllSubscriptions() = either {
-    val body = call.receiveText().deserialized().bindMap()
-    val deviceToken = body["deviceToken"].asString().bindMap().toDeviceToken()
+    val body = call.receiveText().deserialized().bindJson()
+    val deviceToken = body["deviceToken"].asString().bindJson().toDeviceToken()
     val subscriptions = getSubscriptions(deviceToken).toList()
     ResponseJson(subscriptions.map { buildSubscription(it, deviceToken) }.asJson(), HttpStatusCode.OK)
 }
 
 suspend fun Call.unsubscribeStopTime(codMode: String) = either {
-    val body = call.receiveText().deserialized().bindMap()
-    val deviceToken = body["deviceToken"].asString().bindMap()
-    val subscription = body["subscription"].bindMap()
-    val stopCode = createStopCode(codMode, subscription["stopCode"].asString().bindMap())
+    val body = call.receiveText().deserialized().bindJson()
+    val deviceToken = body["deviceToken"].asString().bindJson()
+    val subscription = body["subscription"].bindJson()
+    val stopCode = createStopCode(codMode, subscription["stopCode"].asString().bindJson())
     val lineDestination = LineDestination(
-        subscription["lineDestination"]["line"].asString().bindMap(),
-        subscription["lineDestination"]["destination"].asString().bindMap(),
-        subscription["lineDestination"]["codMode"].asInt().bindMap()
+        subscription["lineDestination"]["line"].asString().bindJson(),
+        subscription["lineDestination"]["destination"].asString().bindJson(),
+        subscription["lineDestination"]["codMode"].asInt().bindJson()
     )
     unsubscribeDevice(deviceToken = deviceToken.toDeviceToken(), stopCode = stopCode, lineDestination = lineDestination)
     ResponseRaw(HttpStatusCode.OK)

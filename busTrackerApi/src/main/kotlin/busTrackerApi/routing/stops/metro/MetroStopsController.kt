@@ -8,7 +8,7 @@ import busTrackerApi.db.getIdByStopCode
 import busTrackerApi.db.getStopCodeById
 import busTrackerApi.db.getStopNameById
 import busTrackerApi.exceptions.BusTrackerException
-import busTrackerApi.extensions.bindMap
+import busTrackerApi.extensions.bindJson
 import crtm.utils.getCodStopFromStopCode
 import okhttp3.HttpUrl
 import okhttp3.Request
@@ -69,6 +69,6 @@ suspend fun getTimesBase(id: String, codMode: String) = either {
             ?: jArray()
 
         parseMetroToStopTimes(json, codMode, coordinates, getStopNameById(id).bind(), getCodStopFromStopCode(stopCode))
-            .bindMap()
+            .bindJson()
     }
 }

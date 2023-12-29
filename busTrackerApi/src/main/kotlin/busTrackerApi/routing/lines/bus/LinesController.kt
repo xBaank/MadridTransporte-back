@@ -1,6 +1,7 @@
 package busTrackerApi.routing.lines.bus
 
 import arrow.core.Either
+import busTrackerApi.config.EnvVariables.timeoutSeconds
 import busTrackerApi.db.models.ItineraryWithStops
 import busTrackerApi.db.models.StopOrder
 import busTrackerApi.exceptions.BusTrackerException
@@ -9,13 +10,10 @@ import busTrackerApi.extensions.getSuspend
 import busTrackerApi.utils.auth
 import busTrackerApi.utils.defaultClient
 import busTrackerApi.utils.mapExceptionsF
-import busTrackerApi.utils.timeoutSeconds
 import crtm.soap.LineItineraryRequest
 import crtm.soap.LineLocationRequest
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlin.time.Duration.Companion.seconds
 
-val locationsTimeout = 10.seconds
 suspend fun getLocationsResponse(itinerary: ItineraryWithStops, lineCode: String, codMode: String, stopCode: String?) =
     Either.catch {
         val lineRequest = LineLocationRequest().apply {
@@ -26,7 +24,7 @@ suspend fun getLocationsResponse(itinerary: ItineraryWithStops, lineCode: String
             authentication = defaultClient.value().auth()
             codStop = stopCode ?: "8_"
         }
-        withTimeoutOrNull(locationsTimeout) {
+        withTimeoutOrNull(timeoutSeconds) {
             getSuspend(lineRequest, defaultClient.value()::getLineLocationAsync)
         } ?: throw SoapError("Server error")
     }.mapLeft(mapExceptionsF)
