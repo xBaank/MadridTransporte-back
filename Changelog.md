@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.4
+
+- Fix emt times to always be in UTC format.
+
 ## 3.2.3
 
 - Fix notifications
