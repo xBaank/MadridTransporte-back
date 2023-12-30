@@ -10,6 +10,8 @@ import busTrackerApi.db.models.StopsSubscription
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.BusTrackerException.TooManyRequests
 import com.mongodb.client.model.Filters
+import com.mongodb.client.model.UpdateOptions
+import com.mongodb.client.model.Updates
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.firstOrNull
 
@@ -20,17 +22,22 @@ suspend fun unsubscribeDevice(deviceToken: DeviceToken, stopCode: String, lineDe
         Filters.eq(DeviceToken::token.name, deviceToken.token)
     )
     val equalsStopCode = Filters.eq(StopsSubscription::stopCode.name, stopCode)
+    val filter = Filters.and(containDeviceToken, equalsStopCode)
 
-    stopsSubscriptionsCollection.find(Filters.and(containDeviceToken, equalsStopCode)).collect {
-        val subscription = it
-        subscription.linesByDeviceToken[deviceToken.token] =
-            subscription.linesByDeviceToken[deviceToken.token]?.filter {
-                it != lineDestination
-            } ?: emptyList()
+    stopsSubscriptionsCollection.find(filter).collect { subscription ->
+        subscription.linesByDeviceToken[deviceToken.token] = subscription.linesByDeviceToken[deviceToken.token]
+            ?.filter { it != lineDestination } ?: emptyList()
+
         if (subscription.linesByDeviceToken[deviceToken.token].isNullOrEmpty())
-            stopsSubscriptionsCollection.deleteOne(Filters.eq(StopsSubscription::stopCode.name, stopCode))
-        else
-            stopsSubscriptionsCollection.insertOne(subscription)
+            subscription.deviceTokens -= deviceToken
+
+        val update = Updates.combine(
+            Updates.set(StopsSubscription::linesByDeviceToken.name, subscription.linesByDeviceToken),
+            Updates.set(StopsSubscription::deviceTokens.name, subscription.deviceTokens)
+        )
+        val option = UpdateOptions().upsert(true)
+        stopsSubscriptionsCollection.updateOne(filter = filter, update = update, options = option)
+
     }
 }
 
@@ -39,13 +46,18 @@ suspend fun unsubscribeAllDevice(deviceToken: DeviceToken) {
         StopsSubscription::deviceTokens.name,
         Filters.eq(DeviceToken::token.name, deviceToken.token)
     )
-    stopsSubscriptionsCollection.find(containsDeviceToken).collect {
-        val subscription = it
+    
+    stopsSubscriptionsCollection.find(containsDeviceToken).collect { subscription ->
+        subscription.linesByDeviceToken[deviceToken.token] = emptyList()
         subscription.deviceTokens -= deviceToken
-        if (subscription.deviceTokens.isEmpty())
-            stopsSubscriptionsCollection.deleteOne(Filters.eq(StopsSubscription::stopCode.name, subscription.stopCode))
-        else
-            stopsSubscriptionsCollection.insertOne(subscription)
+
+        val update = Updates.combine(
+            Updates.set(StopsSubscription::linesByDeviceToken.name, subscription.linesByDeviceToken),
+            Updates.set(StopsSubscription::deviceTokens.name, subscription.deviceTokens)
+        )
+        val option = UpdateOptions().upsert(true)
+        stopsSubscriptionsCollection.updateOne(filter = containsDeviceToken, update = update, options = option)
+
     }
 }
 
