@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.3
+
+- Fix notifications
+
 ## 3.2.2
 
 - Add `SOAP_TIMEOUT` and `SUBSCRIPTIONS_LIMIT` as environment variables
