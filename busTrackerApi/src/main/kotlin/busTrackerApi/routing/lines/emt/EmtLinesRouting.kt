@@ -1,9 +1,8 @@
 package busTrackerApi.routing.lines.emt
 
 import busTrackerApi.extensions.handle
-import busTrackerApi.routing.lines.bus.getItineraries
-import busTrackerApi.routing.lines.bus.getLocations
-import busTrackerApi.routing.lines.bus.getShapes
+import busTrackerApi.routing.lines.getItineraries
+import busTrackerApi.routing.lines.getShapes
 import io.ktor.server.routing.*
 
 fun Route.emtLinesRouting() = route("/emt") {

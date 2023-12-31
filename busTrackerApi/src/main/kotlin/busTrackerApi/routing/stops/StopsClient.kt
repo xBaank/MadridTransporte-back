@@ -9,7 +9,7 @@ import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindJson
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.*
-import busTrackerApi.utils.Call
+import busTrackerApi.utils.Pipeline
 import crtm.utils.createStopCode
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -21,22 +21,22 @@ import simpleJson.*
 import busTrackerApi.db.getAllStops as getAllStopsFromDb
 
 
-fun Call.getAllStops(): ResponseFlowJson {
+fun Pipeline.getAllStops(): ResponseFlowJson {
     val stops = getAllStopsFromDb()
     call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
     return ResponseFlowJson(buildStops(stops), HttpStatusCode.OK)
 }
 
-suspend fun Call.getAlertsByCodMode(codMode: String) = either {
+suspend fun Pipeline.getAlertsByCodMode(codMode: String) = either {
     val alerts = getAlertsByCodModeResponse(codMode).bind()
     call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
     ResponseJsonCached(buildAlertsJson(alerts), HttpStatusCode.OK)
 }
 
-suspend fun Call.getStopTimes(codMode: String) =
+suspend fun Pipeline.getStopTimes(codMode: String) =
     getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getBusTimesResponse)
 
-private suspend fun Call.getStopTimesBase(
+private suspend fun Pipeline.getStopTimesBase(
     codMode: String,
     simpleStopCode: Either<BusTrackerException, String>,
     f: suspend (String) -> Either<BusTrackerException, StopTimes>
@@ -49,7 +49,7 @@ private suspend fun Call.getStopTimesBase(
     ResponseJson(buildStopTimesJson(times), statusCode)
 }
 
-suspend fun Call.subscribeStopTime(codMode: String) =
+suspend fun Pipeline.subscribeStopTime(codMode: String) =
     either {
         val body = call.receiveText().deserialized().bindJson()
         val deviceToken = body["deviceToken"].asString().bindJson()
@@ -71,7 +71,7 @@ suspend fun Call.subscribeStopTime(codMode: String) =
         ResponseRaw(HttpStatusCode.OK)
     }
 
-suspend fun Call.getSubscription(codMode: String) = either {
+suspend fun Pipeline.getSubscription(codMode: String) = either {
     val body = call.receiveText().deserialized().bindJson()
     val deviceToken = body["deviceToken"].asString().bindJson().toDeviceToken()
     val stopCode = createStopCode(codMode, body["stopCode"].asString().bindJson())
@@ -79,14 +79,14 @@ suspend fun Call.getSubscription(codMode: String) = either {
     ResponseJson(buildSubscription(subscription, deviceToken), HttpStatusCode.OK)
 }
 
-suspend fun Call.getAllSubscriptions() = either {
+suspend fun Pipeline.getAllSubscriptions() = either {
     val body = call.receiveText().deserialized().bindJson()
     val deviceToken = body["deviceToken"].asString().bindJson().toDeviceToken()
     val subscriptions = getSubscriptions(deviceToken).toList()
     ResponseJson(subscriptions.map { buildSubscription(it, deviceToken) }.asJson(), HttpStatusCode.OK)
 }
 
-suspend fun Call.unsubscribeStopTime(codMode: String) = either {
+suspend fun Pipeline.unsubscribeStopTime(codMode: String) = either {
     val body = call.receiveText().deserialized().bindJson()
     val deviceToken = body["deviceToken"].asString().bindJson()
     val subscription = body["subscription"].bindJson()

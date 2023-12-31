@@ -26,7 +26,7 @@ fun getItinerariesByFullLineCode(fullLineCode: String, direction: Int): Flow<Iti
             /* localField = */ StopOrder::tripId.name,
             /* foreignField = */ Itinerary::tripId.name,
             /* as = */ ItineraryWithStops::stops.name
-        ),
+        )
     )
     return itinerariesCollection.withDocumentClass<ItineraryWithStops>().aggregate(pipeline)
         .distinctUntilChangedBy { it.itineraryCode to it.direction }

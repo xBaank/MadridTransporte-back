@@ -1,4 +1,4 @@
-package busTrackerApi.routing.lines.bus
+package busTrackerApi.routing.lines
 
 import busTrackerApi.db.models.ItineraryWithStops
 import busTrackerApi.db.models.Shape

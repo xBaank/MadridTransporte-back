@@ -6,7 +6,7 @@ import busTrackerApi.db.getIdByStopCode
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.ResponseJson
-import busTrackerApi.utils.Call
+import busTrackerApi.utils.Pipeline
 import crtm.utils.createStopCode
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -15,13 +15,13 @@ import io.ktor.server.plugins.cachingheaders.*
 import simpleJson.JsonNode
 
 
-suspend fun Call.getTrainTimes() = getTrainTimesBase(
+suspend fun Pipeline.getTrainTimes() = getTrainTimesBase(
     ::getTrainTimesResponse,
     call.request.queryParameters.getWrapped("originStopCode"),
     call.request.queryParameters.getWrapped("destinationStopCode")
 )
 
-private suspend fun Call.getTrainTimesBase(
+private suspend fun Pipeline.getTrainTimesBase(
     f: suspend (String, String) -> Either<BusTrackerException, JsonNode>,
     originId: Either<BusTrackerException, String>,
     destinationId: Either<BusTrackerException, String>
