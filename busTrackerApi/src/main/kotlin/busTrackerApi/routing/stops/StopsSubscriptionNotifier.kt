@@ -11,7 +11,7 @@ import busTrackerApi.extensions.batched
 import busTrackerApi.extensions.forEachAsync
 import busTrackerApi.routing.stops.bus.busCodMode
 import busTrackerApi.routing.stops.emt.emtCodMode
-import busTrackerApi.routing.stops.emt.getEmtStopTimesResponse
+import busTrackerApi.routing.stops.emt.getEmtStopTimes
 import busTrackerApi.routing.stops.metro.getMetroTimesResponse
 import busTrackerApi.routing.stops.metro.metroCodMode
 import busTrackerApi.utils.StopTimesF
@@ -39,7 +39,7 @@ suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, S
         }
 
         emtCodMode -> {
-            { getEmtStopTimesResponse(it) }
+            { getEmtStopTimes(it) }
         }
 
         else -> {

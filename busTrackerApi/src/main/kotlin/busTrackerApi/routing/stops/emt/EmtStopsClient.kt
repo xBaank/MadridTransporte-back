@@ -16,7 +16,7 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
 
 suspend fun Pipeline.getStopTimes() =
-    getStopTimesBase(::getEmtStopTimesResponse, call.parameters.getWrapped("stopCode"))
+    getStopTimesBase(::getEmtStopTimes, call.parameters.getWrapped("stopCode"))
 
 private suspend fun Pipeline.getStopTimesBase(
     f: suspend (String) -> Either<BusTrackerException, StopTimes>,
