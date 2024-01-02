@@ -1,5 +1,6 @@
 import arrow.core.continuations.either
 import busTrackerApi.extensions.getOrThrow
+import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.amshove.kluent.shouldBe
@@ -14,23 +15,32 @@ import utils.getItineraries
 import utils.getLineLocation
 import utils.testApplicationBusTracker
 
-enum class LineCodes(val code: String, val direction: Int) {
-    Interurban("8__450___", 1),
-    Urban("9__1__074_", 1),
-    WeirdUrban("9__1__058_", 1)
+enum class LocationsCodes(val url: String, val code: String, val direction: Int) {
+    Emt("/v1/lines/emt/6__144___/locations/2", "6__144___", 2),
+    Interurban("/v1/lines/bus/8__450___/locations/1", "8__450___", 1),
+    Urban("/v1/lines/bus/9__1__074_/locations/1", "9__1__074_", 1),
+    WeirdUrban("/v1/lines/bus/9__1__058_/locations/1", "9__1__058_", 1)
+}
+
+enum class ItinerariesCodes(val url: String, val code: String, val simpleLineCode: String, val direction: Int) {
+    Emt("/v1/lines/emt/6__144___/itineraries/2", "6__144___", "144", 2),
+    Interurban("/v1/lines/bus/8__450___/itineraries/1", "8__450___", "450", 1),
+    Urban("/v1/lines/bus/9__1__074_/itineraries/1", "9__1__074_", "1", 1),
+    WeirdUrban("/v1/lines/bus/9__1__058_/itineraries/1", "9__1__058_", "1", 1)
 }
 
 class BusLinesTests {
     @ParameterizedTest
-    @EnumSource(LineCodes::class)
-    fun `should get line location`(code: LineCodes) = testApplicationBusTracker {
-        val response = getLineLocation(code.code, code.direction)
+    @EnumSource(LocationsCodes::class)
+    fun `should get line location`(code: LocationsCodes) = testApplicationBusTracker {
+        val response = client.get(code.url)
         val json = response.bodyAsText().deserialized().asArray()
 
         response.status.shouldBe(HttpStatusCode.OK)
         either {
             json.bind().forEach {
                 it["lineCode"].asString().bind().shouldBeEqualTo(code.code)
+                it["simpleLineCode"].asString().bind().shouldBeEqualTo(code.code)
                 it["codVehicle"].asString().bind()
                 it["direction"].asInt().bind().shouldBeEqualTo(code.direction)
                 it["service"].asString().bind()
@@ -47,9 +57,9 @@ class BusLinesTests {
     }
 
     @ParameterizedTest
-    @EnumSource(LineCodes::class)
-    fun `should get itineraries from line`(code: LineCodes) = testApplicationBusTracker {
-        val response = getItineraries(code.code, code.direction)
+    @EnumSource(ItinerariesCodes::class)
+    fun `should get itineraries from line`(code: ItinerariesCodes) = testApplicationBusTracker {
+        val response = client.get(code.url)
         val json = response.bodyAsText().deserialized()
 
 

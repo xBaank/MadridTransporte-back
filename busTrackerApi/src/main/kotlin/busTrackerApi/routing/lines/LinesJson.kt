@@ -7,6 +7,7 @@ import simpleJson.jObject
 
 fun buildVehicleLocationJson(vehicleLocation: VehicleLocation) = jObject {
     "lineCode" += vehicleLocation.line.codLine
+    "simpleLineCode" += vehicleLocation.line.shortDescription
     "codVehicle" += vehicleLocation.codVehicle
     "coordinates" += jObject {
         "latitude" += vehicleLocation.coordinates.latitude
