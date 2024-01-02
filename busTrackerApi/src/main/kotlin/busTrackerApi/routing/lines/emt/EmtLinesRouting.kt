@@ -1,11 +1,11 @@
-package busTrackerApi.routing.lines.bus
+package busTrackerApi.routing.lines.emt
 
 import busTrackerApi.extensions.handle
 import busTrackerApi.routing.lines.getItineraries
 import busTrackerApi.routing.lines.getShapes
 import io.ktor.server.routing.*
 
-fun Route.busLinesRouting() = route("/bus") {
+fun Route.emtLinesRouting() = route("/emt") {
     get("/{lineCode}/locations/{direction}") {
         handle { getLocations() }
     }
@@ -18,4 +18,3 @@ fun Route.busLinesRouting() = route("/bus") {
         handle { getShapes() }
     }
 }
-

@@ -1,28 +1,23 @@
 package busTrackerApi.routing.lines.bus
 
 import arrow.core.continuations.either
-import busTrackerApi.db.getItinerariesByFullLineCode
 import busTrackerApi.db.getItineraryByFullLineCode
-import busTrackerApi.db.getShapesByItineraryCode
 import busTrackerApi.exceptions.BusTrackerException.BadRequest
 import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.getWrapped
-import busTrackerApi.extensions.mapAsync
-import busTrackerApi.routing.Response.ResponseFlowJson
 import busTrackerApi.routing.Response.ResponseJson
+import busTrackerApi.routing.lines.buildVehicleLocationJson
 import busTrackerApi.routing.stops.bus.busCodMode
-import busTrackerApi.utils.Call
+import busTrackerApi.utils.Pipeline
 import crtm.utils.createStopCode
 import crtm.utils.getCodModeFromLineCode
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import simpleJson.asJson
 
-suspend fun Call.getLocations() = either {
+suspend fun Pipeline.getLocations() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
     val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: shift<Nothing>(BadRequest())
     val stopCode = call.request.queryParameters["stopCode"]
@@ -30,49 +25,19 @@ suspend fun Call.getLocations() = either {
     val fullStopCode = if (stopCode != null) createStopCode(busCodMode, stopCode) else null
     val codMode = getCodModeFromLineCode(lineCode)
 
-    var itineraries = getItinerariesByFullLineCode(lineCode, direction - 1).toList()
+    var itinerary = getItineraryByFullLineCode(lineCode, direction - 1)
     //TODO save in db so we don't have to ask the shitty server again
-    if (itineraries.isEmpty()) itineraries =
-        getItinerariesResponse(lineCode).bind().filter { it.direction == direction - 1 }
-
-    val locations = itineraries.mapAsync {
-        getLocationsResponse(it, lineCode, codMode, fullStopCode).bind()
+    if (itinerary == null) {
+        itinerary = getItinerariesResponse(lineCode).bind().firstOrNull { it.direction == direction - 1 }
+            ?: shift<Nothing>(NotFound())
     }
 
-    val json = locations
-        .map { it.vehiclesLocation.vehicleLocation }
-        .flatten()
+    val locations = getLocationsResponse(itinerary, lineCode, codMode, fullStopCode).bind()
+
+    val json = locations.vehiclesLocation.vehicleLocation
         .map(::buildVehicleLocationJson)
         .asJson()
 
     call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 10))
     ResponseJson(json, HttpStatusCode.OK)
-}
-
-suspend fun Call.getItineraries() = either {
-    val lineCode = call.parameters.getWrapped("lineCode").bind()
-    val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: shift<Nothing>(BadRequest())
-
-    val itineraries = getItineraryByFullLineCode(lineCode, direction - 1)
-        ?: getItinerariesResponse(lineCode).bind()
-            .sortedBy { it.stops.count() }
-            .firstOrNull { it.direction == direction - 1 }
-        ?: shift<Nothing>(NotFound("Itinerary not found"))
-
-    val itinerariesOrdered =
-        itineraries.copy(stops = itineraries.stops.distinctBy { it.fullStopCode to it.order }.sortedBy { it.order })
-
-    val json = itinerariesOrdered.let(::buildItineraryJson).asJson()
-    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
-    ResponseJson(json, HttpStatusCode.OK)
-}
-
-suspend fun Call.getShapes() = either {
-    val itineraryCode = call.parameters.getWrapped("itineraryCode").bind()
-
-    val shapes = getShapesByItineraryCode(itineraryCode)
-
-    val json = shapes.map(::buildShapeJson)
-    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
-    ResponseFlowJson(json, HttpStatusCode.OK)
 }

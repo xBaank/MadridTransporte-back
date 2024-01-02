@@ -7,7 +7,7 @@ import busTrackerApi.exceptions.BusTrackerException.InternalServerError
 import busTrackerApi.extensions.getSuspend
 import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.ResponseJson
-import busTrackerApi.utils.Call
+import busTrackerApi.utils.Pipeline
 import busTrackerApi.utils.abonoClient
 import busTrackerApi.utils.mapExceptionsF
 import io.ktor.http.*
@@ -20,7 +20,7 @@ import nl.adaptivity.xmlutil.serialization.XML
 
 val xml = XML { autoPolymorphic = true }
 
-suspend fun Call.getAbono() = either {
+suspend fun Pipeline.getAbono() = either {
     val id = call.parameters.getWrapped("id").bind()
     val response = withTimeoutOrNull(timeoutSeconds) {
         Either.catch {

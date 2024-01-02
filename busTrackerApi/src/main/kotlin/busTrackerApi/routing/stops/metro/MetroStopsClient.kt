@@ -8,17 +8,17 @@ import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.routing.stops.StopTimes
 import busTrackerApi.routing.stops.buildStopTimesJson
-import busTrackerApi.utils.Call
+import busTrackerApi.utils.Pipeline
 import crtm.utils.createStopCode
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
 
-suspend fun Call.getMetroTimes(codMode: String) =
+suspend fun Pipeline.getMetroTimes(codMode: String) =
     getMetroTimesBase(::getMetroTimesResponse, codMode, call.parameters.getWrapped("stopCode"))
 
-private suspend fun Call.getMetroTimesBase(
+private suspend fun Pipeline.getMetroTimesBase(
     f: suspend (String, String) -> Either<BusTrackerException, StopTimes>,
     codMode: String,
     id: Either<BusTrackerException, String>

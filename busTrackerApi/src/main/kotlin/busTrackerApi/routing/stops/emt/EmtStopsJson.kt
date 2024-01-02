@@ -3,6 +3,7 @@ package busTrackerApi.routing.stops.emt
 import arrow.core.continuations.either
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindJson
+import busTrackerApi.extensions.toDirection
 import busTrackerApi.routing.stops.Arrive
 import busTrackerApi.routing.stops.Coordinates
 import busTrackerApi.routing.stops.Incident
@@ -28,10 +29,14 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
         val secondsToArrive = it["estimateArrive"].asLong().bindJson()
         val estimatedArrive = LocalDateTime.now(Clock.systemUTC()).plusSeconds(secondsToArrive)
         val line = it["line"].asString().bindJson()
+        val linesInfo = json["data"][0]["StopInfo"][0]["lines"].asArray().bindJson()
+        val direction =
+            linesInfo.first { it["label"].asString().bindJson() == line }["to"].asString().bindJson().toDirection()
         Arrive(
             lineCode = createLineCode(emtCodMode, line),
             line = line,
             destination = it["destination"].asString().bindJson(),
+            direction = direction,
             codMode = emtCodMode.toInt(),
             estimatedArrive = estimatedArrive.toInstant(ZoneOffset.UTC).toEpochMilli()
         )

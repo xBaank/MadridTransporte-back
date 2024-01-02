@@ -39,7 +39,7 @@ fun Application.startUp() = runBlocking {
     setupFirebase().getOrElse { throw it }
     setupMongo().getOrElse { throw it }
     loadDataIntoDb()
-    notifyStopTimesOnBackground()
     configureRoutingV1()
+    notifyStopTimesOnBackground()
 }
 

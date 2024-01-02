@@ -2,6 +2,7 @@ package busTrackerApi.config
 
 import busTrackerApi.routing.abono.abonoRouting
 import busTrackerApi.routing.lines.bus.busLinesRouting
+import busTrackerApi.routing.lines.emt.emtLinesRouting
 import busTrackerApi.routing.stops.bus.busStopsRouting
 import busTrackerApi.routing.stops.emt.emtStopsRouting
 import busTrackerApi.routing.stops.metro.metroStopsRouting
@@ -14,10 +15,14 @@ import io.ktor.server.routing.*
 fun Application.configureRoutingV1() {
     routing {
         route("/v1") {
+            //Will be deprecated
             linesRoute()
             abonosRoute()
             stopsRoute()
         }
+        linesRoute()
+        abonosRoute()
+        stopsRoute()
     }
 }
 
@@ -35,6 +40,7 @@ private fun Route.stopsRoute() {
 private fun Route.linesRoute() {
     route("/lines") {
         busLinesRouting()
+        emtLinesRouting()
     }
 }
 

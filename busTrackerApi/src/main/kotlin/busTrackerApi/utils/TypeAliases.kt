@@ -6,5 +6,5 @@ import busTrackerApi.routing.stops.StopTimes
 import io.ktor.server.application.*
 import io.ktor.util.pipeline.*
 
-typealias Call = PipelineContext<Unit, ApplicationCall>
+typealias Pipeline = PipelineContext<Unit, ApplicationCall>
 typealias StopTimesF = suspend (String) -> Either<BusTrackerException, StopTimes>

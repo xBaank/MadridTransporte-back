@@ -1,7 +1,3 @@
 package busTrackerApi.extensions
 
-import java.text.Normalizer
-
-fun String.removeNonSpacingMarks() =
-    Normalizer.normalize(this, Normalizer.Form.NFD)
-        .replace("\\p{Mn}+".toRegex(), "")
+fun String.toDirection() = if (this == "A") 2 else 1

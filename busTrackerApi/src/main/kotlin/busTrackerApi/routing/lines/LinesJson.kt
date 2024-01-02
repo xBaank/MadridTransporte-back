@@ -1,4 +1,4 @@
-package busTrackerApi.routing.lines.bus
+package busTrackerApi.routing.lines
 
 import busTrackerApi.db.models.ItineraryWithStops
 import busTrackerApi.db.models.Shape
@@ -7,6 +7,7 @@ import simpleJson.jObject
 
 fun buildVehicleLocationJson(vehicleLocation: VehicleLocation) = jObject {
     "lineCode" += vehicleLocation.line.codLine
+    "simpleLineCode" += vehicleLocation.line.shortDescription
     "codVehicle" += vehicleLocation.codVehicle
     "coordinates" += jObject {
         "latitude" += vehicleLocation.coordinates.latitude

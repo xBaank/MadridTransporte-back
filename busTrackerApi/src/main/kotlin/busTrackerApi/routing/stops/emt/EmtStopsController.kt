@@ -1,17 +1,19 @@
 package busTrackerApi.routing.stops.emt
 
+import arrow.core.Either
 import arrow.core.continuations.either
 import busTrackerApi.config.httpClient
 import busTrackerApi.db.getCoordinatesByStopCode
 import busTrackerApi.db.getStopNameByStopCode
+import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.exceptions.BusTrackerException.InternalServerError
 import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.bindJson
 import busTrackerApi.extensions.get
 import busTrackerApi.extensions.post
-import busTrackerApi.routing.stops.StopTimes
 import crtm.utils.getCodStopFromStopCode
 import ru.gildor.coroutines.okhttp.await
+import simpleJson.JsonNode
 import simpleJson.deserialized
 import simpleJson.jObject
 import java.text.SimpleDateFormat
@@ -37,7 +39,7 @@ suspend fun login() = either {
     currentLoginResponse = parseLoginResponse(body).bindJson()
 }
 
-suspend fun getEmtStopTimesResponse(stopCode: String) = either {
+suspend fun getEmtStopTimesResponse(stopCode: String): Either<BusTrackerException, JsonNode?> = either {
     val stopId = getCodStopFromStopCode(stopCode)
     var tries = 3
     do {
@@ -59,16 +61,19 @@ suspend fun getEmtStopTimesResponse(stopCode: String) = either {
             tries--
             continue
         }
+        if (!response.isSuccessful) return@either null
 
-
-        val body = (if (response.isSuccessful) response.body?.string()?.deserialized()?.bindJson() else null)
-            ?: return@either createFailedTimes(
-                name = getStopNameByStopCode(stopCode).bind(),
-                coordinates = getCoordinatesByStopCode(stopCode).bind()
-            )
-        return@either parseEMTToStopTimes(body).bind<StopTimes>()
+        return@either response.body?.string()?.deserialized()?.bindJson()
 
     } while (tries > 0)
 
     shift<Nothing>(InternalServerError("EMT getStopTimes failed"))
+}
+
+suspend fun getEmtStopTimes(stopCode: String) = either {
+    val response = getEmtStopTimesResponse(stopCode).bind()
+    response?.let { parseEMTToStopTimes(it).bind() } ?: createFailedTimes(
+        name = getStopNameByStopCode(stopCode).bind(),
+        coordinates = getCoordinatesByStopCode(stopCode).bind()
+    )
 }

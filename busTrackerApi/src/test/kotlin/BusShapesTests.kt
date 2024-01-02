@@ -12,6 +12,7 @@ import utils.getShapes
 import utils.testApplicationBusTracker
 
 enum class ShapeCodes(val code: String) {
+    Emt("6__144____1__IT_1"),
     Interurban("8__450____1_-_IT_1"),
     Urban("9__2__065__2_-_IT_1"),
 }

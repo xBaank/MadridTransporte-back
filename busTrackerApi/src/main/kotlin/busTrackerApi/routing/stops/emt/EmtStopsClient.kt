@@ -8,16 +8,17 @@ import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.routing.stops.StopTimes
 import busTrackerApi.routing.stops.buildStopTimesJson
-import busTrackerApi.utils.Call
+import busTrackerApi.utils.Pipeline
 import crtm.utils.createStopCode
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
 
-suspend fun Call.getStopTimes() = getStopTimesBase(::getEmtStopTimesResponse, call.parameters.getWrapped("stopCode"))
+suspend fun Pipeline.getStopTimes() =
+    getStopTimesBase(::getEmtStopTimes, call.parameters.getWrapped("stopCode"))
 
-private suspend fun Call.getStopTimesBase(
+private suspend fun Pipeline.getStopTimesBase(
     f: suspend (String) -> Either<BusTrackerException, StopTimes>,
     simpleStopCode: Either<BusTrackerException, String>
 ) = either {

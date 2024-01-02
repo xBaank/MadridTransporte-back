@@ -3,7 +3,7 @@ package busTrackerApi.extensions
 import arrow.core.Either
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.routing.Response
-import busTrackerApi.utils.Call
+import busTrackerApi.utils.Pipeline
 import busTrackerApi.utils.errorObject
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -12,56 +12,56 @@ import io.ktor.utils.io.*
 import kotlinx.coroutines.flow.withIndex
 import simpleJson.serialized
 
-suspend fun Call.badRequest(message: String?) {
+suspend fun Pipeline.badRequest(message: String?) {
     val messageResponse = message ?: "Bad Request"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.BadRequest)
 }
 
-private suspend fun Call.unauthorized(ex: BusTrackerException.Unauthorized) {
+private suspend fun Pipeline.unauthorized(ex: BusTrackerException.Unauthorized) {
     val messageResponse = ex.message ?: "Unauthorized"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.Unauthorized)
 }
 
-private suspend fun Call.notFound(ex: BusTrackerException.NotFound) {
+private suspend fun Pipeline.notFound(ex: BusTrackerException.NotFound) {
     val messageResponse = ex.message ?: "Not found"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.NotFound)
 }
 
-private suspend fun Call.conflict(ex: BusTrackerException.Conflict) {
+private suspend fun Pipeline.conflict(ex: BusTrackerException.Conflict) {
     val messageResponse = ex.message ?: "Conflict"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.Conflict)
 }
 
-private suspend fun Call.tooManyRequests(ex: BusTrackerException.TooManyRequests) {
+private suspend fun Pipeline.tooManyRequests(ex: BusTrackerException.TooManyRequests) {
     val messageResponse = ex.message ?: "Too many requests"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.TooManyRequests)
 }
 
-private suspend fun Call.soapError(ex: BusTrackerException.SoapError) {
+private suspend fun Pipeline.soapError(ex: BusTrackerException.SoapError) {
     val messageResponse = ex.message ?: "Soap Error"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.BadRequest)
 }
 
-private suspend fun Call.internalServerError(ex: BusTrackerException.InternalServerError) {
+private suspend fun Pipeline.internalServerError(ex: BusTrackerException.InternalServerError) {
     val messageResponse = ex.message ?: "Internal Server Error"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.InternalServerError)
 }
 
-suspend fun Call.handleError(ex: BusTrackerException) = when (ex) {
+suspend fun Pipeline.handleError(ex: BusTrackerException) = when (ex) {
     is BusTrackerException.NotFound -> notFound(ex)
     is BusTrackerException.SoapError -> soapError(ex)
     is BusTrackerException.Unauthorized -> unauthorized(ex)
@@ -74,7 +74,7 @@ suspend fun Call.handleError(ex: BusTrackerException) = when (ex) {
     is BusTrackerException.TooManyRequests -> tooManyRequests(ex)
 }
 
-suspend fun Call.handleResponse(response: Response): Unit = when (response) {
+suspend fun Pipeline.handleResponse(response: Response): Unit = when (response) {
     is Response.ResponseJson -> call.respondText(
         response.json.serialized(),
         ContentType.Application.Json,
@@ -105,5 +105,5 @@ suspend fun Call.handleResponse(response: Response): Unit = when (response) {
     }
 }
 
-suspend inline fun Call.handle(f: () -> Either<BusTrackerException, Response>) =
+suspend inline fun Pipeline.handle(f: () -> Either<BusTrackerException, Response>) =
     f().fold({ handleError(it) }, { handleResponse(it) })
