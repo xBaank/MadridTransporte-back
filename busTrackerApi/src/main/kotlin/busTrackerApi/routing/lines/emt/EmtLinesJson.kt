@@ -30,8 +30,8 @@ suspend fun parseEMTToLocation(json: JsonNode, lineCode: String) = either {
             line =
                 Line().apply {
                     val line = location["line"].asString().bindJson()
-                    codLine = line
-                    shortDescription = createLineCode(emtCodMode, line)
+                    codLine = createLineCode(emtCodMode, line)
+                    shortDescription = line
                 }
             direction =
                 linesInfo.first { it["label"].asString().bindJson() == lineCode }["to"].asString().bindJson()

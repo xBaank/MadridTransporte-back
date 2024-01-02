@@ -15,7 +15,9 @@ import busTrackerApi.utils.Pipeline
 import crtm.utils.createStopCode
 import crtm.utils.getSimpleLineCodeFromLineCode
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.cachingheaders.*
 import simpleJson.asJson
 
 suspend fun Pipeline.getLocations(): Either<BusTrackerException, Response> = either {
@@ -34,5 +36,6 @@ suspend fun Pipeline.getLocations(): Either<BusTrackerException, Response> = eit
             .filter { it.direction == direction }
             .map(::buildVehicleLocationJson).asJson()
 
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 15))
     ResponseJson(locations, HttpStatusCode.OK)
 }
