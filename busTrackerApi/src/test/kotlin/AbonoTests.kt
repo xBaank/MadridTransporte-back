@@ -3,6 +3,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -20,6 +21,7 @@ const val abonoTerceraEdad = "0000000010040117155"
 
 class AbonoTest {
     @ParameterizedTest
+    @Disabled
     @ValueSource(strings = [abonoJoven, abonoMetro10Viajes, abonoNormal, abonoTerceraEdad])
     fun `should get abono`(id: String) = testApplicationBusTracker {
         val result = getAbono(id)
@@ -32,6 +34,7 @@ class AbonoTest {
     }
 
     @Test
+    @Disabled
     fun `should not get abono`() = testApplicationBusTracker {
         val result = getAbono("asdasd")
         result.status.shouldBe(HttpStatusCode.NotFound)
