@@ -42,6 +42,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
     if (!reloadDb || alreadyLoadedDb) return@coroutineScope
 
     val allStopsStream = getFileAsStreamFromGtfs("stops.txt")
+    val allRoutesStream = getFileAsStreamFromGtfs("routes.txt")
     val allStopsTimesStream = getStopTimesFileAsStreamFromGtfs()
     val allShapesStream = getShapesFileAsStreamFromGtfs()
     val allItinerariesStream = getFileAsStreamFromGtfs("trips.txt")
@@ -56,8 +57,20 @@ suspend fun loadDataIntoDb() = coroutineScope {
                     .chunked(sequenceChunkSize)
                 stopsCollection.drop()
                 stops.forEach {
-                    val parsed = it.mapAsync(::parseStops).toList()
+                    val parsed = it.mapAsync(::parseStop).toList()
                     stopsCollection.insertMany(parsed)
+                }
+            }
+        },
+        async(Dispatchers.IO) {
+            reader.openAsync(allRoutesStream) {
+                val routes = readAllWithHeaderAsSequence()
+                    .distinctBy { it["route_id"] }
+                    .chunked(sequenceChunkSize)
+                routesCollection.drop()
+                routes.forEach {
+                    val parsed = it.mapAsync(::parseRoute).toList()
+                    routesCollection.insertMany(parsed)
                 }
             }
         },
@@ -86,7 +99,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 val stops = readAllWithHeaderAsSequence().distinct().chunked(sequenceChunkSize)
                 stopsInfoCollection.drop()
                 stops.forEach {
-                    val parsed = it.mapAsync(::parseStopsInfo).toList()
+                    val parsed = it.mapAsync(::parseStopInfo).toList()
                     stopsInfoCollection.insertMany(parsed)
                 }
             }
@@ -94,17 +107,17 @@ suspend fun loadDataIntoDb() = coroutineScope {
         async(Dispatchers.IO) {
             reader.openAsync(allStopsTimesStream) {
                 val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                stopsOrder.drop()
+                stopsOrderCollection.drop()
                 stops.forEach {
                     val parsed = it.mapAsync(::parseStopsOrder).toList()
-                    stopsOrder.insertMany(parsed)
+                    stopsOrderCollection.insertMany(parsed)
                 }
             }
         }
     )
     shapesCollection.createIndex(Indexes.ascending(Shape::itineraryId.name))
     itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name, Itinerary::itineraryCode.name))
-    stopsOrder.createIndex(Indexes.ascending(StopOrder::tripId.name))
+    stopsOrderCollection.createIndex(Indexes.ascending(StopOrder::tripId.name))
     alreadyLoadedDb = true
 }
 

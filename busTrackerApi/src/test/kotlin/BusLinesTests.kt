@@ -1,5 +1,7 @@
 import arrow.core.continuations.either
 import busTrackerApi.extensions.getOrThrow
+import busTrackerApi.routing.stops.bus.busCodMode
+import busTrackerApi.routing.stops.emt.emtCodMode
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -15,11 +17,17 @@ import utils.getItineraries
 import utils.getLineLocation
 import utils.testApplicationBusTracker
 
-enum class LocationsCodes(val url: String, val code: String, val direction: Int) {
-    Emt("/v1/lines/emt/6__144___/locations/2", "6__144___", 2),
-    Interurban("/v1/lines/bus/8__450___/locations/1", "8__450___", 1),
-    Urban("/v1/lines/bus/9__1__074_/locations/1", "9__1__074_", 1),
-    WeirdUrban("/v1/lines/bus/9__1__058_/locations/1", "9__1__058_", 1)
+enum class LocationsCodes(
+    val url: String,
+    val fullLineCode: String,
+    val direction: Int,
+    val lineCode: String,
+    val codMode: Int
+) {
+    Emt("/v1/lines/emt/6__144___/locations/2", "6__144___", 2, "144", emtCodMode.toInt()),
+    Interurban("/v1/lines/bus/8__450___/locations/1", "8__450___", 1, "450", busCodMode.toInt()),
+    Urban("/v1/lines/bus/9__1__074_/locations/1", "9__1__074_", 1, "1", 9),
+    WeirdUrban("/v1/lines/bus/9__1__058_/locations/1", "9__1__058_", 1, "1", 9)
 }
 
 enum class ItinerariesCodes(val url: String, val code: String, val simpleLineCode: String, val direction: Int) {
@@ -34,13 +42,15 @@ class BusLinesTests {
     @EnumSource(LocationsCodes::class)
     fun `should get line location`(code: LocationsCodes) = testApplicationBusTracker {
         val response = client.get(code.url)
-        val json = response.bodyAsText().deserialized().asArray()
+        val json = response.bodyAsText().deserialized().asObject()
 
         response.status.shouldBe(HttpStatusCode.OK)
         either {
-            json.bind().forEach {
-                it["lineCode"].asString().bind().shouldBeEqualTo(code.code)
-                it["simpleLineCode"].asString().bind().shouldBeEqualTo(code.code)
+            json["codMode"].asInt().bind().shouldBeEqualTo(code.codMode)
+            json["lineCode"].asString().bind().shouldBeEqualTo(code.lineCode)
+            json["locations"].asArray().bind().forEach {
+                it["lineCode"].asString().bind().shouldBeEqualTo(code.fullLineCode)
+                it["simpleLineCode"].asString().bind().shouldBeEqualTo(code.fullLineCode)
                 it["codVehicle"].asString().bind()
                 it["direction"].asInt().bind().shouldBeEqualTo(code.direction)
                 it["service"].asString().bind()

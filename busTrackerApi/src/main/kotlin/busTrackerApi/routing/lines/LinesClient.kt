@@ -4,8 +4,11 @@ import arrow.core.continuations.either
 import busTrackerApi.db.getItineraryByFullLineCode
 import busTrackerApi.db.getShapesByItineraryCode
 import busTrackerApi.extensions.getWrapped
+import busTrackerApi.routing.Response.ResponseFlowJson
+import busTrackerApi.routing.Response.ResponseJson
 import busTrackerApi.routing.lines.bus.getItinerariesResponse
 import busTrackerApi.utils.Pipeline
+import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
@@ -27,8 +30,8 @@ suspend fun Pipeline.getItineraries() = either {
         itineraries.copy(stops = itineraries.stops.distinctBy { it.fullStopCode to it.order }.sortedBy { it.order })
 
     val json = itinerariesOrdered.let(::buildItineraryJson).asJson()
-    call.caching = CachingOptions(io.ktor.http.CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
-    busTrackerApi.routing.Response.ResponseJson(json, io.ktor.http.HttpStatusCode.OK)
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
+    ResponseJson(json, HttpStatusCode.OK)
 }
 
 suspend fun Pipeline.getShapes() = either {
@@ -37,6 +40,6 @@ suspend fun Pipeline.getShapes() = either {
     val shapes = getShapesByItineraryCode(itineraryCode)
 
     val json = shapes.map(::buildShapeJson)
-    call.caching = CachingOptions(io.ktor.http.CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
-    busTrackerApi.routing.Response.ResponseFlowJson(json, io.ktor.http.HttpStatusCode.OK)
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
+    ResponseFlowJson(json, HttpStatusCode.OK)
 }

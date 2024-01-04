@@ -2,25 +2,34 @@ package busTrackerApi.routing.lines
 
 import busTrackerApi.db.models.ItineraryWithStops
 import busTrackerApi.db.models.Shape
-import crtm.soap.VehicleLocation
+import simpleJson.JsonObject
+import simpleJson.jArray
 import simpleJson.jObject
 
-fun buildVehicleLocationJson(vehicleLocation: VehicleLocation) = jObject {
-    "lineCode" += vehicleLocation.line.codLine
-    "simpleLineCode" += vehicleLocation.line.shortDescription
-    "codVehicle" += vehicleLocation.codVehicle
-    "coordinates" += jObject {
-        "latitude" += vehicleLocation.coordinates.latitude
-        "longitude" += vehicleLocation.coordinates.longitude
+fun buildVehicleLocationJson(vehicleLocations: VehicleLocations): JsonObject = jObject {
+    "codMode" += vehicleLocations.codMode
+    "lineCode" += vehicleLocations.lineCode
+    "locations" += jArray {
+        vehicleLocations.locations.forEach {
+            addObject {
+                "lineCode" += it.line.codLine
+                "simpleLineCode" += it.line.shortDescription
+                "codVehicle" += it.codVehicle
+                "coordinates" += jObject {
+                    "latitude" += it.coordinates.latitude
+                    "longitude" += it.coordinates.longitude
+                }
+                "direction" += it.direction
+                "service" += it.service
+            }
+        }
     }
-    "direction" += vehicleLocation.direction
-    "service" += vehicleLocation.service
 }
 
 fun buildItineraryJson(itinerary: ItineraryWithStops) = jObject {
     "codItinerary" += itinerary.itineraryCode
     "direction" += itinerary.direction + 1
-    "stops" += simpleJson.jArray {
+    "stops" += jArray {
         itinerary.stops.forEach {
             addObject {
                 "fullStopCode" += it.fullStopCode

@@ -3,7 +3,7 @@ package busTrackerApi.db
 import busTrackerApi.db.models.*
 import crtm.utils.createStopCode
 
-fun parseStops(data: Map<String, String>): Stop {
+fun parseStop(data: Map<String, String>): Stop {
     val codMode = data["stop_id"]?.substringAfter("_")?.substringBefore("_")?.toInt() ?: 0
     val stopCode = data["stop_code"].toString().trim()
     return Stop(
@@ -16,7 +16,14 @@ fun parseStops(data: Map<String, String>): Stop {
     )
 }
 
-fun parseStopsInfo(data: Map<String, String>): StopInfo = StopInfo(
+fun parseRoute(data: Map<String, String>): Route = Route(
+    fullLineCode = data["route_id"].toString(),
+    simpleLineCode = data["route_short_name"].toString(),
+    routeName = data["route_long_name"].toString(),
+    codMode = data["route_id"].toString().substringBefore("_")
+)
+
+fun parseStopInfo(data: Map<String, String>): StopInfo = StopInfo(
     idEstacion = data["IDESTACION"].toString(),
     codigoEmpresa = data["CODIGOEMPRESA"].toString()
 )

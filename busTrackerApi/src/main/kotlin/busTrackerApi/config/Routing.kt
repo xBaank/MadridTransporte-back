@@ -14,12 +14,6 @@ import io.ktor.server.routing.*
 
 fun Application.configureRoutingV1() {
     routing {
-        route("/v1") {
-            //Will be deprecated
-            linesRoute()
-            abonosRoute()
-            stopsRoute()
-        }
         linesRoute()
         abonosRoute()
         stopsRoute()

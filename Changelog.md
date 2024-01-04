@@ -1,12 +1,17 @@
 # Changelog
 
+## 4.0.0
+
+- Remove `v1` from path
+- Change `lines/bus/locations` return type
+
 ## 3.2.5
 
-- Added emt locations.
+- Added emt locations
 
 ## 3.2.4
 
-- Fix emt times to always be in UTC format.
+- Fix emt times to always be in UTC format
 
 ## 3.2.3
 
@@ -44,7 +49,7 @@
 ## 3.0.0
 
 - Removed `v1/bus/lines/stops`
-- Removed `v1/bus/lines/ocations`
+- Removed `v1/bus/lines/locations`
 - Removed `v1/bus/lines/itineraries`
 - Added `v1/lines/bus/locations`
 - Added `v1/lines/bus/itineraries`
