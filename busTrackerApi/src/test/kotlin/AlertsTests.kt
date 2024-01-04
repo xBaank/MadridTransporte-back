@@ -12,11 +12,11 @@ import utils.testApplicationBusTracker
 
 
 enum class Alerts(val url: String) {
-    BUS("/v1/stops/bus/alerts"),
-    TRAIN("/v1/stops/train/alerts"),
-    METRO("/v1/stops/metro/alerts"),
-    TRAM("/v1/stops/tram/alerts"),
-    EMT("/v1/stops/emt/alerts")
+    BUS("/stops/bus/alerts"),
+    TRAIN("/stops/train/alerts"),
+    METRO("/stops/metro/alerts"),
+    TRAM("/stops/tram/alerts"),
+    EMT("/stops/emt/alerts")
 }
 
 class AlertsTest {

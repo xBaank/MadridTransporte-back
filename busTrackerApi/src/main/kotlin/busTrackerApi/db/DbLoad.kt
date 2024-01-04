@@ -14,7 +14,6 @@ import com.github.doyaaaaaken.kotlincsv.dsl.context.ExcessFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.context.InsufficientFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.mongodb.client.model.Indexes
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -49,7 +48,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
     val allStopsInfoStream = getFileAsStreamFromInfo()
 
     awaitAll(
-        async(Dispatchers.IO) {
+        async {
             reader.openAsync(allStopsStream) {
                 val stops = readAllWithHeaderAsSequence()
                     .filter { it["stop_id"]?.contains("par") == true }
@@ -62,7 +61,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 }
             }
         },
-        async(Dispatchers.IO) {
+        async {
             reader.openAsync(allRoutesStream) {
                 val routes = readAllWithHeaderAsSequence()
                     .distinctBy { it["route_id"] }
@@ -74,7 +73,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 }
             }
         },
-        async(Dispatchers.IO) {
+        async {
             reader.openAsync(allItinerariesStream) {
                 val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 itinerariesCollection.drop()
@@ -84,7 +83,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 }
             }
         },
-        async(Dispatchers.IO) {
+        async {
             reader.openAsync(allShapesStream) {
                 val shapes = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 shapesCollection.drop()
@@ -94,7 +93,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 }
             }
         },
-        async(Dispatchers.IO) {
+        async {
             infoReader.openAsync(allStopsInfoStream) {
                 val stops = readAllWithHeaderAsSequence().distinct().chunked(sequenceChunkSize)
                 stopsInfoCollection.drop()
@@ -104,7 +103,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 }
             }
         },
-        async(Dispatchers.IO) {
+        async {
             reader.openAsync(allStopsTimesStream) {
                 val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 stopsOrderCollection.drop()

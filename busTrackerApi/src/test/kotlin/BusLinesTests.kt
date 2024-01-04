@@ -24,17 +24,17 @@ enum class LocationsCodes(
     val lineCode: String,
     val codMode: Int
 ) {
-    Emt("/v1/lines/emt/6__144___/locations/2", "6__144___", 2, "144", emtCodMode.toInt()),
-    Interurban("/v1/lines/bus/8__450___/locations/1", "8__450___", 1, "450", busCodMode.toInt()),
-    Urban("/v1/lines/bus/9__1__074_/locations/1", "9__1__074_", 1, "1", 9),
-    WeirdUrban("/v1/lines/bus/9__1__058_/locations/1", "9__1__058_", 1, "1", 9)
+    Emt("/lines/emt/6__144___/locations/2", "6__144___", 2, "144", emtCodMode.toInt()),
+    Interurban("/lines/bus/8__450___/locations/1", "8__450___", 1, "450", busCodMode.toInt()),
+    Urban("/lines/bus/9__1__074_/locations/1", "9__1__074_", 1, "1", 9),
+    WeirdUrban("/lines/bus/9__1__058_/locations/1", "9__1__058_", 1, "1", 9)
 }
 
 enum class ItinerariesCodes(val url: String, val code: String, val simpleLineCode: String, val direction: Int) {
-    Emt("/v1/lines/emt/6__144___/itineraries/2", "6__144___", "144", 2),
-    Interurban("/v1/lines/bus/8__450___/itineraries/1", "8__450___", "450", 1),
-    Urban("/v1/lines/bus/9__1__074_/itineraries/1", "9__1__074_", "1", 1),
-    WeirdUrban("/v1/lines/bus/9__1__058_/itineraries/1", "9__1__058_", "1", 1)
+    Emt("/lines/emt/6__144___/itineraries/2", "6__144___", "144", 2),
+    Interurban("/lines/bus/8__450___/itineraries/1", "8__450___", "450", 1),
+    Urban("/lines/bus/9__1__074_/itineraries/1", "9__1__074_", "1", 1),
+    WeirdUrban("/lines/bus/9__1__058_/itineraries/1", "9__1__058_", "1", 1)
 }
 
 class BusLinesTests {
@@ -50,7 +50,7 @@ class BusLinesTests {
             json["lineCode"].asString().bind().shouldBeEqualTo(code.lineCode)
             json["locations"].asArray().bind().forEach {
                 it["lineCode"].asString().bind().shouldBeEqualTo(code.fullLineCode)
-                it["simpleLineCode"].asString().bind().shouldBeEqualTo(code.fullLineCode)
+                it["simpleLineCode"].asString().bind().shouldBeEqualTo(code.lineCode)
                 it["codVehicle"].asString().bind()
                 it["direction"].asInt().bind().shouldBeEqualTo(code.direction)
                 it["service"].asString().bind()

@@ -25,10 +25,10 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 enum class Subscriptions(val url: String, val stopcode: String) {
-    BUS("/v1/stops/bus/times", busStopCode),
-    METRO("/v1/stops/metro/times", metroStopCode),
-    EMT("/v1/stops/emt/times", emtStopCode),
-    TRAM("/v1/stops/tram/times", tramStopCode)
+    BUS("/stops/bus/times", busStopCode),
+    METRO("/stops/metro/times", metroStopCode),
+    EMT("/stops/emt/times", emtStopCode),
+    TRAM("/stops/tram/times", tramStopCode)
 }
 
 
