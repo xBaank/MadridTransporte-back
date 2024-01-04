@@ -3,7 +3,7 @@
 ## 4.0.0
 
 - Remove `v1` from path
-- Change `lines/bus/locations` return type
+- Change `lines/bus/locations` return type with more info
 
 ## 3.2.5
 
