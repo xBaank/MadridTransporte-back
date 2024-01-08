@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.1
+
+- Update dependencies
+
 ## 4.0.0
 
 - Remove `v1` from path

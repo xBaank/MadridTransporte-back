@@ -3,6 +3,7 @@ package busTrackerApi.utils
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
+@Suppress("UNCHECKED_CAST")
 class SuspendingLazy<T>(initializer: suspend () -> T) {
     private var initializer: (suspend () -> T)? = initializer
     private var mutex: Mutex? = Mutex()
