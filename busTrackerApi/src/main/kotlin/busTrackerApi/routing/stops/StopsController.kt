@@ -50,9 +50,6 @@ suspend fun getBusTimesResponse(stopCode: String) = either {
 }
 
 suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
-    val cached = cachedAlerts.get(codMode)
-    if (cached != null) return@catch cached
-
     val result = withTimeoutOrNull(timeoutSeconds) {
         val request = IncidentsAffectationsRequest().apply {
             this.codMode = codMode
@@ -63,7 +60,11 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
         getSuspend(request, defaultClient.value()::getIncidentsAffectationsAsync)
     }
 
-    if (result == null) throw BusTrackerException.InternalServerError("Got empty response")
+    if (result == null) {
+        val cached = cachedAlerts.get(codMode)
+        if (cached != null) return@catch cached
+        else throw BusTrackerException.InternalServerError("Got empty response")
+    }
 
     cachedAlerts.put(codMode, result)
     result
