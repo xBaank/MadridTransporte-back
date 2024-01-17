@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.2
+
+- Fix `abono` endpoint
+
 ## 4.0.1
 
 - Update dependencies
