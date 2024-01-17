@@ -7,6 +7,7 @@ import busTrackerApi.config.setupFirebase
 import busTrackerApi.config.setupMongo
 import busTrackerApi.db.loadDataIntoDb
 import busTrackerApi.routing.stops.notifyStopTimesOnBackground
+import busTrackerApi.routing.stops.train.test
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -23,6 +24,7 @@ fun main() {
 }
 
 fun Application.startUp() = runBlocking {
+    test()
     install(CORS) {
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Post)
