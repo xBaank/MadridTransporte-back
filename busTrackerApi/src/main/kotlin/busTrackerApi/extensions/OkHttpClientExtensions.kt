@@ -15,9 +15,18 @@ fun OkHttpClient.get(url: String, headers: Map<String, String> = mapOf()) = newC
     .build()
 )
 
-fun OkHttpClient.post(url: String, body: JsonNode, headers: Map<String, String> = mapOf()) = newCall(Request.Builder()
-    .url(url)
-    .apply { headers.forEach { (k, v) -> header(k, v) } }
-    .post(body.serialized().toRequestBody("application/json".toMediaType()))
-    .build()
-)
+fun OkHttpClient.post(url: String, body: JsonNode, headers: Map<String, String> = mapOf()) =
+    post(url, body.serialized(), headers)
+
+fun OkHttpClient.post(
+    url: String,
+    body: String,
+    headers: Map<String, String> = mapOf(),
+    contentType: String = "application/json"
+) =
+    newCall(Request.Builder()
+        .url(url)
+        .apply { headers.forEach { (k, v) -> header(k, v) } }
+        .post(body.toRequestBody(contentType.toMediaType()))
+        .build()
+    )
