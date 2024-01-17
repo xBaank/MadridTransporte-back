@@ -1,4 +1,4 @@
-package busTrackerApi.routing.stops.`train-routed`
+package busTrackerApi.routing.stops.trainRouted
 
 import busTrackerApi.extensions.handle
 import busTrackerApi.routing.stops.alertsConfigF

@@ -1,4 +1,4 @@
-package busTrackerApi.routing.stops.`train-routed`
+package busTrackerApi.routing.stops.trainRouted
 
 import arrow.core.Either
 import arrow.core.continuations.either
