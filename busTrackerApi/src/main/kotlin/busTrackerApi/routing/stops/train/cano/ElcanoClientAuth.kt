@@ -2,7 +2,7 @@ package busTrackerApi.routing.stops.train.cano
 
 import java.util.*
 
-class ElcanoClientAuth : ElcanoAuth {
+open class ElcanoClientAuth protected constructor(builder: Builder) : ElcanoAuth() {
 
     class Builder(val elcanoAccessKey: String, val elcanoSecretKey: String) {
         var contentType: String? = null
@@ -43,11 +43,6 @@ class ElcanoClientAuth : ElcanoAuth {
             return this
         }
 
-        fun requestDate(date: Date?): Builder {
-            this.requestDate = date
-            return this
-        }
-
         fun xElcanoClient(str: String?): Builder {
             this.xElcanoClient = str
             return this
@@ -73,7 +68,7 @@ class ElcanoClientAuth : ElcanoAuth {
         }
     }
 
-    protected constructor(builder: Builder) {
+    init {
         this.elcanoAccessKey = builder.elcanoAccessKey
         this.elcanoSecretKey = builder.elcanoSecretKey
         this.host = builder.host

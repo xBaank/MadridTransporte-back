@@ -1,11 +1,10 @@
 package busTrackerApi.routing.stops.train.cano
 
+import busTrackerApi.exceptions.BusTrackerException
 import org.apache.commons.codec.digest.MessageDigestAlgorithms
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
-import java.security.InvalidKeyException
 import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.crypto.Mac
@@ -17,66 +16,61 @@ abstract class ElcanoAuth {
     protected var contentType: String? = null
     protected var elcanoAccessKey: String? = null
     protected var elcanoSecretKey: String? = null
-    protected var headers: TreeMap<String, String?>? = null
-    protected val hexArray: CharArray = "0123456789ABCDEF".toCharArray()
     protected var host: String? = null
     protected var httpMethodName: String? = null
     protected var params: String? = null
     protected var path: String? = null
     protected var payload: String? = null
     protected var requestDate: Date? = null
-    protected var signedHeaders: String? = null
+    private var signedHeaders: String? = null
     protected var xElcanoClient: String? = null
     protected var xElcanoDate: String? = null
     protected var xElcanoDateSimple: String? = null
     protected var xElcanoUserId: String? = null
 
-    fun getHeaders(): Map<String, String?>? {
-        val treeMap = TreeMap<String, String?>()
-        this.headers = treeMap
-        treeMap[HEADER_X_ELCANO_HOST] = host
-        headers!![HEADER_CONTENT_CONTENTTYPE] = this.contentType
-        headers!![HEADER_X_ELCANO_CLIENT] = this.xElcanoClient
-        headers!![HEADER_X_ELCANO_DATE] = this.timeStamp
-        headers!![HEADER_X_ELCANO_USERID] = this.xElcanoUserId
-        headers!!["Authorization"] = calculateHeaderAuthorization()
-        return this.headers
+    fun getHeaders(): Map<String, String?> {
+        val headers = TreeMap<String, String?>()
+        headers[HEADER_X_ELCANO_HOST] = host
+        headers[HEADER_CONTENT_CONTENTTYPE] = contentType
+        headers[HEADER_X_ELCANO_CLIENT] = xElcanoClient
+        headers[HEADER_X_ELCANO_DATE] = timeStamp
+        headers[HEADER_X_ELCANO_USERID] = xElcanoUserId
+        headers["Authorization"] = calculateHeaderAuthorization()
+        return headers
     }
-
-    val headerAuthorization: String get() = calculateHeaderAuthorization()
 
     private fun calculateHeaderAuthorization(): String {
         val calculateSignature = calculateSignature(prepareStringToSign(prepareCanonicalRequest()))
         return buildAuthorizationString(calculateSignature)
     }
 
-    fun prepareCanonicalRequest(): String {
+    private fun prepareCanonicalRequest(): String {
         val sb = StringBuilder()
-        sb.append(this.httpMethodName)
+        sb.append(httpMethodName)
         sb.append("\n")
-        sb.append(this.path)
+        sb.append(path)
         sb.append("\n")
-        sb.append(this.params)
+        sb.append(params)
         sb.append("\n")
         sb.append(HEADER_CONTENT_CONTENTTYPE.lowercase(Locale.getDefault()))
         sb.append(":")
-        sb.append(this.contentType)
+        sb.append(contentType)
         sb.append("\n")
         sb.append(HEADER_X_ELCANO_HOST.lowercase(Locale.getDefault()))
         sb.append(":")
-        sb.append(this.host)
+        sb.append(host)
         sb.append("\n")
         sb.append(HEADER_X_ELCANO_CLIENT.lowercase(Locale.getDefault()))
         sb.append(":")
-        sb.append(this.xElcanoClient)
+        sb.append(xElcanoClient)
         sb.append("\n")
         sb.append(HEADER_X_ELCANO_DATE.lowercase(Locale.getDefault()))
         sb.append(":")
-        sb.append(this.xElcanoDate)
+        sb.append(xElcanoDate)
         sb.append("\n")
         sb.append(HEADER_X_ELCANO_USERID.lowercase(Locale.getDefault()))
         sb.append(":")
-        sb.append(this.xElcanoUserId)
+        sb.append(xElcanoUserId)
         sb.append("\n")
         sb.append(HEADER_CONTENT_CONTENTTYPE.lowercase(Locale.getDefault()))
         sb.append(";")
@@ -88,85 +82,60 @@ abstract class ElcanoAuth {
         sb.append(";")
         sb.append(HEADER_X_ELCANO_USERID.lowercase(Locale.getDefault()))
         sb.append("\n")
-        this.signedHeaders =
+        signedHeaders =
             HEADER_CONTENT_CONTENTTYPE.lowercase(Locale.getDefault()) + ";" + HEADER_X_ELCANO_HOST.lowercase(
                 Locale.getDefault()
             ) + ";" + HEADER_X_ELCANO_CLIENT.lowercase(Locale.getDefault()) + ";" + HEADER_X_ELCANO_DATE.lowercase(
                 Locale.getDefault()
             ) + ";" + HEADER_X_ELCANO_USERID.lowercase(Locale.getDefault())
-        val formatPayload = formatPayload(this.payload)
-        this.payload = formatPayload
+        val formatPayload = formatPayload(payload)
+        payload = formatPayload
         sb.append(toHex(formatPayload))
         return sb.toString()
     }
 
-    fun prepareStringToSign(str: String): String {
-        return ((((("""
-    HMAC-SHA256
-    ${xElcanoDate}
-    
-    """.trimIndent()) + this.xElcanoDateSimple + SLASH) + this.xElcanoClient + SLASH) + this.xElcanoUserId + SLASH) + ELCANO_REQUEST + "\n") + toHex(
+    private fun prepareStringToSign(str: String): String =
+        ("HMAC-SHA256\n$xElcanoDate\n${xElcanoDateSimple}$SLASH${xElcanoClient}$SLASH${xElcanoUserId}$SLASH$ELCANO_REQUEST\n") + toHex(
             str
         )
+
+    private fun calculateSignature(str: String): String = bytesToHex(
+        hmacSha256(
+            getSignatureKey(
+                elcanoSecretKey ?: throw BusTrackerException.InternalServerError("Key is null"),
+                xElcanoDateSimple ?: throw BusTrackerException.InternalServerError("Date is null"),
+                xElcanoClient ?: throw BusTrackerException.InternalServerError("Client is null")
+            ), str
+        )
+    )
+
+    private fun buildAuthorizationString(str: String): String =
+        "${"HMAC-SHA256 Credential=${elcanoAccessKey}$SLASH"}${xElcanoDateSimple}$SLASH${xElcanoClient}$SLASH${xElcanoUserId}$SLASH$ELCANO_REQUEST,SignedHeaders=${signedHeaders},Signature=$str"
+
+    private fun formatPayload(str: String?): String = str?.replace("\r", "")
+        ?.replace("\n", "")
+        ?.replace(" ", "")
+        ?: ""
+
+    private fun toHex(str: String): String {
+        val instance = MessageDigest.getInstance(MessageDigestAlgorithms.SHA_256)
+        instance.update(str.toByteArray(StandardCharsets.UTF_8))
+        return String.format("%064x", *arrayOf<Any>(BigInteger(1, instance.digest())))
     }
 
-    fun calculateSignature(str: String?): String {
-        try {
-            return bytesToHex(
-                hmacSha256(
-                    getSignatureKey(
-                        this.elcanoSecretKey,
-                        this.xElcanoDateSimple,
-                        this.xElcanoClient
-                    ), str
-                )
-            )
-        } catch (e: Exception) {
-            throw Exception("The calculation of the signature throws an exception. Ex: " + e.message)
-        }
+    private fun hmacSha256(bArr: ByteArray?, str: String): ByteArray {
+        val instance = Mac.getInstance("HmacSHA256")
+        instance.init(SecretKeySpec(bArr, "HmacSHA256"))
+        return instance.doFinal(str.toByteArray(StandardCharsets.UTF_8))
     }
 
-    fun buildAuthorizationString(str: String): String {
-        return (((("HMAC-SHA256 Credential=" + this.elcanoAccessKey + SLASH) + this.xElcanoDateSimple + SLASH) + this.xElcanoClient + SLASH) + this.xElcanoUserId + SLASH) + ELCANO_REQUEST + ",SignedHeaders=" + this.signedHeaders + ",Signature=" + str
+    private fun getSignatureKey(str: String, str2: String, str3: String): ByteArray {
+        return hmacSha256(hmacSha256(hmacSha256(str.toByteArray(StandardCharsets.UTF_8), str2), str3), ELCANO_REQUEST)
     }
 
-    fun formatPayload(str: String?): String {
-        var str = str
-        if (str == null) {
-            str = ""
-        }
-        return str.replace("\r", "").replace("\n", "").replace(" ", "")
-    }
+    private fun bytesToHex(bArr: ByteArray) = bArr.joinToString("") { "%02x".format(it) }
 
-    fun toHex(str: String): String {
-        try {
-            val instance = MessageDigest.getInstance(MessageDigestAlgorithms.SHA_256)
-            instance.update(str.toByteArray(StandardCharsets.UTF_8))
-            return String.format("%064x", *arrayOf<Any>(BigInteger(1, instance.digest())))
-        } catch (e: NoSuchAlgorithmException) {
-            throw Exception("The algorithm " + MessageDigestAlgorithms.SHA_256 + " is not supported. Ex: " + e.message)
-        }
-    }
-
-    fun hmacSha256(bArr: ByteArray?, str: String?): ByteArray {
-        try {
-            val instance = Mac.getInstance("HmacSHA256")
-            instance.init(SecretKeySpec(bArr, "HmacSHA256"))
-            return instance.doFinal(str!!.toByteArray(StandardCharsets.UTF_8))
-        } catch (e: NoSuchAlgorithmException) {
-            throw Exception("The algorithm " + "HmacSHA256" + " is not supported. Ex: " + e.message)
-        } catch (e2: InvalidKeyException) {
-            throw Exception("The key is not valid. Ex: " + e2.message)
-        }
-    }
-
-    fun getSignatureKey(str: String?, str2: String?, str3: String?): ByteArray {
-        return hmacSha256(hmacSha256(hmacSha256(str!!.toByteArray(StandardCharsets.UTF_8), str2), str3), ELCANO_REQUEST)
-    }
-
-    fun bytesToHex(bArr: ByteArray) = bArr.joinToString("") { "%02x".format(it) }
-
-    val timeStamp: String get() = getTimeStamp(this.requestDate)
+    private val timeStamp: String get() = getTimeStamp(requestDate)
 
     companion object {
         protected const val ELCANO_REQUEST: String = "elcano_request"

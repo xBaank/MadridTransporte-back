@@ -17,7 +17,7 @@ class AuthHeaderInterceptor : Interceptor {
     private val id: String = "718da3df4199ede4"
 
     override fun intercept(chain: Chain): Response {
-        var map: Map<String, String?>?
+        val map: Map<String, String?>?
         val request: Request = chain.request()
         val path = ElcanoClientAuth.Builder("and20210615", "Jthjtr946RTt")
             .host(request.url.host).contentType("application/json;charset=utf-8")
