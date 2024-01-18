@@ -24,9 +24,10 @@ import java.util.*
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-enum class Subscriptions(val url: String, val stopcode: String) {
+enum class Subscriptions(val url: String, val stopCode: String) {
     BUS("/stops/bus/times", busStopCode),
     METRO("/stops/metro/times", metroStopCode),
+    TRAIN("/stops/train/times", trainStopCode),
     EMT("/stops/emt/times", emtStopCode),
     TRAM("/stops/tram/times", tramStopCode)
 }
@@ -68,7 +69,7 @@ class NotificationsTest {
             val body = jObject {
                 "deviceToken" += "token"
                 "subscription" += jObject {
-                    "stopCode" += subscription.stopcode
+                    "stopCode" += subscription.stopCode
                     "lineDestination" += jObject {
                         "line" += UUID.randomUUID().toString()
                         "destination" += UUID.randomUUID().toString()
@@ -84,7 +85,7 @@ class NotificationsTest {
             val subscriptionsResponse = client.post(subscription.url + "/subscription") {
                 setBody(jObject {
                     "deviceToken" += "token"
-                    "stopCode" += subscription.stopcode
+                    "stopCode" += subscription.stopCode
                 }.serialized())
             }
 
@@ -120,7 +121,7 @@ class NotificationsTest {
             val body = jObject {
                 "deviceToken" += "token"
                 "subscription" += jObject {
-                    "stopCode" += subscription.stopcode
+                    "stopCode" += subscription.stopCode
                     "lineDestination" += jObject {
                         "line" += UUID.randomUUID().toString()
                         "destination" += UUID.randomUUID().toString()
@@ -139,7 +140,7 @@ class NotificationsTest {
             val subscriptionsResponse = client.post(subscription.url + "/subscription") {
                 setBody(jObject {
                     "deviceToken" += "token"
-                    "stopCode" += subscription.stopcode
+                    "stopCode" += subscription.stopCode
                 }.serialized())
             }
 

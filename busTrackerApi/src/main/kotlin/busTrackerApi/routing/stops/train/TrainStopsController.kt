@@ -2,43 +2,34 @@ package busTrackerApi.routing.stops.train
 
 import arrow.core.continuations.either
 import busTrackerApi.config.EnvVariables.timeoutSeconds
+import busTrackerApi.config.httpClient
 import busTrackerApi.db.getCoordinatesByStopCode
 import busTrackerApi.db.getIdByStopCode
 import busTrackerApi.db.getStopNameById
 import busTrackerApi.exceptions.BusTrackerException.InternalServerError
 import busTrackerApi.exceptions.BusTrackerException.NotFound
 import busTrackerApi.extensions.await
-import busTrackerApi.extensions.bindJson
 import busTrackerApi.extensions.post
-import busTrackerApi.routing.stops.train.cano.canoHttpClient
 import crtm.utils.getStopCodeFromFullStopCode
-import simpleJson.deserialized
-import simpleJson.jObject
+import org.jsoup.Jsoup
 
-suspend fun getTrainRoutedTimesResponse(fullStopCode: String) = either {
+suspend fun getTrainTimes(fullStopCode: String) = either {
     val stopInfoStationCode = getIdByStopCode(fullStopCode).bind()
     val stopName = getStopNameById(stopInfoStationCode).bind()
     val coordinates = getCoordinatesByStopCode(fullStopCode).bind()
 
     var tries = 3
     do {
-        val response = canoHttpClient.post(
-            "https://circulacion.api.adif.es/portroyalmanager/secure/circulationpaths/departures/traffictype/",
-            jObject {
-                "commercialService" += "YES"
-                "commercialStopType" += "YES"
-                "page" += jObject {
-                    "pageNumber" += 0
-                }
-                "stationCode" += stopInfoStationCode
-                "trafficType" += "CERCANIAS"
-            },
-            contentType = null,
+        val request =
+            "station=${stopInfoStationCode}&dest=&previous=1&showCercanias=true&showOtros=false&iframe=false&isNative=true"
+        val response = httpClient.post(
+            "https://elcanoweb.adif.es/departures/reload",
+            request,
+            contentType = "application/x-www-form-urlencoded; charset=utf-8",
             headers = mapOf(
-                "User-Key" to "f4ce9fbfa9d721e39b8984805901b5df",
-                "Host" to "circulacion.api.adif.es",
-                "User-Agent" to "okhttp/4.10.0",
-                "Connection" to "Close"
+                "Authorization" to "Basic ZGVpbW9zOmRlaW1vc3R0",
+                "Host" to "elcanoweb.adif.es",
+                "User-Agent" to "okhttp/4.12.0"
             )
         ).await(timeoutSeconds)
 
@@ -55,9 +46,16 @@ suspend fun getTrainRoutedTimesResponse(fullStopCode: String) = either {
                 return@use
             }
 
-            val json = it.body?.string()?.deserialized()?.bindJson() ?: shift<Nothing>(InternalServerError())
+            val html = it.body?.string()?.let(Jsoup::parse) ?: shift<Nothing>(InternalServerError())
 
-            parseTrainToStopTimes(json, coordinates, stopName, getStopCodeFromFullStopCode(fullStopCode)).bind()
+            val result = parseTrainToStopTimes(html, coordinates, stopName, getStopCodeFromFullStopCode(fullStopCode))
+
+            if (result.arrives != null && result.arrives.isEmpty()) {
+                tries--
+                return@use
+            }
+
+            return@either result
         }
     } while (tries > 0)
 
