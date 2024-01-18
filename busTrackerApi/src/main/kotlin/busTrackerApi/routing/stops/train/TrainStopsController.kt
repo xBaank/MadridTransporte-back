@@ -1,17 +1,16 @@
 package busTrackerApi.routing.stops.train
 
 import arrow.core.continuations.either
-import busTrackerApi.config.EnvVariables.timeoutSeconds
 import busTrackerApi.config.httpClient
 import busTrackerApi.db.getCoordinatesByStopCode
 import busTrackerApi.db.getIdByStopCode
 import busTrackerApi.db.getStopNameById
 import busTrackerApi.exceptions.BusTrackerException.InternalServerError
 import busTrackerApi.exceptions.BusTrackerException.NotFound
-import busTrackerApi.extensions.await
 import busTrackerApi.extensions.post
 import crtm.utils.getStopCodeFromFullStopCode
 import org.jsoup.Jsoup
+import ru.gildor.coroutines.okhttp.await
 
 suspend fun getTrainTimes(fullStopCode: String) = either {
     val stopInfoStationCode = getIdByStopCode(fullStopCode).bind()
@@ -31,13 +30,7 @@ suspend fun getTrainTimes(fullStopCode: String) = either {
                 "Host" to "elcanoweb.adif.es",
                 "User-Agent" to "okhttp/4.12.0"
             )
-        ).await(timeoutSeconds)
-
-        if (response == null) {
-            tries--
-            continue
-        }
-
+        ).await()
 
         response.use {
             if (it.code == 404) shift<Nothing>(NotFound())
