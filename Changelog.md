@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.0
+
+- Added `/stops/train/{stopCode}/times` endpoint
+
 ## 4.0.2
 
 - Fix `abono` endpoint
