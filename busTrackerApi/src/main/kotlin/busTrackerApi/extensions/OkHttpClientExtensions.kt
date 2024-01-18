@@ -20,9 +20,16 @@ fun OkHttpClient.post(
     body: JsonNode,
     headers: Map<String, String> = mapOf(),
     contentType: String? = "application/json"
+) = post(url, body.serialized(), headers, contentType)
+
+fun OkHttpClient.post(
+    url: String,
+    body: String,
+    headers: Map<String, String> = mapOf(),
+    contentType: String? = "application/json"
 ) = newCall(Request.Builder()
     .url(url)
     .apply { headers.forEach { (k, v) -> header(k, v) } }
-    .post(body.serialized().toRequestBody(contentType?.toMediaType()))
+    .post(body.toRequestBody(contentType?.toMediaType()))
     .build()
 )

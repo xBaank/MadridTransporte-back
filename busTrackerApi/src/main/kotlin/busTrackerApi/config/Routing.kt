@@ -8,7 +8,8 @@ import busTrackerApi.routing.stops.emt.emtStopsRouting
 import busTrackerApi.routing.stops.metro.metroStopsRouting
 import busTrackerApi.routing.stops.metro.tramStopsRouting
 import busTrackerApi.routing.stops.stopsRouting
-import busTrackerApi.routing.stops.trainRouted.trainStopsRouting
+import busTrackerApi.routing.stops.train.trainStopsRouting
+import busTrackerApi.routing.stops.trainRouted.trainRoutedStopsRouting
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 
@@ -24,6 +25,7 @@ private fun Route.stopsRoute() {
     route("/stops") {
         stopsRouting()
         busStopsRouting()
+        trainRoutedStopsRouting()
         trainStopsRouting()
         metroStopsRouting()
         tramStopsRouting()

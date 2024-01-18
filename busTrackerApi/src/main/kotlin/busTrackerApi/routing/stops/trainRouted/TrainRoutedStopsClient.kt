@@ -15,8 +15,8 @@ import io.ktor.server.plugins.cachingheaders.*
 import simpleJson.JsonNode
 
 
-suspend fun Pipeline.getTrainTimes() = getTrainTimesBase(
-    ::getTrainTimesResponse,
+suspend fun Pipeline.getTrainRoutedTimes() = getTrainTimesBase(
+    ::getTrainRoutedTimesResponse,
     call.request.queryParameters.getWrapped("originStopCode"),
     call.request.queryParameters.getWrapped("destinationStopCode")
 )

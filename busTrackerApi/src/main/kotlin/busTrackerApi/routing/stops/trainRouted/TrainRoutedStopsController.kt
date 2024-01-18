@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter
 private val outputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
 private const val horariosUrl = "https://horarios.renfe.com/cer/HorariosServlet"
 
-suspend fun getTrainTimesResponse(origin: String, destination: String) = either {
+suspend fun getTrainRoutedTimesResponse(origin: String, destination: String) = either {
     val madridDate = LocalDateTime.now(timeZoneMadrid.toZoneId()).format(outputFormatter)
     val madridHour = LocalDateTime.now(timeZoneMadrid.toZoneId()).format(hourFormatter)
 

@@ -1,7 +1,6 @@
 package busTrackerApi.routing.stops.emt
 
 import arrow.core.continuations.either
-import busTrackerApi.db.getRoute
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindJson
 import busTrackerApi.extensions.toDirection
@@ -9,8 +8,6 @@ import busTrackerApi.routing.stops.Arrive
 import busTrackerApi.routing.stops.Coordinates
 import busTrackerApi.routing.stops.Incident
 import busTrackerApi.routing.stops.StopTimes
-import crtm.utils.createLineCode
-import crtm.utils.getCodStopFromStopCode
 import simpleJson.*
 import java.time.Clock
 import java.time.LocalDateTime
@@ -34,7 +31,6 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
         val direction =
             linesInfo.first { it["label"].asString().bindJson() == line }["to"].asString().bindJson().toDirection()
         Arrive(
-            lineCode = getRoute(line, emtCodMode).getOrNull()?.fullLineCode ?: createLineCode(emtCodMode, line),
             line = line,
             destination = it["destination"].asString().bindJson(),
             direction = direction,
@@ -63,11 +59,11 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
     )
 }
 
-fun createFailedTimes(name: String, coordinates: Coordinates) = StopTimes(
+fun createEMTFailedTimes(name: String, coordinates: Coordinates, stopCode: String) = StopTimes(
     codMode = emtCodMode.toInt(),
     stopName = name,
     coordinates = coordinates,
     arrives = null,
     incidents = emptyList(),
-    simpleStopCode = getCodStopFromStopCode(name)
+    simpleStopCode = stopCode
 )

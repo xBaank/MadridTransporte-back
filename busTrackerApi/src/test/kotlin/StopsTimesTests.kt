@@ -12,12 +12,14 @@ import simpleJson.*
 import utils.testApplicationBusTracker
 
 const val busStopCode = "08242"
+const val trainStopCode = "11"
 const val metroStopCode = "235"
 const val emtStopCode = "5827"
 const val tramStopCode = "4"
 
 enum class Times(val url: String) {
     BUS("/stops/bus/$busStopCode/times"),
+    TRAIN("/stops/train/$trainStopCode/times"),
     METRO("/stops/metro/$metroStopCode/times"),
     EMT("/stops/emt/$emtStopCode/times"),
     TRAM("/stops/tram/$tramStopCode/times")
@@ -25,6 +27,7 @@ enum class Times(val url: String) {
 
 enum class TimesNotFound(val url: String) {
     BUS("/stops/bus/asdasd/times"),
+    TRAIN("/stops/train/asdasd/times"),
     METRO("/stops/metro/asdasd/times"),
     EMT("/stops/emt/asdasd/times"),
     TRAM("/stops/tram/asdasd/times")
