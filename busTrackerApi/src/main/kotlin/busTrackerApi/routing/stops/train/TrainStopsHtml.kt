@@ -22,8 +22,8 @@ fun parseTrainToStopTimes(
     val arrives = table.children().drop(1).mapNotNull {
         if (it.children().size < 5) return@mapNotNull null
         val salida = (it.child(0).firstElementChild()?.firstChild() as TextNode?)?.wholeText ?: ""
-        val destino = (it.child(1).firstElementChild()?.firstChild() as TextNode).wholeText
-        val linea = (it.child(3).firstChild() as TextNode).wholeText
+        val destino = (it.child(1).firstElementChild()?.firstChild() as TextNode?)?.wholeText ?: ""
+        val linea = (it.child(3).firstChild() as TextNode?)?.wholeText ?: ""
         val anden = getAndenOrNull(it.child(4))
         Arrive(
             line = linea,
