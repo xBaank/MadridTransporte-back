@@ -12,7 +12,7 @@ import simpleJson.*
 import utils.testApplicationBusTracker
 
 const val busStopCode = "08242"
-const val trainStopCode = "11"
+const val trainStopCode = "34"
 const val metroStopCode = "235"
 const val emtStopCode = "5827"
 const val tramStopCode = "4"
