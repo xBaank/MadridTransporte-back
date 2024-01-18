@@ -14,7 +14,7 @@ import crtm.soap.ArrayOfString
 import crtm.soap.IncidentsAffectationsRequest
 import crtm.soap.IncidentsAffectationsResponse
 import crtm.soap.StopTimesRequest
-import crtm.utils.getCodStopFromStopCode
+import crtm.utils.getStopCodeFromFullStopCode
 import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.hours
@@ -43,7 +43,7 @@ suspend fun getBusTimesResponse(stopCode: String) = either {
         stopTimes,
         getCoordinatesByStopCode(stopCode).bind(),
         getStopNameByStopCode(stopCode).getOrNull(),
-        getCodStopFromStopCode(stopCode)
+        getStopCodeFromFullStopCode(stopCode)
     )
 
     result

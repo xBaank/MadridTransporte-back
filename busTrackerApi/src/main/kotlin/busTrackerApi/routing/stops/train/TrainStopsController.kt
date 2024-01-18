@@ -1,43 +1,67 @@
 package busTrackerApi.routing.stops.train
 
 import arrow.core.continuations.either
+import busTrackerApi.config.EnvVariables.timeoutSeconds
 import busTrackerApi.config.httpClient
+import busTrackerApi.db.getCoordinatesByStopCode
+import busTrackerApi.db.getIdByStopCode
+import busTrackerApi.db.getStopNameById
 import busTrackerApi.exceptions.BusTrackerException.InternalServerError
-import busTrackerApi.extensions.bindJson
+import busTrackerApi.exceptions.BusTrackerException.NotFound
+import busTrackerApi.extensions.await
 import busTrackerApi.extensions.post
-import busTrackerApi.utils.hourFormatter
-import busTrackerApi.utils.timeZoneMadrid
-import ru.gildor.coroutines.okhttp.await
-import simpleJson.deserialized
-import simpleJson.jObject
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import crtm.utils.getStopCodeFromFullStopCode
+import org.jsoup.Jsoup
 
-private val outputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-private const val horariosUrl = "https://horarios.renfe.com/cer/HorariosServlet"
+suspend fun getTrainTimes(fullStopCode: String) = either {
+    val stopInfoStationCode = getIdByStopCode(fullStopCode).bind()
+    val stopName = getStopNameById(stopInfoStationCode).bind()
+    val coordinates = getCoordinatesByStopCode(fullStopCode).bind()
 
-suspend fun getTrainTimesResponse(origin: String, destination: String) = either {
-    val madridDate = LocalDateTime.now(timeZoneMadrid.toZoneId()).format(outputFormatter)
-    val madridHour = LocalDateTime.now(timeZoneMadrid.toZoneId()).format(hourFormatter)
+    var tries = 3
+    do {
+        val request =
+            "station=${stopInfoStationCode}&dest=&previous=1&showCercanias=true&showOtros=false&iframe=false&isNative=true"
+        val response = httpClient.post(
+            "https://elcanoweb.adif.es/departures/reload",
+            request,
+            contentType = "application/x-www-form-urlencoded; charset=utf-8",
+            headers = mapOf(
+                "Authorization" to "Basic ZGVpbW9zOmRlaW1vc3R0",
+                "Host" to "elcanoweb.adif.es",
+                "User-Agent" to "okhttp/4.12.0"
+            )
+        ).await(timeoutSeconds)
 
-    val response = httpClient.post(horariosUrl, jObject {
-        "nucleo" += "10" //Madrid Hardcoded
-        "origen" += origin
-        "destino" += destination
-        "fchaViaje" += madridDate
-        "validaReglaNegocio" += true
-        "tiempoReal" += true
-        "servicioHorarios" += "VTI"
-        "horaViajeOrigen" += madridHour
-        "horaViajeLlegada" += "26"
-        "accesibilidadTrenes" += true
-    }).await()
+        if (response == null) {
+            tries--
+            continue
+        }
 
-    if (!response.isSuccessful) shift<Nothing>(InternalServerError("Renfe server not responding"))
-    val json = response.body?.bytes()
-        ?.let { String(it, Charsets.ISO_8859_1) }
-        ?.toByteArray(Charsets.ISO_8859_1)
-        ?.toString(Charsets.UTF_8)
-        ?: shift<Nothing>(InternalServerError("Renfe server returned empty response"))
-    json.deserialized().bindJson()
+
+        response.use {
+            if (it.code == 404) shift<Nothing>(NotFound())
+            if (!it.isSuccessful) {
+                tries--
+                return@use
+            }
+
+            val html = it.body?.string()?.let(Jsoup::parse) ?: shift<Nothing>(InternalServerError())
+
+            val result = parseTrainToStopTimes(html, coordinates, stopName, getStopCodeFromFullStopCode(fullStopCode))
+
+            if (result.arrives != null && result.arrives.isEmpty()) {
+                tries--
+                return@use
+            }
+
+            return@either result
+        }
+    } while (tries > 0)
+
+    createTrainFailedTimes(
+        name = stopName,
+        coordinates = coordinates,
+        stopCode = getStopCodeFromFullStopCode(fullStopCode)
+    )
 }

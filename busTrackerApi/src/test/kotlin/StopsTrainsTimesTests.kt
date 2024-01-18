@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test
 import simpleJson.*
 import utils.testApplicationBusTracker
 
-const val trainStopCode = "41"
+const val originStopCode = "41"
 const val destinationStopCode = "53"
 
 class StopsTrainsTimesTests {
     @Test
     fun `should get stop times`() = testApplicationBusTracker {
-        val url = "/stops/train/times?originStopCode=$trainStopCode&destinationStopCode=$destinationStopCode"
+        val url = "/stops/train/times?originStopCode=$originStopCode&destinationStopCode=$destinationStopCode"
         val response = client.get(url)
         val body = response.bodyAsText().deserialized().getOrElse { throw it }
         body.shouldBeInstanceOf<JsonObject>()

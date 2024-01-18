@@ -1,11 +1,13 @@
 package busTrackerApi.routing.stops.metro
 
 import arrow.core.continuations.either
+import busTrackerApi.db.getRoute
 import busTrackerApi.extensions.toZoneOffset
 import busTrackerApi.routing.stops.Arrive
 import busTrackerApi.routing.stops.Coordinates
 import busTrackerApi.routing.stops.StopTimes
 import busTrackerApi.utils.timeZoneMadrid
+import crtm.utils.createLineCode
 import simpleJson.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -48,8 +50,11 @@ suspend fun parseMetroToStopTimes(
                 ?.let { now.plusMinutes(it + 1).minusSeconds(1) }
                 ?.toInstant(timeZoneMadrid.toZoneOffset())?.toEpochMilli()
 
+            val line = arrive["linea"].asNumber().bind().toString()
+
             val first = Arrive(
-                line = arrive["linea"].asNumber().bind().toString(),
+                line = line,
+                lineCode = getRoute(line, metroCodMode).getOrNull()?.fullLineCode ?: createLineCode(metroCodMode, line),
                 destination = arrive["sentido"].asString().bind(),
                 anden = arrive["anden"].asInt().getOrNull(),
                 codMode = metroCodMode.toInt(),

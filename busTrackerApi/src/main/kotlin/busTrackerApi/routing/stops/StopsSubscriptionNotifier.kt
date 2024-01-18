@@ -14,6 +14,9 @@ import busTrackerApi.routing.stops.emt.emtCodMode
 import busTrackerApi.routing.stops.emt.getEmtStopTimes
 import busTrackerApi.routing.stops.metro.getMetroTimesResponse
 import busTrackerApi.routing.stops.metro.metroCodMode
+import busTrackerApi.routing.stops.metro.tramCodMode
+import busTrackerApi.routing.stops.train.getTrainTimes
+import busTrackerApi.routing.stops.trainRouted.trainCodMode
 import busTrackerApi.utils.StopTimesF
 import com.google.firebase.ErrorCode.INVALID_ARGUMENT
 import com.google.firebase.ErrorCode.NOT_FOUND
@@ -34,12 +37,20 @@ suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, S
             { getMetroTimesResponse(it, codMode) }
         }
 
+        tramCodMode -> {
+            { getMetroTimesResponse(it, codMode) }
+        }
+
         busCodMode -> {
             { getBusTimesResponse(it) }
         }
 
         emtCodMode -> {
             { getEmtStopTimes(it) }
+        }
+
+        trainCodMode -> {
+            { getTrainTimes(it) }
         }
 
         else -> {
