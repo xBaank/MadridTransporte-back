@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.2
+
+- Remove duplicates stops.
+
 ## 4.1.1
 
 - Return lineCode when getting emt times.
