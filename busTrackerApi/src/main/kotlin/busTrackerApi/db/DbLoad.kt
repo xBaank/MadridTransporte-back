@@ -10,6 +10,7 @@ import busTrackerApi.extensions.get
 import busTrackerApi.extensions.mapAsync
 import busTrackerApi.extensions.removeFirstLine
 import busTrackerApi.extensions.toEnumeration
+import busTrackerApi.routing.stops.metro.metroCodMode
 import com.github.doyaaaaaken.kotlincsv.dsl.context.ExcessFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.context.InsufficientFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
@@ -20,6 +21,7 @@ import kotlinx.coroutines.coroutineScope
 import ru.gildor.coroutines.okhttp.await
 import java.io.File
 import java.io.SequenceInputStream
+import java.util.*
 import kotlin.io.path.createTempFile
 
 private val reader = csvReader {
@@ -53,11 +55,19 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 val stops = readAllWithHeaderAsSequence()
                     .filter { it["stop_id"]?.contains("par") == true }
                     .distinctBy { it["stop_id"] }
-                    .chunked(sequenceChunkSize)
+                    .map(::parseStop)
+                    .distinctBy { //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
+                        Pair(
+                            if (it.codMode.toString() == metroCodMode) 1
+                            else UUID.randomUUID().toString(),
+                            it.stopName
+                        )
+                    }
+
                 stopsCollection.drop()
-                stops.forEach {
-                    val parsed = it.mapAsync(::parseStop).toList()
-                    stopsCollection.insertMany(parsed)
+
+                stops.chunked(sequenceChunkSize).forEach {
+                    stopsCollection.insertMany(it)
                 }
             }
         },
