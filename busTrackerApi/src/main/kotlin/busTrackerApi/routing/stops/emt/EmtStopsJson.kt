@@ -1,6 +1,7 @@
 package busTrackerApi.routing.stops.emt
 
 import arrow.core.continuations.either
+import busTrackerApi.db.getRoute
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindJson
 import busTrackerApi.extensions.toDirection
@@ -8,6 +9,7 @@ import busTrackerApi.routing.stops.Arrive
 import busTrackerApi.routing.stops.Coordinates
 import busTrackerApi.routing.stops.Incident
 import busTrackerApi.routing.stops.StopTimes
+import crtm.utils.createLineCode
 import simpleJson.*
 import java.time.Clock
 import java.time.LocalDateTime
@@ -32,6 +34,7 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
             linesInfo.first { it["label"].asString().bindJson() == line }["to"].asString().bindJson().toDirection()
         Arrive(
             line = line,
+            lineCode = getRoute(line, emtCodMode).getOrNull()?.fullLineCode ?: createLineCode(emtCodMode, line),
             destination = it["destination"].asString().bindJson(),
             direction = direction,
             codMode = emtCodMode.toInt(),

@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.1
+
+- Return lineCode when getting emt times.
+
 ## 4.1.0
 
 - Added `/stops/train/{stopCode}/times` endpoint
