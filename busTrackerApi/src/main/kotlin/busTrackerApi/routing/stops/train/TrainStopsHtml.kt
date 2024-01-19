@@ -72,6 +72,10 @@ private fun parseSalida(input: String): Long {
     }
 
     val formatted = LocalTime.parse(formattedInput, DateTimeFormatter.ofPattern("HH:mm"))
-    val madridDateTime = ZonedDateTime.of(ZonedDateTime.now().toLocalDate(), formatted, timeZoneMadrid.toZoneId())
+    val madridDateTime = ZonedDateTime.of(
+        ZonedDateTime.now(timeZoneMadrid.toZoneId()).toLocalDate(),
+        formatted,
+        timeZoneMadrid.toZoneId()
+    )
     return madridDateTime.toInstant().toEpochMilli()
 }
