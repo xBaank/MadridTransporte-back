@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.3
+
+- Fix train times.
+
 ## 4.1.2
 
 - Remove duplicates stops.
