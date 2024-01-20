@@ -1,4 +1,5 @@
 import arrow.core.right
+import busTrackerApi.routing.stops.Arrive
 import busTrackerApi.routing.stops.Coordinates
 import busTrackerApi.routing.stops.StopTimes
 import busTrackerApi.routing.stops.getFunctionByCodMode
@@ -40,7 +41,17 @@ class NotificationsTest {
         simpleStopCode = "",
         stopCode = "",
         coordinates = Coordinates(0.0, 0.0),
-        arrives = listOf(),
+        arrives = listOf(
+            Arrive(
+                "",
+                "",
+                0,
+                0,
+                0,
+                "",
+                0
+            )
+        ),
         incidents = listOf()
     )
 
