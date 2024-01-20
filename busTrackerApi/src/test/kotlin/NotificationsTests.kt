@@ -21,7 +21,6 @@ import simpleJson.jObject
 import simpleJson.serialized
 import utils.MongoContainer
 import utils.testApplicationBusTracker
-import java.util.*
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -82,8 +81,8 @@ class NotificationsTest {
                 "subscription" += jObject {
                     "stopCode" += subscription.stopCode
                     "lineDestination" += jObject {
-                        "line" += UUID.randomUUID().toString()
-                        "destination" += UUID.randomUUID().toString()
+                        "line" += testStopTimes.arrives!!.first().line
+                        "destination" += testStopTimes.arrives!!.first().destination
                         "codMode" += 8
                     }
                 }
@@ -134,8 +133,8 @@ class NotificationsTest {
                 "subscription" += jObject {
                     "stopCode" += subscription.stopCode
                     "lineDestination" += jObject {
-                        "line" += UUID.randomUUID().toString()
-                        "destination" += UUID.randomUUID().toString()
+                        "line" += testStopTimes.arrives!!.first().line
+                        "destination" += testStopTimes.arrives!!.first().destination
                         "codMode" += 8
                     }
                 }
