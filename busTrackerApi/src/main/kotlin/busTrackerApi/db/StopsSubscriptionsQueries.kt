@@ -39,6 +39,8 @@ suspend fun unsubscribeDevice(deviceToken: DeviceToken, stopCode: String, lineDe
         stopsSubscriptionsCollection.updateOne(filter = filter, update = update, options = option)
 
     }
+
+    stopsSubscriptionsCollection.deleteMany(Filters.size(StopsSubscription::deviceTokens.name, 0))
 }
 
 suspend fun unsubscribeAllDevice(deviceToken: DeviceToken) {
@@ -46,7 +48,7 @@ suspend fun unsubscribeAllDevice(deviceToken: DeviceToken) {
         StopsSubscription::deviceTokens.name,
         Filters.eq(DeviceToken::token.name, deviceToken.token)
     )
-    
+
     stopsSubscriptionsCollection.find(containsDeviceToken).collect { subscription ->
         subscription.linesByDeviceToken[deviceToken.token] = emptyList()
         subscription.deviceTokens -= deviceToken
@@ -57,8 +59,9 @@ suspend fun unsubscribeAllDevice(deviceToken: DeviceToken) {
         )
         val option = UpdateOptions().upsert(true)
         stopsSubscriptionsCollection.updateOne(filter = containsDeviceToken, update = update, options = option)
-
     }
+
+    stopsSubscriptionsCollection.deleteMany(Filters.size(StopsSubscription::deviceTokens.name, 0))
 }
 
 fun getSubscriptions(deviceToken: DeviceToken) = stopsSubscriptionsCollection
