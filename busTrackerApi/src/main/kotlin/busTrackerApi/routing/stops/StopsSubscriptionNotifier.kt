@@ -20,13 +20,13 @@ import busTrackerApi.routing.stops.trainRouted.trainCodMode
 import busTrackerApi.utils.StopTimesF
 import com.google.firebase.ErrorCode.INVALID_ARGUMENT
 import com.google.firebase.ErrorCode.NOT_FOUND
-import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.FirebaseMessagingException
-import com.google.firebase.messaging.Message
+import com.google.firebase.messaging.*
 import com.google.firebase.messaging.MessagingErrorCode.UNREGISTERED
 import io.ktor.util.logging.*
 import kotlinx.coroutines.*
-import simpleJson.serialized
+import java.time.Clock
+import java.time.Instant
+import kotlin.time.Duration.Companion.milliseconds
 
 
 private val LOGGER = KtorSimpleLogger("Subscriptions")
@@ -64,8 +64,8 @@ suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, S
 fun notifyStopTimesOnBackground() {
     GlobalScope.launch(Dispatchers.IO) {
         while (isActive) {
-            getSubscriptions().batched(100).forEachAsync { subscription ->
-                try {
+            try {
+                getSubscriptions().batched(100).forEachAsync { subscription ->
                     val function = getFunctionByCodMode(subscription.codMode).getOrNull() ?: return@forEachAsync
                     val stopTimes = function(subscription.stopCode).getOrNull() ?: return@forEachAsync
 
@@ -78,26 +78,56 @@ fun notifyStopTimesOnBackground() {
                             } ?: emptyList()
                         )
 
-                        val message = Message.builder()
-                            .putData("stopTimes", buildStopTimesJson(selectedTimes).serialized())
-                            .setToken(it.token)
-                            .build()
+                        val arrivesToNotify = selectedTimes.arrives?.sortedBy { it.estimatedArrive }
+                            ?.distinctBy { it.line to it.destination }
 
-                        try {
-                            LOGGER.info("Sending message to $it")
-                            FirebaseMessaging.getInstance().sendAsync(message).await()
-                        } catch (e: FirebaseMessagingException) {
-                            LOGGER.error(e)
-                            if (e.errorCode == INVALID_ARGUMENT || e.errorCode == NOT_FOUND || e.messagingErrorCode == UNREGISTERED) {
-                                unsubscribeAllDevice(it)
+                        arrivesToNotify?.forEach { arrive ->
+                            val diff = arrive.estimatedArrive - Instant.now(Clock.systemUTC()).toEpochMilli()
+                            val time = diff.milliseconds.inWholeMinutes
+
+                            val message = Message.builder()
+                                .setAndroidConfig(
+                                    AndroidConfig.builder()
+                                        .setPriority(AndroidConfig.Priority.HIGH)
+                                        .setNotification(
+                                            AndroidNotification.builder()
+                                                .setIcon("https://www.madridtransporte.com/favicon.ico")
+                                                .setTag(stopTimes.stopCode + arrive.line + arrive.destination)
+                                                .setTitle("Parada ${stopTimes.stopName} - ${arrive.line} - ${arrive.destination}")
+                                                .setBody("$time minutos")
+                                                .build()
+                                        ).build()
+                                )
+                                .setWebpushConfig(
+                                    WebpushConfig.builder().setNotification(
+                                        WebpushNotification.builder()
+                                            .setIcon("https://www.madridtransporte.com/favicon.ico")
+                                            .setTag(stopTimes.stopCode + arrive.line + arrive.destination)
+                                            .setTitle("Parada ${stopTimes.stopName} - ${arrive.line} - ${arrive.destination}")
+                                            .setBody("$time minutos")
+                                            .setRenotify(true)
+                                            .build()
+                                    ).build()
+                                )
+                                .setToken(it.token)
+                                .build()
+
+                            try {
+                                LOGGER.info("Sending message to $it")
+                                FirebaseMessaging.getInstance().sendAsync(message).await()
+                            } catch (e: FirebaseMessagingException) {
+                                LOGGER.error(e)
+                                if (e.errorCode == INVALID_ARGUMENT || e.errorCode == NOT_FOUND || e.messagingErrorCode == UNREGISTERED) {
+                                    unsubscribeAllDevice(it)
+                                }
+                            } catch (e: Exception) {
+                                LOGGER.error(e)
                             }
-                        } catch (e: Exception) {
-                            LOGGER.error(e)
                         }
                     }
-                } catch (e: Exception) {
-                    LOGGER.error(e)
                 }
+            } catch (e: Exception) {
+                LOGGER.error(e)
             }
             delay(EnvVariables.notificationDelayTimeSeconds)
         }
