@@ -71,11 +71,15 @@ private fun parseSalida(input: String): Long {
         return time.toInstant(ZoneOffset.UTC).toEpochMilli()
     }
 
+    val nowMadridTime = ZonedDateTime.now(timeZoneMadrid.toZoneId())
     val formatted = LocalTime.parse(formattedInput, DateTimeFormatter.ofPattern("HH:mm"))
-    val madridDateTime = ZonedDateTime.of(
+    var madridDateTime = ZonedDateTime.of(
         ZonedDateTime.now(timeZoneMadrid.toZoneId()).toLocalDate(),
         formatted,
         timeZoneMadrid.toZoneId()
     )
+    
+    if (madridDateTime < nowMadridTime) madridDateTime = madridDateTime.plusDays(1)
+
     return madridDateTime.toInstant().toEpochMilli()
 }

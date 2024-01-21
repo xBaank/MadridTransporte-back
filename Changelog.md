@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.5
+
+- Fix train times not being parsed properly.
+
 ## 4.1.4
 
 - Add notifications to Android.
