@@ -1,4 +1,4 @@
-package busTrackerApi.routing.stops
+package busTrackerApi.notifications
 
 import arrow.core.Either
 import arrow.core.continuations.either
@@ -12,6 +12,7 @@ import busTrackerApi.extensions.forEachAsync
 import busTrackerApi.routing.stops.bus.busCodMode
 import busTrackerApi.routing.stops.emt.emtCodMode
 import busTrackerApi.routing.stops.emt.getEmtStopTimes
+import busTrackerApi.routing.stops.getBusTimesResponse
 import busTrackerApi.routing.stops.metro.getMetroTimesResponse
 import busTrackerApi.routing.stops.metro.metroCodMode
 import busTrackerApi.routing.stops.metro.tramCodMode

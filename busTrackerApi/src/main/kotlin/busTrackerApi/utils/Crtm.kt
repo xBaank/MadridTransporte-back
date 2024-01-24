@@ -2,7 +2,6 @@ package busTrackerApi.utils
 
 import busTrackerApi.extensions.getSuspend
 import com.sun.xml.ws.client.BindingProviderProperties
-import crtm.abono.VentaPrepagoTitulo
 import crtm.soap.AuthHeader
 import crtm.soap.MultimodalInformation
 import crtm.soap.MultimodalInformation_Service
@@ -24,14 +23,6 @@ val defaultClient = SuspendingLazy {
         }
     }
 }
-val abonoClient =
-    SuspendingLazy {
-        withContext(Dispatchers.IO) {
-            VentaPrepagoTitulo().apply {
-                executor = Dispatchers.IO.asExecutor()
-            }.basicHttpBindingIVentaPrepagoTitulo
-        }
-    }
 
 private val privateKey = "pruebapruebapruebapruebaprueba12".toByteArray()
 suspend fun MultimodalInformation.auth(): AuthHeader {

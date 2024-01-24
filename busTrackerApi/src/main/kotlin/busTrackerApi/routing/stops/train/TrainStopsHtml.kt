@@ -67,7 +67,7 @@ private fun parseSalida(input: String): Long {
 
     if (formattedInput.contains("min")) {
         val minutes = formattedInput.removeSuffix("min").trim().toLong()
-        val time = LocalDateTime.now(Clock.systemUTC()).plusMinutes(minutes)
+        val time = LocalDateTime.now(Clock.systemUTC()).plusMinutes(minutes).plusMinutes(1).minusSeconds(1)
         return time.toInstant(ZoneOffset.UTC).toEpochMilli()
     }
 
@@ -78,7 +78,7 @@ private fun parseSalida(input: String): Long {
         formatted,
         timeZoneMadrid.toZoneId()
     )
-    
+
     if (madridDateTime < nowMadridTime) madridDateTime = madridDateTime.plusDays(1)
 
     return madridDateTime.toInstant().toEpochMilli()

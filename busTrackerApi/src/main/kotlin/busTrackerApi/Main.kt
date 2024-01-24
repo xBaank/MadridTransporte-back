@@ -6,7 +6,7 @@ import busTrackerApi.config.configureRoutingV1
 import busTrackerApi.config.setupFirebase
 import busTrackerApi.config.setupMongo
 import busTrackerApi.db.loadDataIntoDb
-import busTrackerApi.routing.stops.notifyStopTimesOnBackground
+import busTrackerApi.notifications.notifyStopTimesOnBackground
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*

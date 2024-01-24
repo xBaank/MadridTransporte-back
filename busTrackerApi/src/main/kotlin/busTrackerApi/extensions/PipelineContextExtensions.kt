@@ -88,7 +88,7 @@ suspend fun Pipeline.handleResponse(response: Response): Unit = when (response) 
     )
 
     is Response.ResponseRaw -> call.respond(response.status)
-    is Response.ResponseRedirect -> call.respondRedirect(response.url)
+    
     is Response.ResponseFlowJson -> {
         call.respondBytesWriter(status = response.status, contentType = ContentType.Application.Json) {
             writeStringUtf8("[")
