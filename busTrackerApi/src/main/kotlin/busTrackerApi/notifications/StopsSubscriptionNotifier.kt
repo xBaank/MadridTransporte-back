@@ -85,6 +85,10 @@ fun notifyStopTimesOnBackground() {
                         arrivesToNotify?.forEach { arrive ->
                             val diff = arrive.estimatedArrive - Instant.now(Clock.systemUTC()).toEpochMilli()
                             val time = diff.milliseconds.inWholeMinutes
+                            val icon = "https://www.madridtransporte.com/favicon.ico"
+                            val tag = stopTimes.stopCode + arrive.line + arrive.destination
+                            val title = "Parada ${stopTimes.stopName} - ${arrive.line} - ${arrive.destination}"
+                            val body = "$time minutos"
 
                             val message = Message.builder()
                                 .setAndroidConfig(
@@ -92,10 +96,10 @@ fun notifyStopTimesOnBackground() {
                                         .setPriority(AndroidConfig.Priority.HIGH)
                                         .setNotification(
                                             AndroidNotification.builder()
-                                                .setIcon("https://www.madridtransporte.com/favicon.ico")
-                                                .setTag(stopTimes.stopCode + arrive.line + arrive.destination)
-                                                .setTitle("Parada ${stopTimes.stopName} - ${arrive.line} - ${arrive.destination}")
-                                                .setBody("$time minutos")
+                                                .setIcon(icon)
+                                                .setTag(tag)
+                                                .setTitle(title)
+                                                .setBody(body)
                                                 .build()
                                         ).build()
                                 )
@@ -104,10 +108,10 @@ fun notifyStopTimesOnBackground() {
                                         .putHeader("Urgency", "high")
                                         .setNotification(
                                             WebpushNotification.builder()
-                                                .setIcon("https://www.madridtransporte.com/favicon.ico")
-                                                .setTag(stopTimes.stopCode + arrive.line + arrive.destination)
-                                                .setTitle("Parada ${stopTimes.stopName} - ${arrive.line} - ${arrive.destination}")
-                                                .setBody("$time minutos")
+                                                .setIcon(icon)
+                                                .setTag(tag)
+                                                .setTitle(title)
+                                                .setBody(body)
                                                 .setRenotify(true)
                                                 .build()
                                         ).build()
