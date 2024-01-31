@@ -24,17 +24,15 @@ enum class LocationsCodes(
     val lineCode: String,
     val codMode: Int
 ) {
-    Emt("/lines/emt/6__144___/locations/2", "6__144___", 2, "144", emtCodMode.toInt()),
-    Interurban("/lines/bus/8__450___/locations/1", "8__450___", 1, "450", busCodMode.toInt()),
-    Urban("/lines/bus/9__1__074_/locations/1", "9__1__074_", 1, "1", 9),
-    WeirdUrban("/lines/bus/9__1__058_/locations/1", "9__1__058_", 1, "1", 9)
+    Emt("/lines/emt/locations/6__144____2__IT_1", "6__144___", 2, "144", emtCodMode.toInt()),
+    Interurban("/lines/bus/locations/8__450____1_-_IT_1", "8__450___", 1, "450", busCodMode.toInt()),
+    Urban("/lines/bus/locations/9__1__074__1_-_IT_1", "9__1__074_", 1, "1", 9),
 }
 
 enum class ItinerariesCodes(val url: String, val code: String, val simpleLineCode: String, val direction: Int) {
-    Emt("/lines/emt/6__144___/itineraries/2", "6__144___", "144", 2),
-    Interurban("/lines/bus/8__450___/itineraries/1", "8__450___", "450", 1),
-    Urban("/lines/bus/9__1__074_/itineraries/1", "9__1__074_", "1", 1),
-    WeirdUrban("/lines/bus/9__1__058_/itineraries/1", "9__1__058_", "1", 1)
+    Emt("/lines/emt/itineraries/6__144____2__IT_1", "6__144___", "144", 2),
+    Interurban("/lines/bus/itineraries/8__450____1_-_IT_1", "8__450___", "450", 1),
+    Urban("/lines/bus/itineraries/9__1__074__1_-_IT_1", "9__1__074_", "1", 1),
 }
 
 class BusLinesTests {

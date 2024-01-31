@@ -1,9 +1,11 @@
 package busTrackerApi.routing.stops.emt
 
 import arrow.core.continuations.either
+import busTrackerApi.db.getItineraryByFullLineCode
 import busTrackerApi.db.getRoute
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindJson
+import busTrackerApi.extensions.mapAsync
 import busTrackerApi.extensions.toDirection
 import busTrackerApi.routing.stops.Arrive
 import busTrackerApi.routing.stops.Coordinates
@@ -25,20 +27,22 @@ suspend fun parseEMTToStopTimes(json: JsonNode) = either {
         .let { Coordinates(it[1].asDouble().bindJson(), it[0].asDouble().bindJson()) }
     val arrives = json["data"][0]["Arrive"].asArray().bindJson()
     val incidents = json["data"][0]["Incident"]["ListaIncident"]["data"].asArray().getOrNull()
-    val arrivesMapped = arrives.map {
+    val arrivesMapped = arrives.mapAsync {
         val secondsToArrive = it["estimateArrive"].asLong().bindJson()
         val estimatedArrive = LocalDateTime.now(Clock.systemUTC()).plusSeconds(secondsToArrive)
         val line = it["line"].asString().bindJson()
         val linesInfo = json["data"][0]["StopInfo"][0]["lines"].asArray().bindJson()
         val direction =
             linesInfo.first { it["label"].asString().bindJson() == line }["to"].asString().bindJson().toDirection()
+        val lineCode = getRoute(line, emtCodMode).getOrNull()?.fullLineCode ?: createLineCode(emtCodMode, line)
         Arrive(
             line = line,
-            lineCode = getRoute(line, emtCodMode).getOrNull()?.fullLineCode ?: createLineCode(emtCodMode, line),
+            lineCode = lineCode,
             destination = it["destination"].asString().bindJson(),
             direction = direction,
             codMode = emtCodMode.toInt(),
-            estimatedArrive = estimatedArrive.toInstant(ZoneOffset.UTC).toEpochMilli()
+            estimatedArrive = estimatedArrive.toInstant(ZoneOffset.UTC).toEpochMilli(),
+            itineraryCode = getItineraryByFullLineCode(lineCode, direction)?.itineraryCode
         )
     }
     val incidentsMapped = incidents?.map {

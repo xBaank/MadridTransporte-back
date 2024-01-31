@@ -14,6 +14,7 @@ data class Arrive(
     val line: String,
     val lineCode: String? = null,
     val direction: Int? = null,
+    val itineraryCode: String? = null,
     val codMode: Int,
     val anden: Int? = null,
     val destination: String,

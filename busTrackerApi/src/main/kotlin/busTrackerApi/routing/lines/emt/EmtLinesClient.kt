@@ -2,6 +2,7 @@ package busTrackerApi.routing.lines.emt
 
 import arrow.core.Either
 import arrow.core.continuations.either
+import busTrackerApi.db.getItinerariesByItineraryCode
 import busTrackerApi.db.getItineraryByFullLineCode
 import busTrackerApi.db.getRoute
 import busTrackerApi.exceptions.BusTrackerException
@@ -20,6 +21,7 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
+import kotlinx.coroutines.flow.firstOrNull
 
 suspend fun Pipeline.getLocations(): Either<BusTrackerException, Response> = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
@@ -28,7 +30,7 @@ suspend fun Pipeline.getLocations(): Either<BusTrackerException, Response> = eit
     val stopCode = call.request.queryParameters["stopCode"]
 
     val fullStopCode = if (stopCode != null) createStopCode(emtCodMode, stopCode) else run {
-        val itinerary = getItineraryByFullLineCode(lineCode, direction - 1) ?: shift<Nothing>(NotFound())
+        val itinerary = getItineraryByFullLineCode(lineCode, direction) ?: shift<Nothing>(NotFound())
         itinerary.stops[itinerary.stops.size - 2].fullStopCode
     }
     val route = getRoute(lineCode).getOrNull()
@@ -38,6 +40,33 @@ suspend fun Pipeline.getLocations(): Either<BusTrackerException, Response> = eit
     val locations = VehicleLocations(
         locations = getLocationsResponse(fullStopCode, simpleLineCode).bind()
             .filter { it.direction == direction },
+        codMode = codMode.toInt(),
+        lineCode = simpleLineCode
+    )
+
+    val json = buildVehicleLocationJson(locations)
+
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 15))
+    ResponseJson(json, HttpStatusCode.OK)
+}
+
+suspend fun Pipeline.getLocationsByItineraryCode(): Either<BusTrackerException, Response> = either {
+    val itineraryCode = call.parameters.getWrapped("itineraryCode").bind()
+    val stopCode = call.request.queryParameters["stopCode"]
+    val itinerary = getItinerariesByItineraryCode(itineraryCode).firstOrNull() ?: shift<Nothing>(NotFound())
+
+
+    val fullStopCode = if (stopCode != null) createStopCode(emtCodMode, stopCode) else run {
+        itinerary.stops[itinerary.stops.size - 2].fullStopCode
+    }
+
+    val route = getRoute(itineraryCode).getOrNull()
+    val simpleLineCode = route?.simpleLineCode ?: getSimpleLineCodeFromLineCode(itineraryCode)
+    val codMode = route?.codMode ?: emtCodMode
+
+    val locations = VehicleLocations(
+        locations = getLocationsResponse(fullStopCode, simpleLineCode).bind()
+            .filter { it.direction == itinerary.direction },
         codMode = codMode.toInt(),
         lineCode = simpleLineCode
     )

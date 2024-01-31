@@ -1,8 +1,11 @@
 package busTrackerApi.routing.stops
 
+import busTrackerApi.db.getItineraryByDestStop
+import busTrackerApi.db.getItineraryByFullLineCode
 import busTrackerApi.db.models.DeviceToken
 import busTrackerApi.db.models.Stop
 import busTrackerApi.db.models.StopsSubscription
+import busTrackerApi.extensions.mapAsync
 import busTrackerApi.extensions.toMiliseconds
 import busTrackerApi.routing.stops.bus.busCodMode
 import crtm.soap.IncidentsAffectationsResponse
@@ -13,20 +16,28 @@ import simpleJson.asJson
 import simpleJson.jArray
 import simpleJson.jObject
 
-fun parseStopTimesResponseToStopTimes(
+suspend fun parseStopTimesResponseToStopTimes(
     response: StopTimesResponse?,
     coordinates: Coordinates,
     name: String?,
     shortStopCode: String?
 ): StopTimes {
-    val arrives = response?.stopTimes?.times?.time?.map {
+    val arrives = response?.stopTimes?.times?.time?.mapAsync {
         Arrive(
             direction = it.direction,
             lineCode = it.line.codLine,
             line = it.line.shortDescription,
             destination = it.destination,
             codMode = it.line.codMode.toInt(),
-            estimatedArrive = it.time.toMiliseconds()
+            estimatedArrive = it.time.toMiliseconds(),
+            itineraryCode = getItineraryByDestStop(
+                it.line.codLine,
+                it.direction,
+                it.destinationStop.codStop
+            )?.itineraryCode ?: getItineraryByFullLineCode(
+                it.line.codLine,
+                it.direction
+            )?.itineraryCode
         )
     }
 
@@ -101,6 +112,7 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
                 "anden" += arrive.value.first().anden
                 "destination" += arrive.value.first().destination
                 "estimatedArrives" += arrive.value.map { it.estimatedArrive.asJson() }.asJson()
+                "itineraryCode" += arrive.value.first().itineraryCode
             }
         }
     }

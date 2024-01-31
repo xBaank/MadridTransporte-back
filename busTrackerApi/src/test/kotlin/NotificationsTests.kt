@@ -45,6 +45,7 @@ class NotificationsTest {
                 "",
                 "",
                 0,
+                null,
                 0,
                 0,
                 "",

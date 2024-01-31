@@ -13,12 +13,18 @@ import kotlinx.coroutines.flow.firstOrNull
 suspend fun getItineraryByFullLineCode(fullLineCode: String, direction: Int) =
     getItinerariesByFullLineCode(fullLineCode, direction).firstOrNull()
 
+suspend fun getItineraryByDestStop(fullLineCode: String, direction: Int, destStopCode: String) =
+    getItinerariesByFullLineCode(
+        fullLineCode,
+        direction
+    ).firstOrNull { destStopCode in it.stops.map(StopOrder::fullStopCode) }
+
 fun getItinerariesByFullLineCode(fullLineCode: String, direction: Int): Flow<ItineraryWithStops> {
     val pipeline = listOf(
         Aggregates.match(
             Filters.and(
                 Filters.eq(Itinerary::fullLineCode.name, fullLineCode),
-                Filters.eq(Itinerary::direction.name, direction)
+                Filters.eq(Itinerary::direction.name, direction - 1)
             )
         ),
         Aggregates.lookup(
@@ -31,3 +37,22 @@ fun getItinerariesByFullLineCode(fullLineCode: String, direction: Int): Flow<Iti
     return itinerariesCollection.withDocumentClass<ItineraryWithStops>().aggregate(pipeline)
         .distinctUntilChangedBy { it.itineraryCode to it.direction }
 }
+
+fun getItinerariesByItineraryCode(itineraryCode: String): Flow<ItineraryWithStops> {
+    val pipeline = listOf(
+        Aggregates.match(
+            Filters.and(
+                Filters.eq(Itinerary::itineraryCode.name, itineraryCode)
+            )
+        ),
+        Aggregates.lookup(
+            /* from = */ StopOrder::class.simpleName!!,
+            /* localField = */ StopOrder::tripId.name,
+            /* foreignField = */ Itinerary::tripId.name,
+            /* as = */ ItineraryWithStops::stops.name
+        )
+    )
+    return itinerariesCollection.withDocumentClass<ItineraryWithStops>().aggregate(pipeline)
+        .distinctUntilChangedBy { it.itineraryCode to it.direction }
+}
+

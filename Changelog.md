@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.2.0
+
+- Added `/lines/bus/locations/{itineraryCode}`
+- Added `/lines/emt/locations/{itineraryCode}`
+- Added `itineraryCode` property for  `/stops/bus/{stopCode}/times`
+- Added `itineraryCode` property for  `/stops/emt/{stopCode}/times`
+
 ## 4.1.5
 
 - Fix train times not being parsed properly.
