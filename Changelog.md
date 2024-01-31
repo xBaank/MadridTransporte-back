@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.0.0
+
+- Removed `/lines/bus/{lineCode}/locations/{direction}`
+- Removed `/lines/emt/{lineCode}/locations/{direction}`
+- Removed `/lines/bus/{lineCode}/itineraries/{direction}`
+- Removed `/lines/emt/{lineCode}/itineraries/{direction}`
+
 ## 4.2.0
 
 - Added `/lines/bus/locations/{itineraryCode}`
