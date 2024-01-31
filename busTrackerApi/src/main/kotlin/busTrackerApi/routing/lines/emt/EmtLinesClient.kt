@@ -60,13 +60,13 @@ suspend fun Pipeline.getLocationsByItineraryCode(): Either<BusTrackerException, 
         itinerary.stops[itinerary.stops.size - 2].fullStopCode
     }
 
-    val route = getRoute(itineraryCode).getOrNull()
+    val route = getRoute(itinerary.fullLineCode).getOrNull()
     val simpleLineCode = route?.simpleLineCode ?: getSimpleLineCodeFromLineCode(itineraryCode)
     val codMode = route?.codMode ?: emtCodMode
 
     val locations = VehicleLocations(
         locations = getLocationsResponse(fullStopCode, simpleLineCode).bind()
-            .filter { it.direction == itinerary.direction },
+            .filter { it.direction == itinerary.direction + 1 },
         codMode = codMode.toInt(),
         lineCode = simpleLineCode
     )
