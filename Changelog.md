@@ -6,6 +6,8 @@
 - Removed `/lines/emt/{lineCode}/locations/{direction}`
 - Removed `/lines/bus/{lineCode}/itineraries/{direction}`
 - Removed `/lines/emt/{lineCode}/itineraries/{direction}`
+- Added `distance` property to `/lines/bus/shapes/{itineraryCode}`
+- Added `distance` property to `/lines/emt/shapes/{itineraryCode}`
 
 ## 4.2.0
 

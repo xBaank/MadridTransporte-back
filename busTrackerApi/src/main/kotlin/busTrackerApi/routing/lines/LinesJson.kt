@@ -43,4 +43,5 @@ fun buildShapeJson(shape: Shape) = jObject {
     "latitude" += shape.latitude
     "longitude" += shape.longitude
     "sequence" += shape.sequence
+    "distance" += shape.distance
 }

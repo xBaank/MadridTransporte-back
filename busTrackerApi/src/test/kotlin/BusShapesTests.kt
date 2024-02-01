@@ -31,6 +31,7 @@ class BusShapesTests {
                 it["sequence"].asInt().bind()
                 it["longitude"].asDouble().bind()
                 it["latitude"].asDouble().bind()
+                it["distance"].asDouble().bind()
             }
         }
     }

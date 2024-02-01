@@ -39,7 +39,8 @@ fun parseShape(data: Map<String, String>) = Shape(
     itineraryId = data["shape_id"].toString(),
     latitude = data["shape_pt_lat"]?.toDoubleOrNull() ?: 0.0,
     longitude = data["shape_pt_lon"]?.toDoubleOrNull() ?: 0.0,
-    sequence = data["shape_pt_sequence"]?.toIntOrNull() ?: 0
+    sequence = data["shape_pt_sequence"]?.toIntOrNull() ?: 0,
+    distance = data["shape_dist_traveled"]?.toDoubleOrNull() ?: 0.0
 )
 
 fun parseStopsOrder(data: Map<String, String>) = StopOrder(
