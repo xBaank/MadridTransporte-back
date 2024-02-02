@@ -6,6 +6,9 @@ import java.util.*
 suspend fun <A> Collection<A>.forEachAsync(f: suspend (A) -> Unit) = coroutineScope {
     map { launch { f(it) } }.joinAll()
 }
+suspend fun <A> Sequence<A>.forEachAsync(f: suspend (A) -> Unit) = coroutineScope {
+    map { launch { f(it) } }.toList().joinAll()
+}
 
 suspend fun <A, B> Collection<A>.mapAsync(f: suspend (A) -> B) = coroutineScope {
     map { async { f(it) } }.awaitAll()

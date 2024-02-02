@@ -32,7 +32,7 @@ import java.time.Instant
 import kotlin.time.Duration.Companion.milliseconds
 
 
-private val LOGGER = KtorSimpleLogger("Subscriptions")
+private val logger = KtorSimpleLogger("Subscriptions")
 
 suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, StopTimesF> = either {
     when (codMode) {
@@ -71,7 +71,7 @@ fun notifyStopTimesOnBackground() =
                 getSubscriptions().batched(100).forEachAsync(::sendNotification)
             }
             catch (e: Exception) {
-                LOGGER.error(e)
+                logger.error(e)
             }
             delay(EnvVariables.notificationDelayTimeSeconds)
         }
@@ -131,17 +131,17 @@ private suspend fun sendNotification(subscription: StopsSubscription) {
                 .build()
 
             try {
-                LOGGER.info("Sending message to $it")
+                logger.info("Sending message to $it")
                 FirebaseMessaging.getInstance().sendAsync(message).await()
             }
             catch (e: FirebaseMessagingException) {
-                LOGGER.error(e)
+                logger.error(e)
                 if (e.errorCode == INVALID_ARGUMENT || e.errorCode == NOT_FOUND || e.messagingErrorCode == UNREGISTERED) {
                     unsubscribeAllDevice(it)
                 }
             }
             catch (e: Exception) {
-                LOGGER.error(e)
+                logger.error(e)
             }
         }
     }
