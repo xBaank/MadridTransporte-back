@@ -19,18 +19,11 @@ suspend fun getIdByStopCode(stopCode: String) = either {
         ?: shift<Nothing>(BusTrackerException.NotFound("Stop with stopCode $stopCode not found"))
 }
 
-suspend fun getStopCodeById(id: String) = either {
-    stopsInfoCollection.find(Filters.eq(StopInfo::codigoEmpresa.name, id))
+suspend fun getStopNameById(codigoEmpresa: String) = either {
+    val id = stopsInfoCollection.find(Filters.eq(StopInfo::codigoEmpresa.name, codigoEmpresa))
         .firstOrNull()
         ?.idEstacion
-        ?: shift<Nothing>(BusTrackerException.NotFound("Stop with id $id not found"))
-}
-
-suspend fun getStopNameById(id: String) = either {
-    val id = stopsInfoCollection.find(Filters.eq(StopInfo::codigoEmpresa.name, id))
-        .firstOrNull()
-        ?.idEstacion
-        ?: shift<Nothing>(BusTrackerException.NotFound("Stop with id $id not found"))
+        ?: shift<Nothing>(BusTrackerException.NotFound("Stop with id $codigoEmpresa not found"))
 
     stopsCollection.find(Filters.eq(Stop::fullStopCode.name, id))
         .firstOrNull()

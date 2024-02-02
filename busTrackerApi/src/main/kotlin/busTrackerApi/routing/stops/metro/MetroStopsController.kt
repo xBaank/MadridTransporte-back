@@ -5,7 +5,6 @@ import arrow.core.getOrElse
 import busTrackerApi.config.httpClient
 import busTrackerApi.db.getCoordinatesByStopCode
 import busTrackerApi.db.getIdByStopCode
-import busTrackerApi.db.getStopCodeById
 import busTrackerApi.db.getStopNameById
 import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindJson
@@ -40,11 +39,10 @@ private suspend fun getMetroTimesResponse(id: String? = null): Response {
     return httpClient.newCall(request).await()
 }
 
-suspend fun getMetroTimes(id: String, codMode: String) = either {
-    val stationCode = getIdByStopCode(id).bind()
-    val response = getMetroTimesResponse(stationCode)
-    val stopCode = getStopCodeById(id).bind()
-    val coordinates = getCoordinatesByStopCode(stopCode).bind()
+suspend fun getMetroTimes(fullStopCode: String, codMode: String) = either {
+    val codigoEmpresa = getIdByStopCode(fullStopCode).bind()
+    val response = getMetroTimesResponse(codigoEmpresa)
+    val coordinates = getCoordinatesByStopCode(fullStopCode).bind()
 
     response.use {
         if (it.code == 404) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
@@ -67,8 +65,8 @@ suspend fun getMetroTimes(id: String, codMode: String) = either {
             json,
             codMode,
             coordinates,
-            getStopNameById(id).bind(),
-            getStopCodeFromFullStopCode(stopCode)
+            getStopNameById(codigoEmpresa).bind(),
+            getStopCodeFromFullStopCode(fullStopCode)
         ).bindJson()
     }
 }
