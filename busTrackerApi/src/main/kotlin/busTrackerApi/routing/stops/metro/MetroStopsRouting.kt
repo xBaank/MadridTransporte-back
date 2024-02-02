@@ -20,7 +20,7 @@ fun Route.tramStopsRouting() = route("/tram") {
 
 private val metroConfigF: Route.(String) -> Unit = { codMode ->
     get("/{stopCode}/times") {
-        handle { getMetroTimes(codMode) }
+        handle { getMetroTimesResponse(codMode) }
     }
     alertsConfigF(codMode)
 }

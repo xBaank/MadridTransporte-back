@@ -1,13 +1,10 @@
 package busTrackerApi.routing.stops
 
-import arrow.core.Either
 import arrow.core.continuations.either
 import busTrackerApi.db.*
 import busTrackerApi.db.models.LineDestination
 import busTrackerApi.db.models.toDeviceToken
-import busTrackerApi.exceptions.BusTrackerException
 import busTrackerApi.extensions.bindJson
-import busTrackerApi.extensions.getWrapped
 import busTrackerApi.routing.Response.*
 import busTrackerApi.utils.Pipeline
 import crtm.utils.createStopCode
@@ -31,22 +28,6 @@ suspend fun Pipeline.getAlertsByCodMode(codMode: String) = either {
     val alerts = getAlertsByCodModeResponse(codMode).bind()
     call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
     ResponseJsonCached(buildAlertsJson(alerts), HttpStatusCode.OK)
-}
-
-suspend fun Pipeline.getStopTimes(codMode: String) =
-    getStopTimesBase(codMode, call.parameters.getWrapped("stopCode"), ::getBusTimesResponse)
-
-private suspend fun Pipeline.getStopTimesBase(
-    codMode: String,
-    simpleStopCode: Either<BusTrackerException, String>,
-    f: suspend (String) -> Either<BusTrackerException, StopTimes>
-) = either {
-    val stopCode = createStopCode(codMode, simpleStopCode.bind())
-    checkStopExists(stopCode).bind()
-    val times = f(stopCode).bind()
-    if (times.arrives != null) call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 30))
-    val statusCode = if (times.arrives == null) HttpStatusCode.ServiceUnavailable else HttpStatusCode.OK
-    ResponseJson(buildStopTimesJson(times), statusCode)
 }
 
 suspend fun Pipeline.subscribeStopTime(codMode: String) =

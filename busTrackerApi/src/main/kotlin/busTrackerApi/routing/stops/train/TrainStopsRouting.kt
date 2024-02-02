@@ -8,7 +8,7 @@ import io.ktor.server.routing.*
 
 fun Route.trainStopsRouting() = route("/train") {
     get("/{stopCode}/times") {
-        handle { getTrainStopsTimes() }
+        handle { getTrainStopsTimesResponse() }
     }
 
     subConfigF(trainCodMode)

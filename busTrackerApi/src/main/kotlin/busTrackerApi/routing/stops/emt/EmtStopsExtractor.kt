@@ -17,7 +17,7 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-suspend fun parseEMTToStopTimes(json: JsonNode) = either {
+suspend fun extractEMTStopTimes(json: JsonNode) = either {
     val description =
         json["description"].asArray().getOrNull()?.firstOrNull { it["ES"].isRight() }?.get("ES")?.asString()
             ?.getOrNull()

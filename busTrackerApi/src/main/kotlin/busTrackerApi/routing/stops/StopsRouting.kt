@@ -13,12 +13,6 @@ fun Route.stopsRouting() {
     }
 }
 
-val timesConfigF: Route.(codMode: String) -> Unit = { codMode ->
-    get("/{stopCode}/times") {
-        handle { getStopTimes(codMode) }
-    }
-}
-
 val subConfigF: Route.(codMode: String) -> Unit =
     { codMode ->
         post("/times/subscribe") {

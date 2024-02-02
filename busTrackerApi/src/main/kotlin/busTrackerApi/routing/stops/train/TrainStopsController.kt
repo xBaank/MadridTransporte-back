@@ -12,11 +12,10 @@ import crtm.utils.getStopCodeFromFullStopCode
 import org.jsoup.Jsoup
 import ru.gildor.coroutines.okhttp.await
 
-suspend fun getTrainTimes(fullStopCode: String) = either {
+suspend fun getTrainStopTimes(fullStopCode: String) = either {
     val stopInfoStationCode = getIdByStopCode(fullStopCode).bind()
     val stopName = getStopNameById(stopInfoStationCode).bind()
     val coordinates = getCoordinatesByStopCode(fullStopCode).bind()
-
     var tries = 3
     do {
         val request =
@@ -41,7 +40,7 @@ suspend fun getTrainTimes(fullStopCode: String) = either {
 
             val html = it.body?.string()?.let(Jsoup::parse) ?: shift<Nothing>(InternalServerError())
 
-            val result = parseTrainToStopTimes(html, coordinates, stopName, getStopCodeFromFullStopCode(fullStopCode))
+            val result = extractTrainStopTimes(html, coordinates, stopName, getStopCodeFromFullStopCode(fullStopCode))
 
             if (result.arrives != null && result.arrives.isEmpty()) {
                 tries--

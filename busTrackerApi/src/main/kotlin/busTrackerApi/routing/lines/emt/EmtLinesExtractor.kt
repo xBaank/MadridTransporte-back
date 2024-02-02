@@ -11,7 +11,7 @@ import crtm.soap.VehicleLocation
 import crtm.utils.createLineCode
 import simpleJson.*
 
-suspend fun parseEMTToLocation(json: JsonNode, lineCode: String) = either {
+suspend fun extractEMTLineLocations(json: JsonNode, lineCode: String) = either {
     val arrives = json["data"][0]["Arrive"].asArray().bindJson()
 
     val lineLocations = arrives.filter { it["line"].asString().bindJson() == lineCode }

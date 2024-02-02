@@ -11,7 +11,7 @@ import org.jsoup.nodes.TextNode
 import java.time.*
 import java.time.format.DateTimeFormatter
 
-fun parseTrainToStopTimes(
+fun extractTrainStopTimes(
     html: Document,
     coordinates: Coordinates,
     stopName: String,

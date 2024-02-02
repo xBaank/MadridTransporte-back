@@ -74,7 +74,7 @@ suspend fun getEmtStopTimesResponse(stopCode: String): Either<BusTrackerExceptio
 
 suspend fun getEmtStopTimes(stopCode: String) = either {
     val response = getEmtStopTimesResponse(stopCode).bind()
-    response?.let { parseEMTToStopTimes(it).bind() } ?: createEMTFailedTimes(
+    response?.let { extractEMTStopTimes(it).bind() } ?: createEMTFailedTimes(
         name = getStopNameByStopCode(stopCode).bind(),
         coordinates = getCoordinatesByStopCode(stopCode).bind(),
         stopCode = getStopCodeFromFullStopCode(stopCode)

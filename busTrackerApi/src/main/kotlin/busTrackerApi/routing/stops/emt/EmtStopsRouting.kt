@@ -12,7 +12,7 @@ fun Route.emtStopsRouting() = route("/emt") {
     runBlocking { login().getOrElse { throw it } } //Try to log in and throw if it fails
 
     get("/{stopCode}/times") {
-        handle { getStopTimes() }
+        handle { getEMTStopTimesResponse() }
     }
 
     subConfigF(emtCodMode)

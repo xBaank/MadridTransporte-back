@@ -1,56 +1,14 @@
 package busTrackerApi.routing.stops
 
-import busTrackerApi.db.getItineraryByDestStop
-import busTrackerApi.db.getItineraryByFullLineCode
 import busTrackerApi.db.models.DeviceToken
 import busTrackerApi.db.models.Stop
 import busTrackerApi.db.models.StopsSubscription
-import busTrackerApi.extensions.mapAsync
-import busTrackerApi.extensions.toMiliseconds
-import busTrackerApi.routing.stops.bus.busCodMode
 import crtm.soap.IncidentsAffectationsResponse
-import crtm.soap.StopTimesResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import simpleJson.asJson
 import simpleJson.jArray
 import simpleJson.jObject
-
-suspend fun parseStopTimesResponseToStopTimes(
-    response: StopTimesResponse?,
-    coordinates: Coordinates,
-    name: String?,
-    shortStopCode: String?
-): StopTimes {
-    val arrives = response?.stopTimes?.times?.time?.mapAsync {
-        Arrive(
-            direction = it.direction,
-            lineCode = it.line.codLine,
-            line = it.line.shortDescription,
-            destination = it.destination,
-            codMode = it.line.codMode.toInt(),
-            estimatedArrive = it.time.toMiliseconds(),
-            itineraryCode = getItineraryByDestStop(
-                it.line.codLine,
-                it.direction,
-                it.destinationStop.codStop
-            )?.itineraryCode ?: getItineraryByFullLineCode(
-                it.line.codLine,
-                it.direction
-            )?.itineraryCode
-        )
-    }
-
-    return StopTimes(
-        busCodMode.toInt(),
-        name ?: response?.stopTimes?.stop?.name ?: "",
-        coordinates,
-        arrives?.sortedBy { it.line.toIntOrNull() },
-        emptyList(),
-        shortStopCode ?: response?.stopTimes?.stop?.shortCodStop ?: "",
-    )
-}
-
 
 fun buildAlertsJson(alerts: IncidentsAffectationsResponse) = jArray {
     alerts.incidentsAffectations.incidentAffectation.forEach {

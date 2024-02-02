@@ -19,14 +19,14 @@ import simpleJson.deserialized
 import simpleJson.get
 import simpleJson.jArray
 
-fun urlBuilder() = HttpUrl.Builder()
+private fun urlBuilder() = HttpUrl.Builder()
     .scheme("https")
     .host("serviciosapp.metromadrid.es")
     .addPathSegment("servicios")
     .addPathSegment("rest")
     .addPathSegment("teleindicadores")
 
-suspend fun getMetroTimesResponse(id: String? = null): Response {
+private suspend fun getMetroTimesResponse(id: String? = null): Response {
     val url = urlBuilder()
         .also { if (id != null) it.addPathSegment(id) }
         .build()
@@ -40,14 +40,9 @@ suspend fun getMetroTimesResponse(id: String? = null): Response {
     return httpClient.newCall(request).await()
 }
 
-suspend fun getMetroTimesResponse(id: String, codMode: String) = either {
+suspend fun getMetroTimes(id: String, codMode: String) = either {
     val stationCode = getIdByStopCode(id).bind()
-    val response = getTimesBase(stationCode, codMode).bind()
-    response
-}
-
-suspend fun getTimesBase(id: String, codMode: String) = either {
-    val response = getMetroTimesResponse(id)
+    val response = getMetroTimesResponse(stationCode)
     val stopCode = getStopCodeById(id).bind()
     val coordinates = getCoordinatesByStopCode(stopCode).bind()
 
@@ -68,13 +63,12 @@ suspend fun getTimesBase(id: String, codMode: String) = either {
             ?.getOrElse { jArray() }
             ?: jArray()
 
-        parseMetroToStopTimes(
+        extractMetroStopTimes(
             json,
             codMode,
             coordinates,
             getStopNameById(id).bind(),
             getStopCodeFromFullStopCode(stopCode)
-        )
-            .bindJson()
+        ).bindJson()
     }
 }

@@ -12,7 +12,7 @@ import simpleJson.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-suspend fun parseMetroToStopTimes(
+suspend fun extractMetroStopTimes(
     json: JsonNode,
     codMode: String,
     coordinates: Coordinates,
