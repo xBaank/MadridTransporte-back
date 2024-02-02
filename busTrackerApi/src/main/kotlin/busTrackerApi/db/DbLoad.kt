@@ -6,15 +6,18 @@ import busTrackerApi.config.EnvVariables.reloadDb
 import busTrackerApi.db.models.Itinerary
 import busTrackerApi.db.models.Shape
 import busTrackerApi.db.models.StopOrder
-import busTrackerApi.extensions.*
+import busTrackerApi.extensions.get
+import busTrackerApi.extensions.mapAsync
+import busTrackerApi.extensions.removeFirstLine
+import busTrackerApi.extensions.toEnumeration
 import busTrackerApi.routing.stops.metro.metroCodMode
 import com.github.doyaaaaaken.kotlincsv.dsl.context.ExcessFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.context.InsufficientFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.mongodb.client.model.Indexes
 import io.ktor.util.logging.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import ru.gildor.coroutines.okhttp.await
 import java.io.File
@@ -37,7 +40,7 @@ private val infoReader = csvReader {
 }
 
 
-private const val sequenceChunkSize = 100_000
+private const val sequenceChunkSize = 10_000
 
 suspend fun loadDataIntoDb() = coroutineScope {
     if (!reloadDb || alreadyLoadedDb) return@coroutineScope
@@ -49,8 +52,9 @@ suspend fun loadDataIntoDb() = coroutineScope {
     val allItinerariesStream = getFileAsStreamFromGtfs("trips.txt")
     val allStopsInfoStream = getFileAsStreamFromInfo()
 
-    async(Dispatchers.IO) {
-        logger.info("Loading stops")
+    awaitAll(
+        async {
+            logger.info("Loading stops")
             reader.openAsync(allStopsStream) {
                 val stops = readAllWithHeaderAsSequence()
                     .filter { it["stop_id"]?.contains("par") == true }
@@ -66,80 +70,75 @@ suspend fun loadDataIntoDb() = coroutineScope {
 
                 stopsCollection.drop()
 
-                stops.chunked(sequenceChunkSize).forEachAsync {
+                stops.chunked(sequenceChunkSize).forEach {
                     stopsCollection.insertMany(it)
                 }
             }
-        logger.info("Loaded stops")
-    }.await()
-    
-    async(Dispatchers.IO) {
-        logger.info("Loading routes")
+            logger.info("Loaded stops")
+        },
+        async {
+            logger.info("Loading routes")
             reader.openAsync(allRoutesStream) {
                 val routes = readAllWithHeaderAsSequence()
                     .distinctBy { it["route_id"] }
                     .chunked(sequenceChunkSize)
                 routesCollection.drop()
-                routes.forEachAsync {
+                routes.forEach {
                     val parsed = it.mapAsync(::parseRoute).toList()
                     routesCollection.insertMany(parsed)
                 }
             }
-        logger.info("Loaded routes")
-    }.await()
-
-    async(Dispatchers.IO) {
-        logger.info("Loading itineraries")
+            logger.info("Loaded routes")
+        },
+        async {
+            logger.info("Loading itineraries")
             reader.openAsync(allItinerariesStream) {
                 val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 itinerariesCollection.drop()
-                itineraries.forEachAsync {
+                itineraries.forEach {
                     val parsed = it.mapAsync(::parseItinerary).toList()
                     itinerariesCollection.insertMany(parsed)
                 }
             }
-        logger.info("Loaded itineraries")
-    }.await()
-
-    async(Dispatchers.IO) {
-        logger.info("Loading shapes")
+            logger.info("Loaded itineraries")
+        },
+        async {
+            logger.info("Loading shapes")
             reader.openAsync(allShapesStream) {
                 val shapes = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 shapesCollection.drop()
-                shapes.forEachAsync {
+                shapes.forEach {
                     val parsed = it.mapAsync(::parseShape).toList()
                     shapesCollection.insertMany(parsed)
                 }
             }
-        logger.info("Loaded shapes")
-    }.await()
-
-    async(Dispatchers.IO) {
-        logger.info("Loading stops info")
+            logger.info("Loaded shapes")
+        },
+        async {
+            logger.info("Loading stops info")
             infoReader.openAsync(allStopsInfoStream) {
                 val stops = readAllWithHeaderAsSequence().distinct().chunked(sequenceChunkSize)
                 stopsInfoCollection.drop()
-                stops.forEachAsync {
+                stops.forEach {
                     val parsed = it.mapAsync(::parseStopInfo).toList()
                     stopsInfoCollection.insertMany(parsed)
                 }
             }
-        logger.info("Loaded stops info")
-    }.await()
-
-    async(Dispatchers.IO) {
-        logger.info("Loading stops order")
+            logger.info("Loaded stops info")
+        },
+        async {
+            logger.info("Loading stops order")
             reader.openAsync(allStopsTimesStream) {
                 val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 stopsOrderCollection.drop()
-                stops.forEachAsync {
+                stops.forEach {
                     val parsed = it.mapAsync(::parseStopsOrder).toList()
                     stopsOrderCollection.insertMany(parsed)
                 }
             }
-        logger.info("Loaded stops order")
-    }.await()
-
+            logger.info("Loaded stops order")
+        }
+    )
     shapesCollection.createIndex(Indexes.ascending(Shape::itineraryId.name))
     itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name, Itinerary::itineraryCode.name))
     stopsOrderCollection.createIndex(Indexes.ascending(StopOrder::tripId.name))
