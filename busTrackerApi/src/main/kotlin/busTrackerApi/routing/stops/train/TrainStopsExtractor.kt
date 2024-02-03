@@ -17,9 +17,9 @@ fun extractTrainStopTimes(
     stopName: String,
     stopCode: String
 ): StopTimes {
-    val table = html.selectXpath("/html/body/div/div[1]/table/tbody").first()!!
+    val table = html.selectXpath("/html/body/div/div[1]/table/tbody").firstOrNull()
 
-    val arrives = table.children().drop(1).mapNotNull {
+    val arrives = table?.children()?.drop(1)?.mapNotNull {
         if (it.children().size < 5) return@mapNotNull null
         val salida = (it.child(0).firstElementChild()?.firstChild() as TextNode?)?.wholeText ?: ""
         val destino = (it.child(1).firstElementChild()?.firstChild() as TextNode?)?.wholeText ?: ""
