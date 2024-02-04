@@ -11,7 +11,7 @@ import simpleJson.*
 import utils.getShapes
 import utils.testApplicationBusTracker
 
-enum class ShapeCodes(val code: String) {
+enum class ItinerariesCodes(val code: String) {
     Emt("6__144____1__IT_1"),
     Interurban("8__450____1_-_IT_1"),
     Urban("9__2__065__2_-_IT_1"),
@@ -19,8 +19,8 @@ enum class ShapeCodes(val code: String) {
 
 class BusShapesTests {
     @ParameterizedTest
-    @EnumSource(ShapeCodes::class)
-    fun `should get bus shapes`(code: ShapeCodes) = testApplicationBusTracker {
+    @EnumSource(ItinerariesCodes::class)
+    fun `should get bus shapes`(code: ItinerariesCodes) = testApplicationBusTracker {
         val response = getShapes(code.code)
         val json = response.bodyAsText().deserialized().asArray()
 

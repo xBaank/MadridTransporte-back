@@ -4,8 +4,8 @@ import api.db.getItinerariesByItineraryCode
 import api.db.getShapesByItineraryCode
 import api.exceptions.BusTrackerException.NotFound
 import api.extensions.getWrapped
-import api.routing.Response.ResponseFlowJson
-import api.routing.Response.ResponseJson
+import api.routing.Response.*
+import api.routing.lines.bus.getKmlText
 import api.utils.Pipeline
 import arrow.core.continuations.either
 import io.ktor.http.*
@@ -29,6 +29,18 @@ suspend fun Pipeline.getItinerariesByItineraryCode() = either {
     val json = itinerariesOrdered.let(::buildItineraryJson).asJson()
     call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
     ResponseJson(json, HttpStatusCode.OK)
+}
+
+suspend fun Pipeline.getKml() = either {
+    val itineraryCode = call.parameters.getWrapped("itineraryCode").bind()
+
+    val itinerary =
+        getItinerariesByItineraryCode(itineraryCode).firstOrNull() ?: shift<Nothing>(NotFound("Itinerary not found"))
+
+    val kml = getKmlText(itinerary).bind()
+
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 24 * 60))
+    ResponseString(kml, contentType = ContentType.parse("text/xml"), HttpStatusCode.OK)
 }
 
 suspend fun Pipeline.getShapes() = either {

@@ -11,4 +11,6 @@ sealed interface Response {
     data class ResponseJson(val json: JsonNode, override val status: HttpStatusCode) : Response
     data class ResponseJsonCached(val json: JsonNode, override val status: HttpStatusCode) : Response
     data class ResponseRaw(override val status: HttpStatusCode) : Response
+    data class ResponseString(val data: String, val contentType: ContentType, override val status: HttpStatusCode) :
+        Response
 }

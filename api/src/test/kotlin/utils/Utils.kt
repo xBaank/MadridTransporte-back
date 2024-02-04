@@ -20,6 +20,9 @@ suspend fun ApplicationTestBuilder.getItineraries(line: String, direction: Int) 
 suspend fun ApplicationTestBuilder.getShapes(itineraryId: String) =
     client.get("/lines/bus/shapes/$itineraryId")
 
+suspend fun ApplicationTestBuilder.getKml(itineraryId: String) =
+    client.get("/lines/bus/kml/$itineraryId")
+
 fun testApplicationBusTracker(
     startUpF: Application.() -> Unit = {
         MongoContainer.start()
