@@ -7,5 +7,5 @@ FROM amazoncorretto:21.0.1
 COPY . /build
 RUN mkdir /app
 
-COPY --from=build /home/gradle/src/busTrackerApi/build/libs/*.jar /app/busTrackerApi.jar
-ENTRYPOINT ["java", "-jar", "/app/busTrackerApi.jar"]
+COPY --from=build /home/gradle/src/api/build/libs/*.jar /app/api.jar
+ENTRYPOINT ["java", "-jar", "/app/api.jar"]
