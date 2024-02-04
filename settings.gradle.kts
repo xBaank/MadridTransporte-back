@@ -1,5 +1,5 @@
-rootProject.name = "bus-tracker-back"
-include("busTrackerApi")
+rootProject.name = "madrid-transporte-back"
+include("api")
 include("crtm")
 
 pluginManagement {
