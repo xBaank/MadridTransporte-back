@@ -17,7 +17,7 @@ import utils.getItineraries
 import utils.getLineLocation
 import utils.testApplicationBusTracker
 
-enum class LocationsCodes(
+enum class LocationsUrls(
     val url: String,
     val fullLineCode: String,
     val direction: Int,
@@ -29,7 +29,7 @@ enum class LocationsCodes(
     Urban("/lines/bus/locations/9__1__074__1_-_IT_1", "9__1__074_", 1, "1", 9),
 }
 
-enum class ItinerariesCodes(val url: String, val code: String, val simpleLineCode: String, val direction: Int) {
+enum class ItinerariesUrls(val url: String, val code: String, val simpleLineCode: String, val direction: Int) {
     Emt("/lines/emt/itineraries/6__144____2__IT_1", "6__144___", "144", 2),
     Interurban("/lines/bus/itineraries/8__450____1_-_IT_1", "8__450___", "450", 1),
     Urban("/lines/bus/itineraries/9__1__074__1_-_IT_1", "9__1__074_", "1", 1),
@@ -37,8 +37,8 @@ enum class ItinerariesCodes(val url: String, val code: String, val simpleLineCod
 
 class BusLinesTests {
     @ParameterizedTest
-    @EnumSource(LocationsCodes::class)
-    fun `should get line location`(code: LocationsCodes) = testApplicationBusTracker {
+    @EnumSource(LocationsUrls::class)
+    fun `should get line location`(code: LocationsUrls) = testApplicationBusTracker {
         val response = client.get(code.url)
         val json = response.bodyAsText().deserialized().asObject()
 
@@ -65,8 +65,8 @@ class BusLinesTests {
     }
 
     @ParameterizedTest
-    @EnumSource(ItinerariesCodes::class)
-    fun `should get itineraries from line`(code: ItinerariesCodes) = testApplicationBusTracker {
+    @EnumSource(ItinerariesUrls::class)
+    fun `should get itineraries from line`(code: ItinerariesUrls) = testApplicationBusTracker {
         val response = client.get(code.url)
         val json = response.bodyAsText().deserialized()
 
