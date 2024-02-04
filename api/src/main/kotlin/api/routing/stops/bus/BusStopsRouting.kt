@@ -6,6 +6,7 @@ import api.routing.stops.subConfigF
 import io.ktor.server.routing.*
 
 const val busCodMode = "8"
+const val urbanCodMode = "9"
 fun Route.busStopsRouting() = route("/bus") {
     get("/{stopCode}/times") {
         handle { getBusStopTimesResponse() }

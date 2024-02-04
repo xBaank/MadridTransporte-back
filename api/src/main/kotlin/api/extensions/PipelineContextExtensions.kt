@@ -88,7 +88,7 @@ suspend fun Pipeline.handleResponse(response: Response): Unit = when (response) 
     )
 
     is Response.ResponseRaw -> call.respond(response.status)
-    
+
     is Response.ResponseFlowJson -> {
         call.respondBytesWriter(status = response.status, contentType = ContentType.Application.Json) {
             writeStringUtf8("[")
@@ -103,6 +103,12 @@ suspend fun Pipeline.handleResponse(response: Response): Unit = when (response) 
             writeStringUtf8("]")
         }
     }
+
+    is Response.ResponseString -> call.respondText(
+        response.data,
+        contentType = response.contentType,
+        status = response.status
+    )
 }
 
 suspend inline fun Pipeline.handle(f: () -> Either<BusTrackerException, Response>) =
