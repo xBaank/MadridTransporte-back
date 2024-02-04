@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.1.0
+
+- Added `/lines/bus/kml/{itineraryCode}`
+- Added `/lines/emt/kml/{itineraryCode}`
+
 ## 5.0.0
 
 - Removed `/lines/bus/{lineCode}/locations/{direction}`
