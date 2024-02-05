@@ -70,7 +70,6 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
                 "anden" += arrive.value.first().anden
                 "destination" += arrive.value.first().destination
                 "estimatedArrives" += arrive.value.map { it.estimatedArrive.asJson() }.asJson()
-                "itineraryCode" += arrive.value.first().itineraryCode
             }
         }
     }

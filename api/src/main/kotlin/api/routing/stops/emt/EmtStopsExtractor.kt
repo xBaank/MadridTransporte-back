@@ -1,6 +1,5 @@
 package api.routing.stops.emt
 
-import api.db.getItineraryByFullLineCode
 import api.db.getRoute
 import api.exceptions.BusTrackerException
 import api.extensions.bindJson
@@ -41,8 +40,7 @@ suspend fun extractEMTStopTimes(json: JsonNode) = either {
             destination = it["destination"].asString().bindJson(),
             direction = direction,
             codMode = emtCodMode.toInt(),
-            estimatedArrive = estimatedArrive.toInstant(ZoneOffset.UTC).toEpochMilli(),
-            itineraryCode = getItineraryByFullLineCode(lineCode, direction)?.itineraryCode
+            estimatedArrive = estimatedArrive.toInstant(ZoneOffset.UTC).toEpochMilli()
         )
     }
     val incidentsMapped = incidents?.map {

@@ -12,10 +12,10 @@ suspend fun ApplicationTestBuilder.getAbono(id: String) =
     client.get("/abono/$id")
 
 suspend fun ApplicationTestBuilder.getLineLocation(line: String, direction: Int) =
-    client.get("/lines/bus/$line/locations/$direction")
+    client.get("/lines/bus/$line/locations/$direction?stopCode=01231")
 
 suspend fun ApplicationTestBuilder.getItineraries(line: String, direction: Int) =
-    client.get("/lines/bus/$line/itineraries/$direction")
+    client.get("/lines/bus/$line/itineraries/$direction?stopCode=01231")
 
 suspend fun ApplicationTestBuilder.getShapes(itineraryId: String) =
     client.get("/lines/bus/shapes/$itineraryId")

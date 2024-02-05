@@ -1,7 +1,5 @@
 package api.routing.stops.bus
 
-import api.db.getItineraryByDestStop
-import api.db.getItineraryByFullLineCode
 import api.extensions.mapAsync
 import api.extensions.toMiliseconds
 import api.routing.stops.Arrive
@@ -22,15 +20,7 @@ suspend fun extractBusStopTimes(
             line = it.line.shortDescription,
             destination = it.destination,
             codMode = it.line.codMode.toInt(),
-            estimatedArrive = it.time.toMiliseconds(),
-            itineraryCode = getItineraryByDestStop(
-                it.line.codLine,
-                it.direction,
-                it.destinationStop.codStop
-            )?.itineraryCode ?: getItineraryByFullLineCode(
-                it.line.codLine,
-                it.direction
-            )?.itineraryCode
+            estimatedArrive = it.time.toMiliseconds()
         )
     }
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## 6.0.0
+
+- Readded `/lines/bus/{lineCode}/locations/{direction}?stopCode={stopCode}`
+- Readded `/lines/emt/{lineCode}/locations/{direction}?stopCode={stopCode}`
+- Readded `/lines/bus/{lineCode}/itineraries/{direction}?stopCode={stopCode}`
+- Readded `/lines/emt/{lineCode}/itineraries/{direction}?stopCode={stopCode}`
+- Removed `/lines/bus/kml/{itineraryCode}`
+- Removed `/lines/emt/kml/{itineraryCode}`
+
+This is because times does not return codItinerary, and we had to guess the codItinerary, this caused too many false
+matches.
+Now we just get the itinerary that has the same direction and stopCode.
+
 ## 5.1.0
 
 - Added `/lines/bus/kml/{itineraryCode}`

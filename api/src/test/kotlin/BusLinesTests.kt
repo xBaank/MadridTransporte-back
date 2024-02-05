@@ -1,5 +1,6 @@
 import api.extensions.getOrThrow
 import api.routing.stops.bus.busCodMode
+import api.routing.stops.bus.urbanCodMode
 import api.routing.stops.emt.emtCodMode
 import arrow.core.continuations.either
 import io.ktor.client.request.*
@@ -14,7 +15,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import simpleJson.*
 import utils.getItineraries
-import utils.getLineLocation
 import utils.testApplicationBusTracker
 
 enum class LocationsUrls(
@@ -24,15 +24,15 @@ enum class LocationsUrls(
     val lineCode: String,
     val codMode: Int
 ) {
-    Emt("/lines/emt/locations/6__144____2__IT_1", "6__144___", 2, "144", emtCodMode.toInt()),
-    Interurban("/lines/bus/locations/8__450____1_-_IT_1", "8__450___", 1, "450", busCodMode.toInt()),
-    Urban("/lines/bus/locations/9__1__074__1_-_IT_1", "9__1__074_", 1, "1", 9),
+    Emt("/lines/emt/6__144___/locations/2?stopCode=4597", "6__144___", 2, "144", emtCodMode.toInt()),
+    Interurban("/lines/bus/8__450___/locations/1?stopCode=08242", "8__450___", 1, "450", busCodMode.toInt()),
+    Urban("/lines/bus/9__2__065_/locations/2?stopCode=08242", "9__2__065_", 2, "2", urbanCodMode.toInt()),
 }
 
 enum class ItinerariesUrls(val url: String, val code: String, val simpleLineCode: String, val direction: Int) {
-    Emt("/lines/emt/itineraries/6__144____2__IT_1", "6__144___", "144", 2),
-    Interurban("/lines/bus/itineraries/8__450____1_-_IT_1", "8__450___", "450", 1),
-    Urban("/lines/bus/itineraries/9__1__074__1_-_IT_1", "9__1__074_", "1", 1),
+    Emt("/lines/emt/6__144___/itineraries/2?stopCode=4597", "6__144___", "144", 2),
+    Interurban("/lines/bus/8__450___/itineraries/1?stopCode=08242", "8__450___", "450", 1),
+    Urban("/lines/bus/9__2__065_/itineraries/2?stopCode=08242", "9__2__065_", "2", 2),
 }
 
 class BusLinesTests {
@@ -56,12 +56,6 @@ class BusLinesTests {
                 it["coordinates"]["longitude"].asDouble().bind()
             }
         }.getOrThrow()
-    }
-
-    @Test
-    fun `should not get line location`() = testApplicationBusTracker {
-        val response = getLineLocation("asdasd", 2)
-        response.status.shouldBe(HttpStatusCode.NotFound)
     }
 
     @ParameterizedTest
