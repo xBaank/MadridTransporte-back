@@ -2,7 +2,6 @@ import api.notifications.sendAbonoNotifications
 import api.routing.abono.Abono
 import api.routing.abono.Contract
 import api.routing.abono.getAbonoResponse
-import api.startUp
 import arrow.core.right
 import com.google.api.core.ApiFuture
 import com.google.firebase.ErrorCode
@@ -10,13 +9,12 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingException
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.mockk.*
 import org.amshove.kluent.shouldBe
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import simpleJson.jObject
 import simpleJson.serialized
-import utils.MongoContainer
 import utils.testApplicationBusTracker
 import kotlin.time.Duration.Companion.minutes
 
@@ -45,15 +43,9 @@ class AbonoNotificationsTests {
         )
     )
 
-    val startUpF: Application.() -> Unit = {
-        System.setProperty("RELOAD_DB", "false")
-        MongoContainer.start()
-        startUp()
-    }
-
     @Test
     fun `should subscribe to abono, get subscription and unsubscribe`() =
-        testApplicationBusTracker(startUpF) {
+        testApplicationBusTracker {
             val firebaseMessaging = mockk<FirebaseMessaging>()
             val future = mockk<ApiFuture<String>>()
             mockkStatic(FirebaseMessaging::class)
@@ -97,7 +89,7 @@ class AbonoNotificationsTests {
 
     @Test
     fun `should subscribe to abono and unsubscribe on error`() =
-        testApplicationBusTracker(startUpF) {
+        testApplicationBusTracker {
             val firebaseMessaging = mockk<FirebaseMessaging>()
             val firebaseMessagingException = mockk<FirebaseMessagingException>()
             mockkStatic(FirebaseMessaging::class)
@@ -139,8 +131,7 @@ class AbonoNotificationsTests {
         }
 
     @Test
-    fun `should not subscribe to abono`() = testApplicationBusTracker(startUpF) {
-        unmockkStatic(::getAbonoResponse)
+    fun `should not subscribe to abono`() = testApplicationBusTracker {
         val body = jObject {
             "deviceToken" += "token"
             "ttpNumber" += "asd"
@@ -153,4 +144,8 @@ class AbonoNotificationsTests {
 
         subscribedResponse.status.shouldBe(HttpStatusCode.NotFound)
     }
+
+    @AfterEach
+    fun cleanup(): Unit = unmockkStatic(::getAbonoResponse)
+
 }
