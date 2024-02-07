@@ -1,8 +1,8 @@
 import api.notifications.getFunctionByCodMode
+import api.notifications.sendStopTimesNotifications
 import api.routing.stops.Arrive
 import api.routing.stops.Coordinates
 import api.routing.stops.StopTimes
-import api.startUp
 import api.utils.StopTimesF
 import arrow.core.right
 import com.google.api.core.ApiFuture
@@ -11,18 +11,14 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingException
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.mockk.*
-import kotlinx.coroutines.delay
 import org.amshove.kluent.shouldBe
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import simpleJson.jObject
 import simpleJson.serialized
-import utils.MongoContainer
 import utils.testApplicationBusTracker
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 enum class Subscriptions(val url: String, val stopCode: String) {
     BUS("/stops/bus/times", busStopCode),
@@ -31,7 +27,6 @@ enum class Subscriptions(val url: String, val stopCode: String) {
     EMT("/stops/emt/times", emtStopCode),
     TRAM("/stops/tram/times", tramStopCode)
 }
-
 
 class NotificationsTest {
     private val testStopTimes = StopTimes(
@@ -42,29 +37,22 @@ class NotificationsTest {
         coordinates = Coordinates(0.0, 0.0),
         arrives = listOf(
             Arrive(
-                "",
-                "",
-                0,
-                8,
-                0,
-                "",
-                0
+                line = "",
+                lineCode = "",
+                direction = 0,
+                codMode = 8,
+                anden = 0,
+                destination = "",
+                estimatedArrive = 0
             )
         ),
         incidents = listOf()
     )
 
-    private val delayTime = 5.seconds
-    private val startupF: Application.() -> Unit = {
-        MongoContainer.start()
-        System.setProperty("NOTIFICATION_DELAY_TIME_SECONDS", delayTime.inWholeSeconds.toString())
-        startUp()
-    }
-
     @ParameterizedTest
     @EnumSource(Subscriptions::class)
     fun `should subscribe to line times, get subscription and unsubscribe`(subscription: Subscriptions) =
-        testApplicationBusTracker(startupF) {
+        testApplicationBusTracker {
             val functionMocked: StopTimesF = { testStopTimes.right() }
             val firebaseMessaging = mockk<FirebaseMessaging>()
             val future = mockk<ApiFuture<String>>()
@@ -99,6 +87,8 @@ class NotificationsTest {
                 }.serialized())
             }
 
+            sendStopTimesNotifications()
+
             verify(timeout = 1.minutes.inWholeMilliseconds, atLeast = 1) { firebaseMessaging.sendAsync(any()) }
 
             val unsubscribeResponse = client.post(subscription.url + "/unsubscribe") {
@@ -113,7 +103,7 @@ class NotificationsTest {
     @ParameterizedTest
     @EnumSource(Subscriptions::class)
     fun `should subscribe to line times and unsubscribe on error`(subscription: Subscriptions) =
-        testApplicationBusTracker(startupF) {
+        testApplicationBusTracker {
             val functionMocked: StopTimesF = { testStopTimes.right() }
             val firebaseMessaging = mockk<FirebaseMessaging>()
             val firebaseMessagingException = mockk<FirebaseMessagingException>()
@@ -144,8 +134,9 @@ class NotificationsTest {
                 setBody(body)
             }
 
+            sendStopTimesNotifications()
+
             verify(timeout = 1.minutes.inWholeMilliseconds, atLeast = 1) { firebaseMessaging.sendAsync(any()) }
-            delay(delayTime.inWholeMilliseconds) //TODO We need this to wait for the subscription to be removed after sending the message failed
 
             val subscriptionsResponse = client.post(subscription.url + "/subscription") {
                 setBody(jObject {
@@ -161,26 +152,23 @@ class NotificationsTest {
 
     @ParameterizedTest
     @EnumSource(Subscriptions::class)
-    fun `should not subscribe to line times`(subscription: Subscriptions) =
-        testApplicationBusTracker(startupF) {
-
-            val body = jObject {
-                "deviceToken" += "token"
-                "subscription" += jObject {
-                    "stopCode" += "88888"
-                    "lineDestination" += jObject {
-                        "line" += "8"
-                        "destination" += "asd"
-                        "codMode" += 8
-                    }
+    fun `should not subscribe to line times`(subscription: Subscriptions) = testApplicationBusTracker {
+        val body = jObject {
+            "deviceToken" += "token"
+            "subscription" += jObject {
+                "stopCode" += "88888"
+                "lineDestination" += jObject {
+                    "line" += "8"
+                    "destination" += "asd"
+                    "codMode" += 8
                 }
-            }.serialized()
-
-            val subscribedResponse = client.post(subscription.url + "/subscribe") {
-                setBody(body)
             }
+        }.serialized()
 
-            subscribedResponse.status.shouldBe(HttpStatusCode.NotFound)
-
+        val subscribedResponse = client.post(subscription.url + "/subscribe") {
+            setBody(body)
         }
+
+        subscribedResponse.status.shouldBe(HttpStatusCode.NotFound)
+    }
 }

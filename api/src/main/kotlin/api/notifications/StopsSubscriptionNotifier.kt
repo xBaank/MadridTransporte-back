@@ -1,6 +1,6 @@
 package api.notifications
 
-import api.config.EnvVariables
+import api.config.EnvVariables.notificationDelayTimeSeconds
 import api.db.getSubscriptions
 import api.db.models.StopsSubscription
 import api.db.unsubscribeAllDevice
@@ -25,8 +25,12 @@ import com.google.firebase.ErrorCode.INVALID_ARGUMENT
 import com.google.firebase.ErrorCode.NOT_FOUND
 import com.google.firebase.messaging.*
 import com.google.firebase.messaging.MessagingErrorCode.UNREGISTERED
+import dev.inmo.krontab.doInfinityTz
 import io.ktor.util.logging.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Instant
 import kotlin.time.Duration.Companion.milliseconds
@@ -64,18 +68,17 @@ suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, S
 
 
 @OptIn(DelicateCoroutinesApi::class)
-fun notifyStopTimesOnBackground() =
-    GlobalScope.launch(Dispatchers.IO) {
-        while (isActive) {
-            try {
-                getSubscriptions().batched(100).forEachAsync(::sendNotification)
-            }
-            catch (e: Exception) {
-                logger.error(e)
-            }
-            delay(EnvVariables.notificationDelayTimeSeconds)
+fun notifyStopTimesOnBackground() = GlobalScope.launch(Dispatchers.IO) {
+    doInfinityTz("*/${notificationDelayTimeSeconds.inWholeSeconds} * * * * 0o") {
+        try {
+            sendStopTimesNotifications()
+        } catch (e: Exception) {
+            logger.error(e)
         }
     }
+}
+
+suspend fun sendStopTimesNotifications() = getSubscriptions().batched(100).forEachAsync(::sendNotification)
 
 private suspend fun sendNotification(subscription: StopsSubscription) {
     val function = getFunctionByCodMode(subscription.codMode).getOrNull() ?: return
@@ -131,16 +134,14 @@ private suspend fun sendNotification(subscription: StopsSubscription) {
                 .build()
 
             try {
-                logger.info("Sending message to $it")
+                logger.info("Sending stopTimes notification message to $it")
                 FirebaseMessaging.getInstance().sendAsync(message).await()
-            }
-            catch (e: FirebaseMessagingException) {
+            } catch (e: FirebaseMessagingException) {
                 logger.error(e)
                 if (e.errorCode == INVALID_ARGUMENT || e.errorCode == NOT_FOUND || e.messagingErrorCode == UNREGISTERED) {
                     unsubscribeAllDevice(it)
                 }
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 logger.error(e)
             }
         }

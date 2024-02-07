@@ -22,8 +22,7 @@ suspend fun getAbonoResponse(TTPNumber: String) = either {
 
     if (!response.isSuccessful) shift<Nothing>(InternalServerError("Can't get abono data"))
 
-    val data: String =
-        response.body?.string() ?: shift<Nothing>(InternalServerError("Can't get abono data"))
+    val data: String = response.use { it.body?.string() ?: shift<Nothing>(InternalServerError("Can't get abono data")) }
 
     val result = xml.decodeFromString<SS_prepagoConsultaSaldo>(data)
     extractAbono(result).bind()

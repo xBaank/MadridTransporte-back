@@ -21,7 +21,7 @@ application {
 
 dependencies {
     implementation("com.sun.xml.ws:jaxws-tools:4.0.1")
-    implementation("ch.qos.logback:logback-classic:1.4.7")
+    implementation("ch.qos.logback:logback-classic:1.4.12")
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("io.ktor:ktor-server-websockets:$ktor_version")
@@ -45,7 +45,7 @@ dependencies {
     testImplementation("org.testcontainers:mongodb:1.19.1")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     testImplementation("io.mockk:mockk:1.13.7")
-    implementation("io.github.pdvrieze.xmlutil:core:0.86.0")
+    implementation("io.github.pdvrieze.xmlutil:core:0.86.2")
     implementation("io.github.pdvrieze.xmlutil:serialization:0.86.0")
     implementation("io.ktor:ktor-server-caching-headers:$ktor_version")// https://mvnrepository.com/artifact/com.google.firebase/firebase-messaging
     implementation("com.google.firebase:firebase-admin:9.2.0")
@@ -53,6 +53,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-guava
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.7.3")
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.11.0")
+    implementation("dev.inmo:krontab:2.2.7")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.17.2")
     implementation(project(":crtm"))
@@ -63,7 +64,7 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 }
 
 tasks.withType<KotlinCompile> {

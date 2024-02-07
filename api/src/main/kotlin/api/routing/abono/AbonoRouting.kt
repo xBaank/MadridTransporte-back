@@ -4,16 +4,19 @@ import api.extensions.handle
 import io.ktor.server.routing.*
 
 fun Route.abonoRouting() {
-    get("{id}") {
+    get("/{id}") {
         handle { getAbono() }
     }
-    post("/abono/subscribe") {
+    post("/subscribe") {
         handle { subscribeAbono() }
     }
-    post("/abono/unsubscribe") {
+    post("/unsubscribe") {
         handle { unsubscribeAbono() }
     }
-    post("/abono/subscription") {
-        handle { subscriptionAbono() }
+    post("/subscription") {
+        handle { abonoSubscription() }
+    }
+    post("/subscriptions") {
+        handle { abonoSubscriptions() }
     }
 }

@@ -2,5 +2,6 @@ package api.db.models
 
 data class AbonoSubscription(
     val ttp: String,
-    val token: DeviceToken
+    val token: DeviceToken,
+    val abonoName: String
 )
