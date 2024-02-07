@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.firstOrNull
 
 fun getAbonoSubscriptions() = abonosSubscriptionsCollection.find()
 
-suspend fun getAbonoSubscription(abonoSubscription: AbonoSubscription) = abonosSubscriptionsCollection.find(
+suspend fun getAbonoSubscription(token: DeviceToken, ttp: String) = abonosSubscriptionsCollection.find(
     Filters.and(
-        Filters.eq(AbonoSubscription::token.name, abonoSubscription.token),
-        Filters.eq(AbonoSubscription::ttp.name, abonoSubscription.ttp),
+        Filters.eq(AbonoSubscription::token.name, token),
+        Filters.eq(AbonoSubscription::ttp.name, ttp),
     )
 ).firstOrNull()
 
@@ -24,14 +24,14 @@ fun getAbonoSubscriptions(deviceToken: DeviceToken) = abonosSubscriptionsCollect
 )
 
 suspend fun addAbonoSubscription(abonoSubscription: AbonoSubscription) = either {
-    if (getAbonoSubscription(abonoSubscription) != null) shift<Nothing>(Conflict())
+    if (getAbonoSubscription(abonoSubscription.token, abonoSubscription.ttp) != null) shift<Nothing>(Conflict())
     if (getAbonoSubscriptions(abonoSubscription.token).count() > 5) shift<Nothing>(TooManyRequests("Limit of subscriptions reached"))
     abonosSubscriptionsCollection.insertOne(abonoSubscription)
 }
 
-suspend fun removeAbonoSubscription(abonoSubscription: AbonoSubscription) = abonosSubscriptionsCollection.deleteOne(
+suspend fun removeAbonoSubscription(token: DeviceToken, ttp: String) = abonosSubscriptionsCollection.deleteOne(
     Filters.and(
-        Filters.eq(AbonoSubscription::token.name, abonoSubscription.token),
-        Filters.eq(AbonoSubscription::ttp.name, abonoSubscription.ttp),
+        Filters.eq(AbonoSubscription::token.name, token),
+        Filters.eq(AbonoSubscription::ttp.name, ttp),
     )
 )

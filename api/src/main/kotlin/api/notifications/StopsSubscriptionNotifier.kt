@@ -25,6 +25,7 @@ import com.google.firebase.ErrorCode.INVALID_ARGUMENT
 import com.google.firebase.ErrorCode.NOT_FOUND
 import com.google.firebase.messaging.*
 import com.google.firebase.messaging.MessagingErrorCode.UNREGISTERED
+import dev.inmo.krontab.builder.buildSchedule
 import dev.inmo.krontab.doInfinityTz
 import io.ktor.util.logging.*
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -69,7 +70,13 @@ suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, S
 
 @OptIn(DelicateCoroutinesApi::class)
 fun notifyStopTimesOnBackground() = GlobalScope.launch(Dispatchers.IO) {
-    doInfinityTz("*/${notificationDelayTimeSeconds.inWholeSeconds} * * * * 0o") {
+    val scheduler = buildSchedule {
+        seconds {
+            every(notificationDelayTimeSeconds.inWholeSeconds.toInt())
+        }
+    }
+
+    scheduler.doInfinityTz {
         try {
             sendStopTimesNotifications()
         } catch (e: Exception) {

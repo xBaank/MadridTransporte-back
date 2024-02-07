@@ -7,20 +7,29 @@ import api.extensions.await
 import api.extensions.batched
 import api.extensions.forEachAsync
 import api.routing.abono.getAbonoResponse
+import api.utils.timeZoneMadrid
 import com.google.firebase.ErrorCode
 import com.google.firebase.messaging.*
+import dev.inmo.krontab.builder.buildSchedule
 import dev.inmo.krontab.doInfinityTz
 import io.ktor.util.logging.*
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 private val logger = KtorSimpleLogger("AbonoSubscriptions")
 
 @OptIn(DelicateCoroutinesApi::class)
 fun notifyAbonosOnBackground() = GlobalScope.launch(Dispatchers.IO) {
-    doInfinityTz("0 1 * * * 0o") {
+    val scheduler = buildSchedule(timeZoneMadrid.rawOffset.milliseconds.inWholeMinutes.toInt()) {
+        hours {
+            at(6)
+        }
+    }
+
+    scheduler.doInfinityTz {
         try {
             sendAbonoNotifications()
         } catch (e: Exception) {
@@ -75,7 +84,7 @@ private suspend fun sendNotification(abonoSubcription: AbonoSubscription) {
         } catch (e: FirebaseMessagingException) {
             logger.error(e)
             if (e.errorCode == ErrorCode.INVALID_ARGUMENT || e.errorCode == ErrorCode.NOT_FOUND || e.messagingErrorCode == MessagingErrorCode.UNREGISTERED) {
-                removeAbonoSubscription(abonoSubcription)
+                removeAbonoSubscription(abonoSubcription.token, abonoSubcription.ttp)
             }
         } catch (e: Exception) {
             logger.error(e)

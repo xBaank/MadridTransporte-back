@@ -46,8 +46,7 @@ suspend fun Pipeline.unsubscribeAbono() = either {
     val body = call.receiveText().deserialized().bindJson()
     val deviceToken = body["deviceToken"].asString().bindJson()
     val ttpNumber = body["ttpNumber"].asString().bindJson()
-    val name = body["name"].asString().bindJson()
-    removeAbonoSubscription(AbonoSubscription(ttpNumber, deviceToken.toDeviceToken(), name))
+    removeAbonoSubscription(deviceToken.toDeviceToken(), ttpNumber)
     ResponseRaw(HttpStatusCode.OK)
 }
 
@@ -55,9 +54,7 @@ suspend fun Pipeline.abonoSubscription() = either {
     val body = call.receiveText().deserialized().bindJson()
     val deviceToken = body["deviceToken"].asString().bindJson()
     val ttpNumber = body["ttpNumber"].asString().bindJson()
-    val name = body["name"].asString().bindJson()
-    val subscription = getAbonoSubscription(AbonoSubscription(ttpNumber, deviceToken.toDeviceToken(), name))
-        ?: shift<Nothing>(NotFound())
+    val subscription = getAbonoSubscription(deviceToken.toDeviceToken(), ttpNumber) ?: shift<Nothing>(NotFound())
     ResponseJson(buildAbonoSubscriptionJson(subscription), HttpStatusCode.OK)
 }
 
