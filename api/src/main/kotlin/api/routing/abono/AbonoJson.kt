@@ -29,7 +29,7 @@ fun buildAbonoJson(abono: Abono) = jObject {
 }
 
 fun buildAbonoSubscriptionJson(abonoSubscription: AbonoSubscription) = jObject {
-    "ttp" += abonoSubscription.ttp
+    "ttpNumber" += abonoSubscription.ttp
     "deviceToken" += abonoSubscription.token.token
     "name" += abonoSubscription.abonoName
 }

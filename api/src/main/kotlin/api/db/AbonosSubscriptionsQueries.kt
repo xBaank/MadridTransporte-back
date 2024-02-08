@@ -20,7 +20,7 @@ suspend fun getAbonoSubscription(token: DeviceToken, ttp: String) = abonosSubscr
 ).firstOrNull()
 
 fun getAbonoSubscriptions(deviceToken: DeviceToken) = abonosSubscriptionsCollection.find(
-    Filters.eq(DeviceToken::token.name, deviceToken.token)
+    Filters.eq(AbonoSubscription::token.name, deviceToken)
 )
 
 suspend fun addAbonoSubscription(abonoSubscription: AbonoSubscription) = either {
