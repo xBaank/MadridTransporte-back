@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.1.1
+
+- Fixed tran stops times
+
 ## 6.1.0
 
 - Fixed some `500` status codes when extracting emt data.

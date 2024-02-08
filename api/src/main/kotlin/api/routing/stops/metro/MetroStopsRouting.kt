@@ -12,16 +12,17 @@ const val tramCodMode = "10"
 fun Route.metroStopsRouting() = route("/metro") {
     metroConfigF(metroCodMode)
     subConfigF(metroCodMode)
+    alertsConfigF(metroCodMode)
 }
 
 fun Route.tramStopsRouting() = route("/tram") {
     timesConfigF(tramCodMode)
     subConfigF(tramCodMode)
+    alertsConfigF(tramCodMode)
 }
 
 private val metroConfigF: Route.(String) -> Unit = { codMode ->
     get("/{stopCode}/times") {
         handle { getMetroTimesResponse(codMode) }
     }
-    alertsConfigF(codMode)
 }
