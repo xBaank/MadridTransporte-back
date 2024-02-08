@@ -10,7 +10,7 @@ import api.extensions.await
 import api.extensions.batched
 import api.extensions.forEachAsync
 import api.routing.stops.bus.busCodMode
-import api.routing.stops.bus.getBusStopTimes
+import api.routing.stops.bus.getCRTMStopTimes
 import api.routing.stops.emt.emtCodMode
 import api.routing.stops.emt.getEmtStopTimes
 import api.routing.stops.metro.getMetroTimes
@@ -46,11 +46,11 @@ suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, S
         }
 
         tramCodMode -> {
-            { getMetroTimes(it, codMode) }
+            { getCRTMStopTimes(it) }
         }
 
         busCodMode -> {
-            { getBusStopTimes(it) }
+            { getCRTMStopTimes(it) }
         }
 
         emtCodMode -> {

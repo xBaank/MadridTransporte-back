@@ -24,7 +24,7 @@ private suspend fun getStopTimesResponse(stopCode: String) = Either.catch {
     getSuspend(request, defaultClient.value()::getStopTimesAsync)
 }.mapLeft(mapExceptionsF)
 
-suspend fun getBusStopTimes(stopCode: String) = either {
+suspend fun getCRTMStopTimes(stopCode: String) = either {
     val stopTimes = withTimeoutOrNull(EnvVariables.timeoutSeconds) {
         getStopTimesResponse(stopCode).getOrNull()
     }

@@ -1,6 +1,7 @@
 package api.routing.stops
 
 import api.extensions.handle
+import api.routing.stops.bus.getCRTMStopTimesResponse
 import arrow.core.right
 import io.ktor.server.routing.*
 
@@ -12,6 +13,13 @@ fun Route.stopsRouting() {
         handle { stopTimesSubscriptions() }
     }
 }
+
+val timesConfigF: Route.(codMode: String) -> Unit =
+    { codMode ->
+        get("/{stopCode}/times") {
+            handle { getCRTMStopTimesResponse(codMode) }
+        }
+    }
 
 val subConfigF: Route.(codMode: String) -> Unit =
     { codMode ->

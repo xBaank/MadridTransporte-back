@@ -3,6 +3,7 @@ package api.routing.stops.metro
 import api.extensions.handle
 import api.routing.stops.alertsConfigF
 import api.routing.stops.subConfigF
+import api.routing.stops.timesConfigF
 import io.ktor.server.routing.*
 
 const val metroCodMode = "4"
@@ -14,7 +15,7 @@ fun Route.metroStopsRouting() = route("/metro") {
 }
 
 fun Route.tramStopsRouting() = route("/tram") {
-    metroConfigF(tramCodMode)
+    timesConfigF(tramCodMode)
     subConfigF(tramCodMode)
 }
 

@@ -12,11 +12,11 @@ import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
 
-suspend fun Pipeline.getBusStopTimesResponse() = either {
+suspend fun Pipeline.getCRTMStopTimesResponse(codMode: String) = either {
     val stopCode = call.parameters.getWrapped("stopCode")
-    val fullStopCode = createStopCode(busCodMode, stopCode.bind())
+    val fullStopCode = createStopCode(codMode, stopCode.bind())
     checkStopExists(fullStopCode).bind()
-    val times = getBusStopTimes(fullStopCode).bind()
+    val times = getCRTMStopTimes(fullStopCode).bind()
     if (times.arrives != null) call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 30))
     val statusCode = if (times.arrives == null) HttpStatusCode.ServiceUnavailable else HttpStatusCode.OK
     ResponseJson(buildStopTimesJson(times), statusCode)
