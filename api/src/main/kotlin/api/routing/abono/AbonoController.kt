@@ -1,7 +1,7 @@
 package api.routing.abono
 
 import api.config.httpClient
-import api.exceptions.BusTrackerException
+import api.exceptions.BusTrackerException.InternalServerError
 import api.extensions.post
 import arrow.core.continuations.either
 import kotlinx.serialization.decodeFromString
@@ -20,12 +20,10 @@ suspend fun getAbonoResponse(TTPNumber: String) = either {
         contentType = "application/x-www-form-urlencoded"
     ).await()
 
-    if (!response.isSuccessful) shift<Nothing>(BusTrackerException.InternalServerError("Can't get abono data"))
+    if (!response.isSuccessful) shift<Nothing>(InternalServerError("Can't get abono data"))
 
-    val data: String =
-        response.body?.string() ?: shift<Nothing>(BusTrackerException.InternalServerError("Can't get abono data"))
+    val data: String = response.use { it.body?.string() ?: shift<Nothing>(InternalServerError("Can't get abono data")) }
 
     val result = xml.decodeFromString<SS_prepagoConsultaSaldo>(data)
-    isFound(result).bind()
-    result
+    extractAbono(result).bind()
 }

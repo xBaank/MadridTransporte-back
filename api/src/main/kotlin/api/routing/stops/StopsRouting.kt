@@ -9,7 +9,7 @@ fun Route.stopsRouting() {
         handle { getAllStops().right() }
     }
     post("/times/subscriptions") {
-        handle { getAllSubscriptions() }
+        handle { stopTimesSubscriptions() }
     }
 }
 
@@ -19,7 +19,7 @@ val subConfigF: Route.(codMode: String) -> Unit =
             handle { subscribeStopTime(codMode) }
         }
         post("/times/subscription") {
-            handle { getSubscription(codMode) }
+            handle { stopTimesSubscription(codMode) }
         }
         post("/times/unsubscribe") {
             handle { unsubscribeStopTime(codMode) }

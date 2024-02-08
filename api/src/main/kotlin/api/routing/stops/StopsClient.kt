@@ -52,7 +52,7 @@ suspend fun Pipeline.subscribeStopTime(codMode: String) =
         ResponseRaw(HttpStatusCode.OK)
     }
 
-suspend fun Pipeline.getSubscription(codMode: String) = either {
+suspend fun Pipeline.stopTimesSubscription(codMode: String) = either {
     val body = call.receiveText().deserialized().bindJson()
     val deviceToken = body["deviceToken"].asString().bindJson().toDeviceToken()
     val stopCode = createStopCode(codMode, body["stopCode"].asString().bindJson())
@@ -60,7 +60,7 @@ suspend fun Pipeline.getSubscription(codMode: String) = either {
     ResponseJson(buildSubscription(subscription, deviceToken), HttpStatusCode.OK)
 }
 
-suspend fun Pipeline.getAllSubscriptions() = either {
+suspend fun Pipeline.stopTimesSubscriptions() = either {
     val body = call.receiveText().deserialized().bindJson()
     val deviceToken = body["deviceToken"].asString().bindJson().toDeviceToken()
     val subscriptions = getSubscriptions(deviceToken).toList()

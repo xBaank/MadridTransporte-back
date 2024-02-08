@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.1.0
+
+- Fixed some `500` status codes when extracting emt data.
+- Added abono notifications.
+
 ## 6.0.0
 
 - Readded `/lines/bus/{lineCode}/locations/{direction}?stopCode={stopCode}`

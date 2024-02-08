@@ -5,6 +5,7 @@ import api.config.configureRoutingV1
 import api.config.setupFirebase
 import api.config.setupMongo
 import api.db.loadDataIntoDb
+import api.notifications.notifyAbonosOnBackground
 import api.notifications.notifyStopTimesOnBackground
 import arrow.core.getOrElse
 import io.ktor.http.*
@@ -41,5 +42,6 @@ fun Application.startUp() = runBlocking {
     loadDataIntoDb()
     configureRoutingV1()
     notifyStopTimesOnBackground()
+    notifyAbonosOnBackground()
 }
 
