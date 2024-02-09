@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.1.2
+
+- Improve stop times precision
+
 ## 6.1.1
 
 - Fixed tran stops times
