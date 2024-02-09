@@ -1,15 +1,22 @@
 package api.routing.stops.train
 
+import api.db.getStopNameById
+import api.extensions.bindJson
 import api.routing.stops.Arrive
 import api.routing.stops.Coordinates
 import api.routing.stops.StopTimes
 import api.routing.stops.trainRouted.trainCodMode
 import api.utils.timeZoneMadrid
+import arrow.core.continuations.either
+import arrow.core.getOrElse
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
+import simpleJson.*
 import java.time.*
 import java.time.format.DateTimeFormatter
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 fun extractTrainStopTimes(
     html: Document,
@@ -43,6 +50,36 @@ fun extractTrainStopTimes(
         stopCode
     )
 }
+
+suspend fun extractTrainStopTimes(json: JsonNode, coordinates: Coordinates, stopName: String, stopCode: String) =
+    either {
+        val commercialPaths = json["commercialPaths"].asArray().bindJson()
+
+        val arrives = commercialPaths.map {
+            val departureSteps = it["passthroughStep"]["departurePassthroughStepSides"]
+            val destinationCode = it["commercialPathInfo"]["commercialDestinationStationCode"].asString().bindJson()
+            val destinationName = getStopNameById(destinationCode).bind()
+            val line = it["commercialPathInfo"]["line"].asString().getOrElse { "" }
+            val delay = departureSteps["forecastedOrAuditedDelay"].asInt().bindJson().seconds
+            val plannedTime = departureSteps["plannedTime"].asLong().bindJson().milliseconds
+            Arrive(
+                line = line,
+                codMode = trainCodMode.toInt(),
+                anden = departureSteps["plannedPlatform"].asString().bindJson().toInt(),
+                destination = destinationName,
+                estimatedArrive = (plannedTime + delay).inWholeMilliseconds
+            )
+        }
+
+        StopTimes(
+            trainCodMode.toInt(),
+            stopName,
+            coordinates,
+            arrives,
+            listOf(),
+            stopCode
+        )
+    }
 
 fun createTrainFailedTimes(name: String, coordinates: Coordinates, stopCode: String) = StopTimes(
     codMode = trainCodMode.toInt(),

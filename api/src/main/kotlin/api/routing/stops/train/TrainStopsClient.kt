@@ -15,7 +15,7 @@ import io.ktor.server.plugins.cachingheaders.*
 suspend fun Pipeline.getTrainStopsTimesResponse() = either {
     val stopCode = call.parameters.getWrapped("stopCode").bind()
     val fullStopCode = createStopCode(trainCodMode, stopCode)
-    val times = getTrainStopTimes(fullStopCode).bind()
+    val times = getTrainTimes(fullStopCode).bind()
     call.caching = CachingOptions(cacheControl = CacheControl.MaxAge(maxAgeSeconds = 30))
     ResponseJson(buildStopTimesJson(times), HttpStatusCode.OK)
 }
