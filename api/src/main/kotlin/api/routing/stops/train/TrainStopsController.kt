@@ -1,6 +1,5 @@
 package api.routing.stops.train
 
-import api.config.httpClient
 import api.db.getCoordinatesByStopCode
 import api.db.getIdByStopCode
 import api.db.getStopNameById
@@ -8,54 +7,18 @@ import api.exceptions.BusTrackerException.InternalServerError
 import api.exceptions.BusTrackerException.NotFound
 import api.extensions.bindJson
 import api.extensions.post
+import api.routing.stops.bus.getCRTMStopTimes
 import api.routing.stops.train.cano.canoHttpClient
+import api.routing.stops.trainRouted.trainCodMode
 import arrow.core.continuations.either
 import crtm.utils.getStopCodeFromFullStopCode
-import org.jsoup.Jsoup
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.deserialized
 import simpleJson.jObject
 
-suspend fun getHtmlTrainStopTimes(fullStopCode: String) = either {
-    val stopInfoStationCode = getIdByStopCode(fullStopCode).bind()
-    val stopName = getStopNameById(stopInfoStationCode).bind()
-    val coordinates = getCoordinatesByStopCode(fullStopCode).bind()
-    val request =
-        "station=${stopInfoStationCode}&dest=&previous=1&showCercanias=true&showOtros=false&iframe=false&isNative=true"
-    
-    val response = httpClient.post(
-        "https://elcanoweb.adif.es/departures/reload",
-        request,
-        contentType = "application/x-www-form-urlencoded; charset=utf-8",
-        headers = mapOf(
-            "Authorization" to "Basic ZGVpbW9zOmRlaW1vc3R0",
-            "Host" to "elcanoweb.adif.es",
-            "User-Agent" to "okhttp/4.12.0"
-        )
-    ).await()
-
-    response.use {
-        if (it.code == 404) shift<Nothing>(NotFound())
-        if (!it.isSuccessful) return@use
-
-        val html = it.body?.string()?.let(Jsoup::parse) ?: shift<Nothing>(InternalServerError())
-
-        val result = extractTrainStopTimes(html, coordinates, stopName, getStopCodeFromFullStopCode(fullStopCode))
-
-        if (result.arrives != null && result.arrives.isEmpty()) return@use
-
-        return@either result
-    }
-
-    createTrainFailedTimes(
-        name = stopName,
-        coordinates = coordinates,
-        stopCode = getStopCodeFromFullStopCode(fullStopCode)
-    )
-}
-
 suspend fun getTrainTimes(fullStopCode: String) = either {
-    getCanoTrainTimes(fullStopCode).getOrNull() ?: getHtmlTrainStopTimes(fullStopCode).bind()
+    getCanoTrainTimes(fullStopCode).getOrNull() ?: getCRTMStopTimes(fullStopCode).bind()
+        .let { times -> times.copy(arrives = times.arrives?.filter { it.codMode == trainCodMode.toInt() }) }
 }
 
 suspend fun getCanoTrainTimes(fullStopCode: String) = either {

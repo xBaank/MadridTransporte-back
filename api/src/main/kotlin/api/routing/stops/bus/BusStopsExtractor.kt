@@ -7,7 +7,7 @@ import api.routing.stops.Coordinates
 import api.routing.stops.StopTimes
 import crtm.soap.StopTimesResponse
 
-suspend fun extractBusStopTimes(
+suspend fun extractCRTMStopTimes(
     response: StopTimesResponse?,
     coordinates: Coordinates,
     name: String?,

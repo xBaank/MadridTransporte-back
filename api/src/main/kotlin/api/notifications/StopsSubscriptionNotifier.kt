@@ -16,7 +16,7 @@ import api.routing.stops.emt.getEmtStopTimes
 import api.routing.stops.metro.getMetroTimes
 import api.routing.stops.metro.metroCodMode
 import api.routing.stops.metro.tramCodMode
-import api.routing.stops.train.getCanoTrainTimes
+import api.routing.stops.train.getTrainTimes
 import api.routing.stops.trainRouted.trainCodMode
 import api.utils.StopTimesF
 import arrow.core.Either
@@ -58,7 +58,7 @@ suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, S
         }
 
         trainCodMode -> {
-            { getCanoTrainTimes(it) }
+            { getTrainTimes(it) }
         }
 
         else -> {

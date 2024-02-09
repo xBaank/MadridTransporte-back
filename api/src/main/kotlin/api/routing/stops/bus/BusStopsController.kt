@@ -29,7 +29,7 @@ suspend fun getCRTMStopTimes(stopCode: String) = either {
         getStopTimesResponse(stopCode).getOrNull()
     }
 
-    val result = extractBusStopTimes(
+    val result = extractCRTMStopTimes(
         stopTimes,
         getCoordinatesByStopCode(stopCode).bind(),
         getStopNameByStopCode(stopCode).getOrNull(),
