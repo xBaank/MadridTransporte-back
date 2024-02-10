@@ -13,24 +13,16 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 suspend fun extractMetroStopTimes(
-    json: JsonNode,
+    json: JsonNode?,
     codMode: String,
     coordinates: Coordinates,
     name: String,
     simpleStopCode: String
 ) =
     either {
-        val arrives = json.asArray().bind()
-        if (arrives.isEmpty()) return@either StopTimes(
-            codMode.toInt(),
-            name,
-            coordinates,
-            emptyList(),
-            emptyList(),
-            simpleStopCode
-        )
+        val arrives = json?.asArray()?.bind()
 
-        val arrivesMapped = arrives.flatMap { arrive ->
+        val arrivesMapped = arrives?.flatMap { arrive ->
             val proximo = arrive["proximo"].asLong().getOrNull()
             val siguiente = arrive["siguiente"].asLong().getOrNull()
 

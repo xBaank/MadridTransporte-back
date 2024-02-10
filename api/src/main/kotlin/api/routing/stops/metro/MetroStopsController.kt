@@ -4,19 +4,16 @@ import api.config.httpClient
 import api.db.getCoordinatesByStopCode
 import api.db.getIdByStopCode
 import api.db.getStopNameById
-import api.exceptions.BusTrackerException.InternalServerError
 import api.exceptions.BusTrackerException.NotFound
 import api.extensions.awaitWrap
 import api.extensions.bindJson
 import arrow.core.continuations.either
-import arrow.core.getOrElse
 import crtm.utils.getStopCodeFromFullStopCode
 import okhttp3.HttpUrl
 import okhttp3.Request
 import simpleJson.asArray
 import simpleJson.deserialized
 import simpleJson.get
-import simpleJson.jArray
 
 private fun urlBuilder() = HttpUrl.Builder()
     .scheme("https")
@@ -46,19 +43,13 @@ suspend fun getMetroTimes(fullStopCode: String, codMode: String) = either {
 
     response.use {
         if (it?.code == 404) shift<NotFound>(NotFound("Station not found"))
-        if (it?.code in 500..600) shift<InternalServerError>(
-            InternalServerError(
-                "Internal server error"
-            )
-        )
 
         val json = it?.body
             ?.string()
             ?.deserialized()
             ?.get("Vtelindicadores")
             ?.asArray()
-            ?.getOrElse { jArray() }
-            ?: jArray()
+            ?.getOrNull()
 
         extractMetroStopTimes(
             json,

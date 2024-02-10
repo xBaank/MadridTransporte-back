@@ -1,19 +1,18 @@
 package api.routing.stops.bus
 
-import api.extensions.mapAsync
 import api.extensions.toMiliseconds
 import api.routing.stops.Arrive
 import api.routing.stops.Coordinates
 import api.routing.stops.StopTimes
 import crtm.soap.StopTimesResponse
 
-suspend fun extractCRTMStopTimes(
+fun extractCRTMStopTimes(
     response: StopTimesResponse?,
     coordinates: Coordinates,
     name: String?,
     shortStopCode: String?
 ): StopTimes {
-    val arrives = response?.stopTimes?.times?.time?.mapAsync {
+    val arrives = response?.stopTimes?.times?.time?.map {
         Arrive(
             direction = it.direction,
             lineCode = it.line.codLine,
