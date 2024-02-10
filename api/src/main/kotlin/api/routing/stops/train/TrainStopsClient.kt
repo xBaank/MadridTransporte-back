@@ -16,6 +16,7 @@ suspend fun Pipeline.getTrainStopsTimesResponse() = either {
     val stopCode = call.parameters.getWrapped("stopCode").bind()
     val fullStopCode = createStopCode(trainCodMode, stopCode)
     val times = getTrainTimes(fullStopCode).bind()
-    call.caching = CachingOptions(cacheControl = CacheControl.MaxAge(maxAgeSeconds = 30))
-    ResponseJson(buildStopTimesJson(times), HttpStatusCode.OK)
+    if (times.arrives != null) call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 30))
+    val statusCode = if (times.arrives == null) HttpStatusCode.ServiceUnavailable else HttpStatusCode.OK
+    ResponseJson(buildStopTimesJson(times), statusCode)
 }
