@@ -4,15 +4,15 @@ import api.config.httpClient
 import api.db.getCoordinatesByStopCode
 import api.db.getIdByStopCode
 import api.db.getStopNameById
-import api.exceptions.BusTrackerException
+import api.exceptions.BusTrackerException.InternalServerError
+import api.exceptions.BusTrackerException.NotFound
+import api.extensions.awaitWrap
 import api.extensions.bindJson
 import arrow.core.continuations.either
 import arrow.core.getOrElse
 import crtm.utils.getStopCodeFromFullStopCode
 import okhttp3.HttpUrl
 import okhttp3.Request
-import okhttp3.Response
-import ru.gildor.coroutines.okhttp.await
 import simpleJson.asArray
 import simpleJson.deserialized
 import simpleJson.get
@@ -25,7 +25,7 @@ private fun urlBuilder() = HttpUrl.Builder()
     .addPathSegment("rest")
     .addPathSegment("teleindicadores")
 
-private suspend fun getMetroTimesResponse(id: String? = null): Response {
+private suspend fun getMetroTimesResponse(id: String? = null) = either {
     val url = urlBuilder()
         .also { if (id != null) it.addPathSegment(id) }
         .build()
@@ -36,26 +36,25 @@ private suspend fun getMetroTimesResponse(id: String? = null): Response {
         .addHeader("Accept", "application/json")
         .build()
 
-    return httpClient.newCall(request).await()
+    httpClient.newCall(request).awaitWrap().bind()
 }
 
 suspend fun getMetroTimes(fullStopCode: String, codMode: String) = either {
     val codigoEmpresa = getIdByStopCode(fullStopCode).bind()
-    val response = getMetroTimesResponse(codigoEmpresa)
+    val response = getMetroTimesResponse(codigoEmpresa).getOrNull()
     val coordinates = getCoordinatesByStopCode(fullStopCode).bind()
 
     response.use {
-        if (it.code == 404) shift<BusTrackerException.NotFound>(BusTrackerException.NotFound("Station not found"))
-        if (it.code in 500..600) shift<BusTrackerException.InternalServerError>(
-            BusTrackerException.InternalServerError(
+        if (it?.code == 404) shift<NotFound>(NotFound("Station not found"))
+        if (it?.code in 500..600) shift<InternalServerError>(
+            InternalServerError(
                 "Internal server error"
             )
         )
-        val body = it
-            .body
-            .use { it?.string() }
 
-        val json = body?.deserialized()
+        val json = it?.body
+            ?.string()
+            ?.deserialized()
             ?.get("Vtelindicadores")
             ?.asArray()
             ?.getOrElse { jArray() }

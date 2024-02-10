@@ -5,6 +5,7 @@ import api.db.getIdByStopCode
 import api.db.getStopNameById
 import api.exceptions.BusTrackerException.InternalServerError
 import api.exceptions.BusTrackerException.NotFound
+import api.extensions.awaitWrap
 import api.extensions.bindJson
 import api.extensions.post
 import api.routing.stops.bus.getCRTMStopTimes
@@ -12,7 +13,6 @@ import api.routing.stops.train.cano.canoHttpClient
 import api.routing.stops.trainRouted.trainCodMode
 import arrow.core.continuations.either
 import crtm.utils.getStopCodeFromFullStopCode
-import ru.gildor.coroutines.okhttp.await
 import simpleJson.deserialized
 import simpleJson.jObject
 
@@ -45,7 +45,7 @@ suspend fun getCanoTrainTimes(fullStopCode: String) = either {
             "User-Agent" to "okhttp/4.10.0",
             "Connection" to "Close"
         )
-    ).await()
+    ).awaitWrap().bind()
 
 
     response.use {

@@ -95,7 +95,13 @@ private suspend fun sendNotification(subscription: StopsSubscription) {
         val selectedTimes = stopTimes.copy(
             arrives = stopTimes.arrives?.filter { arrive ->
                 subscription.linesByDeviceToken[it.token]?.any { lineDestination ->
-                    lineDestination.line == arrive.line && lineDestination.destination == arrive.destination
+                    lineDestination.line.equals(
+                        arrive.line,
+                        true
+                    ) && lineDestination.destination.equals(
+                        arrive.destination,
+                        true
+                    )
                 } == true
             } ?: emptyList()
         )

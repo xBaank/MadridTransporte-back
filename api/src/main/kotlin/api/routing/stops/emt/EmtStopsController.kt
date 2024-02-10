@@ -6,6 +6,7 @@ import api.db.getStopNameByStopCode
 import api.exceptions.BusTrackerException
 import api.exceptions.BusTrackerException.InternalServerError
 import api.exceptions.BusTrackerException.NotFound
+import api.extensions.awaitWrap
 import api.extensions.bindJson
 import api.extensions.get
 import api.extensions.post
@@ -50,37 +51,34 @@ suspend fun login() = either {
 suspend fun getEmtStopTimesResponse(stopCode: String): Either<BusTrackerException, JsonNode?> = either {
     val stopId = getStopCodeFromFullStopCode(stopCode)
     var tries = 3
+    
     do {
         val url = "https://openapi.emtmadrid.es/v2/transport/busemtmad/stops/$stopId/arrives/"
 
-        val response = try {
-            httpClient.post(url, jObject {
-                "cultureInfo" += "ES"
-                "Text_StopRequired_YN" += "Y"
-                "Text_EstimationsRequired_YN" += "Y"
-                "Text_IncidencesRequired_YN" += "Y"
-                "DateTime_Referenced_Incidencies_YYYYMMDD" += dateFormatter.format(Date())
+        val response = httpClient.post(url, jObject {
+            "cultureInfo" += "ES"
+            "Text_StopRequired_YN" += "Y"
+            "Text_EstimationsRequired_YN" += "Y"
+            "Text_IncidencesRequired_YN" += "Y"
+            "DateTime_Referenced_Incidencies_YYYYMMDD" += dateFormatter.format(Date())
 
-            }, mapOf("accessToken" to currentLoginResponse.accessToken)).await()
-        } catch (ex: InterruptedIOException) {
-            shift<Nothing>(InternalServerError("Emt timeout error"))
-        }
+        }, mapOf("accessToken" to currentLoginResponse.accessToken)).awaitWrap().getOrNull()
 
-        response.use {
+
+        response?.use {
             if (it.code == 404) shift<NotFound>(NotFound("Stop not found"))
-
             if (it.code == 401 || it.code == 403) {
                 login().getOrElse(logger::error)
-                tries--
                 return@use
             }
-            if (!it.isSuccessful) return@either null
+            if (!it.isSuccessful) return@use
 
             return@either it.body?.string()?.deserialized()?.bindJson()
         }
 
+        tries--
     } while (tries > 0)
-    
+
     null
 }
 

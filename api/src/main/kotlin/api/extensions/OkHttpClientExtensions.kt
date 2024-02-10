@@ -1,9 +1,14 @@
 package api.extensions
 
+import api.exceptions.BusTrackerException
+import arrow.core.left
+import arrow.core.right
+import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import ru.gildor.coroutines.okhttp.await
 import simpleJson.JsonNode
 import simpleJson.serialized
 
@@ -33,3 +38,9 @@ fun OkHttpClient.post(
     .post(body.toRequestBody(contentType?.toMediaType()))
     .build()
 )
+
+suspend fun Call.awaitWrap() = try {
+    await().right()
+} catch (ex: Throwable) {
+    BusTrackerException.InternalServerError(ex.message).left()
+}
