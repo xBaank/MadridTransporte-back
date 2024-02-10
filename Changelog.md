@@ -1,8 +1,12 @@
 # Changelog
 
+## 6.1.3
+
+- Fixed some cases that caused a 500 to be thrown with no response
+
 ## 6.1.2
 
-- Improve stop times precision
+- Improved stop times precision
 
 ## 6.1.1
 
