@@ -8,7 +8,6 @@ import api.exceptions.BusTrackerException.NotFound
 import api.extensions.getWrapped
 import api.routing.Response.ResponseFlowJson
 import api.routing.Response.ResponseJson
-import api.routing.stops.bus.busCodMode
 import api.utils.Pipeline
 import arrow.core.continuations.either
 import crtm.utils.createStopCode
@@ -53,11 +52,11 @@ suspend fun Pipeline.getLocations() = either {
     val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: shift<Nothing>(BadRequest())
     val stopCode = call.request.queryParameters.getWrapped("stopCode").bind()
 
-    val fullStopCode = createStopCode(busCodMode, stopCode)
     val codMode = getCodModeFromLineCode(lineCode)
+    val fullStopCode = createStopCode(codMode, stopCode)
     val route = getRoute(lineCode).getOrNull()
     val simpleLineCode = route?.simpleLineCode ?: getSimpleLineCodeFromLineCode(lineCode)
-    val routeCodMode = route?.codMode ?: busCodMode
+    val routeCodMode = route?.codMode ?: codMode
 
     val locations = VehicleLocations(
         locations = getLocationsResponse(
