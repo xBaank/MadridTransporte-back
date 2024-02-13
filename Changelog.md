@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.1.4
+
+- Fixed metro stop times problem
+- Fixed emt locations not being correct
+
 ## 6.1.3
 
 - Fixed some cases that caused a 500 to be thrown with no response

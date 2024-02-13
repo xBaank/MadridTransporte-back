@@ -43,10 +43,11 @@ suspend fun extractMetroStopTimes(
                 ?.toInstant(timeZoneMadrid.toZoneOffset())?.toEpochMilli()
 
             val line = arrive["linea"].asNumber().bind().toString()
+            val lineCode = getRoute(line, metroCodMode).getOrNull()?.fullLineCode ?: createLineCode(metroCodMode, line)
 
             val first = Arrive(
                 line = line,
-                lineCode = getRoute(line, metroCodMode).getOrNull()?.fullLineCode ?: createLineCode(metroCodMode, line),
+                lineCode = lineCode,
                 destination = arrive["sentido"].asString().bind(),
                 anden = arrive["anden"].asInt().getOrNull(),
                 codMode = metroCodMode.toInt(),
@@ -54,7 +55,8 @@ suspend fun extractMetroStopTimes(
             )
 
             val second = Arrive(
-                line = arrive["linea"].asNumber().bind().toString(),
+                line = line,
+                lineCode = lineCode,
                 destination = arrive["sentido"].asString().bind(),
                 anden = arrive["anden"].asInt().getOrNull(),
                 codMode = metroCodMode.toInt(),
