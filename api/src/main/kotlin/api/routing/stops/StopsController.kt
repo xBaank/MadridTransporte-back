@@ -7,7 +7,6 @@ import api.utils.auth
 import api.utils.defaultClient
 import api.utils.mapExceptionsF
 import arrow.core.Either
-import crtm.soap.ArrayOfString
 import crtm.soap.IncidentsAffectationsRequest
 import crtm.soap.IncidentsAffectationsResponse
 import io.github.reactivecircus.cache4k.Cache
@@ -22,7 +21,7 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
     val result = withTimeoutOrNull(timeoutSeconds) {
         val request = IncidentsAffectationsRequest().apply {
             this.codMode = codMode
-            codLines = ArrayOfString()
+            //codLines = ArrayOfString()
             authentication = defaultClient.value().auth()
         }
 
