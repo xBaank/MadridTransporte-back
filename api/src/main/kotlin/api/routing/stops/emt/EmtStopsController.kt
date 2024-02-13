@@ -1,5 +1,6 @@
 package api.routing.stops.emt
 
+import api.config.EnvVariables
 import api.config.httpClient
 import api.db.getCoordinatesByStopCode
 import api.db.getStopNameByStopCode
@@ -30,12 +31,11 @@ private val logger = KtorSimpleLogger("EmtControllerLogger")
 suspend fun login() = either {
     val url = "https://openapi.emtmadrid.es/v1/mobilitylabs/user/login/"
 
-    //Hardcoded gojo limitless token
     val response = try {
         httpClient.get(
             url, mapOf(
-                "passKey" to "504fea88211f2f90633f964189b7696037d65cc3a5f47b8fa1d5ea5e34db0239ad2e068851e72be0cec125779224749e3bc236c1b7af39d8a3d398e99223f058",
-                "X-ClientId" to "428B01E6-693C-4F7F-A11E-3BB923420587",
+                "passKey" to EnvVariables.passKey,
+                "X-ClientId" to EnvVariables.clientId,
             )
         ).await()
     } catch (ex: InterruptedIOException) {
@@ -51,7 +51,7 @@ suspend fun login() = either {
 suspend fun getEmtStopTimesResponse(stopCode: String): Either<BusTrackerException, JsonNode?> = either {
     val stopId = getStopCodeFromFullStopCode(stopCode)
     var tries = 3
-    
+
     do {
         val url = "https://openapi.emtmadrid.es/v2/transport/busemtmad/stops/$stopId/arrives/"
 
