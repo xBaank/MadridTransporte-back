@@ -1,4 +1,4 @@
-package api.routing.lines.bus
+package api.routing.lines
 
 import api.config.EnvVariables.timeoutSeconds
 import api.exceptions.BusTrackerException.SoapError

@@ -54,7 +54,7 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
             }
         }
     }
-    val arrivesGroupedByLineAndDest = stopTimes.arrives?.groupBy { Triple(it.line, it.destination, it.anden) }
+    val arrivesGroupedByLineAndDest = stopTimes.arrives?.groupBy { Pair(it.line, it.destination) }
     if (arrivesGroupedByLineAndDest == null) {
         "arrives" += null
         return@jObject
