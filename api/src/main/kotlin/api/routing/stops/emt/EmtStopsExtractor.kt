@@ -8,7 +8,7 @@ import api.routing.stops.Arrive
 import api.routing.stops.Coordinates
 import api.routing.stops.Incident
 import api.routing.stops.StopTimes
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import crtm.utils.createLineCode
 import simpleJson.*
 import java.time.Clock
@@ -19,7 +19,7 @@ suspend fun extractEMTStopTimes(json: JsonNode) = either {
     val description =
         json["description"].asArray().getOrNull()?.firstOrNull { it["ES"].isRight() }?.get("ES")?.asString()
             ?.getOrNull()
-    if (description != null) shift<Nothing>(BusTrackerException.NotFound(description))
+    if (description != null) raise(BusTrackerException.NotFound(description))
     val stopName = json["data"][0]["StopInfo"][0]["stopName"].asString().bindJson()
     val coordinates = json["data"][0]["StopInfo"][0]["geometry"]["coordinates"].asArray().bindJson()
         .let { Coordinates(it[1].asDouble().bindJson(), it[0].asDouble().bindJson()) }

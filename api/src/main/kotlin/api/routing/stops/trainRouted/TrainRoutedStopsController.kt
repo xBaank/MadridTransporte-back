@@ -6,7 +6,7 @@ import api.extensions.bindJson
 import api.extensions.post
 import api.utils.hourFormatter
 import api.utils.timeZoneMadrid
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.deserialized
 import simpleJson.jObject
@@ -33,11 +33,11 @@ suspend fun getTrainRoutedTimesResponse(origin: String, destination: String) = e
         "accesibilidadTrenes" += true
     }).await()
 
-    if (!response.isSuccessful) shift<Nothing>(InternalServerError("Renfe server not responding"))
+    if (!response.isSuccessful) raise(InternalServerError("Renfe server not responding"))
     val json = response.body?.bytes()
         ?.let { String(it, Charsets.ISO_8859_1) }
         ?.toByteArray(Charsets.ISO_8859_1)
         ?.toString(Charsets.UTF_8)
-        ?: shift<Nothing>(InternalServerError("Renfe server returned empty response"))
+        ?: raise(InternalServerError("Renfe server returned empty response"))
     json.deserialized().bindJson()
 }

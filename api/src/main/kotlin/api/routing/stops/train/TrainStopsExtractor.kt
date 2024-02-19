@@ -6,8 +6,8 @@ import api.routing.stops.Arrive
 import api.routing.stops.Coordinates
 import api.routing.stops.StopTimes
 import api.routing.stops.trainRouted.trainCodMode
-import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.raise.either
 import simpleJson.*
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds

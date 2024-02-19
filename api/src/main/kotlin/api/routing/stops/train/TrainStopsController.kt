@@ -11,7 +11,7 @@ import api.extensions.post
 import api.routing.stops.bus.getCRTMStopTimes
 import api.routing.stops.train.cano.canoHttpClient
 import api.routing.stops.trainRouted.trainCodMode
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import crtm.utils.getStopCodeFromFullStopCode
 import simpleJson.deserialized
 import simpleJson.jObject
@@ -49,10 +49,10 @@ suspend fun getCanoTrainTimes(fullStopCode: String) = either {
 
 
     response.use {
-        if (it.code == 404) shift<Nothing>(NotFound())
-        if (!it.isSuccessful) shift<Nothing>(InternalServerError())
+        if (it.code == 404) raise(NotFound())
+        if (!it.isSuccessful) raise(InternalServerError())
 
-        val json = it.body?.string()?.deserialized()?.bindJson() ?: shift<Nothing>(InternalServerError())
+        val json = it.body?.string()?.deserialized()?.bindJson() ?: raise(InternalServerError())
 
         return@either extractTrainStopTimes(
             json,

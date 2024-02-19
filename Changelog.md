@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.1.5
+
+- Fixed EMT exception when getting times
+- Update dependencies
+
 ## 6.1.4
 
 - Fixed metro stop times problem

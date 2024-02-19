@@ -28,13 +28,11 @@ dependencies {
     implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0")
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.1") // for JVM platform
     //arrow kt
-    implementation("io.arrow-kt:arrow-core:1.1.5")
+    implementation("io.arrow-kt:arrow-core:1.2.1")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
     implementation("io.github.xbaank:simpleJson-core:3.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("io.github.reactivecircus.cache4k:cache4k:0.10.0")
-    // https://mvnrepository.com/artifact/io.insert-koin/koin-ktor
-    implementation("io.insert-koin:koin-ktor:3.4.1")
     // https://mvnrepository.com/artifact/org.amshove.kluent/kluent
     testImplementation("org.amshove.kluent:kluent:1.72")
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api

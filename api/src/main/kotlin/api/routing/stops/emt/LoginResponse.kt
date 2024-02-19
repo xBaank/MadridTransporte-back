@@ -1,6 +1,6 @@
 package api.routing.stops.emt
 
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import simpleJson.JsonNode
 import simpleJson.asInt
 import simpleJson.asString
@@ -19,7 +19,7 @@ data class ApiCounter(
 )
 
 
-suspend fun parseLoginResponse(json: JsonNode) = either {
+fun parseLoginResponse(json: JsonNode) = either {
     LoginResponse(
         accessToken = json["data"][0]["accessToken"].asString().bind(),
         tokenSecExpiration = json["data"][0]["tokenSecExpiration"].asInt().bind(),
