@@ -36,7 +36,7 @@ private suspend fun getMetroTimesResponse(id: String? = null) = either {
     httpClient.newCall(request).awaitWrap().bind()
 }
 
-suspend fun getMetroTimes(fullStopCode: String, codMode: String) = either {
+suspend fun getMetroTimes(fullStopCode: String) = either {
     val codigoEmpresa = getIdByStopCode(fullStopCode).bind()
     val response = getMetroTimesResponse(codigoEmpresa).getOrNull()
     val coordinates = getCoordinatesByStopCode(fullStopCode).bind()
@@ -53,7 +53,7 @@ suspend fun getMetroTimes(fullStopCode: String, codMode: String) = either {
 
         extractMetroStopTimes(
             json,
-            codMode,
+            metroCodMode,
             coordinates,
             getStopNameById(codigoEmpresa).bind(),
             getStopCodeFromFullStopCode(fullStopCode)

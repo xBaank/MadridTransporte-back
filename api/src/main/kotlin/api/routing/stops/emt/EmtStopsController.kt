@@ -1,6 +1,5 @@
 package api.routing.stops.emt
 
-import api.config.EnvVariables
 import api.config.httpClient
 import api.db.getCoordinatesByStopCode
 import api.db.getStopNameByStopCode
@@ -31,11 +30,12 @@ private val logger = KtorSimpleLogger("EmtControllerLogger")
 suspend fun login() = either {
     val url = "https://openapi.emtmadrid.es/v1/mobilitylabs/user/login/"
 
+    //🤫🧏🏻‍♂️
     val response = try {
         httpClient.get(
             url, mapOf(
-                "passKey" to EnvVariables.passKey,
-                "X-ClientId" to EnvVariables.clientId,
+                "passKey" to "504fea88211f2f90633f964189b7696037d65cc3a5f47b8fa1d5ea5e34db0239ad2e068851e72be0cec125779224749e3bc236c1b7af39d8a3d398e99223f058",
+                "X-ClientId" to "428B01E6-693C-4F7F-A11E-3BB923420587",
             )
         ).await()
     } catch (ex: InterruptedIOException) {
@@ -84,7 +84,8 @@ suspend fun getEmtStopTimesResponse(stopCode: String): Either<BusTrackerExceptio
 
 suspend fun getEmtStopTimes(stopCode: String) = either {
     val response = getEmtStopTimesResponse(stopCode).bind()
-    response?.let { extractEMTStopTimes(it).bind() } ?: createEMTFailedTimes(
+    if (response != null) return@either extractEMTStopTimes(response).bind()
+    createEMTFailedTimes(
         name = getStopNameByStopCode(stopCode).bind(),
         coordinates = getCoordinatesByStopCode(stopCode).bind(),
         stopCode = getStopCodeFromFullStopCode(stopCode)

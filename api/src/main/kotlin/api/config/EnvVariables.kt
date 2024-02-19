@@ -2,7 +2,6 @@ package api.config
 
 import api.db.downloadToTempFile
 import api.exceptions.BusTrackerException
-import api.extensions.getOrThrow
 import api.extensions.unzip
 import api.utils.SuspendingLazy
 import arrow.core.Either
@@ -32,12 +31,6 @@ private const val defaultTranviaInfo =
     "https://opendata.arcgis.com/api/v3/datasets/624dfeafb4d64580aa2ac5f24d8e8614_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
 
 object EnvVariables {
-    val passKey by lazy {
-        getenvWrapped("PASS_KEY").getOrThrow()
-    }
-    val clientId by lazy {
-        getenvWrapped("CLIENT_ID").getOrThrow()
-    }
     val notificationDelayTimeSeconds by lazy {
         getenvWrapped("NOTIFICATION_DELAY_TIME_SECONDS").map(String::toLong).getOrElse { 60 }.seconds
     }

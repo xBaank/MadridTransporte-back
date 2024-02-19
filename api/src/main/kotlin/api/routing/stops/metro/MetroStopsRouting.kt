@@ -2,6 +2,7 @@ package api.routing.stops.metro
 
 import api.extensions.handle
 import api.routing.stops.alertsConfigF
+import api.routing.stops.getStopTimesResponse
 import api.routing.stops.subConfigF
 import api.routing.stops.timesConfigF
 import io.ktor.server.routing.*
@@ -10,19 +11,15 @@ const val metroCodMode = "4"
 const val tramCodMode = "10"
 
 fun Route.metroStopsRouting() = route("/metro") {
-    metroConfigF(metroCodMode)
+    get("/{stopCode}/times") {
+        handle { getStopTimesResponse(::getMetroTimes, metroCodMode, 10) }
+    }
     subConfigF(metroCodMode)
     alertsConfigF(metroCodMode)
 }
 
 fun Route.tramStopsRouting() = route("/tram") {
-    timesConfigF(tramCodMode)
+    timesConfigF(tramCodMode) //Metro doesn't work with tram
     subConfigF(tramCodMode)
     alertsConfigF(tramCodMode)
-}
-
-private val metroConfigF: Route.(String) -> Unit = { codMode ->
-    get("/{stopCode}/times") {
-        handle { getMetroTimesResponse(codMode) }
-    }
 }

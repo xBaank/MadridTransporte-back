@@ -4,8 +4,10 @@ import api.db.*
 import api.db.models.LineDestination
 import api.db.models.toDeviceToken
 import api.extensions.bindJson
+import api.extensions.getWrapped
 import api.routing.Response.*
 import api.utils.Pipeline
+import api.utils.StopTimesF
 import arrow.core.continuations.either
 import crtm.utils.createStopCode
 import io.ktor.http.*
@@ -22,6 +24,16 @@ fun Pipeline.getAllStops(): ResponseFlowJson {
     val stops = getAllStopsFromDb()
     call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
     return ResponseFlowJson(buildStops(stops), HttpStatusCode.OK)
+}
+
+suspend fun Pipeline.getStopTimesResponse(stopTimeF: StopTimesF, codMode: String, cacheTime: Int) = either {
+    val stopCode = call.parameters.getWrapped("stopCode")
+    val fullStopCode = createStopCode(codMode, stopCode.bind())
+    checkStopExists(fullStopCode).bind()
+    val times = stopTimeF(fullStopCode).bind()
+    if (times.arrives != null) call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = cacheTime))
+    val statusCode = if (times.arrives == null) HttpStatusCode.ServiceUnavailable else HttpStatusCode.OK
+    ResponseJson(buildStopTimesJson(times), statusCode)
 }
 
 suspend fun Pipeline.getAlertsByCodMode(codMode: String) = either {
