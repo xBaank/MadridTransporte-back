@@ -1,6 +1,6 @@
 import api.extensions.getOrThrow
-import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.raise.either
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -49,12 +49,12 @@ class StopsTimesTests {
             body["stopCode"].asString().bind()
             body["coordinates"]["latitude"].asDouble().bind()
             body["coordinates"]["longitude"].asDouble().bind()
-            body["arrives"].asArray().bind().forEach {
-                it["codMode"].asInt().bind()
-                it["line"].asString().bind()
-                it["anden"].asInt().getOrNull()
-                it["destination"].asString().bind()
-                it["estimatedArrives"].asArray().bind().map { it.asLong().bind() }.first()
+            body["arrives"].asArray().bind().forEach { arrive ->
+                arrive["codMode"].asInt().bind()
+                arrive["line"].asString().bind()
+                arrive["anden"].asInt().getOrNull()
+                arrive["destination"].asString().bind()
+                arrive["estimatedArrives"].asArray().bind().map { it.asLong().bind() }.first()
             }
             body["incidents"].asArray().bind().forEach {
                 it["title"].asString().bind()

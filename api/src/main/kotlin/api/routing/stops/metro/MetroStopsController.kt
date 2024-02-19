@@ -7,7 +7,7 @@ import api.db.getStopNameById
 import api.exceptions.BusTrackerException.NotFound
 import api.extensions.awaitWrap
 import api.extensions.bindJson
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import crtm.utils.getStopCodeFromFullStopCode
 import okhttp3.HttpUrl
 import okhttp3.Request
@@ -42,7 +42,7 @@ suspend fun getMetroTimes(fullStopCode: String) = either {
     val coordinates = getCoordinatesByStopCode(fullStopCode).bind()
 
     response.use {
-        if (it?.code == 404) shift<NotFound>(NotFound("Station not found"))
+        if (it?.code == 404) raise(NotFound("Station not found"))
 
         val json = it?.body
             ?.string()

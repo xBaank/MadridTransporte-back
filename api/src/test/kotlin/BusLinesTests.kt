@@ -2,7 +2,7 @@ import api.extensions.getOrThrow
 import api.routing.stops.bus.busCodMode
 import api.routing.stops.bus.urbanCodMode
 import api.routing.stops.emt.emtCodMode
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

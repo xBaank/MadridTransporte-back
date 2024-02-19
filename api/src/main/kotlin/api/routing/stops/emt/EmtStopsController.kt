@@ -11,8 +11,8 @@ import api.extensions.bindJson
 import api.extensions.get
 import api.extensions.post
 import arrow.core.Either
-import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.raise.either
 import crtm.utils.getStopCodeFromFullStopCode
 import io.ktor.util.logging.*
 import ru.gildor.coroutines.okhttp.await
@@ -39,12 +39,12 @@ suspend fun login() = either {
             )
         ).await()
     } catch (ex: InterruptedIOException) {
-        shift<Nothing>(InternalServerError("Emt timeout error"))
+        raise(InternalServerError("Emt timeout error"))
     }
 
-    if (!response.isSuccessful) shift<Nothing>(InternalServerError("EMT login failed"))
+    if (!response.isSuccessful) raise(InternalServerError("EMT login failed"))
     val body =
-        response.body?.string()?.deserialized()?.bindJson() ?: shift<Nothing>(InternalServerError("Body is null"))
+        response.body?.string()?.deserialized()?.bindJson() ?: raise(InternalServerError("Body is null"))
     currentLoginResponse = parseLoginResponse(body).bindJson()
 }
 
@@ -66,7 +66,7 @@ suspend fun getEmtStopTimesResponse(stopCode: String): Either<BusTrackerExceptio
 
 
         response?.use {
-            if (it.code == 404) shift<NotFound>(NotFound("Stop not found"))
+            if (it.code == 404) raise(NotFound("Stop not found"))
             if (it.code == 401 || it.code == 403) {
                 login().getOrElse(logger::error)
                 return@use

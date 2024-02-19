@@ -1,4 +1,4 @@
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.amshove.kluent.shouldBe

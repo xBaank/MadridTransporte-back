@@ -1,6 +1,6 @@
 import api.extensions.getOrThrow
-import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.raise.either
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.amshove.kluent.shouldBe

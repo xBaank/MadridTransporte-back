@@ -12,7 +12,7 @@ import api.extensions.getWrapped
 import api.routing.Response.ResponseJson
 import api.routing.Response.ResponseRaw
 import api.utils.Pipeline
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -54,7 +54,7 @@ suspend fun Pipeline.abonoSubscription() = either {
     val body = call.receiveText().deserialized().bindJson()
     val deviceToken = body["deviceToken"].asString().bindJson()
     val ttpNumber = body["ttpNumber"].asString().bindJson()
-    val subscription = getAbonoSubscription(deviceToken.toDeviceToken(), ttpNumber) ?: shift<Nothing>(NotFound())
+    val subscription = getAbonoSubscription(deviceToken.toDeviceToken(), ttpNumber) ?: raise(NotFound())
     ResponseJson(buildAbonoSubscriptionJson(subscription), HttpStatusCode.OK)
 }
 

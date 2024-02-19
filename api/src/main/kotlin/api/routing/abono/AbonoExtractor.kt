@@ -1,13 +1,13 @@
 package api.routing.abono
 
 import api.exceptions.BusTrackerException.NotFound
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
-suspend fun extractAbono(data: SS_prepagoConsultaSaldo) = either {
-    if (data.ttpSearchResult?.value != 1) shift<Nothing>(NotFound("No se ha encontrado el abono"))
+fun extractAbono(data: SS_prepagoConsultaSaldo) = either {
+    if (data.ttpSearchResult?.value != 1) raise(NotFound("No se ha encontrado el abono"))
 
     val contracts =
         data.ttpSearchResult?.operationResult?.Contracts?.contractNumber?.filter { it.ContractCode != null }

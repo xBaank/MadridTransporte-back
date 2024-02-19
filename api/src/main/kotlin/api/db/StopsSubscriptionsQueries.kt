@@ -8,7 +8,7 @@ import api.db.models.StopsSubscription
 import api.exceptions.BusTrackerException
 import api.exceptions.BusTrackerException.TooManyRequests
 import arrow.core.Either
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.model.Updates
@@ -81,7 +81,7 @@ suspend fun getSubscription(deviceToken: DeviceToken, stopCode: String) = either
         .find(Filters.and(containsDeviceToken, Filters.eq(StopsSubscription::stopCode.name, stopCode)))
         .firstOrNull()
 
-    sub ?: shift<Nothing>(BusTrackerException.NotFound("Subscription not found"))
+    sub ?: raise(BusTrackerException.NotFound("Subscription not found"))
 }
 
 suspend fun subscribeDevice(
@@ -91,7 +91,7 @@ suspend fun subscribeDevice(
     codMode: String
 ): Either<BusTrackerException, Unit> = either {
     if (getSubscriptions(deviceToken).count() > EnvVariables.subscriptionsLimit)
-        shift<Nothing>(TooManyRequests("Limit of subscriptions reached"))
+        raise(TooManyRequests("Limit of subscriptions reached"))
 
     val subscription = stopsSubscriptionsCollection
         .find(
@@ -107,7 +107,7 @@ suspend fun subscribeDevice(
         deviceToken in subscription.deviceTokens
         &&
         subscription.linesByDeviceToken[deviceToken.token]?.contains(lineDestination) == true
-    ) shift<Nothing>(BusTrackerException.Conflict("Device already subscribed"))
+    ) raise(BusTrackerException.Conflict("Device already subscribed"))
 
     if (subscription != null) {
         if (deviceToken !in subscription.deviceTokens) subscription.deviceTokens += deviceToken

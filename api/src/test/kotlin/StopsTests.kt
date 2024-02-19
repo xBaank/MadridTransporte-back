@@ -1,5 +1,5 @@
 import api.extensions.getOrThrow
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import org.amshove.kluent.shouldBeGreaterThan

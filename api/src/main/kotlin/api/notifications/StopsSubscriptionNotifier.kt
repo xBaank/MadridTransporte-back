@@ -20,7 +20,7 @@ import api.routing.stops.train.getTrainTimes
 import api.routing.stops.trainRouted.trainCodMode
 import api.utils.StopTimesF
 import arrow.core.Either
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import com.google.firebase.ErrorCode.INVALID_ARGUMENT
 import com.google.firebase.ErrorCode.NOT_FOUND
 import com.google.firebase.messaging.*
@@ -62,7 +62,7 @@ suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, S
         }
 
         else -> {
-            shift<Nothing>(NotFound("CodMode $codMode is not supported"))
+            raise(NotFound("CodMode $codMode is not supported"))
         }
     }
 }

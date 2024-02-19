@@ -9,7 +9,7 @@ import api.extensions.getWrapped
 import api.routing.Response.ResponseFlowJson
 import api.routing.Response.ResponseJson
 import api.utils.Pipeline
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import crtm.utils.createStopCode
 import crtm.utils.getCodModeFromLineCode
 import crtm.utils.getSimpleLineCodeFromLineCode
@@ -23,11 +23,11 @@ import kotlinx.coroutines.flow.map
 
 suspend fun Pipeline.getItineraries(codMode: String) = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
-    val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: shift<Nothing>(BadRequest())
+    val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: raise(BadRequest())
     val stopCode = call.request.queryParameters.getWrapped("stopCode").bind()
 
     val itinerary = getItinerariesByFullLineCode(lineCode, direction, createStopCode(codMode, stopCode)).firstOrNull()
-        ?: shift<Nothing>(NotFound())
+        ?: raise(NotFound())
 
     val itineraryOrdered =
         itinerary.copy(stops = itinerary.stops.distinctBy { it.fullStopCode to it.order }.sortedBy { it.order })
@@ -37,7 +37,7 @@ suspend fun Pipeline.getItineraries(codMode: String) = either {
     ResponseJson(json, HttpStatusCode.OK)
 }
 
-suspend fun Pipeline.getShapes() = either {
+fun Pipeline.getShapes() = either {
     val itineraryCode = call.parameters.getWrapped("itineraryCode").bind()
 
     val shapes = getShapesByItineraryCode(itineraryCode)
@@ -49,7 +49,7 @@ suspend fun Pipeline.getShapes() = either {
 
 suspend fun Pipeline.getLocations() = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
-    val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: shift<Nothing>(BadRequest())
+    val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: raise(BadRequest())
     val stopCode = call.request.queryParameters.getWrapped("stopCode").bind()
 
     val codMode = getCodModeFromLineCode(lineCode)

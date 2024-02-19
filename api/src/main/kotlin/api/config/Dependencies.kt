@@ -1,7 +1,7 @@
 package api.config
 
 import api.db.models.*
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
@@ -30,11 +30,11 @@ val stopsOrderCollection: MongoCollection<StopOrder> by lazy { db.getCollection(
 val routesCollection: MongoCollection<Route> by lazy { db.getCollection(Route::class.simpleName!!) }
 val abonosSubscriptionsCollection: MongoCollection<AbonoSubscription> by lazy { db.getCollection(AbonoSubscription::class.simpleName!!) }
 
-suspend fun setupMongo() = either {
+fun setupMongo() = either {
     db = MongoClient.create(EnvVariables.mongoConnectionString.bind()).getDatabase("busTracker")
 }
 
-suspend fun setupFirebase() = either {
+fun setupFirebase() = either {
     LoadBalancerRegistry.getDefaultRegistry().register(PickFirstLoadBalancerProvider())
     if (FirebaseApp.getApps().isNotEmpty()) return@either
     if (EnvVariables.serviceJson.isLeft()) {

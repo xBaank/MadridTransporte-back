@@ -8,7 +8,7 @@ import api.utils.auth
 import api.utils.defaultClient
 import api.utils.mapExceptionsF
 import arrow.core.Either
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import crtm.soap.StopTimesRequest
 import crtm.utils.getStopCodeFromFullStopCode
 import kotlinx.coroutines.withTimeoutOrNull
