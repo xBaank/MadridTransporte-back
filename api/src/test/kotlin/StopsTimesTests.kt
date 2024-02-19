@@ -1,9 +1,9 @@
+import api.extensions.getOrThrow
 import arrow.core.continuations.either
 import arrow.core.getOrElse
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
 import org.junit.jupiter.params.ParameterizedTest
@@ -40,7 +40,7 @@ class StopsTimesTests {
         val response = client.get(code.url)
         val body = response.bodyAsText().deserialized().getOrElse { throw it }
 
-        response.status.isSuccess().shouldBe(true)
+        response.status.value.shouldBeEqualTo(200)
         body.shouldBeInstanceOf<JsonObject>()
         either {
             body["codMode"].asInt().bind()
@@ -65,7 +65,7 @@ class StopsTimesTests {
                 it["effect"].asString().bind()
                 it["url"].asString().bind()
             }
-        }.getOrElse { throw it }
+        }.getOrThrow()
     }
 
     @ParameterizedTest

@@ -26,11 +26,11 @@ fun Pipeline.getAllStops(): ResponseFlowJson {
     return ResponseFlowJson(buildStops(stops), HttpStatusCode.OK)
 }
 
-suspend fun Pipeline.getStopTimesResponse(stopTimeF: StopTimesF, codMode: String, cacheTime: Int) = either {
+suspend fun Pipeline.getStopTimesResponse(stopTimesF: StopTimesF, codMode: String, cacheTime: Int) = either {
     val stopCode = call.parameters.getWrapped("stopCode")
     val fullStopCode = createStopCode(codMode, stopCode.bind())
     checkStopExists(fullStopCode).bind()
-    val times = stopTimeF(fullStopCode).bind()
+    val times = stopTimesF(fullStopCode).bind()
     if (times.arrives != null) call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = cacheTime))
     val statusCode = if (times.arrives == null) HttpStatusCode.ServiceUnavailable else HttpStatusCode.OK
     ResponseJson(buildStopTimesJson(times), statusCode)

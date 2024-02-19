@@ -7,21 +7,14 @@ import io.ktor.client.request.*
 import io.ktor.server.application.*
 import io.ktor.server.testing.*
 
-
 suspend fun ApplicationTestBuilder.getAbono(id: String) =
     client.get("/abono/$id")
-
-suspend fun ApplicationTestBuilder.getLineLocation(line: String, direction: Int) =
-    client.get("/lines/bus/$line/locations/$direction?stopCode=01231")
 
 suspend fun ApplicationTestBuilder.getItineraries(line: String, direction: Int) =
     client.get("/lines/bus/$line/itineraries/$direction?stopCode=01231")
 
 suspend fun ApplicationTestBuilder.getShapes(itineraryId: String) =
     client.get("/lines/bus/shapes/$itineraryId")
-
-suspend fun ApplicationTestBuilder.getKml(itineraryId: String) =
-    client.get("/lines/bus/kml/$itineraryId")
 
 fun testApplicationBusTracker(
     startUpF: Application.() -> Unit = {

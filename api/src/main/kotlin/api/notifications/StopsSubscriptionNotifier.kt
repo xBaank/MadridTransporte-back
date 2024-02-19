@@ -42,7 +42,7 @@ private val logger = KtorSimpleLogger("Subscriptions")
 suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, StopTimesF> = either {
     when (codMode) {
         metroCodMode -> {
-            { getMetroTimes(it, codMode) }
+            { getMetroTimes(it) }
         }
 
         tramCodMode -> {

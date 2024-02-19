@@ -3,7 +3,6 @@ package api.routing.stops.emt
 import api.db.getRoute
 import api.exceptions.BusTrackerException
 import api.extensions.bindJson
-import api.extensions.mapAsync
 import api.extensions.toDirection
 import api.routing.stops.Arrive
 import api.routing.stops.Coordinates
@@ -26,13 +25,14 @@ suspend fun extractEMTStopTimes(json: JsonNode) = either {
         .let { Coordinates(it[1].asDouble().bindJson(), it[0].asDouble().bindJson()) }
     val arrives = json["data"][0]["Arrive"].asArray().getOrNull()
     val incidents = json["data"][0]["Incident"]["ListaIncident"]["data"].asArray().getOrNull()
-    val arrivesMapped = arrives?.mapAsync {
+    val arrivesMapped = arrives?.map {
         val secondsToArrive = it["estimateArrive"].asLong().bindJson()
         val estimatedArrive = LocalDateTime.now(Clock.systemUTC()).plusSeconds(secondsToArrive)
         val line = it["line"].asString().bindJson()
         val linesInfo = json["data"][0]["StopInfo"][0]["lines"].asArray().bindJson()
         val direction =
-            linesInfo.first { it["label"].asString().bindJson() == line }["to"].asString().bindJson().toDirection()
+            linesInfo.firstOrNull { it["label"].asString().bindJson() == line }?.get("to")?.asString()?.bindJson()
+                ?.toDirection()
         val lineCode = getRoute(line, emtCodMode).getOrNull()?.fullLineCode ?: createLineCode(emtCodMode, line)
         Arrive(
             line = line,
