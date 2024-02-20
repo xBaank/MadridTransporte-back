@@ -16,5 +16,5 @@ fun <T> Flow<T>.batched(size: Int) = flow {
 }
 
 suspend fun <T> Flow<List<T>>.forEachAsync(f: suspend (T) -> Unit) = collect { batch ->
-    batch.parallelForEach { f(it) }
+    batch.forEachAsync { f(it) }
 }
