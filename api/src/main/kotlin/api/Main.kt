@@ -5,9 +5,9 @@ import api.config.configureRoutingV1
 import api.config.setupFirebase
 import api.config.setupMongo
 import api.db.loadDataIntoDb
+import api.extensions.getOrThrow
 import api.notifications.notifyAbonosOnBackground
 import api.notifications.notifyStopTimesOnBackground
-import arrow.core.getOrElse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -20,6 +20,9 @@ import kotlinx.coroutines.runBlocking
 fun main() {
     embeddedServer(Netty, port = EnvVariables.port) {
         startUp()
+        //startup is used on tests and notifications tests are mocked, so we don't include those methods in the startup
+        notifyStopTimesOnBackground()
+        notifyAbonosOnBackground()
     }.start(wait = true)
 }
 
@@ -37,11 +40,9 @@ fun Application.startUp() = runBlocking {
         anyHost()
     }
     install(CachingHeaders)
-    setupFirebase().getOrElse { throw it }
-    setupMongo().getOrElse { throw it }
+    setupFirebase().getOrThrow()
+    setupMongo().getOrThrow()
     loadDataIntoDb()
     configureRoutingV1()
-    notifyStopTimesOnBackground()
-    notifyAbonosOnBackground()
 }
 
