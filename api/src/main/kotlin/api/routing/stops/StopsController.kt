@@ -14,9 +14,9 @@ import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.hours
 
-val cachedAlerts = Cache.Builder()
+val cachedAlerts = Cache.Builder<String, IncidentsAffectationsResponse>()
     .expireAfterWrite(24.hours)
-    .build<String, IncidentsAffectationsResponse>()
+    .build()
 
 suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
     val result = withTimeoutOrNull(timeoutSeconds) {

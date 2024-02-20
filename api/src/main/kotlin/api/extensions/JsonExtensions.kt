@@ -5,9 +5,9 @@ import simpleJson.JsonNode
 import simpleJson.serialized
 import kotlin.time.Duration.Companion.hours
 
-private val cacheJson = Cache.Builder()
+private val cacheJson = Cache.Builder<JsonNode, String>()
     .expireAfterWrite(24.hours)
-    .build<JsonNode, String>()
+    .build()
 
 suspend fun JsonNode.serializedMemo() = cacheJson.get(this) {
     serialized()
