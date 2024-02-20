@@ -15,12 +15,8 @@ plugins {
 }
 
 dependencies {
-    jaxws("com.sun.xml.ws:jaxws-tools:4.0.0")
-    implementation("com.sun.xml.ws:jaxws-tools:4.0.1")
-    //junit 5
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
-    //kluent
-    testImplementation("org.amshove.kluent:kluent:1.72")
+    jaxws("com.sun.xml.ws:jaxws-tools:4.0.2")
+    implementation("com.sun.xml.ws:jaxws-tools:4.0.2")
 }
 
 
