@@ -9,6 +9,7 @@ import api.exceptions.BusTrackerException.NotFound
 import api.extensions.await
 import api.extensions.batched
 import api.extensions.forEachAsync
+import api.extensions.parallelForEach
 import api.routing.stops.bus.busCodMode
 import api.routing.stops.bus.getCRTMStopTimes
 import api.routing.stops.emt.emtCodMode
@@ -91,7 +92,7 @@ private suspend fun sendNotification(subscription: StopsSubscription) {
     val function = getFunctionByCodMode(subscription.codMode).getOrNull() ?: return
     val stopTimes = function(subscription.stopCode).getOrNull() ?: return
 
-    subscription.deviceTokens.distinctBy { it.token }.forEachAsync {
+    subscription.deviceTokens.distinctBy { it.token }.parallelForEach {
         val selectedTimes = stopTimes.copy(
             arrives = stopTimes.arrives?.filter { arrive ->
                 subscription.linesByDeviceToken[it.token]?.any { lineDestination ->

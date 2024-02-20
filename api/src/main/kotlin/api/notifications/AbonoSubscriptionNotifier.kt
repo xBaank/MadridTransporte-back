@@ -11,7 +11,7 @@ import api.utils.timeZoneMadrid
 import com.google.firebase.ErrorCode
 import com.google.firebase.messaging.*
 import dev.inmo.krontab.builder.buildSchedule
-import dev.inmo.krontab.doInfinityTz
+import dev.inmo.krontab.doOnceTz
 import io.ktor.util.logging.*
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -27,9 +27,15 @@ fun notifyAbonosOnBackground() = GlobalScope.launch(Dispatchers.IO) {
         hours {
             at(6)
         }
+        minutes {
+            at(0)
+        }
+        seconds {
+            at(0)
+        }
     }
 
-    scheduler.doInfinityTz {
+    scheduler.doOnceTz {
         try {
             sendAbonoNotifications()
         } catch (e: Exception) {
