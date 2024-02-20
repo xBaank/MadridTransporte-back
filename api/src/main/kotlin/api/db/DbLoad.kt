@@ -6,8 +6,8 @@ import api.config.EnvVariables.reloadDb
 import api.db.models.Itinerary
 import api.db.models.Shape
 import api.db.models.StopOrder
+import api.extensions.forEachAsync
 import api.extensions.get
-import api.extensions.mapAsync
 import api.extensions.removeFirstLine
 import api.extensions.toEnumeration
 import api.routing.stops.metro.metroCodMode
@@ -40,7 +40,8 @@ private val infoReader = csvReader {
 }
 
 
-private const val sequenceChunkSize = 10_000
+private const val chunkSize = 5_000
+private const val parallelChunkSize = 20
 
 suspend fun loadDataIntoDb() = coroutineScope {
     if (!reloadDb || alreadyLoadedDb) return@coroutineScope
@@ -70,7 +71,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
 
                 stopsCollection.drop()
 
-                stops.chunked(sequenceChunkSize).forEach {
+                stops.chunked(chunkSize).forEach {
                     stopsCollection.insertMany(it)
                 }
             }
@@ -81,10 +82,10 @@ suspend fun loadDataIntoDb() = coroutineScope {
             reader.openAsync(allRoutesStream) {
                 val routes = readAllWithHeaderAsSequence()
                     .distinctBy { it["route_id"] }
-                    .chunked(sequenceChunkSize)
+                    .chunked(chunkSize)
                 routesCollection.drop()
-                routes.forEach {
-                    val parsed = it.mapAsync(::parseRoute).toList()
+                routes.forEachAsync(parallelChunkSize) {
+                    val parsed = it.map(::parseRoute).toList()
                     routesCollection.insertMany(parsed)
                 }
             }
@@ -93,10 +94,10 @@ suspend fun loadDataIntoDb() = coroutineScope {
         async {
             logger.info("Loading itineraries")
             reader.openAsync(allItinerariesStream) {
-                val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
+                val itineraries = readAllWithHeaderAsSequence().chunked(chunkSize)
                 itinerariesCollection.drop()
-                itineraries.forEach {
-                    val parsed = it.mapAsync(::parseItinerary).toList()
+                itineraries.forEachAsync(parallelChunkSize) {
+                    val parsed = it.map(::parseItinerary).toList()
                     itinerariesCollection.insertMany(parsed)
                 }
             }
@@ -105,10 +106,10 @@ suspend fun loadDataIntoDb() = coroutineScope {
         async {
             logger.info("Loading shapes")
             reader.openAsync(allShapesStream) {
-                val shapes = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
+                val shapes = readAllWithHeaderAsSequence().chunked(chunkSize)
                 shapesCollection.drop()
-                shapes.forEach {
-                    val parsed = it.mapAsync(::parseShape).toList()
+                shapes.forEachAsync(parallelChunkSize) {
+                    val parsed = it.map(::parseShape).toList()
                     shapesCollection.insertMany(parsed)
                 }
             }
@@ -117,10 +118,10 @@ suspend fun loadDataIntoDb() = coroutineScope {
         async {
             logger.info("Loading stops info")
             infoReader.openAsync(allStopsInfoStream) {
-                val stops = readAllWithHeaderAsSequence().distinct().chunked(sequenceChunkSize)
+                val stops = readAllWithHeaderAsSequence().distinct().chunked(chunkSize)
                 stopsInfoCollection.drop()
-                stops.forEach {
-                    val parsed = it.mapAsync(::parseStopInfo).toList()
+                stops.forEachAsync(parallelChunkSize) {
+                    val parsed = it.map(::parseStopInfo).toList()
                     stopsInfoCollection.insertMany(parsed)
                 }
             }
@@ -129,10 +130,10 @@ suspend fun loadDataIntoDb() = coroutineScope {
         async {
             logger.info("Loading stops order")
             reader.openAsync(allStopsTimesStream) {
-                val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
+                val stops = readAllWithHeaderAsSequence().chunked(chunkSize)
                 stopsOrderCollection.drop()
-                stops.forEach {
-                    val parsed = it.mapAsync(::parseStopsOrder).toList()
+                stops.forEachAsync(parallelChunkSize) {
+                    val parsed = it.map(::parseStopsOrder).toList()
                     stopsOrderCollection.insertMany(parsed)
                 }
             }
