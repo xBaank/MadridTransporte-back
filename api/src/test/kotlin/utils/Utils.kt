@@ -2,7 +2,6 @@ package utils
 
 import api.startUp
 import io.ktor.client.*
-import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.server.application.*
 import io.ktor.server.testing.*
@@ -23,13 +22,8 @@ fun testApplicationBusTracker(
     },
     block: suspend ApplicationTestBuilder.(client: HttpClient) -> Unit
 ) = testApplication {
-    val newClient = createClient {
-        install(WebSockets) {
-            pingInterval = 1000
-        }
-    }
     application {
         startUpF()
     }
-    block(newClient)
+    block(client)
 }
