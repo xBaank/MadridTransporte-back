@@ -1,8 +1,12 @@
 # Changelog
 
+## 6.1.7
+
+- Fixed abono notification typo
+
 ## 6.1.6
 
-- Fixed abono notifications bug that caused to receive the notification every second for an hour.
+- Fixed abono notifications bug that caused to receive the notification every second for an hour
 - Update dependencies
 
 ## 6.1.5
