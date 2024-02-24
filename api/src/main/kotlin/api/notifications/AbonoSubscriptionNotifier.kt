@@ -53,7 +53,7 @@ private suspend fun sendNotification(abonoSubcription: AbonoSubscription) {
         val icon = "https://www.madridtransporte.com/favicon.ico"
         val title = "Abono apunto de caducar"
         val body =
-            if (it.leftDays > 0) "Te quedan ${it.leftDays} dias para que tu abono ${abonoSubcription.abonoName} caduque"
+            if (it.leftDays > 0) "Quedan ${it.leftDays} días para que tu abono ${abonoSubcription.abonoName} caduque"
             else "Tu abono ${abonoSubcription.abonoName} ha caducado"
         val tag = data.ttpNumber + it.contractName
 
