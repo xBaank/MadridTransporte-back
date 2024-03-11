@@ -51,7 +51,7 @@ private suspend fun sendNotification(abonoSubcription: AbonoSubscription) {
     data.contracts.forEach {
         if (it.leftDays == null || it.leftDays > 5) return@forEach
         val icon = "https://www.madridtransporte.com/favicon.ico"
-        val title = "Abono apunto de caducar"
+        val title = "Caducidad abono"
         val body =
             if (it.leftDays > 0) "Quedan ${it.leftDays} días para que tu abono ${abonoSubcription.abonoName} caduque"
             else "Tu abono ${abonoSubcription.abonoName} ha caducado"
