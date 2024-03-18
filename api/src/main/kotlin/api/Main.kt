@@ -13,6 +13,7 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.cachingheaders.*
+import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.cors.routing.*
 import kotlinx.coroutines.runBlocking
 
@@ -38,6 +39,10 @@ fun Application.startUp() = runBlocking {
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
         anyHost()
+    }
+    install(Compression) {
+        gzip()
+        deflate()
     }
     install(CachingHeaders)
     setupFirebase().getOrThrow()
