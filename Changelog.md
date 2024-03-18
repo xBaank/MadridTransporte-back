@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.1.9
+
+- Updated mongo driver
+- Added soap error logs
+
 ## 6.1.8
 
 - Added gzip and deflate support
