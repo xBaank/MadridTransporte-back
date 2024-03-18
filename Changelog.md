@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.1.8
+
+- Added gzip and deflate support
+- Updated dependencies
+
 ## 6.1.7
 
 - Fixed abono notification typo
@@ -7,12 +12,12 @@
 ## 6.1.6
 
 - Fixed abono notifications bug that caused to receive the notification every second for an hour
-- Update dependencies
+- Updated dependencies
 
 ## 6.1.5
 
 - Fixed EMT exception when getting times
-- Update dependencies
+- Updated dependencies
 
 ## 6.1.4
 
