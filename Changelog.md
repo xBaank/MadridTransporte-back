@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.1.10
+
+- Add unsafe http for trains
+
 ## 6.1.9
 
 - Updated mongo driver

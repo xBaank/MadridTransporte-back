@@ -1,12 +1,16 @@
 package api.routing.stops.train.cano
 
-import okhttp3.*
+import api.utils.getUnsafeOkHttpClientBuilder
+import okhttp3.Headers
+import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
+import okhttp3.Request
+import okhttp3.Response
 import okio.Buffer
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
-val canoHttpClient = OkHttpClient.Builder()
+val canoHttpClient = getUnsafeOkHttpClientBuilder()
     .callTimeout(60.seconds.toJavaDuration())
     .connectTimeout(60.seconds.toJavaDuration())
     .readTimeout(60.seconds.toJavaDuration())
