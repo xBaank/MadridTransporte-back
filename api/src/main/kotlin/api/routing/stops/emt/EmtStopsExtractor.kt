@@ -51,7 +51,7 @@ suspend fun extractEMTStopTimes(json: JsonNode) = either {
             effect = it["effect"].asString().bindJson(),
             from = it["rssFrom"].asString().bindJson(),
             to = it["rssTo"].asString().bindJson(),
-            url = it["moreInfo"]["@url"].asString().bindJson()
+            url = it["moreInfo"]["@url"].asString().getOrNull() ?: ""
         )
     } ?: emptyList()
     StopTimes(

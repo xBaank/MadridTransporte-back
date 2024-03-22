@@ -14,7 +14,7 @@ import utils.testApplicationBusTracker
 const val busStopCode = "08242"
 const val trainStopCode = "34"
 const val metroStopCode = "235"
-const val emtStopCode = "5827"
+const val emtStopCode = "73"
 const val tramStopCode = "58"
 
 enum class Times(val url: String) {
