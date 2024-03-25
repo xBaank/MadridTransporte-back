@@ -29,9 +29,9 @@ suspend fun extractEMTStopTimes(json: JsonNode) = either {
         val secondsToArrive = it["estimateArrive"].asLong().bindJson()
         val estimatedArrive = LocalDateTime.now(Clock.systemUTC()).plusSeconds(secondsToArrive)
         val line = it["line"].asString().bindJson()
-        val linesInfo = json["data"][0]["StopInfo"][0]["lines"].asArray().bindJson()
+        val linesInfo = json["data"][0]["StopInfo"][0]["lines"].asArray().getOrNull()
         val direction =
-            linesInfo.firstOrNull { it["label"].asString().bindJson() == line }?.get("to")?.asString()?.bindJson()
+            linesInfo?.firstOrNull { it["label"].asString().bindJson() == line }?.get("to")?.asString()?.bindJson()
                 ?.toDirection()
         val lineCode = getRoute(line, emtCodMode).getOrNull()?.fullLineCode ?: createLineCode(emtCodMode, line)
         Arrive(

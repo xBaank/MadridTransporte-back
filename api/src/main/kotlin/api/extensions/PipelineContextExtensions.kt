@@ -8,12 +8,16 @@ import arrow.core.Either
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
+import io.ktor.util.logging.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.flow.withIndex
 import simpleJson.serialized
 
-suspend fun Pipeline.badRequest(message: String?) {
-    val messageResponse = message ?: "Bad Request"
+private val logger = KtorSimpleLogger("ResponseLogger")
+
+
+suspend fun Pipeline.badRequest(ex: BusTrackerException) {
+    val messageResponse = ex.message ?: "Bad Request"
     val messageResponseJson = errorObject(messageResponse).serialized()
 
     call.respondText(messageResponseJson, ContentType.Application.Json, HttpStatusCode.BadRequest)
@@ -63,13 +67,13 @@ private suspend fun Pipeline.internalServerError(ex: BusTrackerException.Interna
 
 suspend fun Pipeline.handleError(ex: BusTrackerException) = when (ex) {
     is BusTrackerException.NotFound -> notFound(ex)
-    is BusTrackerException.SoapError -> soapError(ex)
+    is BusTrackerException.SoapError -> soapError(ex.also(logger::error))
     is BusTrackerException.Unauthorized -> unauthorized(ex)
-    is BusTrackerException.InternalServerError -> internalServerError(ex)
-    is BusTrackerException.JsonError -> badRequest(ex.message)
-    is BusTrackerException.QueryParamError -> badRequest(ex.message)
-    is BusTrackerException.ValidationException -> badRequest(ex.message)
-    is BusTrackerException.BadRequest -> badRequest(ex.message)
+    is BusTrackerException.InternalServerError -> internalServerError(ex.also(logger::error))
+    is BusTrackerException.JsonError -> badRequest(ex.also(logger::error))
+    is BusTrackerException.QueryParamError -> badRequest(ex)
+    is BusTrackerException.ValidationException -> badRequest(ex)
+    is BusTrackerException.BadRequest -> badRequest(ex)
     is BusTrackerException.Conflict -> conflict(ex)
     is BusTrackerException.TooManyRequests -> tooManyRequests(ex)
 }
