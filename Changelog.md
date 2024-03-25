@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.1.12
+
+- Added more logging
+
 ## 6.1.11
 
 - Fix emt exception on cases where it can't extract the url of incidents
