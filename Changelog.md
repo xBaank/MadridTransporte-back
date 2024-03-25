@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.1.13
+
+- Added retry policy when extracting emt data as an attempt to fix transient errors.
+
 ## 6.1.12
 
 - Added more logging

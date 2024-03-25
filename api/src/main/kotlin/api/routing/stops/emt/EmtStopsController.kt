@@ -13,6 +13,8 @@ import api.extensions.post
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.either
+import arrow.resilience.Schedule
+import arrow.resilience.retry
 import crtm.utils.getStopCodeFromFullStopCode
 import io.ktor.util.logging.*
 import ru.gildor.coroutines.okhttp.await
@@ -83,11 +85,13 @@ suspend fun getEmtStopTimesResponse(stopCode: String): Either<BusTrackerExceptio
 }
 
 suspend fun getEmtStopTimes(stopCode: String) = either {
-    val response = getEmtStopTimesResponse(stopCode).bind()
-    if (response != null) return@either extractEMTStopTimes(response).bind()
-    createEMTFailedTimes(
-        name = getStopNameByStopCode(stopCode).bind(),
-        coordinates = getCoordinatesByStopCode(stopCode).bind(),
-        stopCode = getStopCodeFromFullStopCode(stopCode)
-    )
+    retry(Schedule.recurs(5)) {
+        val response = getEmtStopTimesResponse(stopCode).bind()
+        if (response != null) return@either extractEMTStopTimes(response).bind()
+        createEMTFailedTimes(
+            name = getStopNameByStopCode(stopCode).bind(),
+            coordinates = getCoordinatesByStopCode(stopCode).bind(),
+            stopCode = getStopCodeFromFullStopCode(stopCode)
+        )
+    }
 }
