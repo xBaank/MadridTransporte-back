@@ -15,6 +15,7 @@ const val busStopCode = "08242"
 const val trainStopCode = "34"
 const val metroStopCode = "235"
 const val emtStopCode = "73"
+const val emtStopCode2 = "77"
 const val tramStopCode = "58"
 
 enum class Times(val url: String) {
@@ -22,6 +23,7 @@ enum class Times(val url: String) {
     TRAIN("/stops/train/$trainStopCode/times"),
     METRO("/stops/metro/$metroStopCode/times"),
     EMT("/stops/emt/$emtStopCode/times"),
+    EMT2("/stops/emt/$emtStopCode2/times"),
     TRAM("/stops/tram/$tramStopCode/times")
 }
 
