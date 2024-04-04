@@ -1,9 +1,9 @@
-FROM gradle:8.5.0-jdk17 AS build
+FROM gradle:8.7.0-jdk17 AS build
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN gradle build -x test
 
-FROM amazoncorretto:21.0.1
+FROM amazoncorretto:21.0.2
 COPY . /build
 RUN mkdir /app
 

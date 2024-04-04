@@ -10,8 +10,8 @@ val test_containers_version: String by project
 plugins {
     kotlin("jvm")
     id("io.ktor.plugin")
-    id("org.jetbrains.kotlinx.kover") version "0.7.1"
-    kotlin("plugin.serialization") version "1.8.21"
+    id("org.jetbrains.kotlinx.kover") version "0.7.6"
+    kotlin("plugin.serialization") version "1.9.23"
     application
 }
 
@@ -21,7 +21,7 @@ application {
 
 dependencies {
     implementation("com.sun.xml.ws:jaxws-tools:4.0.2")
-    implementation("ch.qos.logback:logback-classic:1.4.14")
+    implementation("ch.qos.logback:logback-classic:1.5.3")
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0")
@@ -34,27 +34,27 @@ dependencies {
     implementation("io.ktor:ktor-server-cors:$ktor_version")
     implementation("io.github.xbaank:simpleJson-core:3.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("io.github.reactivecircus.cache4k:cache4k:0.12.0")
+    implementation("io.github.reactivecircus.cache4k:cache4k:0.13.0")
     // https://mvnrepository.com/artifact/org.amshove.kluent/kluent
     testImplementation("org.amshove.kluent:kluent:1.73")
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
 // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.1")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
     testImplementation("org.testcontainers:mongodb:1.19.7")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     implementation("io.ktor:ktor-server-compression:$ktor_version")
-    testImplementation("io.mockk:mockk:1.13.9")
-    implementation("io.github.pdvrieze.xmlutil:core:0.86.2")
-    implementation("io.github.pdvrieze.xmlutil:serialization:0.86.2")
+    testImplementation("io.mockk:mockk:1.13.10")
+    implementation("io.github.pdvrieze.xmlutil:core:0.86.3")
+    implementation("io.github.pdvrieze.xmlutil:serialization:0.86.3")
     implementation("io.ktor:ktor-server-caching-headers:$ktor_version")// https://mvnrepository.com/artifact/com.google.firebase/firebase-messaging
     implementation("com.google.firebase:firebase-admin:9.2.0")
-    implementation("com.google.auth:google-auth-library-oauth2-http:1.20.0")
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.23.0")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-guava
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.7.3")
-    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.0.0")
-    implementation("dev.inmo:krontab:2.2.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.0")
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.0.1")
+    implementation("dev.inmo:krontab:2.2.9")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.17.2")
     implementation(project(":crtm"))
