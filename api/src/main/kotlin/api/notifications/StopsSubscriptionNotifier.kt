@@ -89,7 +89,7 @@ fun notifyStopTimesOnBackground() = GlobalScope.launch(Dispatchers.IO) {
 suspend fun sendStopTimesNotifications() = getSubscriptions().batched(100).forEachAsync(::sendNotification)
 
 private suspend fun sendNotification(subscription: StopsSubscription) {
-    val function = getFunctionByCodMode(subscription.codMode).getOrNull() ?: return
+    val function = getFunctionByCodMode(subscription.codMode).onLeft(logger::error).getOrNull() ?: return
     val stopTimes = function(subscription.stopCode).getOrNull() ?: return
 
     subscription.deviceTokens.distinctBy { it.token }.mapAsync {

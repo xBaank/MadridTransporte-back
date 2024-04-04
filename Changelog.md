@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.1.14
+
+- Fix notifications not working, caused
+  by [Fold restriction not allowing any Function<*> to be returned is too strict](https://github.com/arrow-kt/arrow/issues/3391)
+
 ## 6.1.13
 
 - Added retry policy when extracting emt data as an attempt to fix transient errors.

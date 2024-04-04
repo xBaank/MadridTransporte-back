@@ -27,9 +27,9 @@ dependencies {
     implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0")
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3") // for JVM platform
     //arrow kt
-    implementation("io.arrow-kt:arrow-core:1.2.3")
+    implementation("io.arrow-kt:arrow-core:1.2.4")
     // https://mvnrepository.com/artifact/io.arrow-kt/arrow-resilience
-    implementation("io.arrow-kt:arrow-resilience:1.2.3")
+    implementation("io.arrow-kt:arrow-resilience:1.2.4")
 
     implementation("io.ktor:ktor-server-cors:$ktor_version")
     implementation("io.github.xbaank:simpleJson-core:3.0.0")
