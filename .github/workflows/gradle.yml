@@ -24,9 +24,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -37,6 +37,6 @@ jobs:
       - name: Build with Gradle
         env: 
           SERVICE_JSON: ${{ secrets.SERVICE_JSON }}
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        uses: gradle/gradle-build-action@942d5e1456472d289f4b112fd3b62244067bac9c
         with:
           arguments: build --stacktrace
