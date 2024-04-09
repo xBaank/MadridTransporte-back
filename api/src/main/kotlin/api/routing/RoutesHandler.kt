@@ -1,7 +1,7 @@
-package api.extensions
+package api.routing
 
 import api.exceptions.BusTrackerException
-import api.routing.Response
+import api.extensions.serializedMemo
 import api.utils.Pipeline
 import api.utils.errorObject
 import arrow.core.Either

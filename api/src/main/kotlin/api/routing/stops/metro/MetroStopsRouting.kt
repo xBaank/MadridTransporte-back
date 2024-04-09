@@ -1,6 +1,6 @@
 package api.routing.stops.metro
 
-import api.extensions.handle
+import api.routing.handle
 import api.routing.stops.alertsConfigF
 import api.routing.stops.getStopTimesResponse
 import api.routing.stops.subConfigF

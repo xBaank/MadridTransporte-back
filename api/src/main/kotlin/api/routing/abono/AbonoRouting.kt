@@ -1,6 +1,6 @@
 package api.routing.abono
 
-import api.extensions.handle
+import api.routing.handle
 import io.ktor.server.routing.*
 
 fun Route.abonoRouting() {

@@ -1,6 +1,6 @@
 package api.routing.lines
 
-import api.extensions.handle
+import api.routing.handle
 import io.ktor.server.routing.*
 
 val linesConfigF: Route.(codMode: String) -> Unit =

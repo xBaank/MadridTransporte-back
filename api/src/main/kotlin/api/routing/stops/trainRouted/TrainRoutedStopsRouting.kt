@@ -1,6 +1,6 @@
 package api.routing.stops.trainRouted
 
-import api.extensions.handle
+import api.routing.handle
 import io.ktor.server.routing.*
 
 const val trainCodMode = "5"

@@ -1,6 +1,6 @@
 package api.routing.stops
 
-import api.extensions.handle
+import api.routing.handle
 import api.routing.stops.bus.getCRTMStopTimes
 import arrow.core.right
 import io.ktor.server.routing.*
