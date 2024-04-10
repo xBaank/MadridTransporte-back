@@ -32,14 +32,16 @@ services:
     environment:
       - SERVICE_JSON= #WRITE HERE YOUR SERVICE JSON, NOT THE FILE PATH, You can get it from https://console.firebase.google.com/u/0/project/YOUR_PROJECT/settings/serviceaccounts/adminsdk
       - MONGO_CONNECTION_STRING= #WRITE HERE YOUR MONGO CONNECTION STRING
-      - NOTIFICATION_DELAY_TIME_SECONDS= #WRITE HERE THE DELAY TIME IN SECONDS FOR THE NOTIFICATION SERVICE, DEFAULT IS 60
+      - NOTIFICATION_DELAY_TIME_SECONDS=60 #WRITE HERE THE DELAY TIME IN SECONDS FOR THE NOTIFICATION SERVICE, DEFAULT IS 60
+      - RELOAD_DB=false #DEFAULT IS TRUE, THIS IS NEEDED AT LEAST THE FIRST TIME AND TO UPDATE THE GTFS DATA
+      - SOAP_TIMEOUT=45 #DEFAULT is 30
     image: xbank/bus_tracker_api:latest
   nginx:
     depends_on:
       - api
     image: nginx
     ports:
-      - "7777:443"
+      - "443:443"
     volumes:
       - yourNginxConfFilePath:/etc/nginx/conf.d/default.conf #Example below
       - yourPrivateKeyFilePath:/root/ssl/key.pem #You can generate it using letsencrypt
