@@ -51,6 +51,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
     val allShapesStream = getShapesFileAsStreamFromGtfs()
     val allItinerariesStream = getFileAsStreamFromGtfs("trips.txt")
     val allStopsInfoStream = getFileAsStreamFromInfo()
+    val allCalendars = getFileAsStreamFromGtfs("calendar.txt")
 
     awaitAll(
         async {
@@ -137,11 +138,24 @@ suspend fun loadDataIntoDb() = coroutineScope {
                 }
             }
             logger.info("Loaded stops order")
+        },
+        async {
+            logger.info("Loading calendars")
+            reader.openAsync(allCalendars) {
+                val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
+                calendarsCollection.drop()
+                stops.forEach {
+                    val parsed = it.mapAsync(::parseCalendar).toList()
+                    calendarsCollection.insertMany(parsed)
+                }
+            }
+            logger.info("Loaded calendars")
         }
     )
     shapesCollection.createIndex(Indexes.ascending(Shape::itineraryId.name))
-    itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name, Itinerary::itineraryCode.name))
+    itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name))
     stopsOrderCollection.createIndex(Indexes.ascending(StopOrder::tripId.name))
+    stopsOrderCollection.createIndex(Indexes.ascending(StopOrder::fullStopCode.name))
     alreadyLoadedDb = true
 }
 

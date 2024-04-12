@@ -27,6 +27,7 @@ val stopsSubscriptionsCollection: MongoCollection<StopsSubscription> by lazy { d
 val itinerariesCollection: MongoCollection<Itinerary> by lazy { db.getCollection(Itinerary::class.simpleName!!) }
 val shapesCollection: MongoCollection<Shape> by lazy { db.getCollection(Shape::class.simpleName!!) }
 val stopsOrderCollection: MongoCollection<StopOrder> by lazy { db.getCollection(StopOrder::class.simpleName!!) }
+val calendarsCollection: MongoCollection<Calendar> by lazy { db.getCollection(Calendar::class.simpleName!!) }
 val routesCollection: MongoCollection<Route> by lazy { db.getCollection(Route::class.simpleName!!) }
 val abonosSubscriptionsCollection: MongoCollection<AbonoSubscription> by lazy { db.getCollection(AbonoSubscription::class.simpleName!!) }
 

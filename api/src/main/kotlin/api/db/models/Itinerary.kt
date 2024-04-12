@@ -4,7 +4,8 @@ data class Itinerary(
     val itineraryCode: String,
     val fullLineCode: String,
     val direction: Int,
-    val tripId: String
+    val tripId: String,
+    val serviceId: String,
 )
 
 data class ItineraryWithStops(
@@ -12,11 +13,20 @@ data class ItineraryWithStops(
     val fullLineCode: String,
     val direction: Int,
     val stops: List<StopOrder>,
-    val tripId: String?
+    val tripId: String?,
 )
 
 data class StopOrder(
     val fullStopCode: String,
-    val tripId: String?,
-    val order: Int
+    val tripId: String,
+    val order: Int,
+    val departureTime: Long,
+)
+
+data class StopOrderWithItineraries(
+    val fullStopCode: String,
+    val tripId: String,
+    val itineraries: List<Itinerary>,
+    val order: Int,
+    val departureTime: Long,
 )

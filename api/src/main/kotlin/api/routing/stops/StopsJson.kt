@@ -2,6 +2,7 @@ package api.routing.stops
 
 import api.db.models.DeviceToken
 import api.db.models.Stop
+import api.db.models.StopOrderWithItineraries
 import api.db.models.StopsSubscription
 import crtm.soap.IncidentsAffectationsResponse
 import kotlinx.coroutines.flow.Flow
@@ -75,6 +76,30 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
     }
 
 }
+
+//TODO try to make this as similar as the live times
+fun buildStopTimesPlannedJson(stopTimes: List<StopOrderWithItineraries>) = stopTimes.map {
+    object {
+        val fullStopCode = it.fullStopCode
+        val lineCode = it.itineraries.first().fullLineCode
+        val itineraryCode = it.itineraries.first().itineraryCode
+        val direction = it.itineraries.first().direction
+        val departureTime = it.departureTime
+    }
+}.groupBy {
+    Triple(it.lineCode, it.direction, it.itineraryCode)
+}.map {
+    jObject {
+        "lineCode" += it.key.first
+        "direction" += it.key.second
+        "itineraryCode" += it.key.third
+        "arrives" += jArray {
+            it.value.forEach {
+                add(it.departureTime)
+            }
+        }
+    }
+}.asJson()
 
 fun buildSubscription(subscription: StopsSubscription, deviceToken: DeviceToken) = jObject {
     "stopCode" += subscription.stopCode.asJson()

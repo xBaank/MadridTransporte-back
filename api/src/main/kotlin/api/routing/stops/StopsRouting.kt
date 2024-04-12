@@ -21,6 +21,13 @@ val timesConfigF: Route.(codMode: String) -> Unit =
         }
     }
 
+val timesPlannedConfigF: Route.(codMode: String) -> Unit =
+    { codMode ->
+        get("/{stopCode}/planned") {
+            handle { getTimesPlanned(codMode) }
+        }
+    }
+
 val subConfigF: Route.(codMode: String) -> Unit =
     { codMode ->
         post("/times/subscribe") {
