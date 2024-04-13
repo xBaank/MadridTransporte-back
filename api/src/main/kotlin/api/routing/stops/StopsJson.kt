@@ -94,7 +94,7 @@ fun buildStopTimesPlannedJson(stopTimes: List<StopOrderWithItineraries>) = stopT
         "direction" += it.key.second
         "itineraryCode" += it.key.third
         "arrives" += jArray {
-            it.value.forEach {
+            it.value.distinctBy { it.departureTime }.sortedBy { it.departureTime }.forEach {
                 add(it.departureTime)
             }
         }

@@ -60,7 +60,7 @@ fun parseStopsOrder(data: Map<String, String>): StopOrder {
     } else hour
     val newTime = listOf(fixedHour.toString().padStart(2, '0'), times[1], times[2]).joinToString(":")
     val departure = LocalTime.parse(newTime, DateTimeFormatter.ofPattern("HH:mm:ss"))
-        .atDate(LocalDate.now())
+        .atDate(LocalDate.EPOCH)
         .atZone(ZoneOffset.UTC)
         .plusDays(daysToAdd)
         .toInstant()

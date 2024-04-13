@@ -15,8 +15,8 @@ import arrow.core.raise.either
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import kotlinx.coroutines.flow.*
-import java.time.DayOfWeek
-import java.time.Instant
+import java.time.*
+import java.time.temporal.ChronoUnit
 
 
 fun getAllStops() = stopsCollection.find()
@@ -67,6 +67,10 @@ suspend fun checkStopExists(stopCode: String) = either {
 suspend fun getStopTimesPlannedQuery(fullStopCode: String): Flow<StopOrderWithItineraries> {
     //We only want the services ids of this current moment
     val now = Instant.now().atZone(timeZoneMadrid.toZoneOffset())
+    
+    val nowUtc = Instant.now()
+    val startOfDayUTC = nowUtc.truncatedTo(ChronoUnit.DAYS)
+    val millisecondsSinceStartOfDay: Long = Duration.between(startOfDayUTC, nowUtc).toMillis()
 
     val dayFilter = when (now.dayOfWeek) {
         DayOfWeek.MONDAY -> Filters.eq(Calendar::monday.name, true)
@@ -93,7 +97,7 @@ suspend fun getStopTimesPlannedQuery(fullStopCode: String): Flow<StopOrderWithIt
         Aggregates.match(
             Filters.and(
                 Filters.eq(StopOrder::fullStopCode.name, fullStopCode),
-                Filters.gte(StopOrder::departureTime.name, now.toInstant().toEpochMilli())
+                Filters.gte(StopOrder::departureTime.name, millisecondsSinceStartOfDay)
             )
         ),
         Aggregates.lookup(
@@ -107,4 +111,12 @@ suspend fun getStopTimesPlannedQuery(fullStopCode: String): Flow<StopOrderWithIt
     return stopsOrderCollection.withDocumentClass<StopOrderWithItineraries>()
         .aggregate(pipeline)
         .filter { it.itineraries.any { it.serviceId in filteredServicesIds } }
+        .map {
+            it.copy(
+                departureTime = it.departureTime + LocalDate.now(ZoneOffset.UTC)
+                    .atStartOfDay()
+                    .toInstant(ZoneOffset.UTC)
+                    .toEpochMilli()
+            )
+        }
 }
