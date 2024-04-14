@@ -38,4 +38,3 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
     cachedAlerts.put(codMode, result)
     result
 }.mapLeft(mapExceptionsF)
-

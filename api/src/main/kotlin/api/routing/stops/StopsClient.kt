@@ -42,6 +42,15 @@ suspend fun Pipeline.getAlertsByCodMode(codMode: String) = either {
     ResponseJsonCached(buildAlertsJson(alerts), HttpStatusCode.OK)
 }
 
+suspend fun Pipeline.getTimesPlanned(codMode: String) = either {
+    val stopCode = call.parameters.getWrapped("stopCode")
+    val fullStopCode = createStopCode(codMode, stopCode.bind())
+    checkStopExists(fullStopCode).bind()
+    val timesPlanned = getStopTimesPlannedQuery(fullStopCode).toList()
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 15))
+    ResponseJson(buildStopTimesPlannedJson(timesPlanned), HttpStatusCode.OK)
+}
+
 suspend fun Pipeline.subscribeStopTime(codMode: String) =
     either {
         val body = call.receiveText().deserialized().bindJson()

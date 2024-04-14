@@ -14,7 +14,7 @@ const val destinationStopCode = "53"
 
 class StopsTrainsTimesTests {
     @Test
-    fun `should get stop times`() = testApplicationBusTracker {
+    fun `should get stop times planned`() = testApplicationBusTracker {
         val url = "/stops/train/times?originStopCode=$originStopCode&destinationStopCode=$destinationStopCode"
         val response = client.get(url)
         val body = response.bodyAsText().deserialized().getOrElse { throw it }
@@ -29,7 +29,7 @@ class StopsTrainsTimesTests {
     }
 
     @Test
-    fun `should not get stop times`() = testApplicationBusTracker {
+    fun `should not get stop times planned`() = testApplicationBusTracker {
         val url = "/stops/train/times?originStopCode=asdasd&destinationStopCode=asdasd"
         val response = client.get(url)
         response.status shouldBe HttpStatusCode.NotFound
