@@ -77,10 +77,8 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
 
 }
 
-//TODO try to make this as similar as the live times
 fun buildStopTimesPlannedJson(stopTimes: List<StopOrderWithItineraries>) = stopTimes.map {
     object {
-        val fullStopCode = it.fullStopCode
         val lineCode = it.itineraries.first().fullLineCode
         val itineraryCode = it.itineraries.first().itineraryCode
         val direction = it.itineraries.first().direction

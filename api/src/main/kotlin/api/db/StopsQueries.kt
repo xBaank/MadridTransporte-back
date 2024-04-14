@@ -67,7 +67,7 @@ suspend fun checkStopExists(stopCode: String) = either {
 suspend fun getStopTimesPlannedQuery(fullStopCode: String): Flow<StopOrderWithItineraries> {
     //We only want the services ids of this current moment
     val now = Instant.now().atZone(timeZoneMadrid.toZoneOffset())
-    
+
     val nowUtc = Instant.now()
     val startOfDayUTC = nowUtc.truncatedTo(ChronoUnit.DAYS)
     val millisecondsSinceStartOfDay: Long = Duration.between(startOfDayUTC, nowUtc).toMillis()
