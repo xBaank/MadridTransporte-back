@@ -6,6 +6,7 @@ data class Itinerary(
     val direction: Int,
     val tripId: String,
     val serviceId: String,
+    val tripName: String,
 )
 
 data class ItineraryWithStops(

@@ -1,10 +1,12 @@
 package api.routing.stops
 
+import api.db.getRoute
 import api.db.models.DeviceToken
 import api.db.models.Stop
 import api.db.models.StopOrderWithItineraries
 import api.db.models.StopsSubscription
 import crtm.soap.IncidentsAffectationsResponse
+import crtm.utils.getCodModeFromLineCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import simpleJson.asJson
@@ -77,10 +79,11 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
 
 }
 
-fun buildStopTimesPlannedJson(stopTimes: List<StopOrderWithItineraries>) = stopTimes.map {
+suspend fun buildStopTimesPlannedJson(stopTimes: List<StopOrderWithItineraries>) = stopTimes.map {
     object {
         val lineCode = it.itineraries.first().fullLineCode
         val itineraryCode = it.itineraries.first().itineraryCode
+        val itineraryName = it.itineraries.first().tripName
         val direction = it.itineraries.first().direction
         val departureTime = it.departureTime
     }
@@ -88,8 +91,12 @@ fun buildStopTimesPlannedJson(stopTimes: List<StopOrderWithItineraries>) = stopT
     Triple(it.lineCode, it.direction, it.itineraryCode)
 }.map {
     jObject {
-        "lineCode" += it.key.first
-        "direction" += it.key.second
+        val route = getRoute(it.key.first).getOrNull()
+        "fullLineCode" += it.key.first
+        "lineCode" += route?.simpleLineCode
+        "destination" += it.value.first().itineraryName
+        "codMode" += (route?.codMode ?: getCodModeFromLineCode(it.key.first)).toIntOrNull()
+        "direction" += it.key.second + 1
         "itineraryCode" += it.key.third
         "arrives" += jArray {
             it.value.distinctBy { it.departureTime }.sortedBy { it.departureTime }.forEach {

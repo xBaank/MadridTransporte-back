@@ -38,7 +38,8 @@ fun parseItinerary(data: Map<String, String>) = Itinerary(
     direction = data["direction_id"]?.toIntOrNull() ?: 0,
     fullLineCode = data["route_id"].toString(),
     tripId = data["trip_id"].toString(),
-    serviceId = data["service_id"].toString()
+    serviceId = data["service_id"].toString(),
+    tripName = data["trip_short_name"].toString()
 )
 
 fun parseShape(data: Map<String, String>) = Shape(
