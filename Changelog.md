@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.2.0
+
+- Updated dependencies
+- Added `/stops/{type}/times/{stopId}/planned` (Only available for type `bus` in this update)
+
 ## 6.1.14
 
 - Fix notifications not working, caused
