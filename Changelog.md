@@ -7,7 +7,7 @@
 
 ## 6.1.14
 
-- Fix notifications not working, caused
+- Fixed notifications not working, caused
   by [Fold restriction not allowing any Function<*> to be returned is too strict](https://github.com/arrow-kt/arrow/issues/3391)
 
 ## 6.1.13
@@ -20,11 +20,11 @@
 
 ## 6.1.11
 
-- Fix emt exception on cases where it can't extract the url of incidents
+- Fixed emt exception on cases where it can't extract the url of incidents
 
 ## 6.1.10
 
-- Add unsafe http for trains
+- Added unsafe http for trains
 
 ## 6.1.9
 
