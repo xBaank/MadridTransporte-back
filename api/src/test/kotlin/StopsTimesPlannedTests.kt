@@ -30,6 +30,8 @@ class StopsTimesPlannedTests {
             body.forEach {
                 it["lineCode"].asString().bind()
                 it["direction"].asInt().bind()
+                it["codMode"].asInt().bind()
+                it["destination"].asString().bind()
                 it["itineraryCode"].asString().bind()
                 it["arrives"].asArray().getOrThrow().forEach { arrive ->
                     arrive.asLong().bind()
