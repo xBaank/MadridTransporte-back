@@ -3,7 +3,7 @@ COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN gradle build -x test
 
-FROM amazoncorretto:21.0.2
+FROM amazoncorretto:21.0.3
 COPY . /build
 RUN mkdir /app
 
