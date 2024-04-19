@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.3.0
+
+- Added `wheelchair` and `zone` properties to `stops/all` endpoint
+
 ## 6.2.0
 
 - Updated dependencies
