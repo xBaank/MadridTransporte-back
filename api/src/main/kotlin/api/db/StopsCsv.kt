@@ -17,7 +17,9 @@ fun parseStop(data: Map<String, String>): Stop {
         stopLat = data["stop_lat"]?.toDoubleOrNull() ?: 0.0,
         stopLon = data["stop_lon"]?.toDoubleOrNull() ?: 0.0,
         codMode = codMode,
-        fullStopCode = createStopCode(codMode.toString(), stopCode)
+        fullStopCode = createStopCode(codMode.toString(), stopCode),
+        wheelchair = data["wheelchair_boarding"]?.toIntOrNull() ?: 0,
+        zone = data["zone_id"].toString()
     )
 }
 

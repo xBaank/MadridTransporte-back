@@ -32,6 +32,8 @@ fun buildStops(data: Flow<Stop>) = data.map {
         "stopLon" += it.stopLon
         "codMode" += it.codMode
         "fullStopCode" += it.fullStopCode
+        "wheelchair" += it.wheelchair
+        "zone" += it.zone
     }
 }
 

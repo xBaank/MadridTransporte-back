@@ -6,5 +6,7 @@ data class Stop(
     val stopLat: Double,
     val stopLon: Double,
     val codMode: Int,
-    val fullStopCode: String
+    val fullStopCode: String,
+    val wheelchair: Int,
+    val zone: String,
 )

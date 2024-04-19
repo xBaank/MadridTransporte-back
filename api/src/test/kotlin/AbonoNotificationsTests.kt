@@ -12,6 +12,7 @@ import io.ktor.http.*
 import io.mockk.*
 import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import simpleJson.jObject
 import simpleJson.serialized
@@ -43,6 +44,7 @@ class AbonoNotificationsTests {
         )
     )
 
+    @Disabled("Abono api is not working at the moment")
     @Test
     fun `should subscribe to abono, get subscription and unsubscribe`() =
         testApplicationBusTracker {
@@ -87,6 +89,7 @@ class AbonoNotificationsTests {
             unsubscribeResponse.status.isSuccess().shouldBe(true)
         }
 
+    @Disabled("Abono api is not working at the moment")
     @Test
     fun `should subscribe to abono and unsubscribe on error`() =
         testApplicationBusTracker {
@@ -130,6 +133,7 @@ class AbonoNotificationsTests {
             subscriptionsResponse.status.shouldBe(HttpStatusCode.NotFound)
         }
 
+    @Disabled("Abono api is not working at the moment")
     @Test
     fun `should not subscribe to abono`() = testApplicationBusTracker {
         val body = jObject {

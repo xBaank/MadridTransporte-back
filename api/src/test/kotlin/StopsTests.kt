@@ -23,6 +23,8 @@ class StopsTests {
                 it["stopLon"].asDouble().bind()
                 it["codMode"].asInt().bind().shouldBeGreaterThan(0)
                 it["fullStopCode"].asString().bind().shouldNotBeEmpty()
+                it["wheelchair"].asInt().bind()
+                it["zone"].asString().bind()
             }
         }.getOrThrow()
     }
