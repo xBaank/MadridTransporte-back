@@ -23,3 +23,17 @@ suspend fun getLocationsResponse(lineCode: String, direction: Int, codMode: Stri
             getSuspend(lineRequest, defaultClient.value()::getLineLocationAsync)
         } ?: throw SoapError("Server error")
     }.mapLeft(mapExceptionsF)
+
+suspend fun getLocationsResponse(lineCode: String, itineraryCode: String, codMode: String, stopCode: String?) =
+    Either.catch {
+        val lineRequest = LineLocationRequest().apply {
+            this.codMode = codMode
+            codLine = lineCode
+            codItinerary = itineraryCode
+            authentication = defaultClient.value().auth()
+            codStop = stopCode ?: "8_"
+        }
+        withTimeoutOrNull(timeoutSeconds) {
+            getSuspend(lineRequest, defaultClient.value()::getLineLocationAsync)
+        } ?: throw SoapError("Server error")
+    }.mapLeft(mapExceptionsF)

@@ -1,6 +1,7 @@
 package api.routing.lines
 
 import api.routing.handle
+import arrow.core.right
 import io.ktor.server.routing.*
 
 val linesConfigF: Route.(codMode: String) -> Unit =
@@ -10,10 +11,20 @@ val linesConfigF: Route.(codMode: String) -> Unit =
         }
 
         get("/{lineCode}/locations/{direction}") {
-            handle { getLocations() }
+            handle { getLocations(codMode) }
+        }
+
+        get("/{lineCode}/itineraries/{itineraryCode}/locations") {
+            handle { getLocationsByItineraryCode(codMode) }
         }
 
         get("/{lineCode}/itineraries/{direction}") {
             handle { getItineraries(codMode) }
         }
     }
+
+fun Route.linesRouting() {
+    get("/routes") {
+        handle { getAllLinesRoutes().right() }
+    }
+}

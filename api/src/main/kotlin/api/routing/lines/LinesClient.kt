@@ -2,6 +2,7 @@ package api.routing.lines
 
 import api.db.getItinerariesByFullLineCode
 import api.db.getRoute
+import api.db.getRoutesWithItineraries
 import api.db.getShapesByItineraryCode
 import api.exceptions.BusTrackerException.BadRequest
 import api.exceptions.BusTrackerException.NotFound
@@ -37,6 +38,13 @@ suspend fun Pipeline.getItineraries(codMode: String) = either {
     ResponseJson(json, HttpStatusCode.OK)
 }
 
+fun Pipeline.getAllLinesRoutes(): ResponseFlowJson {
+    val routes = getRoutesWithItineraries()
+    val json = routes.map(::buildRouteJson)
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
+    return ResponseFlowJson(json, HttpStatusCode.OK)
+}
+
 fun Pipeline.getShapes() = either {
     val itineraryCode = call.parameters.getWrapped("itineraryCode").bind()
 
@@ -47,22 +55,50 @@ fun Pipeline.getShapes() = either {
     ResponseFlowJson(json, HttpStatusCode.OK)
 }
 
-suspend fun Pipeline.getLocations() = either {
+suspend fun Pipeline.getLocations(codMode: String) = either {
     val lineCode = call.parameters.getWrapped("lineCode").bind()
     val direction = call.parameters.getWrapped("direction").bind().toIntOrNull() ?: raise(BadRequest())
     val stopCode = call.request.queryParameters.getWrapped("stopCode").bind()
 
-    val codMode = getCodModeFromLineCode(lineCode)
+    val lineCodMode = getCodModeFromLineCode(lineCode)
     val fullStopCode = createStopCode(codMode, stopCode)
     val route = getRoute(lineCode).getOrNull()
     val simpleLineCode = route?.simpleLineCode ?: getSimpleLineCodeFromLineCode(lineCode)
-    val routeCodMode = route?.codMode ?: codMode
+    val routeCodMode = route?.codMode ?: lineCodMode
 
     val locations = VehicleLocations(
         locations = getLocationsResponse(
             lineCode,
             direction,
-            codMode,
+            lineCodMode,
+            fullStopCode
+        ).bind().vehiclesLocation.vehicleLocation,
+        codMode = routeCodMode.toInt(),
+        lineCode = simpleLineCode,
+    )
+
+    val json = buildVehicleLocationJson(locations)
+
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 10))
+    ResponseJson(json, HttpStatusCode.OK)
+}
+
+suspend fun Pipeline.getLocationsByItineraryCode(codMode: String) = either {
+    val lineCode = call.parameters.getWrapped("lineCode").bind()
+    val itineraryCode = call.parameters.getWrapped("itineraryCode").bind()
+    val stopCode = call.request.queryParameters.getWrapped("stopCode").bind()
+
+    val lineCodMode = getCodModeFromLineCode(lineCode)
+    val fullStopCode = createStopCode(codMode, stopCode)
+    val route = getRoute(lineCode).getOrNull()
+    val simpleLineCode = route?.simpleLineCode ?: getSimpleLineCodeFromLineCode(lineCode)
+    val routeCodMode = route?.codMode ?: lineCodMode
+
+    val locations = VehicleLocations(
+        locations = getLocationsResponse(
+            lineCode,
+            itineraryCode,
+            lineCodMode,
             fullStopCode
         ).bind().vehiclesLocation.vehicleLocation,
         codMode = routeCodMode.toInt(),
