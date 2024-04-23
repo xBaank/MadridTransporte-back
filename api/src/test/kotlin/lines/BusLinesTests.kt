@@ -1,3 +1,5 @@
+package lines
+
 import api.extensions.getOrThrow
 import api.routing.stops.bus.busCodMode
 import api.routing.stops.bus.urbanCodMode
@@ -22,11 +24,41 @@ enum class LocationsUrls(
     val fullLineCode: String,
     val direction: Int,
     val lineCode: String,
-    val codMode: Int
+    val codMode: Int,
 ) {
     Emt("/lines/emt/6__144___/locations/2?stopCode=4597", "6__144___", 2, "144", emtCodMode.toInt()),
     Interurban("/lines/bus/8__450___/locations/1?stopCode=08242", "8__450___", 1, "450", busCodMode.toInt()),
     Urban("/lines/bus/9__2__065_/locations/2?stopCode=08242", "9__2__065_", 2, "2", urbanCodMode.toInt()),
+}
+
+enum class LocationsItineraryUrls(
+    val url: String,
+    val fullLineCode: String,
+    val direction: Int,
+    val lineCode: String,
+    val codMode: Int,
+) {
+    Emt(
+        "/lines/emt/6__144___/itineraries/6__144____2__IT_1/locations?stopCode=4597",
+        "6__144___",
+        2,
+        "144",
+        emtCodMode.toInt()
+    ),
+    Interurban(
+        "/lines/bus/8__450___/itineraries/8__450____1_-_IT_1/locations?stopCode=08242",
+        "8__450___",
+        1,
+        "450",
+        busCodMode.toInt()
+    ),
+    Urban(
+        "/lines/bus/9__2__065_/itineraries/9__2__065__2_-_IT_1/locations?stopCode=08242",
+        "9__2__065_",
+        2,
+        "2",
+        urbanCodMode.toInt()
+    ),
 }
 
 enum class ItinerariesUrls(val url: String, val code: String, val simpleLineCode: String, val direction: Int) {
@@ -57,6 +89,29 @@ class BusLinesTests {
             }
         }.getOrThrow()
     }
+
+    @ParameterizedTest
+    @EnumSource(LocationsItineraryUrls::class)
+    fun `should get line location by itinerary`(code: LocationsItineraryUrls) = testApplicationBusTracker {
+        val response = client.get(code.url)
+        val json = response.bodyAsText().deserialized().asObject()
+
+        response.status.shouldBe(HttpStatusCode.OK)
+        either {
+            json["codMode"].asInt().bind().shouldBeEqualTo(code.codMode)
+            json["lineCode"].asString().bind().shouldBeEqualTo(code.lineCode)
+            json["locations"].asArray().bind().forEach {
+                it["lineCode"].asString().bind().shouldBeEqualTo(code.fullLineCode)
+                it["simpleLineCode"].asString().bind().shouldBeEqualTo(code.lineCode)
+                it["codVehicle"].asString().bind()
+                it["direction"].asInt().bind().shouldBeEqualTo(code.direction)
+                it["service"].asString().bind()
+                it["coordinates"]["latitude"].asDouble().bind()
+                it["coordinates"]["longitude"].asDouble().bind()
+            }
+        }.getOrThrow()
+    }
+
 
     @ParameterizedTest
     @EnumSource(ItinerariesUrls::class)

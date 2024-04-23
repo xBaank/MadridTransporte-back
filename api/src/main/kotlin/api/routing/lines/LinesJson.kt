@@ -52,14 +52,14 @@ fun buildShapeJson(shape: Shape) = jObject {
 fun buildRouteJson(route: RouteWithItineraries) = jObject {
     "fullLineCode" += route.fullLineCode
     "simpleLineCode" += route.simpleLineCode
-    "codMode" += route.codMode
+    "codMode" += route.codMode.toInt()
     "routeName" += route.routeName
     "itineraries" += route.itineraries.distinctBy(Itinerary::itineraryCode).map(::buildItinerary).asJson()
 }
 
 fun buildItinerary(itinerary: Itinerary) = jObject {
     "itineraryCode" += itinerary.itineraryCode
-    "direction" += itinerary.direction
+    "direction" += itinerary.direction + 1
     "tripName" += itinerary.tripName
     "serviceId" += itinerary.serviceId
 }

@@ -24,7 +24,7 @@ val linesConfigF: Route.(codMode: String) -> Unit =
     }
 
 fun Route.linesRouting() {
-    get("/routes") {
+    get("/all") {
         handle { getAllLinesRoutes().right() }
     }
 }

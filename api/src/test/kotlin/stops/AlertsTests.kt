@@ -1,3 +1,5 @@
+package stops
+
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import io.ktor.client.request.*

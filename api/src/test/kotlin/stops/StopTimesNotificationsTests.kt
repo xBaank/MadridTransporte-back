@@ -1,3 +1,5 @@
+package stops
+
 import api.notifications.getFunctionByCodMode
 import api.notifications.sendStopTimesNotifications
 import api.routing.stops.Arrive
