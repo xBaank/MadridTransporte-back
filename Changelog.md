@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.4.0
+
+- Added `/lines/all` to get all routes
+- Added `/lines/{type}/itineraries/{itineraryCode}/locations` to get locations by itinerary code
+- Added `/lines/{type}/itineraries/{itineraryCode}` to get itinerary by itinerary code
+
 ## 6.3.0
 
 - Added `wheelchair` and `zone` properties to `stops/all` endpoint
