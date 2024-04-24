@@ -1,9 +1,6 @@
 package api.routing.lines
 
-import api.db.getItinerariesByFullLineCode
-import api.db.getRoute
-import api.db.getRoutesWithItineraries
-import api.db.getShapesByItineraryCode
+import api.db.*
 import api.exceptions.BusTrackerException.BadRequest
 import api.exceptions.BusTrackerException.NotFound
 import api.extensions.getWrapped
@@ -29,6 +26,19 @@ suspend fun Pipeline.getItineraries(codMode: String) = either {
 
     val itinerary = getItinerariesByFullLineCode(lineCode, direction, createStopCode(codMode, stopCode)).firstOrNull()
         ?: raise(NotFound())
+
+    val itineraryOrdered =
+        itinerary.copy(stops = itinerary.stops.distinctBy { it.fullStopCode to it.order }.sortedBy { it.order })
+
+    val json = itineraryOrdered.let(::buildItineraryJson)
+    call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 60 * 60))
+    ResponseJson(json, HttpStatusCode.OK)
+}
+
+suspend fun Pipeline.getItinerariesByCode() = either {
+    val itineraryCode = call.parameters.getWrapped("itineraryCode").bind()
+
+    val itinerary = getItineraryByCode(itineraryCode) ?: raise(NotFound("Itinerary code not found"))
 
     val itineraryOrdered =
         itinerary.copy(stops = itinerary.stops.distinctBy { it.fullStopCode to it.order }.sortedBy { it.order })
@@ -84,10 +94,10 @@ suspend fun Pipeline.getLocations(codMode: String) = either {
 }
 
 suspend fun Pipeline.getLocationsByItineraryCode(codMode: String) = either {
-    val lineCode = call.parameters.getWrapped("lineCode").bind()
     val itineraryCode = call.parameters.getWrapped("itineraryCode").bind()
     val stopCode = call.request.queryParameters.getWrapped("stopCode").bind()
 
+    val lineCode = getItineraryByCode(itineraryCode)?.fullLineCode ?: raise(NotFound("Itinerary code not found"))
     val lineCodMode = getCodModeFromLineCode(lineCode)
     val fullStopCode = createStopCode(codMode, stopCode)
     val route = getRoute(lineCode).getOrNull()

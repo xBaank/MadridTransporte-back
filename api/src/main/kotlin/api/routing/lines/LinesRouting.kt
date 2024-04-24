@@ -14,12 +14,16 @@ val linesConfigF: Route.(codMode: String) -> Unit =
             handle { getLocations(codMode) }
         }
 
-        get("/{lineCode}/itineraries/{itineraryCode}/locations") {
+        get("/itineraries/{itineraryCode}/locations") {
             handle { getLocationsByItineraryCode(codMode) }
         }
 
         get("/{lineCode}/itineraries/{direction}") {
             handle { getItineraries(codMode) }
+        }
+
+        get("/itineraries/{itineraryCode}") {
+            handle { getItinerariesByCode() }
         }
     }
 
