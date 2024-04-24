@@ -4,6 +4,7 @@ import api.config.*
 import api.config.EnvVariables.alreadyLoadedDb
 import api.config.EnvVariables.reloadDb
 import api.db.models.Itinerary
+import api.db.models.Route
 import api.db.models.Shape
 import api.db.models.StopOrder
 import api.extensions.get
@@ -152,8 +153,11 @@ suspend fun loadDataIntoDb() = coroutineScope {
             logger.info("Loaded calendars")
         }
     )
+    routesCollection.createIndex(Indexes.ascending(Route::fullLineCode.name))
+    routesCollection.createIndex(Indexes.ascending(Route::codMode.name))
     shapesCollection.createIndex(Indexes.ascending(Shape::itineraryId.name))
     itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name))
+    itinerariesCollection.createIndex(Indexes.ascending(Itinerary::fullLineCode.name))
     stopsOrderCollection.createIndex(Indexes.ascending(StopOrder::tripId.name))
     stopsOrderCollection.createIndex(Indexes.ascending(StopOrder::fullStopCode.name))
     alreadyLoadedDb = true

@@ -3,6 +3,7 @@ package api.config
 import api.routing.abono.abonoRouting
 import api.routing.lines.bus.busLinesRouting
 import api.routing.lines.emt.emtLinesRouting
+import api.routing.lines.linesRouting
 import api.routing.stops.bus.busStopsRouting
 import api.routing.stops.emt.emtStopsRouting
 import api.routing.stops.metro.metroStopsRouting
@@ -35,6 +36,7 @@ private fun Route.stopsRoute() {
 
 private fun Route.linesRoute() {
     route("/lines") {
+        linesRouting()
         busLinesRouting()
         emtLinesRouting()
     }

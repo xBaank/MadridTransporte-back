@@ -1,3 +1,5 @@
+package lines
+
 import api.extensions.getOrThrow
 import api.routing.stops.bus.busCodMode
 import api.routing.stops.bus.urbanCodMode
@@ -22,17 +24,61 @@ enum class LocationsUrls(
     val fullLineCode: String,
     val direction: Int,
     val lineCode: String,
-    val codMode: Int
+    val codMode: Int,
 ) {
-    Emt("/lines/emt/6__144___/locations/2?stopCode=4597", "6__144___", 2, "144", emtCodMode.toInt()),
-    Interurban("/lines/bus/8__450___/locations/1?stopCode=08242", "8__450___", 1, "450", busCodMode.toInt()),
-    Urban("/lines/bus/9__2__065_/locations/2?stopCode=08242", "9__2__065_", 2, "2", urbanCodMode.toInt()),
+    EmtDirectionBased(
+        "/lines/emt/6__144___/locations/2?stopCode=4597",
+        "6__144___",
+        2,
+        "144",
+        emtCodMode.toInt()
+    ),
+    InterurbanDirectionBased(
+        "/lines/bus/8__450___/locations/1?stopCode=08242",
+        "8__450___",
+        1,
+        "450",
+        busCodMode.toInt()
+    ),
+    UrbanDirectionBased(
+        "/lines/bus/9__2__065_/locations/2?stopCode=08242",
+        "9__2__065_",
+        2,
+        "2",
+        urbanCodMode.toInt()
+    ),
+
+    EmtCodeBased(
+        "/lines/emt/itineraries/6__144____2__IT_1/locations?stopCode=4597",
+        "6__144___",
+        2,
+        "144",
+        emtCodMode.toInt()
+    ),
+    InterurbanCodeBased(
+        "/lines/bus/itineraries/8__450____1_-_IT_1/locations?stopCode=08242",
+        "8__450___",
+        1,
+        "450",
+        busCodMode.toInt()
+    ),
+    UrbanCodeBased(
+        "/lines/bus/itineraries/9__2__065__2_-_IT_1/locations?stopCode=08242",
+        "9__2__065_",
+        2,
+        "2",
+        urbanCodMode.toInt()
+    ),
 }
 
-enum class ItinerariesUrls(val url: String, val code: String, val simpleLineCode: String, val direction: Int) {
-    Emt("/lines/emt/6__144___/itineraries/2?stopCode=4597", "6__144___", "144", 2),
-    Interurban("/lines/bus/8__450___/itineraries/1?stopCode=08242", "8__450___", "450", 1),
-    Urban("/lines/bus/9__2__065_/itineraries/2?stopCode=08242", "9__2__065_", "2", 2),
+enum class ItinerariesUrls(val url: String, val direction: Int) {
+    EmtDirectionBased("/lines/emt/6__144___/itineraries/2?stopCode=4597", 2),
+    InterurbanDirectionBased("/lines/bus/8__450___/itineraries/1?stopCode=08242", 1),
+    UrbanDirectionBased("/lines/bus/9__2__065_/itineraries/2?stopCode=08242", 2),
+
+    EmtCodeBased("/lines/emt/itineraries/6__144____2__IT_1", 2),
+    InterurbanCodeBased("/lines/bus/itineraries/8__450____1_-_IT_1", 1),
+    UrbanCodeBased("/lines/bus/itineraries/9__2__065__2_-_IT_1", 2),
 }
 
 class BusLinesTests {
@@ -57,6 +103,7 @@ class BusLinesTests {
             }
         }.getOrThrow()
     }
+
 
     @ParameterizedTest
     @EnumSource(ItinerariesUrls::class)

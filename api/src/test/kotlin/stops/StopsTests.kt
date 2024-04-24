@@ -1,3 +1,5 @@
+package stops
+
 import api.extensions.getOrThrow
 import arrow.core.raise.either
 import io.ktor.client.request.*

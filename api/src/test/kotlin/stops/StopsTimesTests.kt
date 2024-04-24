@@ -1,3 +1,5 @@
+package stops
+
 import api.extensions.getOrThrow
 import arrow.core.getOrElse
 import arrow.core.raise.either

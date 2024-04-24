@@ -9,12 +9,30 @@ import com.mongodb.client.model.Filters
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 
 fun getItinerariesByFullLineCode(fullLineCode: String, direction: Int, stopCode: String) =
     getItinerariesByFullLineCode(
         fullLineCode,
         direction
     ).filter { stopCode in it.stops.map(StopOrder::fullStopCode) }
+
+suspend fun getItineraryByCode(itineraryCode: String): ItineraryWithStops? {
+    val pipeline = listOf(
+        Aggregates.match(
+            Filters.and(
+                Filters.eq(Itinerary::itineraryCode.name, itineraryCode),
+            )
+        ),
+        Aggregates.lookup(
+            /* from = */ StopOrder::class.simpleName!!,
+            /* localField = */ StopOrder::tripId.name,
+            /* foreignField = */ Itinerary::tripId.name,
+            /* as = */ ItineraryWithStops::stops.name
+        )
+    )
+    return itinerariesCollection.withDocumentClass<ItineraryWithStops>().aggregate(pipeline).firstOrNull()
+}
 
 fun getItinerariesByFullLineCode(fullLineCode: String, direction: Int): Flow<ItineraryWithStops> {
     val pipeline = listOf(

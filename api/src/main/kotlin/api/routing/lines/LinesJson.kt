@@ -1,8 +1,11 @@
 package api.routing.lines
 
+import api.db.models.Itinerary
 import api.db.models.ItineraryWithStops
+import api.db.models.RouteWithItineraries
 import api.db.models.Shape
 import simpleJson.JsonObject
+import simpleJson.asJson
 import simpleJson.jArray
 import simpleJson.jObject
 
@@ -44,4 +47,19 @@ fun buildShapeJson(shape: Shape) = jObject {
     "longitude" += shape.longitude
     "sequence" += shape.sequence
     "distance" += shape.distance
+}
+
+fun buildRouteJson(route: RouteWithItineraries) = jObject {
+    "fullLineCode" += route.fullLineCode
+    "simpleLineCode" += route.simpleLineCode
+    "codMode" += route.codMode.toInt()
+    "routeName" += route.routeName
+    "itineraries" += route.itineraries.distinctBy(Itinerary::itineraryCode).map(::buildItinerary).asJson()
+}
+
+fun buildItinerary(itinerary: Itinerary) = jObject {
+    "itineraryCode" += itinerary.itineraryCode
+    "direction" += itinerary.direction + 1
+    "tripName" += itinerary.tripName
+    "serviceId" += itinerary.serviceId
 }

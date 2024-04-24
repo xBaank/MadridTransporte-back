@@ -1,3 +1,5 @@
+package abono
+
 import api.notifications.sendAbonoNotifications
 import api.routing.abono.Abono
 import api.routing.abono.Contract
