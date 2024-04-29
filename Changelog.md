@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.4.1
+
+- Improved performance
+
 ## 6.4.0
 
 - Added `/lines/all` to get all routes

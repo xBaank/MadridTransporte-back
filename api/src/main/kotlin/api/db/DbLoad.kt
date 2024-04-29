@@ -158,6 +158,7 @@ suspend fun loadDataIntoDb() = coroutineScope {
     shapesCollection.createIndex(Indexes.ascending(Shape::itineraryId.name))
     itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name))
     itinerariesCollection.createIndex(Indexes.ascending(Itinerary::fullLineCode.name))
+    itinerariesCollection.createIndex(Indexes.ascending(Itinerary::itineraryCode.name))
     stopsOrderCollection.createIndex(Indexes.ascending(StopOrder::tripId.name))
     stopsOrderCollection.createIndex(Indexes.ascending(StopOrder::fullStopCode.name))
     alreadyLoadedDb = true
