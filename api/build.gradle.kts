@@ -53,7 +53,7 @@ dependencies {
     implementation("com.google.auth:google-auth-library-oauth2-http:1.23.0")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-guava
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.0")
-    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.0.1")
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.1.0")
     implementation("dev.inmo:krontab:2.3.0")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.17.2")
