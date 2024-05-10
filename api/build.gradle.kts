@@ -32,7 +32,7 @@ dependencies {
     implementation("io.arrow-kt:arrow-resilience:1.2.4")
 
     implementation("io.ktor:ktor-server-cors:$ktor_version")
-    implementation("io.github.xbaank:simpleJson-core:3.0.0")
+    implementation("io.github.xbaank:simpleJson-core:3.0.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("io.github.reactivecircus.cache4k:cache4k:0.13.0")
     // https://mvnrepository.com/artifact/org.amshove.kluent/kluent
@@ -52,7 +52,7 @@ dependencies {
     implementation("com.google.firebase:firebase-admin:9.2.0")
     implementation("com.google.auth:google-auth-library-oauth2-http:1.23.0")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-guava
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.1")
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.1.0")
     implementation("dev.inmo:krontab:2.3.0")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
