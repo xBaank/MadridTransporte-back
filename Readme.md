@@ -4,10 +4,14 @@ This is the backend for the MadridTransporte app.
 
 ## Features
 
-- Abono data
 - Bus locations
 - Bus stops times
-- Metro stations times
+- Metro stops times
+- Emt stops times
+- Emt locations
+- Renfe stops times
+- Stops data
+- Stops times notifications
 
 It is written in kotlin using ktor.
 
