@@ -10,7 +10,7 @@ val test_containers_version: String by project
 plugins {
     kotlin("jvm")
     id("io.ktor.plugin")
-    id("org.jetbrains.kotlinx.kover") version "0.7.6"
+    id("org.jetbrains.kotlinx.kover") version "0.8.0"
     kotlin("plugin.serialization") version "1.9.24"
     application
 }
@@ -45,7 +45,7 @@ dependencies {
     testImplementation("org.testcontainers:mongodb:1.19.8")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     implementation("io.ktor:ktor-server-compression:$ktor_version")
-    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("io.mockk:mockk:1.13.11")
     implementation("io.github.pdvrieze.xmlutil:core:0.86.3")
     implementation("io.github.pdvrieze.xmlutil:serialization:0.86.3")
     implementation("io.ktor:ktor-server-caching-headers:$ktor_version")// https://mvnrepository.com/artifact/com.google.firebase/firebase-messaging
