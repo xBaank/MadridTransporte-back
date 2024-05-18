@@ -67,7 +67,7 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
     "arrives" to jArray {
         arrivesGroupedByLineAndDest.forEach { arrive ->
             if (arrive.value.isEmpty()) return@forEach
-            +jObject {
+            addObject {
                 "codMode" += arrive.value.first().codMode
                 "line" += arrive.value.first().line
                 "lineCode" += arrive.value.first().lineCode

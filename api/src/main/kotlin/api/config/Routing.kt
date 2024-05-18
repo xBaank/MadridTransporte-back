@@ -1,6 +1,5 @@
 package api.config
 
-import api.routing.abono.abonoRouting
 import api.routing.lines.bus.busLinesRouting
 import api.routing.lines.emt.emtLinesRouting
 import api.routing.lines.linesRouting
@@ -17,7 +16,6 @@ import io.ktor.server.routing.*
 fun Application.configureRoutingV1() {
     routing {
         linesRoute()
-        abonosRoute()
         stopsRoute()
     }
 }
@@ -39,11 +37,5 @@ private fun Route.linesRoute() {
         linesRouting()
         busLinesRouting()
         emtLinesRouting()
-    }
-}
-
-private fun Route.abonosRoute() {
-    route("/abono") {
-        abonoRouting()
     }
 }

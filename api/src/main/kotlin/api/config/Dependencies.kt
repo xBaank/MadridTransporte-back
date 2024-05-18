@@ -29,7 +29,6 @@ val shapesCollection: MongoCollection<Shape> by lazy { db.getCollection(Shape::c
 val stopsOrderCollection: MongoCollection<StopOrder> by lazy { db.getCollection(StopOrder::class.simpleName!!) }
 val calendarsCollection: MongoCollection<Calendar> by lazy { db.getCollection(Calendar::class.simpleName!!) }
 val routesCollection: MongoCollection<Route> by lazy { db.getCollection(Route::class.simpleName!!) }
-val abonosSubscriptionsCollection: MongoCollection<AbonoSubscription> by lazy { db.getCollection(AbonoSubscription::class.simpleName!!) }
 
 fun setupMongo() = either {
     db = MongoClient.create(EnvVariables.mongoConnectionString.bind()).getDatabase("busTracker")

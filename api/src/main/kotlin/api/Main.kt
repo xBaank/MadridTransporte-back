@@ -6,7 +6,6 @@ import api.config.setupFirebase
 import api.config.setupMongo
 import api.db.loadDataIntoDb
 import api.extensions.getOrThrow
-import api.notifications.notifyAbonosOnBackground
 import api.notifications.notifyStopTimesOnBackground
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -23,7 +22,6 @@ fun main() {
         startUp()
         //startup is used on tests and notifications tests are mocked, so we don't include those methods in the startup
         notifyStopTimesOnBackground()
-        notifyAbonosOnBackground()
     }.start(wait = true)
 }
 

@@ -1,6 +1,7 @@
 rootProject.name = "madrid-transporte-back"
 include("api")
 include("crtm")
+include("loader")
 
 pluginManagement {
     val kotlin_version: String by settings
