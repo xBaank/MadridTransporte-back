@@ -6,13 +6,11 @@ import api.config.setupFirebase
 import api.notifications.notifyStopTimesOnBackground
 import common.DB
 import common.extensions.getOrThrow
-import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.plugins.compression.*
-import io.ktor.server.plugins.cors.routing.*
 import kotlinx.coroutines.runBlocking
 
 
@@ -25,18 +23,6 @@ fun main() {
 }
 
 fun Application.startUp() = runBlocking {
-    install(CORS) {
-        allowMethod(HttpMethod.Options)
-        allowMethod(HttpMethod.Post)
-        allowMethod(HttpMethod.Put)
-        allowMethod(HttpMethod.Delete)
-        allowMethod(HttpMethod.Patch)
-        allowMethod(HttpMethod.Get)
-        allowHeader(HttpHeaders.AccessControlAllowOrigin)
-        allowHeader(HttpHeaders.ContentType)
-        allowHeader(HttpHeaders.Authorization)
-        anyHost()
-    }
     install(Compression) {
         gzip()
         deflate()
