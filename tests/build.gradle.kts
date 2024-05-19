@@ -18,10 +18,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":loader"))
     testImplementation(kotlin("test"))
-    // https://mvnrepository.com/artifact/org.amshove.kluent/kluent
     testImplementation("org.amshove.kluent:kluent:1.73")
-    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")

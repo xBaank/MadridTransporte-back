@@ -4,20 +4,14 @@ import com.github.doyaaaaaken.kotlincsv.dsl.context.ExcessFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.context.InsufficientFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.mongodb.client.model.Indexes
-import common.DB.calendarsCollection
-import common.DB.itinerariesCollection
-import common.DB.routesCollection
-import common.DB.shapesCollection
-import common.DB.stopsCollection
-import common.DB.stopsInfoCollection
-import common.DB.stopsOrderCollection
+import com.mongodb.client.model.RenameCollectionOptions
+import com.mongodb.kotlin.client.coroutine.MongoCollection
+import common.DB
+import common.DB.db
 import common.extensions.get
 import common.extensions.mapAsync
 import common.extensions.toEnumeration
-import common.models.Itinerary
-import common.models.Route
-import common.models.Shape
-import common.models.StopOrder
+import common.models.*
 import common.queries.*
 import common.utils.metroCodMode
 import kotlinx.coroutines.async
@@ -28,7 +22,7 @@ import org.slf4j.LoggerFactory
 import ru.gildor.coroutines.okhttp.await
 import java.io.File
 import java.io.SequenceInputStream
-import java.util.*
+import java.util.UUID.randomUUID
 import kotlin.io.path.createTempFile
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
@@ -66,6 +60,14 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
     val allStopsInfoStream = getFileAsStreamFromInfo()
     val allCalendars = getFileAsStreamFromGtfs("calendar.txt")
 
+    val stopsCollectionNew: MongoCollection<Stop> by lazy { db.getCollection(randomUUID().toString()) }
+    val stopsInfoCollectionNew: MongoCollection<StopInfo> by lazy { db.getCollection(randomUUID().toString()) }
+    val itinerariesCollectionNew: MongoCollection<Itinerary> by lazy { db.getCollection(randomUUID().toString()) }
+    val shapesCollectionNew: MongoCollection<Shape> by lazy { db.getCollection(randomUUID().toString()) }
+    val stopsOrderCollectionNew: MongoCollection<StopOrder> by lazy { db.getCollection(randomUUID().toString()) }
+    val calendarsCollectionNew: MongoCollection<Calendar> by lazy { db.getCollection(randomUUID().toString()) }
+    val routesCollectionNew: MongoCollection<Route> by lazy { db.getCollection(randomUUID().toString()) }
+
     awaitAll(
         async {
             logger.info("Loading stops")
@@ -77,15 +79,15 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                     .distinctBy { //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
                         Pair(
                             if (it.codMode.toString() == metroCodMode) 1
-                            else UUID.randomUUID().toString(),
+                            else randomUUID().toString(),
                             it.stopName
                         )
                     }
 
-                stopsCollection.drop()
+                stopsCollectionNew.drop()
 
                 stops.chunked(sequenceChunkSize).forEach {
-                    stopsCollection.insertMany(it)
+                    stopsCollectionNew.insertMany(it)
                 }
             }
             logger.info("Loaded stops")
@@ -96,10 +98,10 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                 val routes = readAllWithHeaderAsSequence()
                     .distinctBy { it["route_id"] }
                     .chunked(sequenceChunkSize)
-                routesCollection.drop()
+                routesCollectionNew.drop()
                 routes.forEach {
                     val parsed = it.mapAsync(::parseRoute).toList()
-                    routesCollection.insertMany(parsed)
+                    routesCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded routes")
@@ -108,10 +110,10 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             logger.info("Loading itineraries")
             reader.openAsync(allItinerariesStream) {
                 val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                itinerariesCollection.drop()
+                itinerariesCollectionNew.drop()
                 itineraries.forEach {
                     val parsed = it.mapAsync(::parseItinerary).toList()
-                    itinerariesCollection.insertMany(parsed)
+                    itinerariesCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded itineraries")
@@ -120,10 +122,10 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             logger.info("Loading shapes")
             reader.openAsync(allShapesStream) {
                 val shapes = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                shapesCollection.drop()
+                shapesCollectionNew.drop()
                 shapes.forEach {
                     val parsed = it.mapAsync(::parseShape).toList()
-                    shapesCollection.insertMany(parsed)
+                    shapesCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded shapes")
@@ -132,10 +134,10 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             logger.info("Loading stops info")
             infoReader.openAsync(allStopsInfoStream) {
                 val stops = readAllWithHeaderAsSequence().distinct().chunked(sequenceChunkSize)
-                stopsInfoCollection.drop()
+                stopsInfoCollectionNew.drop()
                 stops.forEach {
                     val parsed = it.mapAsync(::parseStopInfo).toList()
-                    stopsInfoCollection.insertMany(parsed)
+                    stopsInfoCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded stops info")
@@ -144,10 +146,10 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             logger.info("Loading stops order")
             reader.openAsync(allStopsTimesStream) {
                 val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                stopsOrderCollection.drop()
+                stopsOrderCollectionNew.drop()
                 stops.forEach {
                     val parsed = it.mapAsync(::parseStopsOrder).toList()
-                    stopsOrderCollection.insertMany(parsed)
+                    stopsOrderCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded stops order")
@@ -156,24 +158,53 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             logger.info("Loading calendars")
             reader.openAsync(allCalendars) {
                 val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                calendarsCollection.drop()
+                calendarsCollectionNew.drop()
                 stops.forEach {
                     val parsed = it.mapAsync(::parseCalendar).toList()
-                    calendarsCollection.insertMany(parsed)
+                    calendarsCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded calendars")
         }
     )
 
-    routesCollection.createIndex(Indexes.ascending(Route::fullLineCode.name))
-    routesCollection.createIndex(Indexes.ascending(Route::codMode.name))
-    shapesCollection.createIndex(Indexes.ascending(Shape::itineraryId.name))
-    itinerariesCollection.createIndex(Indexes.ascending(Itinerary::tripId.name))
-    itinerariesCollection.createIndex(Indexes.ascending(Itinerary::fullLineCode.name))
-    itinerariesCollection.createIndex(Indexes.ascending(Itinerary::itineraryCode.name))
-    stopsOrderCollection.createIndex(Indexes.ascending(StopOrder::tripId.name))
-    stopsOrderCollection.createIndex(Indexes.ascending(StopOrder::fullStopCode.name))
+    routesCollectionNew.createIndex(Indexes.ascending(Route::fullLineCode.name))
+    routesCollectionNew.createIndex(Indexes.ascending(Route::codMode.name))
+    shapesCollectionNew.createIndex(Indexes.ascending(Shape::itineraryId.name))
+    itinerariesCollectionNew.createIndex(Indexes.ascending(Itinerary::tripId.name))
+    itinerariesCollectionNew.createIndex(Indexes.ascending(Itinerary::fullLineCode.name))
+    itinerariesCollectionNew.createIndex(Indexes.ascending(Itinerary::itineraryCode.name))
+    stopsOrderCollectionNew.createIndex(Indexes.ascending(StopOrder::tripId.name))
+    stopsOrderCollectionNew.createIndex(Indexes.ascending(StopOrder::fullStopCode.name))
+
+    stopsCollectionNew.renameCollection(
+        DB.stopsCollection.namespace,
+        RenameCollectionOptions().dropTarget(true)
+    )
+    stopsInfoCollectionNew.renameCollection(
+        DB.stopsInfoCollection.namespace,
+        RenameCollectionOptions().dropTarget(true)
+    )
+    itinerariesCollectionNew.renameCollection(
+        DB.itinerariesCollection.namespace,
+        RenameCollectionOptions().dropTarget(true)
+    )
+    shapesCollectionNew.renameCollection(
+        DB.shapesCollection.namespace,
+        RenameCollectionOptions().dropTarget(true)
+    )
+    stopsOrderCollectionNew.renameCollection(
+        DB.stopsOrderCollection.namespace,
+        RenameCollectionOptions().dropTarget(true)
+    )
+    calendarsCollectionNew.renameCollection(
+        DB.calendarsCollection.namespace,
+        RenameCollectionOptions().dropTarget(true)
+    )
+    routesCollectionNew.renameCollection(
+        DB.routesCollection.namespace,
+        RenameCollectionOptions().dropTarget(true)
+    )
 }
 
 suspend fun downloadToTempFile(url: String): File = httpClient.get(url).await().use { response ->

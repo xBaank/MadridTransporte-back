@@ -6,7 +6,7 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import common.models.*
 
 object DB {
-    private lateinit var db: MongoDatabase
+    lateinit var db: MongoDatabase
     val stopsCollection: MongoCollection<Stop> by lazy { db.getCollection(Stop::class.simpleName!!) }
     val stopsInfoCollection: MongoCollection<StopInfo> by lazy { db.getCollection(StopInfo::class.simpleName!!) }
     val stopsSubscriptionsCollection: MongoCollection<StopsSubscription> by lazy { db.getCollection(StopsSubscription::class.simpleName!!) }
