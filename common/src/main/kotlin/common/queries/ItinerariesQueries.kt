@@ -1,9 +1,7 @@
 package common.queries
 
-import com.mongodb.MongoNamespace
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
-import com.mongodb.client.model.RenameCollectionOptions
 import common.DB.itinerariesCollection
 import common.models.Itinerary
 import common.models.ItineraryWithStops
@@ -33,7 +31,6 @@ suspend fun getItineraryByCode(itineraryCode: String): ItineraryWithStops? {
             /* as = */ ItineraryWithStops::stops.name
         )
     )
-    itinerariesCollection.renameCollection(MongoNamespace(""), RenameCollectionOptions().dropTarget(true))
     return itinerariesCollection.withDocumentClass<ItineraryWithStops>().aggregate(pipeline).firstOrNull()
 }
 

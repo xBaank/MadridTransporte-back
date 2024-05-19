@@ -1,10 +1,10 @@
 package api.routing.stops.train
 
-import api.extensions.bindJson
 import api.routing.stops.Arrive
 import api.routing.stops.StopTimes
 import arrow.core.getOrElse
 import arrow.core.raise.either
+import common.extensions.bindJson
 import common.models.Coordinates
 import common.queries.getStopNameById
 import common.utils.trainCodMode

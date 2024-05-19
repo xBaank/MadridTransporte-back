@@ -1,12 +1,12 @@
 package api.routing.stops.train
 
-import api.extensions.bindJson
 import api.routing.stops.bus.getCRTMStopTimes
 import api.routing.stops.train.cano.canoHttpClient
 import arrow.core.raise.either
 import common.exceptions.BusTrackerException.InternalServerError
 import common.exceptions.BusTrackerException.NotFound
 import common.extensions.awaitWrap
+import common.extensions.bindJson
 import common.extensions.post
 import common.queries.getCoordinatesByStopCode
 import common.queries.getIdByStopCode

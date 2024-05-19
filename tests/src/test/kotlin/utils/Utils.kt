@@ -6,9 +6,6 @@ import io.ktor.client.request.*
 import io.ktor.server.application.*
 import io.ktor.server.testing.*
 
-suspend fun ApplicationTestBuilder.getAbono(id: String) =
-    client.get("/abono/$id")
-
 suspend fun ApplicationTestBuilder.getItineraries(line: String, direction: Int) =
     client.get("/lines/bus/$line/itineraries/$direction?stopCode=01231")
 
@@ -20,7 +17,7 @@ fun testApplicationBusTracker(
         MongoContainer.start()
         startUp()
     },
-    block: suspend ApplicationTestBuilder.(client: HttpClient) -> Unit
+    block: suspend ApplicationTestBuilder.(client: HttpClient) -> Unit,
 ) = testApplication {
     application {
         startUpF()

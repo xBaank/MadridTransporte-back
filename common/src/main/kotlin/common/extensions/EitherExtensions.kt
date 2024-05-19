@@ -1,4 +1,4 @@
-package api.extensions
+package common.extensions
 
 import arrow.core.Either
 import arrow.core.getOrElse

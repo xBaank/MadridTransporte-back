@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm")
 }
@@ -19,6 +21,12 @@ dependencies {
     implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:$okhttpcoroutines_version")
     implementation("io.github.xbaank:simpleJson-core:$simplejson_version")
     testImplementation(kotlin("test"))
+}
+
+tasks.withType<KotlinCompile> {
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-receivers")
+    }
 }
 
 tasks.test {

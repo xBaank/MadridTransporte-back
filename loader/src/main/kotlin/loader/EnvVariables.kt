@@ -60,4 +60,5 @@ object EnvVariables {
         SuspendingLazy { getenvWrapped("TRAIN_INFO").getOrElse { downloadToTempFile(defaultTrainInfo).path } }
     val tranviaInfo =
         SuspendingLazy { getenvWrapped("TRANVIA_INFO").getOrElse { downloadToTempFile(defaultTranviaInfo).path } }
+    val mongoConnectionString by lazy { getenvWrapped("MONGO_CONNECTION_STRING") }
 }

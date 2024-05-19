@@ -3,9 +3,9 @@ package api
 import api.config.EnvVariables
 import api.config.configureRoutingV1
 import api.config.setupFirebase
-import api.extensions.getOrThrow
 import api.notifications.notifyStopTimesOnBackground
 import common.DB
+import common.extensions.getOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*

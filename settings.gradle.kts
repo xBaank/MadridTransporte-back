@@ -3,6 +3,7 @@ include("api")
 include("crtm")
 include("loader")
 include("common")
+include("tests")
 pluginManagement {
     val kotlin_version: String by settings
     val ktor_version: String by settings

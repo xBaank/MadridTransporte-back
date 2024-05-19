@@ -1,11 +1,11 @@
 package api.routing.stops
 
-import api.extensions.bindJson
 import api.extensions.getWrapped
 import api.routing.Response.*
 import api.utils.Pipeline
 import api.utils.StopTimesF
 import arrow.core.raise.either
+import common.extensions.bindJson
 import common.models.LineDestination
 import common.models.toDeviceToken
 import common.queries.*

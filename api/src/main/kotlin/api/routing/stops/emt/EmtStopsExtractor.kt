@@ -1,12 +1,12 @@
 package api.routing.stops.emt
 
-import api.extensions.bindJson
 import api.extensions.toDirection
 import api.routing.stops.Arrive
 import api.routing.stops.Incident
 import api.routing.stops.StopTimes
 import arrow.core.raise.either
 import common.exceptions.BusTrackerException
+import common.extensions.bindJson
 import common.models.Coordinates
 import common.queries.getRoute
 import common.utils.createLineCode

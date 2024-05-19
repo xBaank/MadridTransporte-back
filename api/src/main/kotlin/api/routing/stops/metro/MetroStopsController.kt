@@ -1,10 +1,10 @@
 package api.routing.stops.metro
 
 import api.config.httpClient
-import api.extensions.bindJson
 import arrow.core.raise.either
 import common.exceptions.BusTrackerException.NotFound
 import common.extensions.awaitWrap
+import common.extensions.bindJson
 import common.queries.getCoordinatesByStopCode
 import common.queries.getIdByStopCode
 import common.queries.getStopNameById

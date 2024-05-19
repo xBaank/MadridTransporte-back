@@ -1,7 +1,6 @@
 package api.routing.stops.emt
 
 import api.config.httpClient
-import api.extensions.bindJson
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.either
@@ -11,6 +10,7 @@ import common.exceptions.BusTrackerException
 import common.exceptions.BusTrackerException.InternalServerError
 import common.exceptions.BusTrackerException.NotFound
 import common.extensions.awaitWrap
+import common.extensions.bindJson
 import common.extensions.get
 import common.extensions.post
 import common.queries.getCoordinatesByStopCode

@@ -17,7 +17,8 @@ const val destinationStopCode = "53"
 class StopsTrainsTimesTests {
     @Test
     fun `should get stop times planned`() = testApplicationBusTracker {
-        val url = "/stops/train/times?originStopCode=$originStopCode&destinationStopCode=$destinationStopCode"
+        val url =
+            "/stops/train/times?originStopCode=$originStopCode&destinationStopCode=$destinationStopCode"
         val response = client.get(url)
         val body = response.bodyAsText().deserialized().getOrElse { throw it }
         body.shouldBeInstanceOf<JsonObject>()
