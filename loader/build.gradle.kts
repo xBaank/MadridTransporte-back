@@ -11,6 +11,10 @@ repositories {
     mavenCentral()
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 val arrow_version: String by project
 val okhttp_version: String by project
 val mongo_version: String by project

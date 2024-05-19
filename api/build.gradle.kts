@@ -13,7 +13,7 @@ val okhttpcoroutines_version: String by project
 plugins {
     kotlin("jvm")
     id("io.ktor.plugin")
-    id("org.jetbrains.kotlinx.kover") version "0.7.6"
+    id("org.jetbrains.kotlinx.kover")
     kotlin("plugin.serialization")
     application
 }
