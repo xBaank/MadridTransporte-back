@@ -1,9 +1,9 @@
 package api.routing.lines
 
-import api.db.models.Itinerary
-import api.db.models.ItineraryWithStops
-import api.db.models.RouteWithItineraries
-import api.db.models.Shape
+import common.models.Itinerary
+import common.models.ItineraryWithStops
+import common.models.RouteWithItineraries
+import common.models.Shape
 import simpleJson.JsonObject
 import simpleJson.asJson
 import simpleJson.jArray

@@ -3,10 +3,9 @@ package api
 import api.config.EnvVariables
 import api.config.configureRoutingV1
 import api.config.setupFirebase
-import api.config.setupMongo
-import api.db.loadDataIntoDb
 import api.extensions.getOrThrow
 import api.notifications.notifyStopTimesOnBackground
+import common.DB
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -43,9 +42,8 @@ fun Application.startUp() = runBlocking {
         deflate()
     }
     install(CachingHeaders)
+    DB.setupMongo(EnvVariables.mongoConnectionString.getOrThrow())
     setupFirebase().getOrThrow()
-    setupMongo().getOrThrow()
-    loadDataIntoDb()
     configureRoutingV1()
 }
 

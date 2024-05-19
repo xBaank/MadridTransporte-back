@@ -1,13 +1,13 @@
 package api.routing.stops.train
 
-import api.db.getStopNameById
 import api.extensions.bindJson
 import api.routing.stops.Arrive
-import api.routing.stops.Coordinates
 import api.routing.stops.StopTimes
-import api.routing.stops.trainRouted.trainCodMode
 import arrow.core.getOrElse
 import arrow.core.raise.either
+import common.models.Coordinates
+import common.queries.getStopNameById
+import common.utils.trainCodMode
 import simpleJson.*
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds

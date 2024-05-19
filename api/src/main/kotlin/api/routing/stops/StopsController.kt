@@ -1,12 +1,12 @@
 package api.routing.stops
 
 import api.config.EnvVariables.timeoutSeconds
-import api.exceptions.BusTrackerException
-import api.extensions.getSuspend
 import api.utils.auth
 import api.utils.defaultClient
+import api.utils.getSuspend
 import api.utils.mapExceptionsF
 import arrow.core.Either
+import common.exceptions.BusTrackerException
 import crtm.soap.ArrayOfString
 import crtm.soap.IncidentsAffectationsRequest
 import crtm.soap.IncidentsAffectationsResponse

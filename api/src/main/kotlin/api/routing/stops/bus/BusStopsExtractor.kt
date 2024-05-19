@@ -2,15 +2,15 @@ package api.routing.stops.bus
 
 import api.extensions.toMiliseconds
 import api.routing.stops.Arrive
-import api.routing.stops.Coordinates
 import api.routing.stops.StopTimes
+import common.utils.busCodMode
 import crtm.soap.StopTimesResponse
 
 fun extractCRTMStopTimes(
     response: StopTimesResponse?,
-    coordinates: Coordinates,
+    coordinates: common.models.Coordinates,
     name: String?,
-    shortStopCode: String?
+    shortStopCode: String?,
 ): StopTimes {
     val arrives = response?.stopTimes?.times?.time?.map {
         Arrive(

@@ -1,6 +1,6 @@
 package api.utils
 
-import api.exceptions.BusTrackerException
+import common.exceptions.BusTrackerException
 
 
 val mapExceptionsF: (Throwable) -> BusTrackerException = { it ->

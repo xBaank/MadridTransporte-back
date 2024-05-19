@@ -3,7 +3,6 @@ package stops
 import api.notifications.getFunctionByCodMode
 import api.notifications.sendStopTimesNotifications
 import api.routing.stops.Arrive
-import api.routing.stops.Coordinates
 import api.routing.stops.StopTimes
 import api.utils.StopTimesF
 import arrow.core.right
@@ -11,6 +10,7 @@ import com.google.api.core.ApiFuture
 import com.google.firebase.ErrorCode
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingException
+import common.models.Coordinates
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.mockk.*

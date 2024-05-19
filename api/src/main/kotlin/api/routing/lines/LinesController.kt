@@ -1,12 +1,12 @@
 package api.routing.lines
 
 import api.config.EnvVariables.timeoutSeconds
-import api.exceptions.BusTrackerException.SoapError
-import api.extensions.getSuspend
 import api.utils.auth
 import api.utils.defaultClient
+import api.utils.getSuspend
 import api.utils.mapExceptionsF
 import arrow.core.Either
+import common.exceptions.BusTrackerException.SoapError
 import crtm.soap.LineLocationRequest
 import kotlinx.coroutines.withTimeoutOrNull
 

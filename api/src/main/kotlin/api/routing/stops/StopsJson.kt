@@ -1,12 +1,12 @@
 package api.routing.stops
 
-import api.db.getRoute
-import api.db.models.DeviceToken
-import api.db.models.Stop
-import api.db.models.StopOrderWithItineraries
-import api.db.models.StopsSubscription
+import common.models.DeviceToken
+import common.models.Stop
+import common.models.StopOrderWithItineraries
+import common.models.StopsSubscription
+import common.queries.getRoute
+import common.utils.getCodModeFromLineCode
 import crtm.soap.IncidentsAffectationsResponse
-import crtm.utils.getCodModeFromLineCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import simpleJson.asJson
@@ -43,8 +43,8 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
     "simpleStopCode" += stopTimes.simpleStopCode
     "stopCode" += stopTimes.stopCode
     "coordinates" += jObject {
-        "latitude" += stopTimes.coordinates.latitude
-        "longitude" += stopTimes.coordinates.longitude
+        "latitude" += stopTimes.coordinates.stopLat
+        "longitude" += stopTimes.coordinates.stopLon
     }
     "incidents" to jArray {
         stopTimes.incidents.forEach {

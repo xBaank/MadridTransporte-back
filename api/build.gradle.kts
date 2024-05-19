@@ -5,13 +5,16 @@ repositories {
 }
 
 val ktor_version: String by project
+val arrow_version: String by project
 val test_containers_version: String by project
-
+val simplejson_version: String by project
+val okhttp_version: String by project
+val okhttpcoroutines_version: String by project
 plugins {
     kotlin("jvm")
     id("io.ktor.plugin")
     id("org.jetbrains.kotlinx.kover") version "0.7.6"
-    kotlin("plugin.serialization") version "2.0.0-RC3"
+    kotlin("plugin.serialization")
     application
 }
 
@@ -24,16 +27,15 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.5.6")
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
-    implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0")
-    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3") // for JVM platform
+    implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:$okhttpcoroutines_version")
     //arrow kt
-    implementation("io.arrow-kt:arrow-core:1.2.4")
+    implementation("io.arrow-kt:arrow-core:$arrow_version")
     // https://mvnrepository.com/artifact/io.arrow-kt/arrow-resilience
-    implementation("io.arrow-kt:arrow-resilience:1.2.4")
+    implementation("io.arrow-kt:arrow-resilience:$arrow_version")
 
     implementation("io.ktor:ktor-server-cors:$ktor_version")
-    implementation("io.github.xbaank:simpleJson-core:3.0.1")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("io.github.xbaank:simpleJson-core:$simplejson_version")
+    implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
     implementation("io.github.reactivecircus.cache4k:cache4k:0.13.0")
     // https://mvnrepository.com/artifact/org.amshove.kluent/kluent
     testImplementation("org.amshove.kluent:kluent:1.73")
@@ -53,11 +55,11 @@ dependencies {
     implementation("com.google.auth:google-auth-library-oauth2-http:1.23.0")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-guava
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.1")
-    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.1.0")
     implementation("dev.inmo:krontab:2.3.0")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.17.2")
     implementation(project(":crtm"))
+    implementation(project(":common"))
 }
 
 tasks.test {
@@ -69,11 +71,10 @@ kotlin {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.freeCompilerArgs = listOf("-Xcontext-receivers")
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-receivers")
+    }
 }
-
-
-
 
 ktor {
     fatJar {

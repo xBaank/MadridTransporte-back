@@ -1,16 +1,16 @@
 package api.routing.stops.bus
 
 import api.config.EnvVariables
-import api.db.getCoordinatesByStopCode
-import api.db.getStopNameByStopCode
-import api.extensions.getSuspend
 import api.utils.auth
 import api.utils.defaultClient
+import api.utils.getSuspend
 import api.utils.mapExceptionsF
 import arrow.core.Either
 import arrow.core.raise.either
+import common.queries.getCoordinatesByStopCode
+import common.queries.getStopNameByStopCode
+import common.utils.getStopCodeFromFullStopCode
 import crtm.soap.StopTimesRequest
-import crtm.utils.getStopCodeFromFullStopCode
 import kotlinx.coroutines.withTimeoutOrNull
 
 private suspend fun getStopTimesResponse(stopCode: String) = Either.catch {

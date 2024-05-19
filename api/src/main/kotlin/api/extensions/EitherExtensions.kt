@@ -1,10 +1,10 @@
 package api.extensions
 
-import api.exceptions.BusTrackerException
-import api.exceptions.BusTrackerException.JsonError
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.Raise
+import common.exceptions.BusTrackerException
+import common.exceptions.BusTrackerException.JsonError
 import simpleJson.exceptions.JsonException
 
 context(Raise<BusTrackerException>)

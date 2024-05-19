@@ -1,10 +1,10 @@
 package api.routing
 
-import api.exceptions.BusTrackerException
 import api.extensions.serializedMemo
 import api.utils.Pipeline
 import api.utils.errorObject
 import arrow.core.Either
+import common.exceptions.BusTrackerException
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
