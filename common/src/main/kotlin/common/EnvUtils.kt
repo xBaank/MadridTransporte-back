@@ -5,7 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import common.exceptions.BusTrackerException
 
-object Env {
+object EnvUtils {
     fun getenvOrNull(key: String): String? =
         System.getenv(key) ?: System.getProperty(key) ?: null
 

@@ -1,7 +1,7 @@
 package api.config
 
 import arrow.core.getOrElse
-import common.Env.getenvWrapped
+import common.EnvUtils.getenvWrapped
 import kotlin.time.Duration.Companion.seconds
 
 object EnvVariables {

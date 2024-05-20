@@ -1,7 +1,7 @@
 package loader
 
 import arrow.core.getOrElse
-import common.Env.getenvWrapped
+import common.EnvUtils.getenvWrapped
 import common.utils.SuspendingLazy
 import java.io.File
 

@@ -12,4 +12,3 @@ sealed class BusTrackerException : Exception() {
     class Conflict(override val message: String? = null) : BusTrackerException()
     class TooManyRequests(override val message: String? = null) : BusTrackerException()
 }
-
