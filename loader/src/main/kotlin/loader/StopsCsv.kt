@@ -1,4 +1,4 @@
-package common.queries
+package loader
 
 import common.models.*
 import common.utils.createStopCode

@@ -11,6 +11,7 @@ import common.queries.getRoute
 import common.utils.busCodMode
 import common.utils.timeZoneMadrid
 import common.utils.toZoneOffset
+import common.utils.urbanCodMode
 import crtm.soap.StopTimesResponse
 import simpleJson.JsonNode
 import simpleJson.asArray
@@ -42,13 +43,13 @@ fun extractCRTMStopTimes(
         busCodMode.toInt(),
         name ?: response?.stopTimes?.stop?.name ?: "",
         coordinates,
-        arrives?.sortedBy { it.line.toIntOrNull() },
+        arrives,
         emptyList(),
         shortStopCode ?: response?.stopTimes?.stop?.shortCodStop ?: "",
     )
 }
 
-suspend fun extractAndMergeAvanzaBuses(
+suspend fun mergeAvanzaBuses(
     response: JsonNode,
     times: StopTimes,
 ) = either {
@@ -57,19 +58,22 @@ suspend fun extractAndMergeAvanzaBuses(
         val hour = LocalTime.parse(it["llegada"].asString().bindJson(), DateTimeFormatter.ofPattern("HH:mm:ss"))
         val localDate = LocalDate.now(timeZoneMadrid.toZoneId())
         val madridTime = LocalDateTime.of(localDate, hour)
-        val line = it["coLinea"].asString().bindJson()
+        val line = it["coLineaWeb"].asString().bindJson()
+        val route = getRoute(line, listOf(busCodMode, urbanCodMode)).getOrNull()
         val arrive = Arrive(
             line = line,
-            lineCode = getRoute(line, busCodMode).getOrNull()?.fullLineCode,
-            destination = it["dsDestino"].asString().bindJson(),
-            codMode = busCodMode.toInt(),
+            lineCode = route?.fullLineCode,
+            destination = "(Avanza) " + it["dsDestino"].asString().bindJson(),
+            codMode = route?.codMode?.toInt() ?: busCodMode.toInt(),
             estimatedArrive = madridTime.toInstant(timeZoneMadrid.toZoneOffset()).toEpochMilli()
         )
+        arrive
+    }
 
-        val timesArrives = times.arrives?.filter { it.line == arrive.line } ?: listOf()
+    if (times.arrives?.map(Arrive::line)?.intersect(arrives.map(Arrive::line).toSet())?.isEmpty() == true) {
+        times.copy(arrives = arrives + times.arrives)
+    } else {
+        times
+    }
 
-        timesArrives.ifEmpty { listOf(arrive) }
-    }.flatten()
-
-    times.copy(arrives = ((arrives + (times.arrives ?: listOf()))))
 }.getOrElse { times }

@@ -19,7 +19,14 @@ suspend fun getRoute(simpleLineCode: String, codMode: String) = routesCollection
     )
 ).firstOrNull()?.right() ?: BusTrackerException.NotFound().left()
 
-suspend fun getRoute(fullLineCode: String) = routesCollection.find(
+suspend fun getRoute(simpleLineCode: String, codModes: List<String>) = routesCollection.find(
+    Filters.and(
+        Filters.eq(Route::simpleLineCode.name, simpleLineCode),
+        Filters.`in`(Route::codMode.name, codModes)
+    )
+).firstOrNull()?.right() ?: BusTrackerException.NotFound().left()
+
+suspend fun getRouteByFullLineCode(fullLineCode: String) = routesCollection.find(
     Filters.and(
         Filters.eq(Route::fullLineCode.name, fullLineCode)
     )

@@ -63,7 +63,7 @@ suspend fun getCRTMStopTimes(stopCode: String) = either {
             getCoordinatesByStopCode(stopCode).bind(),
             getStopNameByStopCode(stopCode).getOrNull(),
             getStopCodeFromFullStopCode(stopCode)
-        ).let { extractAndMergeAvanzaBuses(avanzaTimesDeferred.await(), it) }
+        ).let { mergeAvanzaBuses(avanzaTimesDeferred.await(), it) }
 
         result
     }

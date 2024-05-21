@@ -72,7 +72,7 @@ suspend fun Pipeline.getLocations(codMode: String) = either {
 
     val lineCodMode = getCodModeFromLineCode(lineCode)
     val fullStopCode = createStopCode(codMode, stopCode)
-    val route = getRoute(lineCode).getOrNull()
+    val route = getRouteByFullLineCode(lineCode).getOrNull()
     val simpleLineCode = route?.simpleLineCode ?: getSimpleLineCodeFromLineCode(lineCode)
     val routeCodMode = route?.codMode ?: lineCodMode
 
@@ -100,7 +100,7 @@ suspend fun Pipeline.getLocationsByItineraryCode(codMode: String) = either {
     val lineCode = getItineraryByCode(itineraryCode)?.fullLineCode ?: raise(NotFound("Itinerary code not found"))
     val lineCodMode = getCodModeFromLineCode(lineCode)
     val fullStopCode = createStopCode(codMode, stopCode)
-    val route = getRoute(lineCode).getOrNull()
+    val route = getRouteByFullLineCode(lineCode).getOrNull()
     val simpleLineCode = route?.simpleLineCode ?: getSimpleLineCodeFromLineCode(lineCode)
     val routeCodMode = route?.codMode ?: lineCodMode
 

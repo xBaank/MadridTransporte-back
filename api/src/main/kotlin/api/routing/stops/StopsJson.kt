@@ -4,7 +4,7 @@ import common.models.DeviceToken
 import common.models.Stop
 import common.models.StopOrderWithItineraries
 import common.models.StopsSubscription
-import common.queries.getRoute
+import common.queries.getRouteByFullLineCode
 import common.utils.getCodModeFromLineCode
 import crtm.soap.IncidentsAffectationsResponse
 import kotlinx.coroutines.flow.Flow
@@ -59,7 +59,9 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
             }
         }
     }
-    val arrivesGroupedByLineAndDest = stopTimes.arrives?.groupBy { Triple(it.line, it.destination, it.anden) }
+    val arrivesGroupedByLineAndDest = stopTimes.arrives
+        ?.sortedBy { it.line.toIntOrNull() }
+        ?.groupBy { Triple(it.line, it.destination, it.anden) }
     if (arrivesGroupedByLineAndDest == null) {
         "arrives" += null
         return@jObject
@@ -93,7 +95,7 @@ suspend fun buildStopTimesPlannedJson(stopTimes: List<StopOrderWithItineraries>)
     Triple(it.lineCode, it.direction, it.itineraryCode)
 }.map {
     jObject {
-        val route = getRoute(it.key.first).getOrNull()
+        val route = getRouteByFullLineCode(it.key.first).getOrNull()
         "fullLineCode" += it.key.first
         "lineCode" += route?.simpleLineCode
         "destination" += it.value.first().itineraryName
