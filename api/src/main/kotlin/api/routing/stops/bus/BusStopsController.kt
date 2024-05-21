@@ -14,7 +14,10 @@ import common.extensions.bindJson
 import common.extensions.get
 import common.queries.getCoordinatesByStopCode
 import common.queries.getStopNameByStopCode
+import common.utils.busCodMode
+import common.utils.getCodModeFromFullStopCode
 import common.utils.getStopCodeFromFullStopCode
+import common.utils.urbanCodMode
 import crtm.soap.StopTimesRequest
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -56,7 +59,13 @@ suspend fun getCRTMStopTimes(stopCode: String) = either {
             }
         }
 
-        val avanzaTimesDeferred = async { getAvanzaData(getStopCodeFromFullStopCode(stopCode)) }
+        val avanzaTimesDeferred = async {
+            if (getCodModeFromFullStopCode(stopCode) in listOf(busCodMode, urbanCodMode)) {
+                getAvanzaData(getStopCodeFromFullStopCode(stopCode))
+            } else {
+                null.asJson()
+            }
+        }
 
         val result = extractCRTMStopTimes(
             stopTimesDeferred.await(),

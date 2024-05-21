@@ -75,6 +75,7 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                     .filter { it["stop_id"]?.contains("par") == true }
                     .distinctBy { it["stop_id"] }
                     .map(::parseStop)
+                    .mapNotNull { it }
                     .distinctBy { //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
                         Pair(
                             if (it.codMode.toString() == metroCodMode) 1
@@ -86,7 +87,7 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                 stopsCollectionNew.drop()
 
                 stops.chunked(sequenceChunkSize).forEach {
-                    stopsCollectionNew.insertMany(it)
+                    if (it.isNotEmpty()) stopsCollectionNew.insertMany(it)
                 }
             }
             logger.info("Loaded stops")
@@ -99,8 +100,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                     .chunked(sequenceChunkSize)
                 routesCollectionNew.drop()
                 routes.forEach {
-                    val parsed = it.mapAsync(::parseRoute).toList()
-                    routesCollectionNew.insertMany(parsed)
+                    val parsed = it.mapAsync(::parseRoute).mapNotNull { it }
+                    if (parsed.isNotEmpty()) routesCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded routes")
@@ -111,8 +112,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                 val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 itinerariesCollectionNew.drop()
                 itineraries.forEach {
-                    val parsed = it.mapAsync(::parseItinerary).toList()
-                    itinerariesCollectionNew.insertMany(parsed)
+                    val parsed = it.mapAsync(::parseItinerary).mapNotNull { it }
+                    if (parsed.isNotEmpty()) itinerariesCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded itineraries")
@@ -123,8 +124,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                 val shapes = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 shapesCollectionNew.drop()
                 shapes.forEach {
-                    val parsed = it.mapAsync(::parseShape).toList()
-                    shapesCollectionNew.insertMany(parsed)
+                    val parsed = it.mapAsync(::parseShape).mapNotNull { it }
+                    if (parsed.isNotEmpty()) shapesCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded shapes")
@@ -135,8 +136,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                 val stops = readAllWithHeaderAsSequence().distinct().chunked(sequenceChunkSize)
                 stopsInfoCollectionNew.drop()
                 stops.forEach {
-                    val parsed = it.mapAsync(::parseStopInfo).toList()
-                    stopsInfoCollectionNew.insertMany(parsed)
+                    val parsed = it.mapAsync(::parseStopInfo).mapNotNull { it }
+                    if (parsed.isNotEmpty()) stopsInfoCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded stops info")
@@ -147,8 +148,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                 val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 stopsOrderCollectionNew.drop()
                 stops.forEach {
-                    val parsed = it.mapAsync(::parseStopsOrder).toList()
-                    stopsOrderCollectionNew.insertMany(parsed)
+                    val parsed = it.mapAsync(::parseStopsOrder).mapNotNull { it }
+                    if (parsed.isNotEmpty()) stopsOrderCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded stops order")
@@ -159,8 +160,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                 val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                 calendarsCollectionNew.drop()
                 stops.forEach {
-                    val parsed = it.mapAsync(::parseCalendar).toList()
-                    calendarsCollectionNew.insertMany(parsed)
+                    val parsed = it.mapAsync(::parseCalendar).mapNotNull { it }
+                    if (parsed.isNotEmpty()) calendarsCollectionNew.insertMany(parsed)
                 }
             }
             logger.info("Loaded calendars")
@@ -221,12 +222,8 @@ suspend fun downloadToTempFile(url: String): File = httpClient.get(url).await().
 
 suspend fun getFileAsStreamFromGtfs(file: String) = SequenceInputStream(
     listOf(
-        File("${EnvVariables.metroGtfs.value()}/$file").inputStream(),
-        File("${EnvVariables.trainGtfs.value()}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.tranviaGtfs.value()}/$file").removeFirstLine().inputStream(),
         File("${EnvVariables.interurbanGtfs.value()}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.emtGtfs.value()}/$file").removeFirstLine().inputStream()
+        File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream()
     ).toEnumeration()
 )
 
