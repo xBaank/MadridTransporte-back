@@ -57,7 +57,7 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
     val allShapesStream = getShapesFileAsStreamFromGtfs()
     val allItinerariesStream = getFileAsStreamFromGtfs("trips.txt")
     val allStopsInfoStream = getFileAsStreamFromInfo()
-    val allCalendars = getFileAsStreamFromGtfs("calendar.txt")
+    val allCalendars = getCalendarStreamFromGtfs()
 
     val stopsCollectionNew: MongoCollection<Stop> by lazy { db.getCollection(randomUUID().toString()) }
     val stopsInfoCollectionNew: MongoCollection<StopInfo> by lazy { db.getCollection(randomUUID().toString()) }
@@ -222,8 +222,19 @@ suspend fun downloadToTempFile(url: String): File = httpClient.get(url).await().
 
 suspend fun getFileAsStreamFromGtfs(file: String) = SequenceInputStream(
     listOf(
+        File("${EnvVariables.metroGtfs.value()}/$file").inputStream(),
+        File("${EnvVariables.trainGtfs.value()}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.tranviaGtfs.value()}/$file").removeFirstLine().inputStream(),
         File("${EnvVariables.interurbanGtfs.value()}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream()
+        File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.emtGtfs.value()}/$file").removeFirstLine().inputStream()
+    ).toEnumeration()
+)
+
+suspend fun getCalendarStreamFromGtfs(file: String = "calendar.txt") = SequenceInputStream(
+    listOf(
+        File("${EnvVariables.interurbanGtfs.value()}/$file").removeFirstLine().inputStream(),
+        File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream(),
     ).toEnumeration()
 )
 
