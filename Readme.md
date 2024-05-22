@@ -36,6 +36,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
   api:
+    image: xbank/bus_tracker_api:latest
     restart: unless-stopped
     depends_on:
       - mongo
@@ -44,7 +45,6 @@ services:
       - MONGO_CONNECTION_STRING= #WRITE HERE YOUR MONGO CONNECTION STRING
       - NOTIFICATION_DELAY_TIME_SECONDS=60 #WRITE HERE THE DELAY TIME IN SECONDS FOR THE NOTIFICATION SERVICE, DEFAULT IS 60
       - SOAP_TIMEOUT=45 #DEFAULT is 30
-    image: xbank/bus_tracker_api:latest
   loader:
     image: xbank/bus_tracker_loader:latest
     restart: unless-stopped
@@ -56,10 +56,10 @@ services:
       - ./entrypoint.sh:/app/entrypoint.sh
     entrypoint: ["/app/entrypoint.sh"]
   nginx:
+    image: nginx
     restart: unless-stopped
     depends_on:
       - api
-    image: nginx
     ports:
       - "443:443"
     volumes:
