@@ -1,6 +1,11 @@
-# MadridTransporte-back  [![Java CI with Gradle](https://github.com/xBaank/bus-tracker-back/actions/workflows/gradle.yml/badge.svg)](https://github.com/xBaank/bus-tracker-back/actions/workflows/gradle.yml) [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/xbank/bus_tracker_api)](https://hub.docker.com/repository/docker/xbank/bus_tracker_api/general)
+# MadridTransporte-back  [![Java CI with Gradle](https://github.com/xBaank/bus-tracker-back/actions/workflows/gradle.yml/badge.svg)](https://github.com/xBaank/bus-tracker-back/actions/workflows/gradle.yml) 
 
 This is the backend for the MadridTransporte app.
+
+| Image                | Version                                                                                                                                                                  |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Backend       | [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/xbank/bus_tracker_api)](https://hub.docker.com/repository/docker/xbank/bus_tracker_api/general)             |
+| Data loader | [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/xbank/bus_tracker_loader)](https://hub.docker.com/repository/docker/xbank/bus_tracker_loader/general) |
 
 ## Features
 
@@ -26,21 +31,32 @@ version: "3.9"
 services:
   mongo:
     image: mongo
-    restart: always
+    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
   api:
+    restart: unless-stopped
     depends_on:
       - mongo
     environment:
       - SERVICE_JSON= #WRITE HERE YOUR SERVICE JSON, NOT THE FILE PATH, You can get it from https://console.firebase.google.com/u/0/project/YOUR_PROJECT/settings/serviceaccounts/adminsdk
       - MONGO_CONNECTION_STRING= #WRITE HERE YOUR MONGO CONNECTION STRING
       - NOTIFICATION_DELAY_TIME_SECONDS=60 #WRITE HERE THE DELAY TIME IN SECONDS FOR THE NOTIFICATION SERVICE, DEFAULT IS 60
-      - RELOAD_DB=false #DEFAULT IS TRUE, THIS IS NEEDED AT LEAST THE FIRST TIME AND TO UPDATE THE GTFS DATA
       - SOAP_TIMEOUT=45 #DEFAULT is 30
     image: xbank/bus_tracker_api:latest
+  loader:
+    image: xbank/bus_tracker_loader:latest
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_CONNECTION_STRING= #WRITE HERE YOUR MONGO CONNECTION STRING
+    volumes:
+      - ./entrypoint.sh:/app/entrypoint.sh
+    entrypoint: ["/app/entrypoint.sh"]
   nginx:
+    restart: unless-stopped
     depends_on:
       - api
     image: nginx
@@ -52,6 +68,19 @@ services:
       - yourFullchainFilePath:/root/ssl/cert.pem #You can generate it using letsencrypt
       - yourNginxCacheFolderPath:/data/nginx/cache #You can use a volume to persist cache
     command: [ "nginx", "-g", "daemon off;" ]
+```
+
+### Entrypoint
+```sh
+#!/bin/bash
+while true; do
+  # Run your service command
+  echo "Running loader..."
+  java -jar /app/loader.jar
+
+  # Wait for the specified interval (e.g., 5 minutes)
+  sleep 1d
+done
 ```
 
 ### Nginx conf example
