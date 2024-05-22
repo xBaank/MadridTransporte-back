@@ -13,7 +13,7 @@ val ktor_version: String by project
 dependencies {
     implementation("io.github.xbaank:simpleJson-core:$simplejson_version")
     implementation("io.arrow-kt:arrow-core:$arrow_version")
-    implementation("com.google.firebase:firebase-admin:9.2.0")
+    implementation("com.google.firebase:firebase-admin:9.3.0")
     implementation(project(":api"))
     implementation(project(":common"))
     implementation(project(":loader"))
@@ -24,7 +24,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
     testImplementation("org.testcontainers:mongodb:1.19.8")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
-    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("io.mockk:mockk:1.13.11")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
 }
 
