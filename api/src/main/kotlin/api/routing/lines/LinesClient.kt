@@ -1,16 +1,16 @@
 package api.routing.lines
 
-import api.db.*
-import api.exceptions.BusTrackerException.BadRequest
-import api.exceptions.BusTrackerException.NotFound
 import api.extensions.getWrapped
 import api.routing.Response.ResponseFlowJson
 import api.routing.Response.ResponseJson
 import api.utils.Pipeline
 import arrow.core.raise.either
-import crtm.utils.createStopCode
-import crtm.utils.getCodModeFromLineCode
-import crtm.utils.getSimpleLineCodeFromLineCode
+import common.exceptions.BusTrackerException.BadRequest
+import common.exceptions.BusTrackerException.NotFound
+import common.queries.*
+import common.utils.createStopCode
+import common.utils.getCodModeFromLineCode
+import common.utils.getSimpleLineCodeFromLineCode
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -72,7 +72,7 @@ suspend fun Pipeline.getLocations(codMode: String) = either {
 
     val lineCodMode = getCodModeFromLineCode(lineCode)
     val fullStopCode = createStopCode(codMode, stopCode)
-    val route = getRoute(lineCode).getOrNull()
+    val route = getRouteByFullLineCode(lineCode).getOrNull()
     val simpleLineCode = route?.simpleLineCode ?: getSimpleLineCodeFromLineCode(lineCode)
     val routeCodMode = route?.codMode ?: lineCodMode
 
@@ -100,7 +100,7 @@ suspend fun Pipeline.getLocationsByItineraryCode(codMode: String) = either {
     val lineCode = getItineraryByCode(itineraryCode)?.fullLineCode ?: raise(NotFound("Itinerary code not found"))
     val lineCodMode = getCodModeFromLineCode(lineCode)
     val fullStopCode = createStopCode(codMode, stopCode)
-    val route = getRoute(lineCode).getOrNull()
+    val route = getRouteByFullLineCode(lineCode).getOrNull()
     val simpleLineCode = route?.simpleLineCode ?: getSimpleLineCodeFromLineCode(lineCode)
     val routeCodMode = route?.codMode ?: lineCodMode
 

@@ -4,10 +4,10 @@ import api.routing.stops.alertsConfigF
 import api.routing.stops.subConfigF
 import api.routing.stops.timesConfigF
 import api.routing.stops.timesPlannedConfigF
+import common.utils.busCodMode
 import io.ktor.server.routing.*
 
-const val busCodMode = "8"
-const val urbanCodMode = "9"
+
 fun Route.busStopsRouting() = route("/bus") {
     timesConfigF(busCodMode)
     subConfigF(busCodMode)

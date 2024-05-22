@@ -1,7 +1,7 @@
 package api.routing.lines.emt
 
 import api.routing.lines.linesConfigF
-import api.routing.stops.emt.emtCodMode
+import common.utils.emtCodMode
 import io.ktor.server.routing.*
 
 fun Route.emtLinesRouting() = route("/emt") {

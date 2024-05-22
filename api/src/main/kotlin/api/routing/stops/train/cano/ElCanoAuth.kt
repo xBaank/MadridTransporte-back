@@ -1,6 +1,6 @@
 package api.routing.stops.train.cano
 
-import api.exceptions.BusTrackerException
+import common.exceptions.BusTrackerException
 import org.apache.commons.codec.digest.MessageDigestAlgorithms
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets

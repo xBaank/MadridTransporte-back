@@ -9,7 +9,7 @@ repositories {
 
 
 plugins {
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm")
     `maven-publish`
     application
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.0.0
+
+- Removed `abono` endpoints
+- Extracted data loading into different module
+- Updated dependencies
+
 ## 6.4.1
 
 - Improved performance

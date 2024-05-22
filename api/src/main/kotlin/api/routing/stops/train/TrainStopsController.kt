@@ -1,18 +1,18 @@
 package api.routing.stops.train
 
-import api.db.getCoordinatesByStopCode
-import api.db.getIdByStopCode
-import api.db.getStopNameById
-import api.exceptions.BusTrackerException.InternalServerError
-import api.exceptions.BusTrackerException.NotFound
-import api.extensions.awaitWrap
-import api.extensions.bindJson
-import api.extensions.post
 import api.routing.stops.bus.getCRTMStopTimes
 import api.routing.stops.train.cano.canoHttpClient
-import api.routing.stops.trainRouted.trainCodMode
 import arrow.core.raise.either
-import crtm.utils.getStopCodeFromFullStopCode
+import common.exceptions.BusTrackerException.InternalServerError
+import common.exceptions.BusTrackerException.NotFound
+import common.extensions.awaitWrap
+import common.extensions.bindJson
+import common.extensions.post
+import common.queries.getCoordinatesByStopCode
+import common.queries.getIdByStopCode
+import common.queries.getStopNameById
+import common.utils.getStopCodeFromFullStopCode
+import common.utils.trainCodMode
 import simpleJson.deserialized
 import simpleJson.jObject
 

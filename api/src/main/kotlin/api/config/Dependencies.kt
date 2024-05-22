@@ -1,13 +1,9 @@
 package api.config
 
-import api.db.models.*
 import arrow.core.raise.either
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
-import com.mongodb.kotlin.client.coroutine.MongoClient
-import com.mongodb.kotlin.client.coroutine.MongoCollection
-import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import io.grpc.LoadBalancerRegistry
 import io.grpc.internal.PickFirstLoadBalancerProvider
 import okhttp3.OkHttpClient
@@ -20,20 +16,6 @@ val httpClient = OkHttpClient.Builder()
     .readTimeout(20.seconds.toJavaDuration())
     .build()
 
-private lateinit var db: MongoDatabase
-val stopsCollection: MongoCollection<Stop> by lazy { db.getCollection(Stop::class.simpleName!!) }
-val stopsInfoCollection: MongoCollection<StopInfo> by lazy { db.getCollection(StopInfo::class.simpleName!!) }
-val stopsSubscriptionsCollection: MongoCollection<StopsSubscription> by lazy { db.getCollection(StopsSubscription::class.simpleName!!) }
-val itinerariesCollection: MongoCollection<Itinerary> by lazy { db.getCollection(Itinerary::class.simpleName!!) }
-val shapesCollection: MongoCollection<Shape> by lazy { db.getCollection(Shape::class.simpleName!!) }
-val stopsOrderCollection: MongoCollection<StopOrder> by lazy { db.getCollection(StopOrder::class.simpleName!!) }
-val calendarsCollection: MongoCollection<Calendar> by lazy { db.getCollection(Calendar::class.simpleName!!) }
-val routesCollection: MongoCollection<Route> by lazy { db.getCollection(Route::class.simpleName!!) }
-val abonosSubscriptionsCollection: MongoCollection<AbonoSubscription> by lazy { db.getCollection(AbonoSubscription::class.simpleName!!) }
-
-fun setupMongo() = either {
-    db = MongoClient.create(EnvVariables.mongoConnectionString.bind()).getDatabase("busTracker")
-}
 
 fun setupFirebase() = either {
     LoadBalancerRegistry.getDefaultRegistry().register(PickFirstLoadBalancerProvider())
