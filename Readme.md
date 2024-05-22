@@ -4,7 +4,7 @@ This is the backend for the MadridTransporte app.
 
 | Image                | Version                                                                                                                                                                  |
 |-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Backend       | [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/xbank/bus_tracker_api)](https://hub.docker.com/repository/docker/xbank/bus_tracker_api/general)             |
+| Api       | [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/xbank/bus_tracker_api)](https://hub.docker.com/repository/docker/xbank/bus_tracker_api/general)             |
 | Data loader | [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/xbank/bus_tracker_loader)](https://hub.docker.com/repository/docker/xbank/bus_tracker_loader/general) |
 
 ## Features
