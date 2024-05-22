@@ -25,7 +25,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Extract metadata (tags, labels) for api
-        id: meta
+        id: meta_api
         uses: docker/metadata-action@f7b4ed12385588c3f9bc252f0a2b520d83b52d48
         with:
           images: xbank/bus_tracker_api
@@ -37,12 +37,12 @@ jobs:
           file: Dockerfile-api
           platforms: linux/amd64,linux/arm64/v8
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta_api.outputs.tags }}
+          labels: ${{ steps.meta_api.outputs.labels }}
           name: remote ssh command
 
       - name: Extract metadata (tags, labels) for loader
-        id: meta
+        id: meta_loader
         uses: docker/metadata-action@f7b4ed12385588c3f9bc252f0a2b520d83b52d48
         with:
           images: xbank/bus_tracker_loader
@@ -54,6 +54,6 @@ jobs:
           file: Dockerfile-loader
           platforms: linux/amd64,linux/arm64/v8
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta_loader.outputs.tags }}
+          labels: ${{ steps.meta_loader.outputs.labels }}
           name: remote ssh command
