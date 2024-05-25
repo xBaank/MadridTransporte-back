@@ -50,15 +50,6 @@ private val infoReader = csvReader {
 private const val sequenceChunkSize = 10_000
 
 suspend fun loadDataIntoDb(): Unit = coroutineScope {
-
-    val allStopsStream = getFileAsStreamFromGtfs("stops.txt")
-    val allRoutesStream = getFileAsStreamFromGtfs("routes.txt")
-    val allStopsTimesStream = getStopTimesFileAsStreamFromGtfs()
-    val allShapesStream = getShapesFileAsStreamFromGtfs()
-    val allItinerariesStream = getFileAsStreamFromGtfs("trips.txt")
-    val allStopsInfoStream = getFileAsStreamFromInfo()
-    val allCalendars = getFileAsStreamFromGtfs("calendar.txt")
-
     val stopsCollectionNew: MongoCollection<Stop> by lazy { db.getCollection(randomUUID().toString()) }
     val stopsInfoCollectionNew: MongoCollection<StopInfo> by lazy { db.getCollection(randomUUID().toString()) }
     val itinerariesCollectionNew: MongoCollection<Itinerary> by lazy { db.getCollection(randomUUID().toString()) }
@@ -67,115 +58,135 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
     val calendarsCollectionNew: MongoCollection<Calendar> by lazy { db.getCollection(randomUUID().toString()) }
     val routesCollectionNew: MongoCollection<Route> by lazy { db.getCollection(randomUUID().toString()) }
 
-    awaitAll(
-        async {
-            logger.info("Loading stops")
-            reader.openAsync(allStopsStream) {
-                val stops = readAllWithHeaderAsSequence()
-                    .filter { it["stop_id"]?.contains("par") == true }
-                    .distinctBy { it["stop_id"] }
-                    .map(::parseStop)
-                    .mapNotNull { it }
-                    .distinctBy { //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
-                        Pair(
-                            if (it.codMode.toString() == metroCodMode) 1
-                            else randomUUID().toString(),
-                            it.stopName
-                        )
+    try {
+        val allStopsStream = getFileAsStreamFromGtfs("stops.txt")
+        val allRoutesStream = getFileAsStreamFromGtfs("routes.txt")
+        val allStopsTimesStream = getStopTimesFileAsStreamFromGtfs()
+        val allShapesStream = getShapesFileAsStreamFromGtfs()
+        val allItinerariesStream = getFileAsStreamFromGtfs("trips.txt")
+        val allStopsInfoStream = getFileAsStreamFromInfo()
+        val allCalendars = getFileAsStreamFromGtfs("calendar.txt")
+
+        awaitAll(
+            async {
+                logger.info("Loading stops")
+                reader.openAsync(allStopsStream) {
+                    val stops = readAllWithHeaderAsSequence()
+                        .filter { it["stop_id"]?.contains("par") == true }
+                        .distinctBy { it["stop_id"] }
+                        .map(::parseStop)
+                        .mapNotNull { it }
+                        .distinctBy { //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
+                            Pair(
+                                if (it.codMode.toString() == metroCodMode) 1
+                                else randomUUID().toString(),
+                                it.stopName
+                            )
+                        }
+
+                    stopsCollectionNew.drop()
+
+                    stops.chunked(sequenceChunkSize).forEach {
+                        if (it.isNotEmpty()) stopsCollectionNew.insertMany(it)
                     }
+                }
+                logger.info("Loaded stops")
+            },
+            async {
+                logger.info("Loading routes")
+                reader.openAsync(allRoutesStream) {
+                    val routes = readAllWithHeaderAsSequence()
+                        .distinctBy { it["route_id"] }
+                        .chunked(sequenceChunkSize)
+                    routesCollectionNew.drop()
+                    routes.forEach {
+                        val parsed = it.mapAsync(::parseRoute).mapNotNull { it }
+                        if (parsed.isNotEmpty()) routesCollectionNew.insertMany(parsed)
+                    }
+                }
+                logger.info("Loaded routes")
+            },
+            async {
+                logger.info("Loading itineraries")
+                reader.openAsync(allItinerariesStream) {
+                    val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
+                    itinerariesCollectionNew.drop()
+                    itineraries.forEach {
+                        val parsed = it.mapAsync(::parseItinerary).mapNotNull { it }
+                        if (parsed.isNotEmpty()) itinerariesCollectionNew.insertMany(parsed)
+                    }
+                }
+                logger.info("Loaded itineraries")
+            },
+            async {
+                logger.info("Loading shapes")
+                reader.openAsync(allShapesStream) {
+                    val shapes = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
+                    shapesCollectionNew.drop()
+                    shapes.forEach {
+                        val parsed = it.mapAsync(::parseShape).mapNotNull { it }
+                        if (parsed.isNotEmpty()) shapesCollectionNew.insertMany(parsed)
+                    }
+                }
+                logger.info("Loaded shapes")
+            },
+            async {
+                logger.info("Loading stops info")
+                infoReader.openAsync(allStopsInfoStream) {
+                    val stops = readAllWithHeaderAsSequence().distinct().chunked(sequenceChunkSize)
+                    stopsInfoCollectionNew.drop()
+                    stops.forEach {
+                        val parsed = it.mapAsync(::parseStopInfo).mapNotNull { it }
+                        if (parsed.isNotEmpty()) stopsInfoCollectionNew.insertMany(parsed)
+                    }
+                }
+                logger.info("Loaded stops info")
+            },
+            async {
+                logger.info("Loading stops order")
+                reader.openAsync(allStopsTimesStream) {
+                    val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
+                    stopsOrderCollectionNew.drop()
+                    stops.forEach {
+                        val parsed = it.mapAsync(::parseStopsOrder).mapNotNull { it }
+                        if (parsed.isNotEmpty()) stopsOrderCollectionNew.insertMany(parsed)
+                    }
+                }
+                logger.info("Loaded stops order")
+            },
+            async {
+                logger.info("Loading calendars")
+                reader.openAsync(allCalendars) {
+                    val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
+                    calendarsCollectionNew.drop()
+                    stops.forEach {
+                        val parsed = it.mapAsync(::parseCalendar).mapNotNull { it }
+                        if (parsed.isNotEmpty()) calendarsCollectionNew.insertMany(parsed)
+                    }
+                }
+                logger.info("Loaded calendars")
+            }
+        )
 
-                stopsCollectionNew.drop()
-
-                stops.chunked(sequenceChunkSize).forEach {
-                    if (it.isNotEmpty()) stopsCollectionNew.insertMany(it)
-                }
-            }
-            logger.info("Loaded stops")
-        },
-        async {
-            logger.info("Loading routes")
-            reader.openAsync(allRoutesStream) {
-                val routes = readAllWithHeaderAsSequence()
-                    .distinctBy { it["route_id"] }
-                    .chunked(sequenceChunkSize)
-                routesCollectionNew.drop()
-                routes.forEach {
-                    val parsed = it.mapAsync(::parseRoute).mapNotNull { it }
-                    if (parsed.isNotEmpty()) routesCollectionNew.insertMany(parsed)
-                }
-            }
-            logger.info("Loaded routes")
-        },
-        async {
-            logger.info("Loading itineraries")
-            reader.openAsync(allItinerariesStream) {
-                val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                itinerariesCollectionNew.drop()
-                itineraries.forEach {
-                    val parsed = it.mapAsync(::parseItinerary).mapNotNull { it }
-                    if (parsed.isNotEmpty()) itinerariesCollectionNew.insertMany(parsed)
-                }
-            }
-            logger.info("Loaded itineraries")
-        },
-        async {
-            logger.info("Loading shapes")
-            reader.openAsync(allShapesStream) {
-                val shapes = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                shapesCollectionNew.drop()
-                shapes.forEach {
-                    val parsed = it.mapAsync(::parseShape).mapNotNull { it }
-                    if (parsed.isNotEmpty()) shapesCollectionNew.insertMany(parsed)
-                }
-            }
-            logger.info("Loaded shapes")
-        },
-        async {
-            logger.info("Loading stops info")
-            infoReader.openAsync(allStopsInfoStream) {
-                val stops = readAllWithHeaderAsSequence().distinct().chunked(sequenceChunkSize)
-                stopsInfoCollectionNew.drop()
-                stops.forEach {
-                    val parsed = it.mapAsync(::parseStopInfo).mapNotNull { it }
-                    if (parsed.isNotEmpty()) stopsInfoCollectionNew.insertMany(parsed)
-                }
-            }
-            logger.info("Loaded stops info")
-        },
-        async {
-            logger.info("Loading stops order")
-            reader.openAsync(allStopsTimesStream) {
-                val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                stopsOrderCollectionNew.drop()
-                stops.forEach {
-                    val parsed = it.mapAsync(::parseStopsOrder).mapNotNull { it }
-                    if (parsed.isNotEmpty()) stopsOrderCollectionNew.insertMany(parsed)
-                }
-            }
-            logger.info("Loaded stops order")
-        },
-        async {
-            logger.info("Loading calendars")
-            reader.openAsync(allCalendars) {
-                val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                calendarsCollectionNew.drop()
-                stops.forEach {
-                    val parsed = it.mapAsync(::parseCalendar).mapNotNull { it }
-                    if (parsed.isNotEmpty()) calendarsCollectionNew.insertMany(parsed)
-                }
-            }
-            logger.info("Loaded calendars")
-        }
-    )
-
-    routesCollectionNew.createIndex(Indexes.ascending(Route::fullLineCode.name))
-    routesCollectionNew.createIndex(Indexes.ascending(Route::codMode.name))
-    shapesCollectionNew.createIndex(Indexes.ascending(Shape::itineraryId.name))
-    itinerariesCollectionNew.createIndex(Indexes.ascending(Itinerary::tripId.name))
-    itinerariesCollectionNew.createIndex(Indexes.ascending(Itinerary::fullLineCode.name))
-    itinerariesCollectionNew.createIndex(Indexes.ascending(Itinerary::itineraryCode.name))
-    stopsOrderCollectionNew.createIndex(Indexes.ascending(StopOrder::tripId.name))
-    stopsOrderCollectionNew.createIndex(Indexes.ascending(StopOrder::fullStopCode.name))
+        routesCollectionNew.createIndex(Indexes.ascending(Route::fullLineCode.name))
+        routesCollectionNew.createIndex(Indexes.ascending(Route::codMode.name))
+        shapesCollectionNew.createIndex(Indexes.ascending(Shape::itineraryId.name))
+        itinerariesCollectionNew.createIndex(Indexes.ascending(Itinerary::tripId.name))
+        itinerariesCollectionNew.createIndex(Indexes.ascending(Itinerary::fullLineCode.name))
+        itinerariesCollectionNew.createIndex(Indexes.ascending(Itinerary::itineraryCode.name))
+        stopsOrderCollectionNew.createIndex(Indexes.ascending(StopOrder::tripId.name))
+        stopsOrderCollectionNew.createIndex(Indexes.ascending(StopOrder::fullStopCode.name))
+    } catch (ex: Throwable) {
+        logger.error("Error loading data", ex)
+        stopsCollectionNew.drop()
+        stopsInfoCollectionNew.drop()
+        itinerariesCollectionNew.drop()
+        shapesCollectionNew.drop()
+        stopsOrderCollectionNew.drop()
+        calendarsCollectionNew.drop()
+        routesCollectionNew.drop()
+        return@coroutineScope
+    }
 
     stopsCollectionNew.renameCollection(
         DB.stopsCollection.namespace,

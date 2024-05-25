@@ -3,7 +3,6 @@ package api.utils
 import com.sun.xml.ws.client.BindingProviderProperties
 import common.utils.SuspendingLazy
 import crtm.soap.AuthHeader
-import crtm.soap.MultimodalInformation
 import crtm.soap.MultimodalInformation_Service
 import crtm.soap.PublicKeyRequest
 import jakarta.xml.ws.AsyncHandler
@@ -21,6 +20,11 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 
+val auth = SuspendingLazy {
+    val key = getSuspend(PublicKeyRequest(), defaultClient.value()::getPublicKeyAsync)
+    authHeader(key.key.toByteArray())
+}
+
 val defaultClient = SuspendingLazy {
     withContext(Dispatchers.IO) {
         MultimodalInformation_Service().apply {
@@ -33,11 +37,6 @@ val defaultClient = SuspendingLazy {
 }
 
 private val privateKey = "pruebapruebapruebapruebaprueba12".toByteArray()
-suspend fun MultimodalInformation.auth(): AuthHeader {
-    val key = getSuspend(PublicKeyRequest(), ::getPublicKeyAsync)
-    return authHeader(key.key.toByteArray(), privateKey)
-}
-
 
 private val ivParameterSpec = IvParameterSpec(ByteArray(16))
 fun encrypt(inputText: ByteArray, key: SecretKeySpec, iv: IvParameterSpec): String {
@@ -47,7 +46,7 @@ fun encrypt(inputText: ByteArray, key: SecretKeySpec, iv: IvParameterSpec): Stri
     return Base64.getEncoder().encodeToString(cipherText)
 }
 
-fun authHeader(publicKey: ByteArray, privateKey: ByteArray) = AuthHeader().apply {
+private fun authHeader(publicKey: ByteArray) = AuthHeader().apply {
     connectionKey = encrypt(publicKey, SecretKeySpec(privateKey, "AES"), ivParameterSpec)
 }
 

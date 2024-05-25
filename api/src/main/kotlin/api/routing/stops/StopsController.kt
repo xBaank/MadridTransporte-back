@@ -23,7 +23,7 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
         val request = IncidentsAffectationsRequest().apply {
             this.codMode = codMode
             codLines = ArrayOfString()
-            authentication = defaultClient.value().auth()
+            authentication = auth.value()
         }
 
         getSuspend(request, defaultClient.value()::getIncidentsAffectationsAsync)

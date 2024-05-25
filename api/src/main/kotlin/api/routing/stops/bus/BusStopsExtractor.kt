@@ -70,10 +70,14 @@ suspend fun mergeAvanzaBuses(
         arrive
     }
 
-    if (times.arrives?.map(Arrive::line)?.intersect(arrives.map(Arrive::line).toSet())?.isEmpty() == true) {
-        times.copy(arrives = arrives + times.arrives)
-    } else {
-        times
-    }
+    when {
+        times.arrives == null ->
+            times.copy(arrives = arrives)
 
+        times.arrives.map(Arrive::line).intersect(arrives.map(Arrive::line).toSet()).isEmpty() ->
+            times.copy(arrives = arrives + times.arrives)
+
+        else ->
+            times
+    }
 }.getOrElse { times }

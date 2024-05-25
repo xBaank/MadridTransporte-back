@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.0.1
+
+- Reduce number of internal requests
+- Don't update data with loader if there is some error
+- Updated dependencies
+
 ## 7.0.0
 
 - Removed `abono` endpoints

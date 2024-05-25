@@ -10,6 +10,7 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import common.exceptions.BusTrackerException.InternalServerError
+import common.extensions.awaitWrap
 import common.extensions.bindJson
 import common.extensions.get
 import common.queries.getCoordinatesByStopCode
@@ -22,10 +23,8 @@ import crtm.soap.StopTimesRequest
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withTimeoutOrNull
-import ru.gildor.coroutines.okhttp.await
 import simpleJson.asJson
 import simpleJson.deserialized
-import java.io.InterruptedIOException
 
 private suspend fun getStopTimesResponse(stopCode: String) = Either.catch {
     val request = StopTimesRequest().apply {
@@ -33,7 +32,7 @@ private suspend fun getStopTimesResponse(stopCode: String) = Either.catch {
         type = 1
         orderBy = 2
         stopTimesByIti = 3
-        authentication = defaultClient.value().auth()
+        authentication = auth.value()
     }
     getSuspend(request, defaultClient.value()::getStopTimesAsync)
 }.mapLeft(mapExceptionsF)
@@ -41,11 +40,7 @@ private suspend fun getStopTimesResponse(stopCode: String) = Either.catch {
 private suspend fun getAvanzaData(simpleStopCode: String) = either {
     val url = "https://apisvt.avanzagrupo.com/lineas/getTraficosParada?empresa=25&parada=$simpleStopCode"
 
-    val response = try {
-        httpClient.get(url).await()
-    } catch (ex: InterruptedIOException) {
-        raise(InternalServerError("Avanza timeout error"))
-    }
+    val response = httpClient.get(url).awaitWrap().bind()
 
     if (!response.isSuccessful) raise(InternalServerError("Avanza error"))
     response.body?.string()?.deserialized()?.bindJson() ?: raise(InternalServerError("Body is null"))
