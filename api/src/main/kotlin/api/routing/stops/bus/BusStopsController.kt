@@ -32,7 +32,7 @@ private suspend fun getStopTimesResponse(stopCode: String) = Either.catch {
         type = 1
         orderBy = 2
         stopTimesByIti = 3
-        authentication = auth.value()
+        authentication = auth()
     }
     getSuspend(request, defaultClient.value()::getStopTimesAsync)
 }.mapLeft(mapExceptionsF)
@@ -68,6 +68,8 @@ suspend fun getCRTMStopTimes(stopCode: String) = either {
             getStopNameByStopCode(stopCode).getOrNull(),
             getStopCodeFromFullStopCode(stopCode)
         ).let { mergeAvanzaBuses(avanzaTimesDeferred.await(), it) }
+
+
 
         result
     }

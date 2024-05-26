@@ -5,8 +5,10 @@ import common.utils.SuspendingLazy
 import crtm.soap.AuthHeader
 import crtm.soap.MultimodalInformation_Service
 import crtm.soap.PublicKeyRequest
+import io.github.reactivecircus.cache4k.Cache
 import jakarta.xml.ws.AsyncHandler
 import jakarta.xml.ws.BindingProvider
+import korlibs.time.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -19,11 +21,9 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-
-val auth = SuspendingLazy {
-    val key = getSuspend(PublicKeyRequest(), defaultClient.value()::getPublicKeyAsync)
-    authHeader(key.key.toByteArray())
-}
+private val cachedAuthHeader = Cache.Builder<Unit, AuthHeader>()
+    .expireAfterWrite(54.seconds)
+    .build()
 
 val defaultClient = SuspendingLazy {
     withContext(Dispatchers.IO) {
@@ -37,17 +37,22 @@ val defaultClient = SuspendingLazy {
 }
 
 private val privateKey = "pruebapruebapruebapruebaprueba12".toByteArray()
-
 private val ivParameterSpec = IvParameterSpec(ByteArray(16))
-fun encrypt(inputText: ByteArray, key: SecretKeySpec, iv: IvParameterSpec): String {
+
+suspend fun auth(): AuthHeader = cachedAuthHeader.get(Unit) {
+    val key = getSuspend(PublicKeyRequest(), defaultClient.value()::getPublicKeyAsync)
+    authHeader(key.key.toByteArray())
+}
+
+private fun encrypt(inputText: ByteArray, key: SecretKeySpec): String {
     val cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING")
-    cipher.init(Cipher.ENCRYPT_MODE, key, iv)
+    cipher.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec)
     val cipherText = cipher.doFinal(inputText)
     return Base64.getEncoder().encodeToString(cipherText)
 }
 
 private fun authHeader(publicKey: ByteArray) = AuthHeader().apply {
-    connectionKey = encrypt(publicKey, SecretKeySpec(privateKey, "AES"), ivParameterSpec)
+    connectionKey = encrypt(publicKey, SecretKeySpec(privateKey, "AES"))
 }
 
 suspend inline fun <T, R : Any?> getSuspend(

@@ -16,7 +16,7 @@ suspend fun getLocationsResponse(lineCode: String, direction: Int, codMode: Stri
             this.codMode = codMode
             codLine = lineCode
             this.direction = direction
-            authentication = auth.value()
+            authentication = auth()
             codStop = stopCode ?: "8_"
         }
         withTimeoutOrNull(timeoutSeconds) {
@@ -30,7 +30,7 @@ suspend fun getLocationsResponse(lineCode: String, itineraryCode: String, codMod
             this.codMode = codMode
             codLine = lineCode
             codItinerary = itineraryCode
-            authentication = auth.value()
+            authentication = auth()
             codStop = stopCode ?: "8_"
         }
         withTimeoutOrNull(timeoutSeconds) {

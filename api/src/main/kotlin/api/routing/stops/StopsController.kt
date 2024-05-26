@@ -14,7 +14,7 @@ import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.hours
 
-val cachedAlerts = Cache.Builder<String, IncidentsAffectationsResponse>()
+private val cachedAlerts = Cache.Builder<String, IncidentsAffectationsResponse>()
     .expireAfterWrite(24.hours)
     .build()
 
@@ -23,7 +23,7 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
         val request = IncidentsAffectationsRequest().apply {
             this.codMode = codMode
             codLines = ArrayOfString()
-            authentication = auth.value()
+            authentication = auth()
         }
 
         getSuspend(request, defaultClient.value()::getIncidentsAffectationsAsync)
