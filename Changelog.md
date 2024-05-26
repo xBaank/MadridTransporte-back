@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.0.2
+
+- Fix auth errors with crtm
+- Fix emt locations
+
 ## 7.0.1
 
 - Reduce number of internal requests
