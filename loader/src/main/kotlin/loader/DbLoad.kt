@@ -242,22 +242,6 @@ suspend fun getFileAsStreamFromGtfs(file: String) = SequenceInputStream(
     ).toEnumeration()
 )
 
-suspend fun getStopTimesFileAsStreamFromGtfs(file: String = "stop_times.txt") = SequenceInputStream(
-    listOf(
-        File("${EnvVariables.interurbanGtfs.value()}/$file").inputStream(),
-        File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.emtGtfs.value()}/$file").removeFirstLine().inputStream(),
-    ).toEnumeration()
-)
-
-suspend fun getShapesFileAsStreamFromGtfs(file: String = "shapes.txt") = SequenceInputStream(
-    listOf(
-        File("${EnvVariables.interurbanGtfs.value()}/$file").inputStream(),
-        File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.emtGtfs.value()}/$file").removeFirstLine().inputStream(),
-    ).toEnumeration()
-)
-
 suspend fun getFileAsStreamFromInfo() = SequenceInputStream(
     listOf(
         File(EnvVariables.metroInfo.value()).inputStream(),
