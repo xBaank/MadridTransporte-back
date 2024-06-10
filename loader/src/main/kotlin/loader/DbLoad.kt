@@ -61,8 +61,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
     try {
         val allStopsStream = getFileAsStreamFromGtfs("stops.txt")
         val allRoutesStream = getFileAsStreamFromGtfs("routes.txt")
-        val allStopsTimesStream = getStopTimesFileAsStreamFromGtfs()
-        val allShapesStream = getShapesFileAsStreamFromGtfs()
+        val allStopsTimesStream = getFileAsStreamFromGtfs("stop_times.txt")
+        val allShapesStream = getFileAsStreamFromGtfs("shapes.txt")
         val allItinerariesStream = getFileAsStreamFromGtfs("trips.txt")
         val allStopsInfoStream = getFileAsStreamFromInfo()
         val allCalendars = getFileAsStreamFromGtfs("calendar.txt")

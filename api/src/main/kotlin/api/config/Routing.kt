@@ -3,6 +3,9 @@ package api.config
 import api.routing.lines.bus.busLinesRouting
 import api.routing.lines.emt.emtLinesRouting
 import api.routing.lines.linesRouting
+import api.routing.lines.metro.metroLinesRouting
+import api.routing.lines.metro.tramLinesRouting
+import api.routing.lines.train.trainLinesRouting
 import api.routing.stops.bus.busStopsRouting
 import api.routing.stops.emt.emtStopsRouting
 import api.routing.stops.metro.metroStopsRouting
@@ -37,5 +40,8 @@ private fun Route.linesRoute() {
         linesRouting()
         busLinesRouting()
         emtLinesRouting()
+        metroLinesRouting()
+        trainLinesRouting()
+        tramLinesRouting()
     }
 }
