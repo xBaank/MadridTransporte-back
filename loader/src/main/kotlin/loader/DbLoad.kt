@@ -84,20 +84,10 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
         val stopsInfoFiles = listOf(EnvVariables.metroInfo, EnvVariables.trainInfo, EnvVariables.tranviaInfo)
         val trainFiles = listOf(EnvVariables.trainItineraries)
 
-        val allStopsStream = getFromGtfs("stops.txt", allGtfs)
-        val busRoutesStream = getFromGtfs("routes.txt", routesGtfs)
-        val allStopsTimesStream = getFromGtfs("stop_times.txt", routesGtfs)
-        val allShapesStream = getFromGtfs("shapes.txt", routesGtfs)
-        val busCalendars = getFromGtfs("calendar.txt", routesGtfs)
-        val busItinerariesStream = getFromGtfs("trips.txt", routesGtfs)
-        val allStopsInfoStream = getFromFile(stopsInfoFiles)
-        val trainItinerariesStream = getFromFile(trainFiles)
-        val trainItinerariesStream2 = getFromFile(trainFiles)
-
         awaitAll(
             async {
                 logger.info("Loading stops")
-                gtfsReader.openAsync(allStopsStream) {
+                gtfsReader.openAsync(getFromGtfs("stops.txt", allGtfs)) {
                     val stops = readAllWithHeaderAsSequence()
                         .filter { it["stop_id"]?.contains("par") == true }
                         .distinctBy { it["stop_id"] }
@@ -110,9 +100,6 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                                 it.stopName
                             )
                         }
-
-                    stopsCollectionNew.drop()
-
                     stops.chunked(sequenceChunkSize).forEach {
                         if (it.isNotEmpty()) stopsCollectionNew.insertMany(it)
                     }
@@ -121,11 +108,10 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading routes from gtfs")
-                gtfsReader.openAsync(busRoutesStream) {
+                gtfsReader.openAsync(getFromGtfs("routes.txt", routesGtfs)) {
                     val routes = readAllWithHeaderAsSequence()
                         .distinctBy { it["route_id"] }
                         .chunked(sequenceChunkSize)
-                    routesCollectionNew.drop()
                     routes.forEach {
                         val parsed = it.mapAsync(::parseRoute).mapNotNull { it }
                         if (parsed.isNotEmpty()) routesCollectionNew.insertMany(parsed)
@@ -135,11 +121,10 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading other routes")
-                itinerariesReader.openAsync(trainItinerariesStream2) {
+                itinerariesReader.openAsync(getFromFile(trainFiles)) {
                     val routes = readAllWithHeaderAsSequence()
                         .distinctBy { it["IDFLINEA"] }
                         .chunked(sequenceChunkSize)
-                    routesCollectionNew.drop()
                     routes.forEach {
                         val parsed = it.mapAsync(::parseRoute).mapNotNull { it }
                         if (parsed.isNotEmpty()) routesCollectionNew.insertMany(parsed)
@@ -149,9 +134,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading bus itineraries from gtfs")
-                gtfsReader.openAsync(busItinerariesStream) {
+                gtfsReader.openAsync(getFromGtfs("trips.txt", routesGtfs)) {
                     val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                    itinerariesCollectionNew.drop()
                     itineraries.forEach {
                         val parsed = it.mapAsync(::parseItinerary).mapNotNull { it }
                         if (parsed.isNotEmpty()) itinerariesCollectionNew.insertMany(parsed)
@@ -161,9 +145,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading itineraries from file")
-                itinerariesReader.openAsync(trainItinerariesStream) {
+                itinerariesReader.openAsync(getFromFile(trainFiles)) {
                     val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                    itinerariesCollectionNew.drop()
                     itineraries.forEach {
                         val parsed = it.mapAsync(::parseItinerary).mapNotNull { it }
                         val parsedStops = it.mapAsync(::parseStopsOrder).mapNotNull { it }
@@ -175,9 +158,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading shapes")
-                gtfsReader.openAsync(allShapesStream) {
+                gtfsReader.openAsync(getFromGtfs("shapes.txt", routesGtfs)) {
                     val shapes = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                    shapesCollectionNew.drop()
                     shapes.forEach {
                         val parsed = it.mapAsync(::parseShape).mapNotNull { it }
                         if (parsed.isNotEmpty()) shapesCollectionNew.insertMany(parsed)
@@ -187,9 +169,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading stops info")
-                stopsInfoReader.openAsync(allStopsInfoStream) {
+                stopsInfoReader.openAsync(getFromFile(stopsInfoFiles)) {
                     val stops = readAllWithHeaderAsSequence().distinct().chunked(sequenceChunkSize)
-                    stopsInfoCollectionNew.drop()
                     stops.forEach {
                         val parsed = it.mapAsync(::parseStopInfo).mapNotNull { it }
                         if (parsed.isNotEmpty()) stopsInfoCollectionNew.insertMany(parsed)
@@ -199,9 +180,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading bus stops order from gtfs")
-                gtfsReader.openAsync(allStopsTimesStream) {
+                gtfsReader.openAsync(getFromGtfs("routes.txt", routesGtfs)) {
                     val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                    stopsOrderCollectionNew.drop()
                     stops.forEach {
                         val parsed = it.mapAsync(::parseStopsOrder).mapNotNull { it }
                         if (parsed.isNotEmpty()) stopsOrderCollectionNew.insertMany(parsed)
@@ -211,9 +191,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading calendars")
-                gtfsReader.openAsync(busCalendars) {
+                gtfsReader.openAsync(getFromGtfs("calendar.txt", routesGtfs)) {
                     val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
-                    calendarsCollectionNew.drop()
                     stops.forEach {
                         val parsed = it.mapAsync(::parseCalendar).mapNotNull { it }
                         if (parsed.isNotEmpty()) calendarsCollectionNew.insertMany(parsed)
