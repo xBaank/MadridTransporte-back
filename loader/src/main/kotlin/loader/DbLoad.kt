@@ -91,8 +91,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
         val busCalendars = getFromGtfs("calendar.txt", routesGtfs)
         val busItinerariesStream = getFromGtfs("trips.txt", routesGtfs)
         val allStopsInfoStream = getFromFile(stopsInfoFiles)
-        val othersItinerariesStream = getFromFile(trainFiles)
-        val othersItinerariesStream2 = getFromFile(trainFiles)
+        val trainItinerariesStream = getFromFile(trainFiles)
+        val trainItinerariesStream2 = getFromFile(trainFiles)
 
         awaitAll(
             async {
@@ -135,7 +135,7 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading other routes")
-                itinerariesReader.openAsync(othersItinerariesStream2) {
+                itinerariesReader.openAsync(trainItinerariesStream2) {
                     val routes = readAllWithHeaderAsSequence()
                         .distinctBy { it["IDFLINEA"] }
                         .chunked(sequenceChunkSize)
@@ -161,7 +161,7 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading itineraries from file")
-                itinerariesReader.openAsync(othersItinerariesStream) {
+                itinerariesReader.openAsync(trainItinerariesStream) {
                     val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                     itinerariesCollectionNew.drop()
                     itineraries.forEach {
