@@ -180,7 +180,7 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading bus stops order from gtfs")
-                gtfsReader.openAsync(getFromGtfs("routes.txt", routesGtfs)) {
+                gtfsReader.openAsync(getFromGtfs("stop_times.txt", routesGtfs)) {
                     val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                     stops.forEach {
                         val parsed = it.mapAsync(::parseStopsOrder).mapNotNull { it }
