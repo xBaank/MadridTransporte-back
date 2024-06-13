@@ -12,6 +12,7 @@ import common.extensions.get
 import common.extensions.mapAsync
 import common.extensions.toEnumeration
 import common.models.*
+import common.utils.SuspendingLazy
 import common.utils.metroCodMode
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -34,13 +35,19 @@ val httpClient = OkHttpClient.Builder()
     .readTimeout(20.seconds.toJavaDuration())
     .build()
 
-private val reader = csvReader {
+private val gtfsReader = csvReader {
     escapeChar = '\''
     skipEmptyLine = true
     autoRenameDuplicateHeaders = true
 }
 
-private val infoReader = csvReader {
+private val stopsInfoReader = csvReader {
+    skipEmptyLine = true
+    insufficientFieldsRowBehaviour = InsufficientFieldsRowBehaviour.EMPTY_STRING
+    excessFieldsRowBehaviour = ExcessFieldsRowBehaviour.TRIM
+}
+
+private val itinerariesReader = csvReader {
     skipEmptyLine = true
     insufficientFieldsRowBehaviour = InsufficientFieldsRowBehaviour.EMPTY_STRING
     excessFieldsRowBehaviour = ExcessFieldsRowBehaviour.TRIM
@@ -59,18 +66,38 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
     val routesCollectionNew: MongoCollection<Route> by lazy { db.getCollection(randomUUID().toString()) }
 
     try {
-        val allStopsStream = getFileAsStreamFromGtfs("stops.txt")
-        val allRoutesStream = getFileAsStreamFromGtfs("routes.txt")
-        val allStopsTimesStream = getFileAsStreamFromGtfs("stop_times.txt")
-        val allShapesStream = getFileAsStreamFromGtfs("shapes.txt")
-        val allItinerariesStream = getFileAsStreamFromGtfs("trips.txt")
-        val allStopsInfoStream = getFileAsStreamFromInfo()
-        val allCalendars = getFileAsStreamFromGtfs("calendar.txt")
+        val allGtfs = listOf(
+            EnvVariables.metroGtfs,
+            EnvVariables.trainGtfs,
+            EnvVariables.tranviaGtfs,
+            EnvVariables.urbanGtfs,
+            EnvVariables.interurbanGtfs,
+            EnvVariables.emtGtfs
+        )
+        val routesGtfs = listOf(
+            EnvVariables.interurbanGtfs,
+            EnvVariables.urbanGtfs,
+            EnvVariables.emtGtfs,
+            EnvVariables.metroGtfs,
+            EnvVariables.tranviaGtfs
+        )
+        val stopsInfoFiles = listOf(EnvVariables.metroInfo, EnvVariables.trainInfo, EnvVariables.tranviaInfo)
+        val trainFiles = listOf(EnvVariables.trainItineraries)
+
+        val allStopsStream = getFromGtfs("stops.txt", allGtfs)
+        val busRoutesStream = getFromGtfs("routes.txt", routesGtfs)
+        val allStopsTimesStream = getFromGtfs("stop_times.txt", routesGtfs)
+        val allShapesStream = getFromGtfs("shapes.txt", routesGtfs)
+        val busCalendars = getFromGtfs("calendar.txt", routesGtfs)
+        val busItinerariesStream = getFromGtfs("trips.txt", routesGtfs)
+        val allStopsInfoStream = getFromFile(stopsInfoFiles)
+        val othersItinerariesStream = getFromFile(trainFiles)
+        val othersItinerariesStream2 = getFromFile(trainFiles)
 
         awaitAll(
             async {
                 logger.info("Loading stops")
-                reader.openAsync(allStopsStream) {
+                gtfsReader.openAsync(allStopsStream) {
                     val stops = readAllWithHeaderAsSequence()
                         .filter { it["stop_id"]?.contains("par") == true }
                         .distinctBy { it["stop_id"] }
@@ -93,8 +120,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                 logger.info("Loaded stops")
             },
             async {
-                logger.info("Loading routes")
-                reader.openAsync(allRoutesStream) {
+                logger.info("Loading routes from gtfs")
+                gtfsReader.openAsync(busRoutesStream) {
                     val routes = readAllWithHeaderAsSequence()
                         .distinctBy { it["route_id"] }
                         .chunked(sequenceChunkSize)
@@ -104,11 +131,25 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                         if (parsed.isNotEmpty()) routesCollectionNew.insertMany(parsed)
                     }
                 }
-                logger.info("Loaded routes")
+                logger.info("Loaded routes from gtfs")
             },
             async {
-                logger.info("Loading itineraries")
-                reader.openAsync(allItinerariesStream) {
+                logger.info("Loading other routes")
+                itinerariesReader.openAsync(othersItinerariesStream2) {
+                    val routes = readAllWithHeaderAsSequence()
+                        .distinctBy { it["IDFLINEA"] }
+                        .chunked(sequenceChunkSize)
+                    routesCollectionNew.drop()
+                    routes.forEach {
+                        val parsed = it.mapAsync(::parseRoute).mapNotNull { it }
+                        if (parsed.isNotEmpty()) routesCollectionNew.insertMany(parsed)
+                    }
+                }
+                logger.info("Loaded other routes")
+            },
+            async {
+                logger.info("Loading bus itineraries from gtfs")
+                gtfsReader.openAsync(busItinerariesStream) {
                     val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                     itinerariesCollectionNew.drop()
                     itineraries.forEach {
@@ -116,11 +157,25 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                         if (parsed.isNotEmpty()) itinerariesCollectionNew.insertMany(parsed)
                     }
                 }
-                logger.info("Loaded itineraries")
+                logger.info("Loaded bus itineraries gtfs")
+            },
+            async {
+                logger.info("Loading itineraries from file")
+                itinerariesReader.openAsync(othersItinerariesStream) {
+                    val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
+                    itinerariesCollectionNew.drop()
+                    itineraries.forEach {
+                        val parsed = it.mapAsync(::parseItinerary).mapNotNull { it }
+                        val parsedStops = it.mapAsync(::parseStopsOrder).mapNotNull { it }
+                        if (parsed.isNotEmpty()) itinerariesCollectionNew.insertMany(parsed)
+                        if (parsedStops.isNotEmpty()) stopsOrderCollectionNew.insertMany(parsedStops)
+                    }
+                }
+                logger.info("Loaded itineraries file")
             },
             async {
                 logger.info("Loading shapes")
-                reader.openAsync(allShapesStream) {
+                gtfsReader.openAsync(allShapesStream) {
                     val shapes = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                     shapesCollectionNew.drop()
                     shapes.forEach {
@@ -132,7 +187,7 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
             },
             async {
                 logger.info("Loading stops info")
-                infoReader.openAsync(allStopsInfoStream) {
+                stopsInfoReader.openAsync(allStopsInfoStream) {
                     val stops = readAllWithHeaderAsSequence().distinct().chunked(sequenceChunkSize)
                     stopsInfoCollectionNew.drop()
                     stops.forEach {
@@ -143,8 +198,8 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                 logger.info("Loaded stops info")
             },
             async {
-                logger.info("Loading stops order")
-                reader.openAsync(allStopsTimesStream) {
+                logger.info("Loading bus stops order from gtfs")
+                gtfsReader.openAsync(allStopsTimesStream) {
                     val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                     stopsOrderCollectionNew.drop()
                     stops.forEach {
@@ -152,11 +207,11 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
                         if (parsed.isNotEmpty()) stopsOrderCollectionNew.insertMany(parsed)
                     }
                 }
-                logger.info("Loaded stops order")
+                logger.info("Loaded bus stops order from gtfs")
             },
             async {
                 logger.info("Loading calendars")
-                reader.openAsync(allCalendars) {
+                gtfsReader.openAsync(busCalendars) {
                     val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                     calendarsCollectionNew.drop()
                     stops.forEach {
@@ -231,21 +286,12 @@ suspend fun downloadToTempFile(url: String): File = httpClient.get(url).await().
     return@use tempFile
 }
 
-suspend fun getFileAsStreamFromGtfs(file: String) = SequenceInputStream(
-    listOf(
-        File("${EnvVariables.metroGtfs.value()}/$file").inputStream(),
-        File("${EnvVariables.trainGtfs.value()}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.tranviaGtfs.value()}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.interurbanGtfs.value()}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.urbanGtfs.value()}/$file").removeFirstLine().inputStream(),
-        File("${EnvVariables.emtGtfs.value()}/$file").removeFirstLine().inputStream()
-    ).toEnumeration()
-)
+suspend fun getFromGtfs(file: String, routes: List<SuspendingLazy<String>>) = routes.mapIndexed { index, s ->
+    if (index == 0) File("${s.value()}/$file").inputStream()
+    else File("${s.value()}/$file").removeFirstLine().inputStream()
+}.let { SequenceInputStream(it.toEnumeration()) }
 
-suspend fun getFileAsStreamFromInfo() = SequenceInputStream(
-    listOf(
-        File(EnvVariables.metroInfo.value()).inputStream(),
-        File(EnvVariables.trainInfo.value()).removeFirstLine().inputStream(),
-        File(EnvVariables.tranviaInfo.value()).removeFirstLine().inputStream(),
-    ).toEnumeration()
-)
+suspend fun getFromFile(files: List<SuspendingLazy<String>>) = files.mapIndexed { index, s ->
+    if (index == 0) File(s.value()).inputStream()
+    else File(s.value()).removeFirstLine().inputStream()
+}.let { SequenceInputStream(it.toEnumeration()) }
