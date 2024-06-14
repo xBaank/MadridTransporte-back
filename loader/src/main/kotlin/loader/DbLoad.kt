@@ -56,7 +56,7 @@ private val itinerariesReader = csvReader {
 }
 
 
-private const val sequenceChunkSize = 20_000
+private const val sequenceChunkSize = 10_000
 
 suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
     val stopsCollectionNew: MongoCollection<Stop> by lazy { db.getCollection(randomUUID().toString()) }
@@ -86,6 +86,9 @@ suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
         val stopsInfoFiles = listOf(EnvVariables.metroInfo, EnvVariables.trainInfo, EnvVariables.tranviaInfo)
         val trainFiles = listOf(EnvVariables.trainItineraries)
 
+        val repeatedToOriginalStops = mutableMapOf<String, String>()
+        val uniqueMetroStops = mutableMapOf<Pair<Int, String>, String>()
+
         awaitAll(
             async {
                 logger.info("Loading stops")
@@ -95,6 +98,13 @@ suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
                         .distinctBy { it["stop_id"] }
                         .map(::parseStop)
                         .mapNotNull { it }
+                        .onEach {
+                            if (it.codMode.toString() != metroCodMode) return@onEach
+                            val key = it.codMode to it.stopName
+                            val uniqueMetroStop = uniqueMetroStops[key]
+                            if (uniqueMetroStop != null) repeatedToOriginalStops[it.fullStopCode] = uniqueMetroStop
+                            else if (it.codMode.toString() == metroCodMode) uniqueMetroStops[key] = it.fullStopCode
+                        }
                         .distinctBy { //This a hack to remove duplicates, since the same stop on metro can be repeated with different names
                             Pair(
                                 if (it.codMode.toString() == metroCodMode) 1
@@ -185,7 +195,12 @@ suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
                 gtfsReader.openAsync(getFromGtfs("stop_times.txt", routesGtfs)) {
                     val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                     stops.forEach {
-                        val parsed = it.mapAsync(::parseStopsOrder).mapNotNull { it }
+                        val parsed = it.mapAsync(::parseStopsOrder)
+                            .mapNotNull { it }
+                            .map {
+                                val originalStop = repeatedToOriginalStops[it.fullStopCode]
+                                if (originalStop != null) it.copy(fullStopCode = originalStop) else it
+                            }
                         if (parsed.isNotEmpty()) stopsOrderCollectionNew.insertMany(parsed)
                     }
                 }
