@@ -56,7 +56,7 @@ private val itinerariesReader = csvReader {
 }
 
 
-private const val sequenceChunkSize = 100_000
+private const val sequenceChunkSize = 20_000
 
 suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
     val stopsCollectionNew: MongoCollection<Stop> by lazy { db.getCollection(randomUUID().toString()) }
