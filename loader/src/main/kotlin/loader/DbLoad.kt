@@ -12,11 +12,13 @@ import common.extensions.get
 import common.extensions.mapAsync
 import common.extensions.toEnumeration
 import common.models.*
+import common.utils.Loom
 import common.utils.SuspendingLazy
 import common.utils.metroCodMode
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import org.slf4j.LoggerFactory
 import ru.gildor.coroutines.okhttp.await
@@ -54,9 +56,9 @@ private val itinerariesReader = csvReader {
 }
 
 
-private const val sequenceChunkSize = 10_000
+private const val sequenceChunkSize = 100_000
 
-suspend fun loadDataIntoDb(): Unit = coroutineScope {
+suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
     val stopsCollectionNew: MongoCollection<Stop> by lazy { db.getCollection(randomUUID().toString()) }
     val stopsInfoCollectionNew: MongoCollection<StopInfo> by lazy { db.getCollection(randomUUID().toString()) }
     val itinerariesCollectionNew: MongoCollection<Itinerary> by lazy { db.getCollection(randomUUID().toString()) }
@@ -219,7 +221,7 @@ suspend fun loadDataIntoDb(): Unit = coroutineScope {
         stopsOrderCollectionNew.drop()
         calendarsCollectionNew.drop()
         routesCollectionNew.drop()
-        return@coroutineScope
+        return@withContext
     }
 
     stopsCollectionNew.renameCollection(

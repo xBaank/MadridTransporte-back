@@ -66,7 +66,7 @@ suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, S
 
 
 @OptIn(DelicateCoroutinesApi::class)
-fun notifyStopTimesOnBackground() = GlobalScope.launch(Dispatchers.IO) {
+fun notifyStopTimesOnBackground() = GlobalScope.launch(Dispatchers.Loom) {
     val scheduler = buildSchedule {
         seconds {
             every(notificationDelayTimeSeconds.inWholeSeconds.toInt())

@@ -3,8 +3,9 @@ package api.extensions
 import com.google.api.core.ApiFuture
 import com.google.api.core.ApiFutureCallback
 import com.google.api.core.ApiFutures
-import com.google.common.util.concurrent.MoreExecutors
+import common.utils.LoomDispatcher
 import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.ExecutionException
 import kotlin.coroutines.resume
@@ -27,6 +28,6 @@ suspend fun <T> ApiFuture<T>.await(): T {
                 cont.resumeWithException(t)
             }
         }
-        ApiFutures.addCallback(this, callback, MoreExecutors.directExecutor())
+        ApiFutures.addCallback(this, callback, LoomDispatcher.asExecutor())
     }
 }
