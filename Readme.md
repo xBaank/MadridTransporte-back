@@ -16,6 +16,7 @@ This is the backend for the MadridTransporte app.
 - Emt locations
 - Renfe stops times
 - Stops data
+- Lines data
 - Stops times notifications
 
 It is written in kotlin using ktor.
