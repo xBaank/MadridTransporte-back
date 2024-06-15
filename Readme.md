@@ -79,7 +79,7 @@ while true; do
   echo "Running loader..."
   java -jar /app/loader.jar
 
-  # Wait for the specified interval (e.g., 5 minutes)
+  # Wait for the specified interval (e.g., 1 day)
   sleep 1d
 done
 ```
