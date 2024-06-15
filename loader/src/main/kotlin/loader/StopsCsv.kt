@@ -55,7 +55,7 @@ fun parseStopInfo(data: Map<String, String>): StopInfo? = runCatching {
 fun parseItinerary(data: Map<String, String>) = runCatching {
     Itinerary(
         itineraryCode = (data["shape_id"] ?: data["CODIGOITINERARIO"]).toString(),
-        direction = data["direction_id"]?.toIntOrNull() ?: data["SENTIDO"]?.toIntOrNull() ?: 0,
+        direction = data["direction_id"]?.toIntOrNull() ?: data["SENTIDO"]?.toIntOrNull()?.minus(1) ?: 0,
         fullLineCode = (data["route_id"] ?: data["IDFLINEA"]).toString(),
         tripId = (data["trip_id"] ?: data["CODIGOITINERARIO"]).toString(),
         serviceId = data["service_id"] ?: "UNKNOWN",

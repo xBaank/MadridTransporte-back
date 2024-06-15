@@ -30,7 +30,7 @@ enum class Subscriptions(val url: String, val stopCode: String) {
     TRAM("/stops/tram/times", tramStopCode)
 }
 
-class NotificationsTest {
+class TimesNotificationsTest {
     private val testStopTimes = StopTimes(
         codMode = 0,
         stopName = "",

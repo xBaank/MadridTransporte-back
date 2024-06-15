@@ -9,6 +9,7 @@ import crtm.soap.PublicKeyRequest
 import io.github.reactivecircus.cache4k.Cache
 import jakarta.xml.ws.AsyncHandler
 import jakarta.xml.ws.BindingProvider
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -61,6 +62,8 @@ suspend inline fun <T, R : Any?> getSuspend(
         val future = f(request) { result ->
             try {
                 continuation.resume(result.get())
+            } catch (e: InterruptedException) {
+                continuation.resumeWithException(CancellationException())
             } catch (e: Throwable) {
                 continuation.resumeWithException(e)
             }
