@@ -1,6 +1,7 @@
 package loader
 
 import common.models.*
+import common.models.Calendar
 import common.utils.createStopCode
 import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
@@ -8,6 +9,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 private val logger = LoggerFactory.getLogger("StopsCsv")
 
@@ -29,11 +31,13 @@ fun parseStop(data: Map<String, String>): Stop? = runCatching {
     .getOrNull()
 
 fun parseRoute(data: Map<String, String>): Route? = runCatching {
+    val codMode = (data["route_id"]?.substringBefore("_") ?: data["MODO"]).toString()
     Route(
-        fullLineCode = data["route_id"].toString(),
-        simpleLineCode = data["route_short_name"].toString(),
-        routeName = data["route_long_name"].toString(),
-        codMode = data["route_id"].toString().substringBefore("_")
+        fullLineCode = (data["route_id"] ?: data["IDFLINEA"]).toString(),
+        simpleLineCode = (data["route_short_name"] ?: data["CODIGOGESTIONLINEA"]).toString()
+            .uppercase(Locale.getDefault()),
+        routeName = (data["route_long_name"] ?: data["DENOMINACION"]).toString(),
+        codMode = codMode
     )
 }
     .onFailure { logger.error(it.message, it) }
@@ -50,12 +54,12 @@ fun parseStopInfo(data: Map<String, String>): StopInfo? = runCatching {
 
 fun parseItinerary(data: Map<String, String>) = runCatching {
     Itinerary(
-        itineraryCode = data["shape_id"].toString(),
-        direction = data["direction_id"]?.toIntOrNull() ?: 0,
-        fullLineCode = data["route_id"].toString(),
-        tripId = data["trip_id"].toString(),
-        serviceId = data["service_id"].toString(),
-        tripName = data["trip_short_name"].toString()
+        itineraryCode = (data["shape_id"] ?: data["CODIGOITINERARIO"]).toString(),
+        direction = data["direction_id"]?.toIntOrNull() ?: data["SENTIDO"]?.toIntOrNull()?.minus(1) ?: 0,
+        fullLineCode = (data["route_id"] ?: data["IDFLINEA"]).toString(),
+        tripId = (data["trip_id"] ?: data["CODIGOITINERARIO"]).toString(),
+        serviceId = data["service_id"] ?: "UNKNOWN",
+        tripName = data["trip_short_name"] ?: "UNKNOWN"
     )
 }
     .onFailure { logger.error(it.message, it) }
@@ -74,27 +78,29 @@ fun parseShape(data: Map<String, String>): Shape? = runCatching {
     .getOrNull()
 
 fun parseStopsOrder(data: Map<String, String>): StopOrder? = runCatching {
-    val departureTime = data["departure_time"].toString()
-    val times = departureTime.split(":")
-    val hour = times[0].toInt()
-    var daysToAdd = 0L
-    val fixedHour = if (hour >= 24) {
-        hour - 24
-        daysToAdd++
-    } else hour
-    val newTime = listOf(fixedHour.toString().padStart(2, '0'), times[1], times[2]).joinToString(":")
-    val departure = LocalTime.parse(newTime, DateTimeFormatter.ofPattern("HH:mm:ss"))
-        .atDate(LocalDate.EPOCH)
-        .atZone(ZoneOffset.UTC)
-        .plusDays(daysToAdd)
-        .toInstant()
-        .toEpochMilli()
+    val departureTime = data["departure_time"]
+    val departure = if (departureTime != null) {
+        val times = departureTime.split(":")
+        val hour = times[0].toInt()
+        var daysToAdd = 0L
+        val fixedHour = if (hour >= 24) {
+            hour - 24
+            daysToAdd++
+        } else hour
+        val newTime = listOf(fixedHour.toString().padStart(2, '0'), times[1], times[2]).joinToString(":")
+        LocalTime.parse(newTime, DateTimeFormatter.ofPattern("HH:mm:ss"))
+            .atDate(LocalDate.EPOCH)
+            .atZone(ZoneOffset.UTC)
+            .plusDays(daysToAdd)
+            .toInstant()
+            .toEpochMilli()
+    } else null
 
     StopOrder(
-        fullStopCode = data["stop_id"].toString().removePrefix("par_"),
-        order = data["stop_sequence"]?.toIntOrNull() ?: 0,
-        tripId = data["trip_id"].toString(),
-        departureTime = departure
+        fullStopCode = (data["stop_id"]?.removePrefix("par_") ?: data["IDFESTACION"]).toString(),
+        order = data["stop_sequence"]?.toIntOrNull() ?: data["NUMEROORDEN"]?.toIntOrNull() ?: 0,
+        tripId = (data["trip_id"] ?: data["CODIGOITINERARIO"]).toString(),
+        departureTime = departure ?: 0L
     )
 }
     .onFailure { logger.error(it.message, it) }

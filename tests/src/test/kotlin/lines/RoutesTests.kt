@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import simpleJson.*
 import utils.testApplicationBusTracker
 
-class BusLinesRoutesTests {
+class RoutesTests {
     @Test
     fun `should get all routes`() = testApplicationBusTracker {
         val result = client.get("/lines/all")

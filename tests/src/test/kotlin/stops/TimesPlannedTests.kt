@@ -20,7 +20,7 @@ enum class TimesPlannedNotFound(val url: String) {
     BUS("/stops/bus/asdasd/planned"),
 }
 
-class StopsTimesPlannedTests {
+class TimesPlannedTests {
     @ParameterizedTest
     @EnumSource(TimesPlanned::class)
     fun `should get stop times`(code: TimesPlanned) = testApplicationBusTracker {
