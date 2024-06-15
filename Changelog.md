@@ -1,9 +1,14 @@
 # Changelog
 
+## 7.0.3
+
+- Fixed lines related data
+- Updated to java 21
+
 ## 7.0.2
 
-- Fix auth errors with crtm
-- Fix emt locations
+- Fixed auth errors with crtm
+- Fixed emt locations
 
 ## 7.0.1
 
