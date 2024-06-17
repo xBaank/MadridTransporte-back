@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.0.4
+
+- Fixed problem that caused stops to be loaded with incorrect names
+- Fixed error that did not allow to get train stop times
+
 ## 7.0.3
 
 - Fixed lines related data
