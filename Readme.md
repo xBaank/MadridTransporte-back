@@ -16,6 +16,7 @@ This is the backend for the MadridTransporte app.
 - Emt locations
 - Renfe stops times
 - Stops data
+- Lines data
 - Stops times notifications
 
 It is written in kotlin using ktor.
@@ -78,7 +79,7 @@ while true; do
   echo "Running loader..."
   java -jar /app/loader.jar
 
-  # Wait for the specified interval (e.g., 5 minutes)
+  # Wait for the specified interval (e.g., 1 day)
   sleep 1d
 done
 ```
