@@ -19,7 +19,7 @@ suspend fun extractTrainStopTimes(json: JsonNode, coordinates: Coordinates, stop
         val arrives = commercialPaths.map {
             val departureSteps = it["passthroughStep"]["departurePassthroughStepSides"]
             val destinationCode = it["commercialPathInfo"]["commercialDestinationStationCode"].asString().bindJson()
-            val destinationName = getStopNameById(destinationCode).bind()
+            val destinationName = getStopNameById(destinationCode).getOrElse { "" }
             val line = it["commercialPathInfo"]["line"].asString().getOrElse { "" }
             val delay = departureSteps["forecastedOrAuditedDelay"].asInt().bindJson().seconds
             val plannedTime = departureSteps["plannedTime"].asLong().bindJson().milliseconds
