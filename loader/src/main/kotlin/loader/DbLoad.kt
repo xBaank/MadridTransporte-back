@@ -72,8 +72,8 @@ suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
             EnvVariables.metroGtfs,
             EnvVariables.trainGtfs,
             EnvVariables.tranviaGtfs,
-            EnvVariables.urbanGtfs,
             EnvVariables.interurbanGtfs,
+            EnvVariables.urbanGtfs,
             EnvVariables.emtGtfs
         )
         val routesGtfs = listOf(
