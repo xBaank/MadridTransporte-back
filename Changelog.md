@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.5
+
+- Added `/health` to see if its running
+
 ## 7.0.4
 
 - Fixed problem that caused stops to be loaded with incorrect names

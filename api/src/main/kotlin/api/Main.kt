@@ -1,7 +1,7 @@
 package api
 
 import api.config.EnvVariables
-import api.config.configureRoutingV1
+import api.config.configureRouting
 import api.config.setupFirebase
 import api.notifications.notifyStopTimesOnBackground
 import common.DB
@@ -43,6 +43,6 @@ fun Application.startUp() = runBlocking {
     install(CachingHeaders)
     DB.setupMongo(EnvVariables.mongoConnectionString.getOrThrow())
     setupFirebase().getOrThrow()
-    configureRoutingV1()
+    configureRouting()
 }
 
