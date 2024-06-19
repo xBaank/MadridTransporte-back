@@ -31,7 +31,7 @@ jobs:
           images: xbank/bus_tracker_api
 
       - name: Build and push Docker image for api
-        uses: docker/build-push-action@4367da978b557b70738a51fed31c93e6a240dfb3
+        uses: docker/build-push-action@94f8f8c2eec4bc3f1d78c1755580779804cb87b2
         with:
           context: .
           file: Dockerfile-api
@@ -48,7 +48,7 @@ jobs:
           images: xbank/bus_tracker_loader
 
       - name: Build and push Docker image for loader
-        uses: docker/build-push-action@4367da978b557b70738a51fed31c93e6a240dfb3
+        uses: docker/build-push-action@94f8f8c2eec4bc3f1d78c1755580779804cb87b2
         with:
           context: .
           file: Dockerfile-loader
