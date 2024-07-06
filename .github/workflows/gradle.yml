@@ -24,6 +24,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Cleanup
+        run: > 
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo rm -rf /tmp
+          
       - uses: actions/checkout@v4
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -33,13 +41,6 @@ jobs:
 
       - name: Run chmod to make gradlew executable
         run: chmod +x ./gradlew
-
-      - name: Cleanup
-        run: > 
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45
