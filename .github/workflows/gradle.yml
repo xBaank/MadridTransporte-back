@@ -31,9 +31,6 @@ jobs:
           swap-size-mb: 1024
           remove-dotnet: 'true'
           
-      - name: Clean tmp
-        run: sudo rm -rf /tmp/*
-          
       - name: Checkout    
         uses: actions/checkout@v4
       
