@@ -39,7 +39,7 @@ jobs:
           sudo swapoff -a
           sudo rm -f /swapfile
           sudo apt clean
-          sudo rm -rf /opt/hostedtoolcach
+          sudo rm -rf /opt/hostedtoolcache
           df -h
       
       - name: Set up JDK 21
