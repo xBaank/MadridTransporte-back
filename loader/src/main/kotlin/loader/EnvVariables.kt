@@ -5,6 +5,11 @@ import common.EnvUtils.getenvWrapped
 import common.utils.SuspendingLazy
 import java.io.File
 
+/*
+I don't think we should depend on CRTM open data because they had removed data from before, each csv could have its
+own separator, data is repeated in many cases... and the funniest part is that this was done with a budget of 344.677 €
+Here is the deleted article https://shorturl.at/XJNOv (btw why was it deleted??)
+* */
 private const val defaultMetroGtfs =
     "https://www.arcgis.com/sharing/rest/content/items/5c7f2951962540d69ffe8f640d94c246/data"
 private const val defaultTrainGtfs =
@@ -18,7 +23,7 @@ private const val defaultUrbanGtfs =
 private const val defaultInterurbanGtfs =
     "https://www.arcgis.com/sharing/rest/content/items/885399f83408473c8d815e40c5e702b7/data"
 private const val defaultMetroInfo =
-    "https://opendata.arcgis.com/api/v3/datasets/f3859438e5504a6b9ca745880f72ef1b_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
+    "https://raw.githubusercontent.com/xBaank/MadridTransporte-Backup/main/Datos_abiertos__Elementos_de_la_Red_de_Metro.csv"
 private const val defaultTrainInfo =
     "https://opendata.arcgis.com/api/v3/datasets/9e353bbf4c5d4bea87f01d6d579d06ab_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
 private const val defaultTranviaInfo =
