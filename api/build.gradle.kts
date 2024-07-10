@@ -44,12 +44,12 @@ dependencies {
     implementation("io.github.pdvrieze.xmlutil:serialization:0.90.1")
     implementation("io.ktor:ktor-server-caching-headers:$ktor_version")// https://mvnrepository.com/artifact/com.google.firebase/firebase-messaging
     implementation("com.google.firebase:firebase-admin:9.3.0")
-    implementation("com.google.auth:google-auth-library-oauth2-http:1.23.0")
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.24.0")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-guava
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.1")
     implementation("dev.inmo:krontab:2.3.0")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
-    implementation("org.jsoup:jsoup:1.17.2")
+    implementation("org.jsoup:jsoup:1.18.1")
     implementation(project(":crtm"))
     implementation(project(":common"))
 }
