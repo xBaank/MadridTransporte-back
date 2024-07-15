@@ -24,7 +24,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.3")
     testImplementation("org.testcontainers:mongodb:1.19.8")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
-    testImplementation("io.mockk:mockk:1.13.11")
+    testImplementation("io.mockk:mockk:1.13.12")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
 }
 
