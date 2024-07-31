@@ -19,19 +19,19 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Extract metadata (tags, labels) for api
         id: meta_api
-        uses: docker/metadata-action@a64d0487d7069df33b279515d35d60fa80e2ea62
+        uses: docker/metadata-action@60a0d343a0d8a18aedee9d34e62251f752153bdb
         with:
           images: xbank/bus_tracker_api
 
       - name: Build and push Docker image for api
-        uses: docker/build-push-action@e050dfa622d93dfcc095192a984db567cb14f0f0
+        uses: docker/build-push-action@a8d35412fb758de9162fd63e3fa3f0942bdedb4d
         with:
           context: .
           file: Dockerfile-api
@@ -43,12 +43,12 @@ jobs:
 
       - name: Extract metadata (tags, labels) for loader
         id: meta_loader
-        uses: docker/metadata-action@a64d0487d7069df33b279515d35d60fa80e2ea62
+        uses: docker/metadata-action@60a0d343a0d8a18aedee9d34e62251f752153bdb
         with:
           images: xbank/bus_tracker_loader
 
       - name: Build and push Docker image for loader
-        uses: docker/build-push-action@e050dfa622d93dfcc095192a984db567cb14f0f0
+        uses: docker/build-push-action@a8d35412fb758de9162fd63e3fa3f0942bdedb4d
         with:
           context: .
           file: Dockerfile-loader

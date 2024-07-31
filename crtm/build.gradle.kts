@@ -15,8 +15,8 @@ plugins {
 }
 
 dependencies {
-    jaxws("com.sun.xml.ws:jaxws-tools:4.0.2")
-    implementation("com.sun.xml.ws:jaxws-tools:4.0.2")
+    jaxws("com.sun.xml.ws:jaxws-tools:4.0.3")
+    implementation("com.sun.xml.ws:jaxws-tools:4.0.3")
 }
 
 
