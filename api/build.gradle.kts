@@ -25,7 +25,7 @@ application {
 }
 
 dependencies {
-    implementation("com.sun.xml.ws:jaxws-tools:4.0.2")
+    implementation("com.sun.xml.ws:jaxws-tools:4.0.3")
     implementation("ch.qos.logback:logback-classic:$logback_classic_version")
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
