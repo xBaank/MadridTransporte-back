@@ -21,7 +21,7 @@ val mongo_version: String by project
 val logback_classic_version: String by project
 
 dependencies {
-    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3") // for JVM platform
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.10.0") // for JVM platform
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
     implementation("ch.qos.logback:logback-classic:$logback_classic_version")
