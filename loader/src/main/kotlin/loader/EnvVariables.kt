@@ -23,13 +23,13 @@ private const val defaultUrbanGtfs =
 private const val defaultInterurbanGtfs =
     "https://www.arcgis.com/sharing/rest/content/items/885399f83408473c8d815e40c5e702b7/data"
 private const val defaultMetroInfo =
-    "https://raw.githubusercontent.com/xBaank/MadridTransporte-Backup/main/Datos_abiertos__Elementos_de_la_Red_de_Metro.csv"
+    "https://hub.arcgis.com/api/v3/datasets/0a6c45e7bdd94679b67a2ae662c8838b_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
 private const val defaultTrainInfo =
-    "https://opendata.arcgis.com/api/v3/datasets/9e353bbf4c5d4bea87f01d6d579d06ab_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
+    "https://hub.arcgis.com/api/v3/datasets/9e353bbf4c5d4bea87f01d6d579d06ab_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
 private const val defaultTranviaInfo =
-    "https://opendata.arcgis.com/api/v3/datasets/624dfeafb4d64580aa2ac5f24d8e8614_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
+    "https://hub.arcgis.com/api/v3/datasets/624dfeafb4d64580aa2ac5f24d8e8614_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
 private const val defaultTrainItineraries =
-    "https://opendata.arcgis.com/api/v3/datasets/9e353bbf4c5d4bea87f01d6d579d06ab_5/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
+    "https://hub.arcgis.com/api/v3/datasets/9e353bbf4c5d4bea87f01d6d579d06ab_5/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
 
 object EnvVariables {
     val metroGtfs =
