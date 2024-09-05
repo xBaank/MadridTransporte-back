@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.7
+
+- Updated dependencies.
+
 ## 7.0.6
 
 - Fixed loader bug that caused the data to not be loaded.
