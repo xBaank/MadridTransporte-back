@@ -7,11 +7,11 @@ import io.ktor.server.testing.*
 
 fun testApplicationBusTracker(
     startUpF: Application.() -> Unit = {
-        MongoContainer.start()
         startUp()
     },
     block: suspend ApplicationTestBuilder.(client: HttpClient) -> Unit,
 ) = testApplication {
+    MongoContainer.start()
     application {
         startUpF()
     }
