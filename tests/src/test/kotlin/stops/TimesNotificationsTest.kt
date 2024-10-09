@@ -15,6 +15,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.mockk.*
 import org.amshove.kluent.shouldBe
+import org.junit.jupiter.api.parallel.Isolated
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import simpleJson.jObject
@@ -30,6 +31,7 @@ enum class Subscriptions(val url: String, val stopCode: String) {
     TRAM("/stops/tram/times", tramStopCode)
 }
 
+@Isolated
 class TimesNotificationsTest {
     private val testStopTimes = StopTimes(
         codMode = 0,
