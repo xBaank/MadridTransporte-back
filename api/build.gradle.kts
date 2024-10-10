@@ -68,8 +68,10 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+
 ktor {
     fatJar {
         archiveFileName.set("${project.name}.jar")
+        allowZip64 = true
     }
 }
