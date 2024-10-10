@@ -1,13 +1,14 @@
 package api.routing.stops.metro
 
-import api.db.getRoute
-import api.extensions.toZoneOffset
 import api.routing.stops.Arrive
-import api.routing.stops.Coordinates
 import api.routing.stops.StopTimes
-import api.utils.timeZoneMadrid
 import arrow.core.raise.either
-import crtm.utils.createLineCode
+import common.models.Coordinates
+import common.queries.getRoute
+import common.utils.createLineCode
+import common.utils.metroCodMode
+import common.utils.timeZoneMadrid
+import common.utils.toZoneOffset
 import simpleJson.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -17,7 +18,7 @@ suspend fun extractMetroStopTimes(
     codMode: String,
     coordinates: Coordinates,
     name: String,
-    simpleStopCode: String
+    simpleStopCode: String,
 ) = either {
     val arrives = json?.asArray()?.bind()
 

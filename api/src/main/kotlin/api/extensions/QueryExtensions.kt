@@ -1,8 +1,8 @@
 package api.extensions
 
-import api.exceptions.BusTrackerException
 import arrow.core.left
 import arrow.core.right
+import common.exceptions.BusTrackerException
 import io.ktor.http.*
 
 fun Parameters.getWrapped(key: String) =

@@ -1,5 +1,7 @@
 package api.routing.stops
 
+import common.models.Coordinates
+
 data class StopTimes(
     val codMode: Int,
     val stopName: String,
@@ -29,10 +31,4 @@ data class Incident(
     val effect: String,
     val url: String,
 )
-
-data class Coordinates(
-    val latitude: Double,
-    val longitude: Double,
-)
-
 

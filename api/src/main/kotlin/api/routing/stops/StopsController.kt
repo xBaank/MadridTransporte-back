@@ -1,12 +1,12 @@
 package api.routing.stops
 
 import api.config.EnvVariables.timeoutSeconds
-import api.exceptions.BusTrackerException
-import api.extensions.getSuspend
 import api.utils.auth
 import api.utils.defaultClient
+import api.utils.getSuspend
 import api.utils.mapExceptionsF
 import arrow.core.Either
+import common.exceptions.BusTrackerException
 import crtm.soap.ArrayOfString
 import crtm.soap.IncidentsAffectationsRequest
 import crtm.soap.IncidentsAffectationsResponse
@@ -14,7 +14,7 @@ import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.hours
 
-val cachedAlerts = Cache.Builder<String, IncidentsAffectationsResponse>()
+private val cachedAlerts = Cache.Builder<String, IncidentsAffectationsResponse>()
     .expireAfterWrite(24.hours)
     .build()
 
@@ -23,7 +23,7 @@ suspend fun getAlertsByCodModeResponse(codMode: String) = Either.catch {
         val request = IncidentsAffectationsRequest().apply {
             this.codMode = codMode
             codLines = ArrayOfString()
-            authentication = defaultClient.value().auth()
+            authentication = auth()
         }
 
         getSuspend(request, defaultClient.value()::getIncidentsAffectationsAsync)

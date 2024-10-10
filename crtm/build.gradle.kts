@@ -9,14 +9,14 @@ repositories {
 
 
 plugins {
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm")
     `maven-publish`
     application
 }
 
 dependencies {
-    jaxws("com.sun.xml.ws:jaxws-tools:4.0.2")
-    implementation("com.sun.xml.ws:jaxws-tools:4.0.2")
+    jaxws("com.sun.xml.ws:jaxws-tools:4.0.3")
+    implementation("com.sun.xml.ws:jaxws-tools:4.0.3")
 }
 
 

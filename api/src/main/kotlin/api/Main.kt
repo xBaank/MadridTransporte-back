@@ -1,13 +1,11 @@
 package api
 
 import api.config.EnvVariables
-import api.config.configureRoutingV1
+import api.config.configureRouting
 import api.config.setupFirebase
-import api.config.setupMongo
-import api.db.loadDataIntoDb
-import api.extensions.getOrThrow
-import api.notifications.notifyAbonosOnBackground
 import api.notifications.notifyStopTimesOnBackground
+import common.DB
+import common.extensions.getOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -23,7 +21,6 @@ fun main() {
         startUp()
         //startup is used on tests and notifications tests are mocked, so we don't include those methods in the startup
         notifyStopTimesOnBackground()
-        notifyAbonosOnBackground()
     }.start(wait = true)
 }
 
@@ -37,7 +34,6 @@ fun Application.startUp() = runBlocking {
         allowMethod(HttpMethod.Get)
         allowHeader(HttpHeaders.AccessControlAllowOrigin)
         allowHeader(HttpHeaders.ContentType)
-        allowHeader(HttpHeaders.Authorization)
         anyHost()
     }
     install(Compression) {
@@ -45,9 +41,8 @@ fun Application.startUp() = runBlocking {
         deflate()
     }
     install(CachingHeaders)
+    DB.setupMongo(EnvVariables.mongoConnectionString.getOrThrow())
     setupFirebase().getOrThrow()
-    setupMongo().getOrThrow()
-    loadDataIntoDb()
-    configureRoutingV1()
+    configureRouting()
 }
 

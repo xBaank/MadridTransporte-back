@@ -1,5 +1,44 @@
 # Changelog
 
+## 7.0.7
+
+- Updated dependencies.
+
+## 7.0.6
+
+- Fixed loader bug that caused the data to not be loaded.
+
+## 7.0.5
+
+- Added `/health` to see if its running
+
+## 7.0.4
+
+- Fixed problem that caused stops to be loaded with incorrect names
+- Fixed error that did not allow to get train stop times
+
+## 7.0.3
+
+- Fixed lines related data
+- Updated to java 21
+
+## 7.0.2
+
+- Fixed auth errors with crtm
+- Fixed emt locations
+
+## 7.0.1
+
+- Reduce number of internal requests
+- Don't update data with loader if there is some error
+- Updated dependencies
+
+## 7.0.0
+
+- Removed `abono` endpoints
+- Extracted data loading into different module
+- Updated dependencies
+
 ## 6.4.1
 
 - Improved performance

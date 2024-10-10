@@ -10,10 +10,6 @@ val linesConfigF: Route.(codMode: String) -> Unit =
             handle { getShapes() }
         }
 
-        get("/{lineCode}/locations/{direction}") {
-            handle { getLocations(codMode) }
-        }
-
         get("/itineraries/{itineraryCode}/locations") {
             handle { getLocationsByItineraryCode(codMode) }
         }

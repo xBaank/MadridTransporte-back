@@ -1,24 +1,13 @@
 package api.notifications
 
 import api.config.EnvVariables.notificationDelayTimeSeconds
-import api.db.getSubscriptions
-import api.db.models.StopsSubscription
-import api.db.unsubscribeAllDevice
-import api.exceptions.BusTrackerException
-import api.exceptions.BusTrackerException.NotFound
 import api.extensions.await
 import api.extensions.batched
 import api.extensions.forEachAsync
-import api.extensions.mapAsync
-import api.routing.stops.bus.busCodMode
 import api.routing.stops.bus.getCRTMStopTimes
-import api.routing.stops.emt.emtCodMode
 import api.routing.stops.emt.getEmtStopTimes
 import api.routing.stops.metro.getMetroTimes
-import api.routing.stops.metro.metroCodMode
-import api.routing.stops.metro.tramCodMode
 import api.routing.stops.train.getTrainTimes
-import api.routing.stops.trainRouted.trainCodMode
 import api.utils.StopTimesF
 import arrow.core.Either
 import arrow.core.raise.either
@@ -26,6 +15,13 @@ import com.google.firebase.ErrorCode.INVALID_ARGUMENT
 import com.google.firebase.ErrorCode.NOT_FOUND
 import com.google.firebase.messaging.*
 import com.google.firebase.messaging.MessagingErrorCode.UNREGISTERED
+import common.exceptions.BusTrackerException
+import common.exceptions.BusTrackerException.NotFound
+import common.extensions.mapAsync
+import common.models.StopsSubscription
+import common.queries.getSubscriptions
+import common.queries.unsubscribeAllDevice
+import common.utils.*
 import dev.inmo.krontab.builder.buildSchedule
 import dev.inmo.krontab.doInfinityTz
 import io.ktor.util.logging.*
@@ -70,7 +66,7 @@ suspend fun getFunctionByCodMode(codMode: String): Either<BusTrackerException, S
 
 
 @OptIn(DelicateCoroutinesApi::class)
-fun notifyStopTimesOnBackground() = GlobalScope.launch(Dispatchers.IO) {
+fun notifyStopTimesOnBackground() = GlobalScope.launch(Dispatchers.Loom) {
     val scheduler = buildSchedule {
         seconds {
             every(notificationDelayTimeSeconds.inWholeSeconds.toInt())

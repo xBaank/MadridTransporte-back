@@ -1,11 +1,12 @@
 package api.routing.stops.trainRouted
 
-import api.db.getIdByStopCode
 import api.extensions.getWrapped
 import api.routing.Response.ResponseJson
 import api.utils.Pipeline
 import arrow.core.raise.either
-import crtm.utils.createStopCode
+import common.queries.getIdByStopCode
+import common.utils.createStopCode
+import common.utils.trainCodMode
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*

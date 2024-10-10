@@ -1,12 +1,12 @@
 package api.routing.stops
 
-import api.db.getRoute
-import api.db.models.DeviceToken
-import api.db.models.Stop
-import api.db.models.StopOrderWithItineraries
-import api.db.models.StopsSubscription
+import common.models.DeviceToken
+import common.models.Stop
+import common.models.StopOrderWithItineraries
+import common.models.StopsSubscription
+import common.queries.getRouteByFullLineCode
+import common.utils.getCodModeFromLineCode
 import crtm.soap.IncidentsAffectationsResponse
-import crtm.utils.getCodModeFromLineCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import simpleJson.asJson
@@ -43,8 +43,8 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
     "simpleStopCode" += stopTimes.simpleStopCode
     "stopCode" += stopTimes.stopCode
     "coordinates" += jObject {
-        "latitude" += stopTimes.coordinates.latitude
-        "longitude" += stopTimes.coordinates.longitude
+        "latitude" += stopTimes.coordinates.stopLat
+        "longitude" += stopTimes.coordinates.stopLon
     }
     "incidents" to jArray {
         stopTimes.incidents.forEach {
@@ -59,7 +59,9 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
             }
         }
     }
-    val arrivesGroupedByLineAndDest = stopTimes.arrives?.groupBy { Triple(it.line, it.destination, it.anden) }
+    val arrivesGroupedByLineAndDest = stopTimes.arrives
+        ?.sortedBy { it.line.toIntOrNull() }
+        ?.groupBy { Triple(it.line, it.destination, it.anden) }
     if (arrivesGroupedByLineAndDest == null) {
         "arrives" += null
         return@jObject
@@ -67,7 +69,7 @@ fun buildStopTimesJson(stopTimes: StopTimes) = jObject {
     "arrives" to jArray {
         arrivesGroupedByLineAndDest.forEach { arrive ->
             if (arrive.value.isEmpty()) return@forEach
-            +jObject {
+            addObject {
                 "codMode" += arrive.value.first().codMode
                 "line" += arrive.value.first().line
                 "lineCode" += arrive.value.first().lineCode
@@ -93,7 +95,7 @@ suspend fun buildStopTimesPlannedJson(stopTimes: List<StopOrderWithItineraries>)
     Triple(it.lineCode, it.direction, it.itineraryCode)
 }.map {
     jObject {
-        val route = getRoute(it.key.first).getOrNull()
+        val route = getRouteByFullLineCode(it.key.first).getOrNull()
         "fullLineCode" += it.key.first
         "lineCode" += route?.simpleLineCode
         "destination" += it.value.first().itineraryName

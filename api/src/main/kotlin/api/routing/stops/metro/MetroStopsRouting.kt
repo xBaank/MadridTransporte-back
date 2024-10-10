@@ -2,10 +2,9 @@ package api.routing.stops.metro
 
 import api.routing.handle
 import api.routing.stops.*
+import common.utils.metroCodMode
+import common.utils.tramCodMode
 import io.ktor.server.routing.*
-
-const val metroCodMode = "4"
-const val tramCodMode = "10"
 
 fun Route.metroStopsRouting() = route("/metro") {
     get("/{stopCode}/times") {

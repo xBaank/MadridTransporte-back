@@ -1,12 +1,12 @@
 package api.routing.stops.trainRouted
 
 import api.config.httpClient
-import api.exceptions.BusTrackerException.InternalServerError
-import api.extensions.bindJson
-import api.extensions.post
-import api.utils.hourFormatter
-import api.utils.timeZoneMadrid
 import arrow.core.raise.either
+import common.exceptions.BusTrackerException.InternalServerError
+import common.extensions.bindJson
+import common.extensions.post
+import common.utils.hourFormatter
+import common.utils.timeZoneMadrid
 import ru.gildor.coroutines.okhttp.await
 import simpleJson.deserialized
 import simpleJson.jObject
