@@ -1,6 +1,5 @@
 package api.routing.lines.emt
 
-import api.routing.handle
 import api.routing.lines.linesConfigF
 import common.utils.emtCodMode
 import io.ktor.server.routing.*

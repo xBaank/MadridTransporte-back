@@ -3,8 +3,7 @@ package api.utils
 import api.routing.stops.StopTimes
 import arrow.core.Either
 import common.exceptions.BusTrackerException
-import io.ktor.server.application.*
-import io.ktor.util.pipeline.*
+import io.ktor.server.routing.*
 
-typealias Pipeline = PipelineContext<Unit, ApplicationCall>
+typealias Pipeline = RoutingContext
 typealias StopTimesF = suspend (String) -> Either<BusTrackerException, StopTimes>

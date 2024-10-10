@@ -1,30 +1,30 @@
 package api.routing.lines
 
-import api.routing.handle
+import api.routing.handleResponse
 import arrow.core.right
 import io.ktor.server.routing.*
 
 val linesConfigF: Route.(codMode: String) -> Unit =
     { codMode ->
         get("/shapes/{itineraryCode}") {
-            handle { getShapes() }
+            handleResponse { getShapes() }
         }
 
         get("/itineraries/{itineraryCode}/locations") {
-            handle { getLocationsByItineraryCode(codMode) }
+            handleResponse { getLocationsByItineraryCode(codMode) }
         }
 
         get("/{lineCode}/itineraries/{direction}") {
-            handle { getItineraries(codMode) }
+            handleResponse { getItineraries(codMode) }
         }
 
         get("/itineraries/{itineraryCode}") {
-            handle { getItinerariesByCode() }
+            handleResponse { getItinerariesByCode() }
         }
     }
 
 fun Route.linesRouting() {
     get("/all") {
-        handle { getAllLinesRoutes().right() }
+        handleResponse { getAllLinesRoutes().right() }
     }
 }

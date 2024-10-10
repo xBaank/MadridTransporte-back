@@ -1,6 +1,5 @@
 package api.routing.lines.bus
 
-import api.routing.handle
 import api.routing.lines.getLocations
 import api.routing.lines.linesConfigF
 import common.utils.busCodMode
