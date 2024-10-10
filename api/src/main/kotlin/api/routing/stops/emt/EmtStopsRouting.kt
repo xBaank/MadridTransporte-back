@@ -1,6 +1,6 @@
 package api.routing.stops.emt
 
-import api.routing.handle
+import api.routing.handleResponse
 import api.routing.stops.alertsConfigF
 import api.routing.stops.getStopTimesResponse
 import api.routing.stops.subConfigF
@@ -15,7 +15,7 @@ fun Route.emtStopsRouting() = route("/emt") {
     runBlocking { login().getOrElse(logger::error) } //Try to log in and log if it fails
 
     get("/{stopCode}/times") {
-        handle { getStopTimesResponse(::getEmtStopTimes, emtCodMode, 10) }
+        handleResponse { getStopTimesResponse(::getEmtStopTimes, emtCodMode, 10) }
     }
 
     subConfigF(emtCodMode)

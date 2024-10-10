@@ -6,7 +6,6 @@ import api.utils.errorObject
 import arrow.core.Either
 import common.exceptions.BusTrackerException
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.util.logging.*
 import io.ktor.utils.io.*
@@ -115,5 +114,5 @@ suspend fun Pipeline.handleResponse(response: Response): Unit = when (response) 
     )
 }
 
-suspend inline fun Pipeline.handle(f: () -> Either<BusTrackerException, Response>) =
+suspend inline fun Pipeline.handleResponse(f: () -> Either<BusTrackerException, Response>) =
     f().fold({ handleError(it) }, { handleResponse(it) })
