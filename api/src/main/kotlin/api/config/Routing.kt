@@ -1,6 +1,7 @@
 package api.config
 
 import api.routing.Response.ResponseJson
+import api.routing.handleResponse
 import api.routing.lines.bus.busLinesRouting
 import api.routing.lines.emt.emtLinesRouting
 import api.routing.lines.linesRouting
@@ -29,7 +30,7 @@ fun Application.configureRouting() {
 }
 
 private fun Route.healthCheck() = get("/health") {
-    handle { ResponseJson(jObject { "isRunning" += true }, HttpStatusCode.OK).right() }
+    handleResponse { ResponseJson(jObject { "isRunning" += true }, HttpStatusCode.OK).right() }
 }
 
 private fun Route.stopsRoute() {

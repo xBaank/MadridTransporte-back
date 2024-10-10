@@ -7,13 +7,17 @@ import io.ktor.server.testing.*
 
 fun testApplicationBusTracker(
     startUpF: Application.() -> Unit = {
-        MongoContainer.start()
         startUp()
     },
     block: suspend ApplicationTestBuilder.(client: HttpClient) -> Unit,
-) = testApplication {
-    application {
-        startUpF()
+) {
+    //The start method loads all data into the db and takes around 5 minutes
+    //The testApplication body have a test timeout of 1 minute, so we have to run it outside
+    MongoContainer.start()
+    testApplication {
+        application {
+            startUpF()
+        }
+        block(client)
     }
-    block(client)
 }
