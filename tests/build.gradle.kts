@@ -13,7 +13,7 @@ val ktor_version: String by project
 dependencies {
     implementation("io.github.xbaank:simpleJson-core:$simplejson_version")
     implementation("io.arrow-kt:arrow-core:$arrow_version")
-    implementation("com.google.firebase:firebase-admin:9.4.1")
+    implementation("com.google.firebase:firebase-admin:9.4.2")
     implementation(project(":api"))
     implementation(project(":common"))
     implementation(project(":loader"))
