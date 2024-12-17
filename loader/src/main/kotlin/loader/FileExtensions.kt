@@ -1,9 +1,9 @@
 package loader
 
 import java.io.*
+import java.nio.file.Path
 import java.util.zip.ZipFile
-import kotlin.io.path.createTempDirectory
-import kotlin.io.path.createTempFile
+import kotlin.io.path.*
 
 fun File.removeFirstLine(): File {
     var index = 0
@@ -26,10 +26,40 @@ fun File.removeFirstLine(): File {
     return newFile
 }
 
-fun File.unzip(): String {
+fun File.unzip(): Path {
     val dir = createTempDirectory().toString()
     unzip(dir)
-    return dir
+    return Path.of(dir)
+}
+
+
+@Suppress("FunctionName")
+fun Path.`fix CRTM 💩`(): Path {
+    fun deepFlatten(path: Path): Sequence<Path> = sequence {
+        if (!path.isDirectory()) {
+            yield(path)
+            return@sequence
+        }
+
+        val entries = path.listDirectoryEntries()
+        entries.forEach {
+            when {
+                it.isDirectory() -> yieldAll(deepFlatten(it))
+                else -> yield(it)
+            }
+        }
+    }
+
+    val subFolderFiles = listDirectoryEntries().flatMap { deepFlatten(it) }
+
+    subFolderFiles.filter { it.extension != "zip" }.forEach {
+        val targetFile = this.resolve(it.name)
+        it.moveTo(targetFile, overwrite = true)
+    }
+    val subGtfsZips = subFolderFiles.filter { it.extension == "zip" }.map { it.toFile().unzip() }
+    println("zips: $subGtfsZips files: $subFolderFiles  $this")
+    TODO()
+    return this
 }
 
 fun File.unzip(destDirectory: String) {
