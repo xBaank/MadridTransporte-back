@@ -33,8 +33,7 @@ fun File.unzip(): Path {
 }
 
 
-@Suppress("FunctionName")
-suspend fun Path.`fix CRTM 💩`(): Path {
+suspend fun Path.fixCRTMProblems(): Path {
     fun deepFlatten(path: Path): Sequence<Path> = sequence {
         if (!path.isDirectory()) {
             yield(path)

@@ -37,32 +37,32 @@ object EnvVariables {
     val metroGtfs =
         SuspendingLazy {
             getenvWrapped("METRO_GTFS").map(::File)
-                .getOrElse { downloadToTempFile(defaultMetroGtfs) }.unzip().`fix CRTM 💩`().toString()
+                .getOrElse { downloadToTempFile(defaultMetroGtfs) }.unzip().fixCRTMProblems().toString()
         }
     val tranviaGtfs: SuspendingLazy<String> =
         SuspendingLazy {
             getenvWrapped("TRANVIA_GTFS").map(::File)
-                .getOrElse { downloadToTempFile(defaultTranviaGtfs) }.unzip().`fix CRTM 💩`().toString()
+                .getOrElse { downloadToTempFile(defaultTranviaGtfs) }.unzip().fixCRTMProblems().toString()
         }
     val emtGtfs =
         SuspendingLazy {
             getenvWrapped("EMT_GTFS").map(::File)
-                .getOrElse { downloadToTempFile(defaultEmtGtfs) }.unzip().`fix CRTM 💩`().toString()
+                .getOrElse { downloadToTempFile(defaultEmtGtfs) }.unzip().fixCRTMProblems().toString()
         }
     val trainGtfs =
         SuspendingLazy {
             getenvWrapped("TRAIN_GTFS").map(::File)
-                .getOrElse { downloadToTempFile(defaultTrainGtfs) }.unzip().`fix CRTM 💩`().toString()
+                .getOrElse { downloadToTempFile(defaultTrainGtfs) }.unzip().fixCRTMProblems().toString()
         }
     val interurbanGtfs =
         SuspendingLazy {
             getenvWrapped("INTERURBAN_GTFS").map(::File)
-                .getOrElse { downloadToTempFile(defaultInterurbanGtfs) }.unzip().`fix CRTM 💩`().toString()
+                .getOrElse { downloadToTempFile(defaultInterurbanGtfs) }.unzip().fixCRTMProblems().toString()
         }
     val urbanGtfs =
         SuspendingLazy {
             getenvWrapped("URBAN_GTFS").map(::File)
-                .getOrElse { downloadToTempFile(defaultUrbanGtfs) }.unzip().`fix CRTM 💩`().toString()
+                .getOrElse { downloadToTempFile(defaultUrbanGtfs) }.unzip().fixCRTMProblems().toString()
         }
 
     val metroInfo =
