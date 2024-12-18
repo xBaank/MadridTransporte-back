@@ -1,9 +1,9 @@
 package loader
 
 import java.io.*
+import java.nio.file.Path
 import java.util.zip.ZipFile
-import kotlin.io.path.createTempDirectory
-import kotlin.io.path.createTempFile
+import kotlin.io.path.*
 
 fun File.removeFirstLine(): File {
     var index = 0
@@ -26,10 +26,53 @@ fun File.removeFirstLine(): File {
     return newFile
 }
 
-fun File.unzip(): String {
+fun File.unzip(): Path {
     val dir = createTempDirectory().toString()
     unzip(dir)
-    return dir
+    return Path.of(dir)
+}
+
+
+suspend fun Path.fixCRTMProblems(): Path {
+    fun deepFlatten(path: Path): Sequence<Path> = sequence {
+        if (!path.isDirectory()) {
+            yield(path)
+            return@sequence
+        }
+
+        val entries = path.listDirectoryEntries()
+        entries.forEach {
+            when {
+                it.isDirectory() -> yieldAll(deepFlatten(it))
+                else -> yield(it)
+            }
+        }
+    }
+
+    val subFolderFiles = listDirectoryEntries().flatMap { deepFlatten(it) }
+
+    subFolderFiles.filter { it.extension != "zip" }.forEach {
+        val targetFile = this.resolve(it.name)
+        it.moveTo(targetFile, overwrite = true)
+        targetFile.toFile().deleteOnExit()
+    }
+
+    subFolderFiles.asSequence()
+        .filter { it.extension == "zip" }
+        .map { it.toFile().unzip() }
+        .flatMap { it.listDirectoryEntries().filter { file -> file.extension == "txt" } }
+        .groupBy { it.name }
+        .map { it.key to getFromFile(it.value.map(Path::toString)) }.toList()
+        .forEach {
+            val targetFile = this.resolve(it.first)
+            gtfsReader.openAsync(it.second) {
+                val data = readAllAsSequence()
+                gtfsWriter.openAsync(targetFile.toFile()) {
+                    writeRows(data)
+                }
+            }
+        }
+    return this
 }
 
 fun File.unzip(destDirectory: String) {
