@@ -3,6 +3,7 @@ package loader
 import com.github.doyaaaaaken.kotlincsv.dsl.context.ExcessFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.context.InsufficientFieldsRowBehaviour
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import com.mongodb.client.model.Indexes
 import com.mongodb.client.model.RenameCollectionOptions
 import com.mongodb.kotlin.client.coroutine.MongoCollection
@@ -37,11 +38,13 @@ val httpClient = OkHttpClient.Builder()
     .readTimeout(20.seconds.toJavaDuration())
     .build()
 
-private val gtfsReader = csvReader {
+internal val gtfsReader = csvReader {
     escapeChar = '\''
     skipEmptyLine = true
     autoRenameDuplicateHeaders = true
 }
+
+internal val gtfsWriter = csvWriter()
 
 private val stopsInfoReader = csvReader {
     skipEmptyLine = true
@@ -287,7 +290,9 @@ suspend fun getFromGtfs(file: String, routes: List<SuspendingLazy<String>>) = ro
     else File("${s.value()}/$file").removeFirstLine().inputStream()
 }.let { SequenceInputStream(it.toEnumeration()) }
 
-suspend fun getFromFile(files: List<SuspendingLazy<String>>) = files.mapIndexed { index, s ->
-    if (index == 0) File(s.value()).inputStream()
-    else File(s.value()).removeFirstLine().inputStream()
+suspend fun getFromFile(files: List<SuspendingLazy<String>>) = getFromFile(files.map { it.value() })
+
+fun getFromFile(files: List<String>) = files.mapIndexed { index, s ->
+    if (index == 0) File(s).inputStream()
+    else File(s).removeFirstLine().inputStream()
 }.let { SequenceInputStream(it.toEnumeration()) }

@@ -34,7 +34,7 @@ fun File.unzip(): Path {
 
 
 @Suppress("FunctionName")
-fun Path.`fix CRTM 💩`(): Path {
+suspend fun Path.`fix CRTM 💩`(): Path {
     fun deepFlatten(path: Path): Sequence<Path> = sequence {
         if (!path.isDirectory()) {
             yield(path)
@@ -55,10 +55,24 @@ fun Path.`fix CRTM 💩`(): Path {
     subFolderFiles.filter { it.extension != "zip" }.forEach {
         val targetFile = this.resolve(it.name)
         it.moveTo(targetFile, overwrite = true)
+        targetFile.toFile().deleteOnExit()
     }
-    val subGtfsZips = subFolderFiles.filter { it.extension == "zip" }.map { it.toFile().unzip() }
-    println("zips: $subGtfsZips files: $subFolderFiles  $this")
-    TODO()
+
+    subFolderFiles.asSequence()
+        .filter { it.extension == "zip" }
+        .map { it.toFile().unzip() }
+        .flatMap { it.listDirectoryEntries().filter { file -> file.extension == "txt" } }
+        .groupBy { it.name }
+        .map { it.key to getFromFile(it.value.map(Path::toString)) }.toList()
+        .forEach {
+            val targetFile = this.resolve(it.first)
+            gtfsReader.openAsync(it.second) {
+                val data = readAllAsSequence()
+                gtfsWriter.openAsync(targetFile.toFile()) {
+                    writeRows(data)
+                }
+            }
+        }
     return this
 }
 
