@@ -1,9 +1,11 @@
 package api.config
 
+import arrow.core.Either
 import arrow.core.raise.either
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
+import common.exceptions.BusTrackerException
 import io.grpc.LoadBalancerRegistry
 import io.grpc.internal.PickFirstLoadBalancerProvider
 import okhttp3.OkHttpClient
@@ -17,7 +19,7 @@ val httpClient = OkHttpClient.Builder()
     .build()
 
 
-fun setupFirebase() = either {
+fun setupFirebase(): Either<BusTrackerException.InternalServerError, Unit> = either {
     LoadBalancerRegistry.getDefaultRegistry().register(PickFirstLoadBalancerProvider())
     if (FirebaseApp.getApps().isNotEmpty()) return@either
     if (EnvVariables.serviceJson.isLeft()) {
