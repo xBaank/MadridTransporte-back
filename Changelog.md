@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.0.10
+
+- Fixed incorrect data from crtm.
+- Updated dependencies.
+
 ## 7.0.9
 
 - Fixed error that caused stop times to be empty.
