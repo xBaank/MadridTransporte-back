@@ -26,6 +26,7 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     testImplementation("io.mockk:mockk:1.13.13")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
+    testImplementation("org.junit.platform:junit-platform-reporting:1.9.1")
 }
 
 kotlin {

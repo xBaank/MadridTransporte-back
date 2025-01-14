@@ -31,8 +31,8 @@ jobs:
           root-reserve-mb: 512
           swap-size-mb: 1024
           remove-dotnet: 'true'
-          
-      - name: Checkout    
+
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Free disk space
@@ -42,7 +42,7 @@ jobs:
           sudo apt clean
           sudo rm -rf /opt/hostedtoolcache
           df -h
-      
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -54,6 +54,12 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-      
+
       - name: Build
         run: ./gradlew build
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v5
+        if: success() || failure() # always run even if the previous step fails
+        with:
+          report_paths: 'tests/build/test-results/test/TEST-*.xml'      # Format of test results
