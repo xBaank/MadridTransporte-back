@@ -22,7 +22,6 @@ permissions:
 
 jobs:
   build:
-    permissions: write-all
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -64,3 +63,4 @@ jobs:
         if: success() || failure() # always run even if the previous step fails
         with:
           report_paths: 'tests/build/test-results/test/TEST-*.xml'      # Format of test results
+          annotate_only: true # forked repo cannot write to checks so just do annotations
