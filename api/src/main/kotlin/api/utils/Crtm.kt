@@ -38,9 +38,9 @@ val defaultClient = SuspendingLazy {
 private val privateKey = "pruebapruebapruebapruebaprueba12".toByteArray()
 private val ivParameterSpec = IvParameterSpec(ByteArray(16))
 
-suspend fun auth(): AuthHeader = cachedAuthHeader.get(Unit) {
+suspend fun auth(): AuthHeader {
     val key = getSuspend(PublicKeyRequest(), defaultClient.value()::getPublicKeyAsync)
-    authHeader(key.key.toByteArray())
+    return authHeader(key.key.toByteArray())
 }
 
 private fun encrypt(inputText: ByteArray, key: SecretKeySpec): String {

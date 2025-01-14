@@ -9,27 +9,30 @@ import java.io.File
 I don't think we should depend on CRTM open data because they had removed data from before, each csv could have its
 own separator, data is repeated in many cases... and the funniest part is that this was done with a budget of 344.677 €
 Here is the deleted article https://shorturl.at/XJNOv (btw why was it deleted??)
+
+4/01/2025
+It happened again, modified/removed data and with incorrect values.
 * */
 private const val defaultMetroGtfs =
-    "https://www.arcgis.com/sharing/rest/content/items/5c7f2951962540d69ffe8f640d94c246/data"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M4.zip"
 private const val defaultTrainGtfs =
-    "https://www.arcgis.com/sharing/rest/content/items/1a25440bf66f499bae2657ec7fb40144/data"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M5.zip"
 private const val defaultTranviaGtfs =
-    "https://www.arcgis.com/sharing/rest/content/items/aaed26cc0ff64b0c947ac0bc3e033196/data"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M10.zip"
 private const val defaultEmtGtfs =
-    "https://www.arcgis.com/sharing/rest/content/items/868df0e58fca47e79b942902dffd7da0/data"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M6.zip"
 private const val defaultUrbanGtfs =
-    "https://www.arcgis.com/sharing/rest/content/items/357e63c2904f43aeb5d8a267a64346d8/data"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M9.zip"
 private const val defaultInterurbanGtfs =
-    "https://www.arcgis.com/sharing/rest/content/items/885399f83408473c8d815e40c5e702b7/data"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M89.zip"
 private const val defaultMetroInfo =
-    "https://hub.arcgis.com/api/v3/datasets/0a6c45e7bdd94679b67a2ae662c8838b_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/Datos_abiertos__Elementos_de_la_Red_de_Metro.csv"
 private const val defaultTrainInfo =
-    "https://hub.arcgis.com/api/v3/datasets/9e353bbf4c5d4bea87f01d6d579d06ab_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/Datos_abiertos__Elementos_de_la_Red_de_Cercan%C3%ADas.csv"
 private const val defaultTranviaInfo =
-    "https://hub.arcgis.com/api/v3/datasets/624dfeafb4d64580aa2ac5f24d8e8614_0/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/Datos_abiertos__Elementos_de_la_Red_de_Metro_Ligero.csv"
 private const val defaultTrainItineraries =
-    "https://hub.arcgis.com/api/v3/datasets/9e353bbf4c5d4bea87f01d6d579d06ab_5/downloads/data?format=csv&spatialRefId=25830&where=1%3D1"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/Datos_abiertos__Elementos_de_la_Red_de_Cercan%C3%ADas_Itinerarios.csv"
 
 object EnvVariables {
     val metroGtfs =

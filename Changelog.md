@@ -1,5 +1,13 @@
 # Changelog
 
+## 7.0.9
+
+- Fixed error that caused stop times to be empty.
+
+## 7.0.8
+
+- Updated dependencies.
+
 ## 7.0.7
 
 - Updated dependencies.
