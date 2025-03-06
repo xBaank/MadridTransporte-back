@@ -1,6 +1,7 @@
 {
   "groupName": "all dependencies",
   "groupSlug": "all",
+  "dependencyDashboard": true,
   "lockFileMaintenance": {
     "enabled": false
   },
