@@ -13,26 +13,27 @@ Here is the deleted article https://shorturl.at/XJNOv (btw why was it deleted??)
 4/01/2025
 It happened again, modified/removed data and with incorrect values.
 * */
+private const val ref = "main"
 private const val defaultMetroGtfs =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M4.zip"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M4.zip"
 private const val defaultTrainGtfs =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M5.zip"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M5.zip"
 private const val defaultTranviaGtfs =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M10.zip"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M10.zip"
 private const val defaultEmtGtfs =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M6.zip"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M6.zip"
 private const val defaultUrbanGtfs =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M9.zip"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M9.zip"
 private const val defaultInterurbanGtfs =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/google_transit_M89.zip"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M89.zip"
 private const val defaultMetroInfo =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/Datos_abiertos__Elementos_de_la_Red_de_Metro.csv"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Datos_abiertos__Elementos_de_la_Red_de_Metro.csv"
 private const val defaultTrainInfo =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/Datos_abiertos__Elementos_de_la_Red_de_Cercan%C3%ADas.csv"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Datos_abiertos__Elementos_de_la_Red_de_Cercan%C3%ADas.csv"
 private const val defaultTranviaInfo =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/Datos_abiertos__Elementos_de_la_Red_de_Metro_Ligero.csv"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Datos_abiertos__Elementos_de_la_Red_de_Metro_Ligero.csv"
 private const val defaultTrainItineraries =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/main/Datos_abiertos__Elementos_de_la_Red_de_Cercan%C3%ADas_Itinerarios.csv"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Datos_abiertos__Elementos_de_la_Red_de_Cercan%C3%ADas_Itinerarios.csv"
 
 object EnvVariables {
     val metroGtfs =

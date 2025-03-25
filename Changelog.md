@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.0.11
+
+- Updated dependencies
+- Added internal fallback when trying to get itineraries by direction
+
 ## 7.0.10
 
 - Fixed incorrect data from crtm.

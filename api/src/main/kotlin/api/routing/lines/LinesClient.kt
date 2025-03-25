@@ -13,7 +13,6 @@ import common.utils.getCodModeFromLineCode
 import common.utils.getSimpleLineCodeFromLineCode
 import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -25,7 +24,7 @@ suspend fun Pipeline.getItineraries(codMode: String) = either {
     val stopCode = call.request.queryParameters.getWrapped("stopCode").bind()
 
     val itinerary = getItinerariesByFullLineCode(lineCode, direction, createStopCode(codMode, stopCode)).firstOrNull()
-        ?: raise(NotFound())
+        ?: getItinerariesResponse(lineCode, direction).bind()
 
     val itineraryOrdered =
         itinerary.copy(stops = itinerary.stops.distinctBy { it.fullStopCode to it.order }.sortedBy { it.order })

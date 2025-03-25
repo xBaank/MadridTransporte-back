@@ -19,6 +19,7 @@ import utils.testApplicationBusTracker
 enum class ItinerariesUrls(val url: String, val direction: Int) {
     EmtDirectionBased("/lines/emt/6__144___/itineraries/2?stopCode=4597", 2),
     InterurbanDirectionBased("/lines/bus/8__450___/itineraries/1?stopCode=08242", 1),
+    Interurban2DirectionBased("/lines/bus/8__428___/itineraries/2?stopCode=08242", 2),
     UrbanDirectionBased("/lines/bus/9__2__065_/itineraries/2?stopCode=08242", 2),
     MetroDirectionBased("/lines/metro/4__12___/itineraries/1?stopCode=205", 1),
     TrainDirectionBased("/lines/train/5__4_A__/itineraries/1?stopCode=53", 1),
