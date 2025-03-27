@@ -13,7 +13,7 @@ Here is the deleted article https://shorturl.at/XJNOv (btw why was it deleted??)
 4/01/2025
 It happened again, modified/removed data and with incorrect values.
 * */
-private const val ref = "main"
+private const val ref = "master"
 private const val defaultMetroGtfs =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M4.zip"
 private const val defaultTrainGtfs =
@@ -27,13 +27,13 @@ private const val defaultUrbanGtfs =
 private const val defaultInterurbanGtfs =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M89.zip"
 private const val defaultMetroInfo =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Datos_abiertos__Elementos_de_la_Red_de_Metro.csv"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Metro_stations.csv"
 private const val defaultTrainInfo =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Datos_abiertos__Elementos_de_la_Red_de_Cercan%C3%ADas.csv"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Train_stations.csv"
 private const val defaultTranviaInfo =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Datos_abiertos__Elementos_de_la_Red_de_Metro_Ligero.csv"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Tram_stations.csv"
 private const val defaultTrainItineraries =
-    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Datos_abiertos__Elementos_de_la_Red_de_Cercan%C3%ADas_Itinerarios.csv"
+    "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Train_itineraries.csv"
 
 object EnvVariables {
     val metroGtfs =
