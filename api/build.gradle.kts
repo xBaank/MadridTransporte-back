@@ -40,7 +40,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
     implementation("io.github.reactivecircus.cache4k:cache4k:0.14.0")
     implementation("io.ktor:ktor-server-compression:$ktor_version")
-    implementation("io.github.pdvrieze.xmlutil:core:0.90.3")
+    implementation("io.github.pdvrieze.xmlutil:core:0.91.0")
     implementation("io.github.pdvrieze.xmlutil:serialization:0.90.3")
     implementation("io.ktor:ktor-server-caching-headers:$ktor_version")// https://mvnrepository.com/artifact/com.google.firebase/firebase-messaging
     implementation("com.google.firebase:firebase-admin:9.4.3")
