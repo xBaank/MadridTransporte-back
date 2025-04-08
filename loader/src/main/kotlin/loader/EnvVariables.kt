@@ -13,7 +13,7 @@ Here is the deleted article https://shorturl.at/XJNOv (btw why was it deleted??)
 4/01/2025
 It happened again, modified/removed data and with incorrect values.
 * */
-private const val ref = "master"
+private const val ref = "pre"
 private const val defaultMetroGtfs =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M4.zip"
 private const val defaultTrainGtfs =
