@@ -1,5 +1,15 @@
 # Changelog
 
+## 7.1.0
+
+- Updated dependencies
+- Fixed a bug when loading data from `calendar.csv`
+
+> [!NOTE]\
+> (This data is incorrect or missing most of the time)
+
+- Added `/stops/{type}/{stopId}/planned` for `train`,`tram` and `emt`
+
 ## 7.0.11
 
 - Updated dependencies
@@ -74,7 +84,7 @@
 ## 6.2.0
 
 - Updated dependencies
-- Added `/stops/{type}/times/{stopId}/planned` (Only available for type `bus` in this update)
+- Added `/stops/{type}/{stopId}/planned` (Only available for type `bus` in this update)
 
 ## 6.1.14
 
