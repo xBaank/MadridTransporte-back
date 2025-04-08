@@ -34,6 +34,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      TARGET: ${{ github.event.inputs.target || 'master' }} # <--- The env variable
     steps:
       - name: Maximize build space
         uses: easimon/maximize-build-space@master

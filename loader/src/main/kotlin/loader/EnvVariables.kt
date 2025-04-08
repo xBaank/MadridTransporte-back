@@ -13,26 +13,26 @@ Here is the deleted article https://shorturl.at/XJNOv (btw why was it deleted??)
 4/01/2025
 It happened again, modified/removed data and with incorrect values.
 * */
-private const val ref = "master"
-private const val defaultMetroGtfs =
+private val ref = getenvWrapped("TARGET").getOrElse { "master" }
+private val defaultMetroGtfs =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M4.zip"
-private const val defaultTrainGtfs =
+private val defaultTrainGtfs =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M5.zip"
-private const val defaultTranviaGtfs =
+private val defaultTranviaGtfs =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M10.zip"
-private const val defaultEmtGtfs =
+private val defaultEmtGtfs =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M6.zip"
-private const val defaultUrbanGtfs =
+private val defaultUrbanGtfs =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M9.zip"
-private const val defaultInterurbanGtfs =
+private val defaultInterurbanGtfs =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/google_transit_M89.zip"
-private const val defaultMetroInfo =
+private val defaultMetroInfo =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Metro_stations.csv"
-private const val defaultTrainInfo =
+private val defaultTrainInfo =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Train_stations.csv"
-private const val defaultTranviaInfo =
+private val defaultTranviaInfo =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Tram_stations.csv"
-private const val defaultTrainItineraries =
+private val defaultTrainItineraries =
     "https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/$ref/Train_itineraries.csv"
 
 object EnvVariables {
