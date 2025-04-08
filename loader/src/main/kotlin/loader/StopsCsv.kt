@@ -106,8 +106,8 @@ fun parseStopsOrder(data: Map<String, String>): StopOrder? = runCatching {
     .onFailure { logger.error(it.message, it) }
     .getOrNull()
 
-private val format = SimpleDateFormat("yyyyMMdd")
 fun parseCalendar(data: Map<String, String>): Calendar? = runCatching {
+    val format = SimpleDateFormat("yyyyMMdd")
     Calendar(
         serviceId = data["service_id"].toString(),
         monday = data["monday"]?.toInt() == 1,
