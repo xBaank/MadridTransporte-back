@@ -76,13 +76,7 @@ suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
             EnvVariables.urbanGtfs,
             EnvVariables.emtGtfs
         )
-        val routesGtfs = listOf(
-            EnvVariables.interurbanGtfs,
-            EnvVariables.urbanGtfs,
-            EnvVariables.emtGtfs,
-            EnvVariables.metroGtfs,
-            EnvVariables.tranviaGtfs
-        )
+
         val stopsInfoFiles = listOf(EnvVariables.metroInfo, EnvVariables.trainInfo, EnvVariables.tranviaInfo)
         val trainFiles = listOf(EnvVariables.trainItineraries)
 
@@ -120,7 +114,7 @@ suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
             },
             async {
                 logger.info("Loading routes from gtfs")
-                gtfsReader.openAsync(getFromGtfs("routes.txt", routesGtfs)) {
+                gtfsReader.openAsync(getFromGtfs("routes.txt", allGtfs)) {
                     val routes = readAllWithHeaderAsSequence()
                         .distinctBy { it["route_id"] }
                         .chunked(sequenceChunkSize)
@@ -146,7 +140,7 @@ suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
             },
             async {
                 logger.info("Loading bus itineraries from gtfs")
-                gtfsReader.openAsync(getFromGtfs("trips.txt", routesGtfs)) {
+                gtfsReader.openAsync(getFromGtfs("trips.txt", allGtfs)) {
                     val itineraries = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                     itineraries.forEach {
                         val parsed = it.mapAsync(::parseItinerary).mapNotNull { it }
@@ -170,7 +164,7 @@ suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
             },
             async {
                 logger.info("Loading shapes")
-                gtfsReader.openAsync(getFromGtfs("shapes.txt", routesGtfs)) {
+                gtfsReader.openAsync(getFromGtfs("shapes.txt", allGtfs)) {
                     val shapes = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                     shapes.forEach {
                         val parsed = it.mapAsync(::parseShape).mapNotNull { it }
@@ -192,7 +186,7 @@ suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
             },
             async {
                 logger.info("Loading bus stops order from gtfs")
-                gtfsReader.openAsync(getFromGtfs("stop_times.txt", routesGtfs)) {
+                gtfsReader.openAsync(getFromGtfs("stop_times.txt", allGtfs)) {
                     val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                     stops.forEach {
                         val parsed = it.mapAsync(::parseStopsOrder)
@@ -208,7 +202,7 @@ suspend fun loadDataIntoDb(): Unit = withContext(Dispatchers.Loom) {
             },
             async {
                 logger.info("Loading calendars")
-                gtfsReader.openAsync(getFromGtfs("calendar.txt", routesGtfs)) {
+                gtfsReader.openAsync(getFromGtfs("calendar.txt", allGtfs)) {
                     val stops = readAllWithHeaderAsSequence().chunked(sequenceChunkSize)
                     stops.forEach {
                         val parsed = it.mapAsync(::parseCalendar).mapNotNull { it }

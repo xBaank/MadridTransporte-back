@@ -4,6 +4,7 @@ import api.routing.handleResponse
 import api.routing.stops.alertsConfigF
 import api.routing.stops.getStopTimesResponse
 import api.routing.stops.subConfigF
+import api.routing.stops.timesPlannedConfigF
 import arrow.core.getOrElse
 import common.utils.emtCodMode
 import io.ktor.server.routing.*
@@ -20,4 +21,5 @@ fun Route.emtStopsRouting() = route("/emt") {
 
     subConfigF(emtCodMode)
     alertsConfigF(emtCodMode)
+    timesPlannedConfigF(emtCodMode)
 }

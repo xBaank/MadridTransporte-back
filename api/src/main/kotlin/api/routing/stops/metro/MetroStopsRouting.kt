@@ -19,4 +19,5 @@ fun Route.tramStopsRouting() = route("/tram") {
     timesConfigF(tramCodMode) //Metro doesn't work with tram
     subConfigF(tramCodMode)
     alertsConfigF(tramCodMode)
+    timesPlannedConfigF(tramCodMode)
 }
