@@ -23,7 +23,7 @@ val logback_classic_version: String by project
 dependencies {
     implementation("com.jsoizo:kotlin-csv-jvm:1.10.0") // for JVM platform
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("ch.qos.logback:logback-classic:$logback_classic_version")
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongo_version")
     implementation("com.squareup.okhttp3:okhttp:$okhttp_version")

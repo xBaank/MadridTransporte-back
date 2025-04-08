@@ -46,7 +46,7 @@ dependencies {
     implementation("com.google.firebase:firebase-admin:9.4.3")
     implementation("com.google.auth:google-auth-library-oauth2-http:1.33.1")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-guava
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.2")
     implementation("dev.inmo:krontab:2.7.2")
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation("org.jsoup:jsoup:1.19.1")
