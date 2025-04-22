@@ -9,7 +9,7 @@ object MongoContainer {
     fun start() = runBlocking {
         if (initialized) return@runBlocking
 
-        val mongoDBContainer = MongoDBContainer(DockerImageName.parse("mongo:latest"))
+        val mongoDBContainer = MongoDBContainer(DockerImageName.parse("mongo:8"))
         mongoDBContainer.start()
 
         if (System.getProperty("MONGO_CONNECTION_STRING") == null)
