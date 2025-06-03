@@ -44,7 +44,7 @@ dependencies {
     implementation("io.github.pdvrieze.xmlutil:serialization:0.91.1")
     implementation("io.ktor:ktor-server-caching-headers:$ktor_version")// https://mvnrepository.com/artifact/com.google.firebase/firebase-messaging
     implementation("com.google.firebase:firebase-admin:9.5.0")
-    implementation("com.google.auth:google-auth-library-oauth2-http:1.35.0")
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.36.0")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-guava
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.2")
     implementation("dev.inmo:krontab:2.7.2")
