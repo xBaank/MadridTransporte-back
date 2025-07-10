@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val jaxws by configurations.creating
 
@@ -33,13 +33,11 @@ tasks.test {
     useJUnitPlatform()
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
-    java {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+
+kotlin {
+    jvmToolchain(11)
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_11)
     }
 }
 
@@ -49,7 +47,7 @@ tasks.withType<JavaCompile> {
     options.encoding = "ISO-8859-1"
 }
 
-task("wsimport-myservice-buses") {
+tasks.register("wsimport-myservice-buses") {
     group = BasePlugin.BUILD_GROUP
     val destDir = file("$projectDir/src/main/java")
     destDir.mkdirs()
@@ -79,7 +77,7 @@ task("wsimport-myservice-buses") {
 }
 
 
-task("wsimport-myservice-abono") {
+tasks.register("wsimport-myservice-abono") {
     group = BasePlugin.BUILD_GROUP
     val destDir = file("$projectDir/src/main/java")
     destDir.mkdirs()
