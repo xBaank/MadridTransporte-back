@@ -33,7 +33,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     env:
       TARGET: ${{ github.event.inputs.target || 'master' }} # <--- The env variable
     steps:
