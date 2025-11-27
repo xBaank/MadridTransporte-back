@@ -26,7 +26,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for api
         id: meta_api
-        uses: docker/metadata-action@be19121bfd18b9c1ac415d9571d4f67b9b357886
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051
         with:
           images: xbank/bus_tracker_api
 
@@ -43,7 +43,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for loader
         id: meta_loader
-        uses: docker/metadata-action@be19121bfd18b9c1ac415d9571d4f67b9b357886
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051
         with:
           images: xbank/bus_tracker_loader
 
