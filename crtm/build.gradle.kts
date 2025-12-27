@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 
 val jaxws by configurations.creating
 
@@ -33,13 +33,16 @@ tasks.test {
     useJUnitPlatform()
 }
 
-
 kotlin {
-    jvmToolchain(11)
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_11)
-    }
+    jvmToolchain(21)
 }
+
+java {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+}
+
+
 
 tasks.withType<JavaCompile> {
     sourceCompatibility = JavaVersion.VERSION_11.toString()
