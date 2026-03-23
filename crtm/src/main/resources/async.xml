@@ -1,4 +1,0 @@
-<jaxws:bindings
-        xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws">
-    <jaxws:enableAsyncMapping>true</jaxws:enableAsyncMapping>
-</jaxws:bindings>

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "MadridTransporte.Api": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:16403;http://localhost:16404"
+    }
+  }
+}

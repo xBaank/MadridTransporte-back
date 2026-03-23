@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep:*)",
+      "Bash(dotnet --version)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet sln:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet package:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)",
+      "WebFetch(domain:aka.ms)"
+    ]
+  }
+}
