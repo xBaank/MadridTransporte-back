@@ -2,7 +2,6 @@ namespace MadridTransporte.Api.Data.Entities;
 
 public class Shape
 {
-    public int Id { get; set; }
     public required string ItineraryId { get; set; }
     public double Latitude { get; set; }
     public double Longitude { get; set; }

@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MadridTransporte.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260323195101_Initial")]
+    [Migration("20260324221656_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -72,11 +72,8 @@ namespace MadridTransporte.Api.Migrations
 
             modelBuilder.Entity("MadridTransporte.Api.Data.Entities.Itinerary", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<string>("TripId")
+                        .HasColumnType("text");
 
                     b.Property<int>("Direction")
                         .HasColumnType("integer");
@@ -93,15 +90,11 @@ namespace MadridTransporte.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("TripId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("TripName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("TripId");
 
                     b.HasIndex("FullLineCode");
 
@@ -109,25 +102,19 @@ namespace MadridTransporte.Api.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.HasIndex("TripId");
-
                     b.ToTable("Itineraries");
                 });
 
             modelBuilder.Entity("MadridTransporte.Api.Data.Entities.Shape", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                    b.Property<string>("ItineraryId")
+                        .HasColumnType("text");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<int>("Sequence")
+                        .HasColumnType("integer");
 
                     b.Property<double>("Distance")
                         .HasColumnType("double precision");
-
-                    b.Property<string>("ItineraryId")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<double>("Latitude")
                         .HasColumnType("double precision");
@@ -135,30 +122,18 @@ namespace MadridTransporte.Api.Migrations
                     b.Property<double>("Longitude")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("Sequence")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItineraryId");
+                    b.HasKey("ItineraryId", "Sequence");
 
                     b.ToTable("Shapes");
                 });
 
             modelBuilder.Entity("MadridTransporte.Api.Data.Entities.Stop", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<string>("FullStopCode")
+                        .HasColumnType("text");
 
                     b.Property<int>("CodMode")
                         .HasColumnType("integer");
-
-                    b.Property<string>("FullStopCode")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("StopCode")
                         .IsRequired()
@@ -181,48 +156,33 @@ namespace MadridTransporte.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("FullStopCode");
 
                     b.HasIndex("CodMode");
-
-                    b.HasIndex("FullStopCode")
-                        .IsUnique();
 
                     b.ToTable("Stops");
                 });
 
             modelBuilder.Entity("MadridTransporte.Api.Data.Entities.StopInfo", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<string>("IdEstacion")
+                        .HasColumnType("text");
 
                     b.Property<string>("CodigoEmpresa")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("IdEstacion")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CodigoEmpresa");
-
-                    b.HasIndex("IdEstacion");
+                    b.HasKey("IdEstacion", "CodigoEmpresa");
 
                     b.ToTable("StopInfos");
                 });
 
             modelBuilder.Entity("MadridTransporte.Api.Data.Entities.StopOrder", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                    b.Property<string>("TripId")
+                        .HasColumnType("text");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
 
                     b.Property<long>("DepartureTime")
                         .HasColumnType("bigint");
@@ -231,35 +191,19 @@ namespace MadridTransporte.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TripId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
+                    b.HasKey("TripId", "Order");
 
                     b.HasIndex("FullStopCode");
-
-                    b.HasIndex("TripId");
 
                     b.ToTable("StopOrders");
                 });
 
             modelBuilder.Entity("MadridTransporte.Api.Data.Entities.TransitRoute", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CodMode")
-                        .IsRequired()
+                    b.Property<string>("FullLineCode")
                         .HasColumnType("text");
 
-                    b.Property<string>("FullLineCode")
+                    b.Property<string>("CodMode")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -271,12 +215,9 @@ namespace MadridTransporte.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("FullLineCode");
 
                     b.HasIndex("CodMode");
-
-                    b.HasIndex("FullLineCode")
-                        .IsUnique();
 
                     b.ToTable("Routes");
                 });

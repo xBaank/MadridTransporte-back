@@ -37,26 +37,22 @@ namespace MadridTransporte.Api.Migrations
                 name: "Itineraries",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TripId = table.Column<string>(type: "text", nullable: false),
                     ItineraryCode = table.Column<string>(type: "text", nullable: false),
                     FullLineCode = table.Column<string>(type: "text", nullable: false),
                     Direction = table.Column<int>(type: "integer", nullable: false),
-                    TripId = table.Column<string>(type: "text", nullable: false),
                     ServiceId = table.Column<string>(type: "text", nullable: false),
                     TripName = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Itineraries", x => x.Id);
+                    table.PrimaryKey("PK_Itineraries", x => x.TripId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Routes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FullLineCode = table.Column<string>(type: "text", nullable: false),
                     SimpleLineCode = table.Column<string>(type: "text", nullable: false),
                     RouteName = table.Column<string>(type: "text", nullable: false),
@@ -64,74 +60,66 @@ namespace MadridTransporte.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Routes", x => x.Id);
+                    table.PrimaryKey("PK_Routes", x => x.FullLineCode);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Shapes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ItineraryId = table.Column<string>(type: "text", nullable: false),
+                    Sequence = table.Column<int>(type: "integer", nullable: false),
                     Latitude = table.Column<double>(type: "double precision", nullable: false),
                     Longitude = table.Column<double>(type: "double precision", nullable: false),
-                    Sequence = table.Column<int>(type: "integer", nullable: false),
                     Distance = table.Column<double>(type: "double precision", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Shapes", x => x.Id);
+                    table.PrimaryKey("PK_Shapes", x => new { x.ItineraryId, x.Sequence });
                 });
 
             migrationBuilder.CreateTable(
                 name: "StopInfos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CodigoEmpresa = table.Column<string>(type: "text", nullable: false),
                     IdEstacion = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StopInfos", x => x.Id);
+                    table.PrimaryKey("PK_StopInfos", x => new { x.IdEstacion, x.CodigoEmpresa });
                 });
 
             migrationBuilder.CreateTable(
                 name: "StopOrders",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FullStopCode = table.Column<string>(type: "text", nullable: false),
                     TripId = table.Column<string>(type: "text", nullable: false),
                     Order = table.Column<int>(type: "integer", nullable: false),
+                    FullStopCode = table.Column<string>(type: "text", nullable: false),
                     DepartureTime = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StopOrders", x => x.Id);
+                    table.PrimaryKey("PK_StopOrders", x => new { x.TripId, x.Order });
                 });
 
             migrationBuilder.CreateTable(
                 name: "Stops",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FullStopCode = table.Column<string>(type: "text", nullable: false),
                     StopCode = table.Column<string>(type: "text", nullable: false),
                     StopName = table.Column<string>(type: "text", nullable: false),
                     StopLat = table.Column<double>(type: "double precision", nullable: false),
                     StopLon = table.Column<double>(type: "double precision", nullable: false),
                     CodMode = table.Column<int>(type: "integer", nullable: false),
-                    FullStopCode = table.Column<string>(type: "text", nullable: false),
                     Wheelchair = table.Column<int>(type: "integer", nullable: false),
                     Zone = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Stops", x => x.Id);
+                    table.PrimaryKey("PK_Stops", x => x.FullStopCode);
                 });
 
             migrationBuilder.CreateIndex(
@@ -155,35 +143,9 @@ namespace MadridTransporte.Api.Migrations
                 column: "ServiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Itineraries_TripId",
-                table: "Itineraries",
-                column: "TripId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Routes_CodMode",
                 table: "Routes",
                 column: "CodMode");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Routes_FullLineCode",
-                table: "Routes",
-                column: "FullLineCode",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Shapes_ItineraryId",
-                table: "Shapes",
-                column: "ItineraryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StopInfos_CodigoEmpresa",
-                table: "StopInfos",
-                column: "CodigoEmpresa");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StopInfos_IdEstacion",
-                table: "StopInfos",
-                column: "IdEstacion");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StopOrders_FullStopCode",
@@ -191,20 +153,9 @@ namespace MadridTransporte.Api.Migrations
                 column: "FullStopCode");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StopOrders_TripId",
-                table: "StopOrders",
-                column: "TripId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Stops_CodMode",
                 table: "Stops",
                 column: "CodMode");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Stops_FullStopCode",
-                table: "Stops",
-                column: "FullStopCode",
-                unique: true);
         }
 
         /// <inheritdoc />

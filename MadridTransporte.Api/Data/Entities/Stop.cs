@@ -2,7 +2,6 @@ namespace MadridTransporte.Api.Data.Entities;
 
 public class Stop
 {
-    public int Id { get; set; }
     public required string StopCode { get; set; }
     public required string StopName { get; set; }
     public double StopLat { get; set; }

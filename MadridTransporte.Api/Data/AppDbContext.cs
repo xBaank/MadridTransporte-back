@@ -17,28 +17,28 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         modelBuilder.Entity<Stop>(entity =>
         {
-            entity.HasIndex(e => e.FullStopCode).IsUnique();
+            entity.HasKey(e => e.FullStopCode);
             entity.HasIndex(e => e.CodMode);
         });
 
         modelBuilder.Entity<TransitRoute>(entity =>
         {
-            entity.HasIndex(e => e.FullLineCode).IsUnique();
+            entity.HasKey(e => e.FullLineCode);
             entity.HasIndex(e => e.CodMode);
         });
 
         modelBuilder.Entity<Itinerary>(entity =>
         {
+            entity.HasKey(e => e.TripId);
             entity.HasIndex(e => e.ItineraryCode);
             entity.HasIndex(e => e.FullLineCode);
-            entity.HasIndex(e => e.TripId);
             entity.HasIndex(e => e.ServiceId);
         });
 
         modelBuilder.Entity<StopOrder>(entity =>
         {
+            entity.HasKey(e => new { e.TripId, e.Order });
             entity.HasIndex(e => e.FullStopCode);
-            entity.HasIndex(e => e.TripId);
         });
 
         modelBuilder.Entity<Calendar>(entity =>
@@ -48,13 +48,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.Entity<Shape>(entity =>
         {
-            entity.HasIndex(e => e.ItineraryId);
+            entity.HasKey(e => new { e.ItineraryId, e.Sequence });
         });
 
         modelBuilder.Entity<StopInfo>(entity =>
         {
-            entity.HasIndex(e => e.CodigoEmpresa);
-            entity.HasIndex(e => e.IdEstacion);
+            entity.HasKey(e => new { e.IdEstacion, e.CodigoEmpresa });
         });
     }
 }

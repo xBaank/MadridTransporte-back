@@ -2,7 +2,6 @@ namespace MadridTransporte.Api.Data.Entities;
 
 public class Itinerary
 {
-    public int Id { get; set; }
     public required string ItineraryCode { get; set; }
     public required string FullLineCode { get; set; }
     public int Direction { get; set; }

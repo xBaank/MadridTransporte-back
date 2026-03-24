@@ -187,7 +187,7 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
             StopName = stopName,
             SimpleStopCode = shortStopCode,
             Coordinates = new CoordinatesDto(),
-            Arrives = arrives.Count > 0 ? GroupArrives(arrives) : null,
+            Arrives =  GroupArrives(arrives),
             Incidents = [],
         };
     }

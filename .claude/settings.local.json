@@ -22,7 +22,8 @@
       "Bash(grep -E \"\\\\.cs$|\\\\.csproj$\")",
       "Bash(xargs ls:*)",
       "Bash(ls:*)",
-      "WebFetch(domain:www.nuget.org)"
+      "WebFetch(domain:www.nuget.org)",
+      "Bash(dotnet ef:*)"
     ]
   }
 }

@@ -45,20 +45,16 @@ public class DataLoader(
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             db.Database.SetCommandTimeout(TimeSpan.FromMinutes(30));
 
-            await TruncateAllTables(db, ct);
             await LoadStops(db, gtfsDirs, ct);
-            await LoadRoutesFromGtfs(db, gtfsDirs, ct);
-            await LoadRoutesFromCsv(db, csvFiles.TrainItineraries, ct);
-            await LoadItinerariesFromGtfs(db, gtfsDirs, ct);
-            await LoadItinerariesFromCsv(db, csvFiles.TrainItineraries, ct);
+            await LoadRoutes(db, gtfsDirs, csvFiles.TrainItineraries, ct);
+            await LoadItineraries(db, gtfsDirs, csvFiles.TrainItineraries, ct);
             await LoadShapes(db, gtfsDirs, ct);
             await LoadStopsInfo(db, csvFiles.StopsInfoFiles, ct);
             await LoadCalendars(db, gtfsDirs, ct);
 
             // StopOrders need the repeated metro stops map, so load after stops
             var repeatedToOriginalStops = await GetRepeatedMetroStops(db, ct);
-            await LoadStopOrdersFromGtfs(db, gtfsDirs, repeatedToOriginalStops, ct);
-            await LoadStopOrdersFromCsv(db, csvFiles.TrainItineraries, ct);
+            await LoadStopOrders(db, gtfsDirs, csvFiles.TrainItineraries, repeatedToOriginalStops, ct);
 
             logger.LogInformation("Data load completed successfully");
         }
@@ -113,17 +109,13 @@ public class DataLoader(
         };
     }
 
-    private static async Task TruncateAllTables(AppDbContext db, CancellationToken ct)
-    {
-        await db.Database.ExecuteSqlRawAsync(
-            """
-            TRUNCATE TABLE "Stops", "Routes", "Itineraries", "StopOrders", "Calendars", "Shapes", "StopInfos" CASCADE
-            """, ct);
-    }
-
     private async Task LoadStops(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, CancellationToken ct)
     {
         logger.LogInformation("Loading stops");
+
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
+
+        await db.Database.ExecuteSqlRawAsync(@"TRUNCATE TABLE ""Stops""", ct);
 
         var seenStopIds = new HashSet<string>();
         var uniqueMetroNames = new HashSet<string>();
@@ -163,6 +155,7 @@ public class DataLoader(
             }
         }
 
+        await tx.CommitAsync(ct);
         logger.LogInformation("Loaded {Count} stops", count);
     }
 
@@ -187,22 +180,26 @@ public class DataLoader(
         return repeatedToOriginal;
     }
 
-    private async Task LoadRoutesFromGtfs(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, CancellationToken ct)
+    private async Task LoadRoutes(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, string trainItinerariesPath,
+        CancellationToken ct)
     {
-        logger.LogInformation("Loading routes from GTFS");
+        logger.LogInformation("Loading routes");
 
-        var seenRouteIds = new HashSet<string>();
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
+
+        await db.Database.ExecuteSqlRawAsync(@"TRUNCATE TABLE ""Routes""", ct);
+
+        var seenLineIds = new HashSet<string>();
         var count = 0;
 
-        using var stream = FileUtils.CombineGtfsFiles("routes.txt", gtfsFeeds.Select(f => f.Dir).ToList());
-
-        await foreach (var batch in ReadCsvChunks(stream, BatchSize))
+        using var gtfsStream = FileUtils.CombineGtfsFiles("routes.txt", gtfsFeeds.Select(f => f.Dir).ToList());
+        await foreach (var batch in ReadCsvChunks(gtfsStream, BatchSize))
         {
             var routes = new List<TransitRoute>();
             foreach (var record in batch)
             {
                 var routeId = record.GetValueOrDefault("route_id", "");
-                if (!seenRouteIds.Add(routeId)) continue;
+                if (!seenLineIds.Add(routeId)) continue;
 
                 var route = GtfsParsers.ParseRouteFromGtfs(record, logger);
                 if (route != null) routes.Add(route);
@@ -215,19 +212,8 @@ public class DataLoader(
             }
         }
 
-        logger.LogInformation("Loaded {Count} routes from GTFS", count);
-    }
-
-    private async Task LoadRoutesFromCsv(AppDbContext db, string trainItinerariesPath, CancellationToken ct)
-    {
-        logger.LogInformation("Loading routes from CSV");
-
-        var seenLineIds = new HashSet<string>();
-        var count = 0;
-
-        using var stream = File.OpenRead(trainItinerariesPath);
-
-        await foreach (var batch in ReadCsvChunks(stream, BatchSize))
+        using var csvStream = File.OpenRead(trainItinerariesPath);
+        await foreach (var batch in ReadCsvChunks(csvStream, BatchSize))
         {
             var routes = new List<TransitRoute>();
             foreach (var record in batch)
@@ -246,13 +232,20 @@ public class DataLoader(
             }
         }
 
-        logger.LogInformation("Loaded {Count} routes from CSV", count);
+        await tx.CommitAsync(ct);
+        logger.LogInformation("Loaded {Count} routes", count);
     }
 
-    private async Task LoadItinerariesFromGtfs(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, CancellationToken ct)
+    private async Task LoadItineraries(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, string trainItinerariesPath,
+        CancellationToken ct)
     {
-        logger.LogInformation("Loading itineraries from GTFS");
+        logger.LogInformation("Loading itineraries");
 
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
+
+        await db.Database.ExecuteSqlRawAsync(@"TRUNCATE TABLE ""Itineraries""", ct);
+
+        var seenTripIds = new HashSet<string>();
         var count = 0;
 
         foreach (var (dir, _) in gtfsFeeds)
@@ -263,11 +256,13 @@ public class DataLoader(
             using var stream = File.OpenRead(filePath);
             await foreach (var batch in ReadCsvChunks(stream, BatchSize))
             {
-                var itineraries = batch
-                    .Select(r => GtfsParsers.ParseItineraryFromGtfs(r, logger))
-                    .Where(i => i != null)
-                    .Cast<Itinerary>()
-                    .ToList();
+                var itineraries = new List<Itinerary>();
+                foreach (var r in batch)
+                {
+                    var itinerary = GtfsParsers.ParseItineraryFromGtfs(r, logger);
+                    if (itinerary != null && seenTripIds.Add(itinerary.TripId))
+                        itineraries.Add(itinerary);
+                }
 
                 if (itineraries.Count > 0)
                 {
@@ -277,23 +272,16 @@ public class DataLoader(
             }
         }
 
-        logger.LogInformation("Loaded {Count} itineraries from GTFS", count);
-    }
-
-    private async Task LoadItinerariesFromCsv(AppDbContext db, string trainItinerariesPath, CancellationToken ct)
-    {
-        logger.LogInformation("Loading itineraries from CSV");
-
-        var count = 0;
-        using var stream = File.OpenRead(trainItinerariesPath);
-
-        await foreach (var batch in ReadCsvChunks(stream, BatchSize))
+        using var csvStream = File.OpenRead(trainItinerariesPath);
+        await foreach (var batch in ReadCsvChunks(csvStream, BatchSize))
         {
-            var itineraries = batch
-                .Select(r => GtfsParsers.ParseItineraryFromCsv(r, logger))
-                .Where(i => i != null)
-                .Cast<Itinerary>()
-                .ToList();
+            var itineraries = new List<Itinerary>();
+            foreach (var r in batch)
+            {
+                var itinerary = GtfsParsers.ParseItineraryFromCsv(r, logger);
+                if (itinerary != null && seenTripIds.Add(itinerary.TripId))
+                    itineraries.Add(itinerary);
+            }
 
             if (itineraries.Count > 0)
             {
@@ -302,12 +290,17 @@ public class DataLoader(
             }
         }
 
-        logger.LogInformation("Loaded {Count} itineraries from CSV", count);
+        await tx.CommitAsync(ct);
+        logger.LogInformation("Loaded {Count} itineraries", count);
     }
 
     private async Task LoadShapes(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, CancellationToken ct)
     {
         logger.LogInformation("Loading shapes");
+
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
+
+        await db.Database.ExecuteSqlRawAsync(@"TRUNCATE TABLE ""Shapes""", ct);
 
         var count = 0;
         using var stream = FileUtils.CombineGtfsFiles("shapes.txt", gtfsFeeds.Select(f => f.Dir).ToList());
@@ -327,12 +320,17 @@ public class DataLoader(
             }
         }
 
+        await tx.CommitAsync(ct);
         logger.LogInformation("Loaded {Count} shapes", count);
     }
 
     private async Task LoadStopsInfo(AppDbContext db, List<string> stopsInfoFiles, CancellationToken ct)
     {
         logger.LogInformation("Loading stops info");
+
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
+
+        await db.Database.ExecuteSqlRawAsync(@"TRUNCATE TABLE ""StopInfos""", ct);
 
         var seen = new HashSet<(string, string)>();
         var count = 0;
@@ -356,13 +354,48 @@ public class DataLoader(
             }
         }
 
+        await tx.CommitAsync(ct);
         logger.LogInformation("Loaded {Count} stop infos", count);
     }
 
-    private async Task LoadStopOrdersFromGtfs(AppDbContext db, List<GtfsDirInfo> gtfsFeeds,
+    private async Task LoadCalendars(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, CancellationToken ct)
+    {
+        logger.LogInformation("Loading calendars");
+
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
+
+        await db.Database.ExecuteSqlRawAsync(@"TRUNCATE TABLE ""Calendars""", ct);
+
+        var count = 0;
+        using var stream = FileUtils.CombineGtfsFiles("calendar.txt", gtfsFeeds.Select(f => f.Dir).ToList());
+
+        await foreach (var batch in ReadCsvChunks(stream, BatchSize))
+        {
+            var calendars = batch
+                .Select(r => GtfsParsers.ParseCalendar(r, logger))
+                .Where(c => c != null)
+                .Cast<Data.Entities.Calendar>()
+                .ToList();
+
+            if (calendars.Count > 0)
+            {
+                await BulkInsertAsync(db, calendars, ct);
+                count += calendars.Count;
+            }
+        }
+
+        await tx.CommitAsync(ct);
+        logger.LogInformation("Loaded {Count} calendars", count);
+    }
+
+    private async Task LoadStopOrders(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, string trainItinerariesPath,
         Dictionary<string, string> repeatedToOriginalStops, CancellationToken ct)
     {
-        logger.LogInformation("Loading stop orders from GTFS");
+        logger.LogInformation("Loading stop orders");
+
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
+
+        await db.Database.ExecuteSqlRawAsync(@"TRUNCATE TABLE ""StopOrders""", ct);
 
         var count = 0;
 
@@ -394,17 +427,8 @@ public class DataLoader(
             }
         }
 
-        logger.LogInformation("Loaded {Count} stop orders from GTFS", count);
-    }
-
-    private async Task LoadStopOrdersFromCsv(AppDbContext db, string trainItinerariesPath, CancellationToken ct)
-    {
-        logger.LogInformation("Loading stop orders from CSV");
-
-        var count = 0;
-        using var stream = File.OpenRead(trainItinerariesPath);
-
-        await foreach (var batch in ReadCsvChunks(stream, BatchSize))
+        using var csvStream = File.OpenRead(trainItinerariesPath);
+        await foreach (var batch in ReadCsvChunks(csvStream, BatchSize))
         {
             var stopOrders = batch
                 .Select(r => GtfsParsers.ParseStopOrderFromCsv(r, logger))
@@ -419,32 +443,8 @@ public class DataLoader(
             }
         }
 
-        logger.LogInformation("Loaded {Count} stop orders from CSV", count);
-    }
-
-    private async Task LoadCalendars(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, CancellationToken ct)
-    {
-        logger.LogInformation("Loading calendars");
-
-        var count = 0;
-        using var stream = FileUtils.CombineGtfsFiles("calendar.txt", gtfsFeeds.Select(f => f.Dir).ToList());
-
-        await foreach (var batch in ReadCsvChunks(stream, BatchSize))
-        {
-            var calendars = batch
-                .Select(r => GtfsParsers.ParseCalendar(r, logger))
-                .Where(c => c != null)
-                .Cast<Data.Entities.Calendar>()
-                .ToList();
-
-            if (calendars.Count > 0)
-            {
-                await BulkInsertAsync(db, calendars, ct);
-                count += calendars.Count;
-            }
-        }
-
-        logger.LogInformation("Loaded {Count} calendars", count);
+        await tx.CommitAsync(ct);
+        logger.LogInformation("Loaded {Count} stop orders", count);
     }
 
     private async Task BulkInsertAsync<T>(AppDbContext db, List<T> items, CancellationToken ct) where T : class

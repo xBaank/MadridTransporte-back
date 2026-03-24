@@ -133,6 +133,10 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, RoutesS
             Longitude = geoCoords.EnumerateArray().ElementAt(0).GetDouble(),
         };
 
+        List<JsonElement>? linesInfo = null;
+        if (stopInfo.TryGetProperty("lines", out var linesEl) && linesEl.ValueKind == JsonValueKind.Array)
+            linesInfo = linesEl.EnumerateArray().ToList();
+
         List<ArriveDto>? arrives = null;
         if (data.TryGetProperty("Arrive", out var arriveArr) && arriveArr.ValueKind == JsonValueKind.Array)
         {
@@ -142,14 +146,23 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, RoutesS
                 var secondsToArrive = a.GetProperty("estimateArrive").GetInt64();
                 var estimatedArrive = DateTimeOffset.UtcNow.AddSeconds(secondsToArrive).ToUnixTimeMilliseconds();
                 var line = a.GetProperty("line").GetString() ?? "";
-                var route = routesService.GetRouteAsync(line, CodeUtils.EmtCodMode).GetAwaiter().GetResult();
-                var lineCode = route?.FullLineCode ?? CodeUtils.CreateLineCode(CodeUtils.EmtCodMode, line);
+                var lineInfo = linesInfo?.FirstOrDefault(l =>
+                    l.TryGetProperty("label", out var label) && label.GetString() == line);
+
+                var fullLine = lineInfo is { } li2 && li2.TryGetProperty("line", out var lineEl)
+                    ? lineEl.GetString() ?? line
+                    : line;
+
+                int? direction = null;
+                if (lineInfo is { } li && li.TryGetProperty("to", out var toEl))
+                    direction = toEl.GetString() == "A" ? 2 : 1;
 
                 arrives.Add(new ArriveDto
                 {
                     Line = line,
-                    LineCode = lineCode,
+                    LineCode = fullLine,
                     Destination = a.GetProperty("destination").GetString() ?? "",
+                    Direction = direction,
                     CodMode = int.Parse(CodeUtils.EmtCodMode),
                     EstimatedArrive = estimatedArrive,
                 });
