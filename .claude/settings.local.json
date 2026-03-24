@@ -9,7 +9,20 @@
       "Bash(dotnet package:*)",
       "Bash(dotnet build:*)",
       "Bash(dotnet test:*)",
-      "WebFetch(domain:aka.ms)"
+      "WebFetch(domain:aka.ms)",
+      "Bash(dotnet tool:*)",
+      "Bash(dotnet-svcutil --version)",
+      "Bash(dotnet-svcutil \"http://www.citram.es:8080/WSMultimodalInformation/MultimodalInformation.svc?wsdl\" --outputDir Generated --namespace \"*, MadridTransporte.Api.Clients.Crtm.Generated\" --sync)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh api:*)",
+      "Bash(curl:*)",
+      "Bash(dotnet add:*)",
+      "Bash(grep -E \"\\\\.\\(cs|csproj|json|xml|yml|yaml\\)$\")",
+      "Bash(grep -E '\\\\.kt$')",
+      "Bash(grep -E \"\\\\.cs$|\\\\.csproj$\")",
+      "Bash(xargs ls:*)",
+      "Bash(ls:*)",
+      "WebFetch(domain:www.nuget.org)"
     ]
   }
 }

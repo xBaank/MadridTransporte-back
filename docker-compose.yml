@@ -1,38 +1,19 @@
-version: "3.9"
+# Use postgres/example user/password credentials
+
 services:
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
+  db:
+    ports:
+    - 5432:5432
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    # or set shared memory limit when deploy via swarm stack
+    #volumes:
+    #  - type: tmpfs
+    #    target: /dev/shm
+    #    tmpfs:
+    #      size: 134217728 # 128*2^20 bytes = 128Mb
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: secret
-      POSTGRES_DB: madrid_transporte
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app -d madrid_transporte"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile-api
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      - ConnectionStrings__Postgres=Host=postgres;Database=madrid_transporte;Username=app;Password=secret
-      - SoapTimeoutSeconds=45
-      - Crtm__TimeoutSeconds=45
-      - Crtm__Endpoint=http://www.citram.es:8080/WSMultimodalInformation/MultimodalInformation.svc
-      - EMT__ClientId=${EMT_CLIENT_ID}
-      - EMT__ClientSecret=${EMT_CLIENT_SECRET}
-    ports:
-      - "8080:8080"
-
-
-volumes:
-  pgdata:

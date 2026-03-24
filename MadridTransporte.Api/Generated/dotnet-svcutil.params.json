@@ -1,0 +1,25 @@
+{
+  "providerId": "Microsoft.Tools.ServiceModel.Svcutil",
+  "version": "8.0.0",
+  "options": {
+    "inputs": [
+      "http://www.citram.es:8080/WSMultimodalInformation/MultimodalInformation.svc?wsdl"
+    ],
+    "namespaceMappings": [
+      "*, MadridTransporte.Api.Clients.Crtm.Generated"
+    ],
+    "outputFile": "Reference.cs",
+    "references": [
+      "Microsoft.AspNetCore.OpenApi, {Microsoft.AspNetCore.OpenApi, 10.0.4}",
+      "Microsoft.EntityFrameworkCore, {Microsoft.EntityFrameworkCore, 10.0.4}",
+      "Microsoft.EntityFrameworkCore.Abstractions, {Microsoft.EntityFrameworkCore.Abstractions, 10.0.4}",
+      "Microsoft.EntityFrameworkCore.Relational, {Microsoft.EntityFrameworkCore.Relational, 10.0.4}",
+      "Microsoft.OpenApi, {Microsoft.OpenApi, 2.0.0}",
+      "Npgsql, {Npgsql, 10.0.2}",
+      "Npgsql.EntityFrameworkCore.PostgreSQL, {Npgsql.EntityFrameworkCore.PostgreSQL, 10.0.1}"
+    ],
+    "sync": true,
+    "targetFramework": "net10.0",
+    "typeReuseMode": "All"
+  }
+}

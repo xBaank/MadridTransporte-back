@@ -55,10 +55,11 @@ public class EmtClient(HttpClient httpClient, IStopsService stopsService, IRoute
                     DateTime_Referenced_Incidencies_YYYYMMDD = DateTime.UtcNow.ToString("yyyy-MM-dd"),
                 };
 
-                var request = new HttpRequestMessage(HttpMethod.Post, url)
-                {
-                    Content = JsonContent.Create(body),
-                };
+                var bodyJson = JsonSerializer.Serialize(body);
+                var content = new StringContent(bodyJson);
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+                var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
                 request.Headers.TryAddWithoutValidation("accessToken", _accessToken);
 
                 var response = await httpClient.SendAsync(request);
@@ -107,19 +108,23 @@ public class EmtClient(HttpClient httpClient, IStopsService stopsService, IRoute
 
     private StopTimesDto ExtractStopTimes(JsonElement json, string simpleStopCode)
     {
-        var data = json.GetProperty("data").EnumerateArray().First();
-
-        // Check for error description
-        if (json.TryGetProperty("description", out var descArr))
+        var code = json.TryGetProperty("code", out var c) ? c.GetString() : null;
+        if (code != "00" && code != "01")
         {
-            foreach (var desc in descArr.EnumerateArray())
-            {
-                if (desc.TryGetProperty("ES", out var esVal))
-                    throw ApiException.NotFound(esVal.GetString() ?? "Not found");
-            }
+            var description = json.TryGetProperty("description", out var d) ? d.GetString() : null;
+            throw new InvalidOperationException($"EMT error {code}: {description}");
         }
 
-        var stopInfo = data.GetProperty("StopInfo").EnumerateArray().First();
+        var dataArr = json.GetProperty("data").EnumerateArray().ToList();
+        if (dataArr.Count == 0)
+            throw new InvalidOperationException("EMT returned empty data");
+
+        var data = dataArr[0];
+
+        var stopInfoArr = data.GetProperty("StopInfo").EnumerateArray().ToList();
+        if (stopInfoArr.Count == 0)
+            throw new InvalidOperationException("EMT returned empty StopInfo");
+        var stopInfo = stopInfoArr[0];
         var stopName = stopInfo.GetProperty("stopName").GetString() ?? "";
         var geoCoords = stopInfo.GetProperty("geometry").GetProperty("coordinates");
         var coordinates = new CoordinatesDto

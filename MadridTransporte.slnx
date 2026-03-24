@@ -1,8 +1,4 @@
 <Solution>
-  <Folder Name="/api/">
-    <Project Path="api/MadridTransporte.Api.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/MadridTransporte.Tests.csproj" />
-  </Folder>
+    <Project Path="MadridTransporte.Api/MadridTransporte.Api.csproj" />
+    <Project Path="MadridTransporte.Tests/MadridTransporte.Tests.csproj"/>
 </Solution>

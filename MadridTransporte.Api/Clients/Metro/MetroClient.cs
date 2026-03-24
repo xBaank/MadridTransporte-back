@@ -49,8 +49,8 @@ public class MetroClient(HttpClient httpClient, IStopsService stopsService, IRou
 
         foreach (var indicator in indicators.EnumerateArray())
         {
-            var proximo = indicator.TryGetProperty("proximo", out var p) ? p.GetInt64() : (long?)null;
-            var siguiente = indicator.TryGetProperty("siguiente", out var s) ? s.GetInt64() : (long?)null;
+            var proximo = indicator.TryGetProperty("proximo", out var p) && p.ValueKind == JsonValueKind.Number ? p.GetInt64() : (long?)null;
+            var siguiente = indicator.TryGetProperty("siguiente", out var s) && s.ValueKind == JsonValueKind.Number ? s.GetInt64() : (long?)null;
 
             var emissionTimeStr = indicator.GetProperty("fechaHoraEmisionPrevision").GetString();
             if (emissionTimeStr == null) continue;

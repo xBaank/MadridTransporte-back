@@ -18,10 +18,11 @@ public class BusClient(
     {
         var crtmTask = crtmClient.GetStopTimesAsync(fullStopCode);
         var avanzaTask = GetAvanzaDataAsync(fullStopCode);
-        var coordsTask = stopsService.GetCoordinatesByStopCodeAsync(fullStopCode);
-        var nameTask = stopsService.GetStopNameByStopCodeAsync(fullStopCode);
 
-        await Task.WhenAll(crtmTask, avanzaTask, coordsTask, nameTask);
+        var coords = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode);
+        var name = await stopsService.GetStopNameByStopCodeAsync(fullStopCode);
+
+        await Task.WhenAll(crtmTask, avanzaTask);
 
         var crtmResult = await crtmTask;
         var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
@@ -29,16 +30,16 @@ public class BusClient(
         var times = crtmResult ?? new StopTimesDto
         {
             CodMode = int.Parse(CodeUtils.BusCodMode),
-            StopName = await nameTask,
+            StopName = name,
             SimpleStopCode = simpleStopCode,
-            Coordinates = await coordsTask,
+            Coordinates = coords,
             Arrives = null,
             Incidents = [],
         };
 
         // Update coordinates and name from DB
-        times.Coordinates = await coordsTask;
-        if (!string.IsNullOrEmpty(await nameTask)) times.StopName = await nameTask;
+        times.Coordinates = coords;
+        if (!string.IsNullOrEmpty(name)) times.StopName = name;
         times.SimpleStopCode = simpleStopCode;
 
         // Merge Avanza data

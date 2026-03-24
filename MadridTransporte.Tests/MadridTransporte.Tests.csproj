@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\api\MadridTransporte.Api.csproj" />
+    <ProjectReference Include="..\MadridTransporte.Api\MadridTransporte.Api.csproj" />
   </ItemGroup>
 
 </Project>
