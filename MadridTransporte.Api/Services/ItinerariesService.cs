@@ -34,9 +34,18 @@ public class ItinerariesService(AppDbContext db) : IItinerariesService
 
     public async Task<ItineraryDto?> GetItineraryByLineAndDirectionAsync(string fullLineCode, int direction, string? stopCode = null)
     {
-        var itinerary = await db.Itineraries
-            .FirstOrDefaultAsync(i => i.FullLineCode == fullLineCode && i.Direction == direction - 1);
+        var query = db.Itineraries
+            .Where(i => i.FullLineCode == fullLineCode && i.Direction == direction - 1);
 
+        if (stopCode != null)
+        {
+            var tripIdsWithStop = db.StopOrders
+                .Where(so => so.FullStopCode == stopCode)
+                .Select(so => so.TripId);
+            query = query.Where(i => tripIdsWithStop.Contains(i.TripId));
+        }
+
+        var itinerary = await query.FirstOrDefaultAsync();
         if (itinerary == null) return null;
 
         var stops = await db.StopOrders
@@ -49,9 +58,6 @@ public class ItinerariesService(AppDbContext db) : IItinerariesService
             .Distinct()
             .OrderBy(so => so.Order)
             .ToListAsync();
-
-        if (stopCode != null && stops.All(s => s.FullStopCode != stopCode))
-            return null;
 
         return new ItineraryDto
         {
