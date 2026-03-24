@@ -7,24 +7,24 @@ using MadridTransporte.Api.Utils;
 
 namespace MadridTransporte.Api.Clients.Emt;
 
-public class EmtClient(HttpClient httpClient, IStopsService stopsService, IRoutesService routesService, ILogger<EmtClient> logger) : IEmtClient
+public class EmtClient(HttpClient httpClient, StopsService stopsService, RoutesService routesService, ILogger<EmtClient> logger)
 {
     private string? _accessToken;
     private readonly SemaphoreSlim _loginLock = new(1, 1);
 
-    private async Task LoginAsync()
+    private async Task LoginAsync(CancellationToken ct = default)
     {
-        await _loginLock.WaitAsync();
+        await _loginLock.WaitAsync(ct);
         try
         {
             var request = new HttpRequestMessage(HttpMethod.Get, "https://openapi.emtmadrid.es/v1/mobilitylabs/user/login/");
             request.Headers.TryAddWithoutValidation("passKey", "504fea88211f2f90633f964189b7696037d65cc3a5f47b8fa1d5ea5e34db0239ad2e068851e72be0cec125779224749e3bc236c1b7af39d8a3d398e99223f058");
             request.Headers.TryAddWithoutValidation("X-ClientId", "428B01E6-693C-4F7F-A11E-3BB923420587");
 
-            var response = await httpClient.SendAsync(request);
+            var response = await httpClient.SendAsync(request, ct);
             if (!response.IsSuccessStatusCode) throw new InvalidOperationException("EMT login failed");
 
-            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
             _accessToken = json.GetProperty("data").EnumerateArray().First()
                 .GetProperty("accessToken").GetString();
         }
@@ -34,12 +34,12 @@ public class EmtClient(HttpClient httpClient, IStopsService stopsService, IRoute
         }
     }
 
-    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode)
+    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode, CancellationToken ct = default)
     {
         var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
 
         if (_accessToken == null)
-            await LoginAsync();
+            await LoginAsync(ct);
 
         for (var tries = 3; tries > 0; tries--)
         {
@@ -62,20 +62,20 @@ public class EmtClient(HttpClient httpClient, IStopsService stopsService, IRoute
                 var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
                 request.Headers.TryAddWithoutValidation("accessToken", _accessToken);
 
-                var response = await httpClient.SendAsync(request);
+                var response = await httpClient.SendAsync(request, ct);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     throw ApiException.NotFound("Stop not found");
 
                 if (response.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden)
                 {
-                    await LoginAsync();
+                    await LoginAsync(ct);
                     continue;
                 }
 
                 if (!response.IsSuccessStatusCode) continue;
 
-                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+                var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
                 return ExtractStopTimes(json, simpleStopCode);
             }
             catch (ApiException) { throw; }
@@ -88,8 +88,8 @@ public class EmtClient(HttpClient httpClient, IStopsService stopsService, IRoute
         // Failed all tries — return unavailable
         try
         {
-            var name = await stopsService.GetStopNameByStopCodeAsync(fullStopCode);
-            var coords = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode);
+            var name = await stopsService.GetStopNameByStopCodeAsync(fullStopCode, ct);
+            var coords = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode, ct);
             return new StopTimesDto
             {
                 CodMode = int.Parse(CodeUtils.EmtCodMode),

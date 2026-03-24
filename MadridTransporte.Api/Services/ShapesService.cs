@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MadridTransporte.Api.Services;
 
-public class ShapesService(AppDbContext db) : IShapesService
+public class ShapesService(AppDbContext db)
 {
-    public async Task<List<ShapeDto>> GetShapesByItineraryCodeAsync(string itineraryCode)
+    public async Task<List<ShapeDto>> GetShapesByItineraryCodeAsync(string itineraryCode, CancellationToken ct = default)
     {
         return await db.Shapes
             .Where(s => s.ItineraryId == itineraryCode)
@@ -18,6 +18,6 @@ public class ShapesService(AppDbContext db) : IShapesService
                 Sequence = s.Sequence,
                 Distance = s.Distance,
             })
-            .ToListAsync();
+            .ToListAsync(ct);
     }
 }

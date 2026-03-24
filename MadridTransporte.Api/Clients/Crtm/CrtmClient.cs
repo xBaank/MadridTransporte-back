@@ -1,3 +1,4 @@
+using System.ServiceModel;
 using System.Text;
 using MadridTransporte.Api.Clients.Crtm.Generated;
 using MadridTransporte.Api.Dtos;
@@ -6,64 +7,92 @@ using Gen = MadridTransporte.Api.Clients.Crtm.Generated;
 
 namespace MadridTransporte.Api.Clients.Crtm;
 
-public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmClient> logger) : ICrtmClient
+public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmClient> logger)
 {
     private string Endpoint => config["Crtm:Endpoint"] ?? "http://www.citram.es:8080/WSMultimodalInformation/MultimodalInformation.svc";
 
-    private MultimodalInformationClient CreateSoapClient()
+    private MultimodalInformationClient? _soapClient;
+    private AuthHeader? _authHeader;
+    private readonly SemaphoreSlim _lock = new(1, 1);
+
+    private MultimodalInformationClient GetOrCreateClient()
     {
-        var binding = new System.ServiceModel.BasicHttpBinding
+        if (_soapClient is { State: CommunicationState.Faulted or CommunicationState.Closed or CommunicationState.Closing })
         {
-            MaxBufferSize = int.MaxValue,
-            MaxReceivedMessageSize = int.MaxValue,
-            ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max,
-            AllowCookies = true,
-            SendTimeout = TimeSpan.FromSeconds(config.GetValue("Crtm:TimeoutSeconds", 30)),
-        };
-        var endpoint = new System.ServiceModel.EndpointAddress(Endpoint);
-        return new MultimodalInformationClient(binding, endpoint);
+            _soapClient.Abort();
+            _soapClient = null;
+        }
+
+        if (_soapClient is null)
+        {
+            var binding = new BasicHttpBinding
+            {
+                SendTimeout = TimeSpan.FromSeconds(config.GetValue("Crtm:TimeoutSeconds", 30)),
+            };
+            _soapClient = new MultimodalInformationClient(binding, new EndpointAddress(Endpoint));
+        }
+
+        return _soapClient;
     }
 
-    private async Task<AuthHeader> GetAuthAsync()
+    private async Task<MultimodalInformationClient> GetClientAsync(CancellationToken ct = default)
     {
-        var client = CreateSoapClient();
+        var client = _soapClient;
+        if (client is { State: CommunicationState.Opened or CommunicationState.Created })
+            return client;
+
+        await _lock.WaitAsync(ct);
         try
         {
-            var response = await client.GetPublicKeyAsync();
-            var publicKey = response.key;
-            var connectionKey = CrtmAuthHelper.Encrypt(Encoding.UTF8.GetBytes(publicKey));
-            return new AuthHeader { connectionKey = connectionKey };
+            return GetOrCreateClient();
         }
         finally
         {
-            await client.CloseAsync();
+            _lock.Release();
         }
     }
 
-    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode)
+    private async Task<AuthHeader> GetAuthAsync(CancellationToken ct = default)
+    {
+        if (_authHeader != null) return _authHeader;
+
+        await _lock.WaitAsync(ct);
+        try
+        {
+            if (_authHeader != null) return _authHeader;
+
+            var client = GetOrCreateClient();
+            var response = await client.GetPublicKeyAsync();
+            var connectionKey = CrtmAuthHelper.Encrypt(Encoding.UTF8.GetBytes(response.key));
+            _authHeader = new AuthHeader { connectionKey = connectionKey };
+            return _authHeader;
+        }
+        finally
+        {
+            _lock.Release();
+        }
+    }
+
+    private void InvalidateAuth() => _authHeader = null;
+
+    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode, CancellationToken ct = default)
     {
         try
         {
-            var auth = await GetAuthAsync();
-            var client = CreateSoapClient();
-            try
-            {
-                var response = await client.GetStopTimesAsync(auth, fullStopCode, 1, 2, null, null, null, 3);
-                return MapStopTimesResponse(response.stopTimes, fullStopCode);
-            }
-            finally
-            {
-                await client.CloseAsync();
-            }
+            var auth = await GetAuthAsync(ct);
+            var client = await GetClientAsync(ct);
+            var response = await client.GetStopTimesAsync(auth, fullStopCode, 1, 2, null, null, null, 3);
+            return MapStopTimesResponse(response.stopTimes, fullStopCode);
         }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "CRTM GetStopTimes failed for {StopCode}", fullStopCode);
+            InvalidateAuth();
             return null;
         }
     }
 
-    public async Task<List<AlertDto>> GetAlertsAsync(string codMode)
+    public async Task<List<AlertDto>> GetAlertsAsync(string codMode, CancellationToken ct = default)
     {
         var cacheKey = $"crtm_alerts_{codMode}";
         if (cache.TryGetValue(cacheKey, out List<AlertDto>? cached) && cached != null)
@@ -71,83 +100,65 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
 
         try
         {
-            var auth = await GetAuthAsync();
-            var client = CreateSoapClient();
-            try
-            {
-                var response = await client.GetIncidentsAffectationsAsync(auth, codMode, []);
-                var alerts = MapAlertsResponse(response.incidentsAffectations);
-                cache.Set(cacheKey, alerts, TimeSpan.FromHours(24));
-                return alerts;
-            }
-            finally
-            {
-                await client.CloseAsync();
-            }
+            var auth = await GetAuthAsync(ct);
+            var client = await GetClientAsync(ct);
+            var response = await client.GetIncidentsAffectationsAsync(auth, codMode, []);
+            var alerts = MapAlertsResponse(response.incidentsAffectations);
+            cache.Set(cacheKey, alerts, TimeSpan.FromHours(24));
+            return alerts;
         }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "CRTM GetAlerts failed for codMode {CodMode}", codMode);
+            InvalidateAuth();
             if (cache.TryGetValue(cacheKey, out List<AlertDto>? fallback) && fallback != null)
                 return fallback;
             return [];
         }
     }
 
-    public async Task<ItineraryDto?> GetLineItinerariesAsync(string lineCode, int direction)
+    public async Task<ItineraryDto?> GetLineItinerariesAsync(string lineCode, int direction, CancellationToken ct = default)
     {
         try
         {
-            var auth = await GetAuthAsync();
-            var client = CreateSoapClient();
-            try
-            {
-                var response = await client.GetLineItinerariesAsync(auth, lineCode, 1);
-                return MapItinerariesResponse(response.itineraries, lineCode, direction);
-            }
-            finally
-            {
-                await client.CloseAsync();
-            }
+            var auth = await GetAuthAsync(ct);
+            var client = await GetClientAsync(ct);
+            var response = await client.GetLineItinerariesAsync(auth, lineCode, 1);
+            return MapItinerariesResponse(response.itineraries, lineCode, direction);
         }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "CRTM GetLineItineraries failed for {LineCode}", lineCode);
+            InvalidateAuth();
             return null;
         }
     }
 
-    public async Task<VehicleLocationsDto?> GetLineLocationsAsync(string lineCode, int direction, string codMode, string? stopCode)
+    public async Task<VehicleLocationsDto?> GetLineLocationsAsync(string lineCode, int direction, string codMode, string? stopCode, CancellationToken ct = default)
     {
-        return await GetLocationsInternalAsync(lineCode, direction, null, codMode, stopCode);
+        return await GetLocationsInternalAsync(lineCode, direction, null, codMode, stopCode, ct);
     }
 
-    public async Task<VehicleLocationsDto?> GetLineLocationsByItineraryAsync(string lineCode, string itineraryCode, string codMode, string? stopCode)
+    public async Task<VehicleLocationsDto?> GetLineLocationsByItineraryAsync(string lineCode, string itineraryCode, string codMode, string? stopCode, CancellationToken ct = default)
     {
-        return await GetLocationsInternalAsync(lineCode, 0, itineraryCode, codMode, stopCode);
+        return await GetLocationsInternalAsync(lineCode, 0, itineraryCode, codMode, stopCode, ct);
     }
 
-    private async Task<VehicleLocationsDto?> GetLocationsInternalAsync(string lineCode, int direction, string? itineraryCode, string codMode, string? stopCode)
+    private async Task<VehicleLocationsDto?> GetLocationsInternalAsync(string lineCode, int direction, string? itineraryCode, string codMode, string? stopCode, CancellationToken ct = default)
     {
         try
         {
-            var auth = await GetAuthAsync();
-            var client = CreateSoapClient();
-            try
-            {
-                var response = await client.GetLineLocationAsync(
-                    auth, codMode, lineCode, direction,
-                    itineraryCode ?? "", "", stopCode ?? "8_");
-                return MapLocationsResponse(response.vehiclesLocation);
-            }
-            finally
-            {
-                await client.CloseAsync();
-            }
+            var auth = await GetAuthAsync(ct);
+            var client = await GetClientAsync(ct);
+            var response = await client.GetLineLocationAsync(
+                auth, codMode, lineCode, direction,
+                itineraryCode ?? "", "", stopCode ?? "8_");
+            return MapLocationsResponse(response.vehiclesLocation);
         }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "CRTM GetLineLocation failed for {LineCode}", lineCode);
+            InvalidateAuth();
             return null;
         }
     }

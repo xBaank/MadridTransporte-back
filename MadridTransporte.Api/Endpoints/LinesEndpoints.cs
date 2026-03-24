@@ -12,9 +12,9 @@ public static class LinesEndpoints
     {
         var lines = app.MapGroup("/lines");
 
-        lines.MapGet("/all", async (IRoutesService routesService) =>
+        lines.MapGet("/all", async (RoutesService routesService, CancellationToken ct) =>
         {
-            var routes = await routesService.GetRoutesWithItinerariesAsync();
+            var routes = await routesService.GetRoutesWithItinerariesAsync(ct);
             return Results.Ok(routes);
         });
 
@@ -34,44 +34,44 @@ public static class LinesEndpoints
     {
         var modeGroup = group.MapGroup(prefix);
 
-        modeGroup.MapGet("/shapes/{itineraryCode}", async (string itineraryCode, IShapesService shapesService) =>
+        modeGroup.MapGet("/shapes/{itineraryCode}", async (string itineraryCode, ShapesService shapesService, CancellationToken ct) =>
         {
-            var shapes = await shapesService.GetShapesByItineraryCodeAsync(itineraryCode);
+            var shapes = await shapesService.GetShapesByItineraryCodeAsync(itineraryCode, ct);
             return Results.Ok(shapes);
         });
 
         modeGroup.MapGet("/{lineCode}/itineraries/{direction:int}", async (
             string lineCode, int direction, string? stopCode,
-            IItinerariesService itinerariesService, ICrtmClient crtmClient) =>
+            ItinerariesService itinerariesService, CrtmClient crtmClient, CancellationToken ct) =>
         {
             var fullStopCode = stopCode != null ? CodeUtils.CreateStopCode(codMode, stopCode) : null;
 
-            var itinerary = await itinerariesService.GetItineraryByLineAndDirectionAsync(lineCode, direction, fullStopCode)
-                ?? await crtmClient.GetLineItinerariesAsync(lineCode, direction);
+            var itinerary = await itinerariesService.GetItineraryByLineAndDirectionAsync(lineCode, direction, fullStopCode, ct)
+                ?? await crtmClient.GetLineItinerariesAsync(lineCode, direction, ct);
 
             return itinerary != null ? Results.Ok(itinerary) : Results.NotFound();
         });
 
-        modeGroup.MapGet("/itineraries/{itineraryCode}", async (string itineraryCode, IItinerariesService itinerariesService) =>
+        modeGroup.MapGet("/itineraries/{itineraryCode}", async (string itineraryCode, ItinerariesService itinerariesService, CancellationToken ct) =>
         {
-            var itinerary = await itinerariesService.GetItineraryByCodeAsync(itineraryCode);
+            var itinerary = await itinerariesService.GetItineraryByCodeAsync(itineraryCode, ct);
             return itinerary != null ? Results.Ok(itinerary) : throw ApiException.NotFound("Itinerary code not found");
         });
 
         modeGroup.MapGet("/itineraries/{itineraryCode}/locations", async (
             string itineraryCode, string? stopCode,
-            IItinerariesService itinerariesService, IRoutesService routesService, ICrtmClient crtmClient) =>
+            ItinerariesService itinerariesService, RoutesService routesService, CrtmClient crtmClient, CancellationToken ct) =>
         {
-            var lineCode = await itinerariesService.GetFullLineCodeByItineraryCodeAsync(itineraryCode);
+            var lineCode = await itinerariesService.GetFullLineCodeByItineraryCodeAsync(itineraryCode, ct);
             if (lineCode == null) throw ApiException.NotFound("Itinerary code not found");
 
             var lineCodMode = CodeUtils.GetCodModeFromLineCode(lineCode);
             var fullStopCode = stopCode != null ? CodeUtils.CreateStopCode(codMode, stopCode) : null;
-            var route = await routesService.GetRouteByFullLineCodeAsync(lineCode);
+            var route = await routesService.GetRouteByFullLineCodeAsync(lineCode, ct);
             var simpleLineCode = route?.SimpleLineCode ?? CodeUtils.GetSimpleLineCodeFromLineCode(lineCode);
             var routeCodMode = route?.CodMode ?? lineCodMode;
 
-            var locations = await crtmClient.GetLineLocationsByItineraryAsync(lineCode, itineraryCode, lineCodMode, fullStopCode);
+            var locations = await crtmClient.GetLineLocationsByItineraryAsync(lineCode, itineraryCode, lineCodMode, fullStopCode, ct);
             if (locations == null) throw ApiException.ServiceUnavailable("Locations unavailable");
 
             locations.CodMode = int.TryParse(routeCodMode, out var cm) ? cm : 0;
@@ -83,15 +83,15 @@ public static class LinesEndpoints
         {
             modeGroup.MapGet("/{lineCode}/locations/{direction:int}", async (
                 string lineCode, int direction, string? stopCode,
-                IRoutesService routesService, ICrtmClient crtmClient) =>
+                RoutesService routesService, CrtmClient crtmClient, CancellationToken ct) =>
             {
                 var lineCodMode = CodeUtils.GetCodModeFromLineCode(lineCode);
                 var fullStopCode = stopCode != null ? CodeUtils.CreateStopCode(codMode, stopCode) : null;
-                var route = await routesService.GetRouteByFullLineCodeAsync(lineCode);
+                var route = await routesService.GetRouteByFullLineCodeAsync(lineCode, ct);
                 var simpleLineCode = route?.SimpleLineCode ?? CodeUtils.GetSimpleLineCodeFromLineCode(lineCode);
                 var routeCodMode = route?.CodMode ?? lineCodMode;
 
-                var locations = await crtmClient.GetLineLocationsAsync(lineCode, direction, lineCodMode, fullStopCode);
+                var locations = await crtmClient.GetLineLocationsAsync(lineCode, direction, lineCodMode, fullStopCode, ct);
                 if (locations == null) throw ApiException.ServiceUnavailable("Locations unavailable");
 
                 locations.CodMode = int.TryParse(routeCodMode, out var cm) ? cm : 0;

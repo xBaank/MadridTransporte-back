@@ -34,7 +34,7 @@ public class TimesTests
         body.StopName.ShouldNotBeNullOrEmpty();
         body.SimpleStopCode.ShouldNotBeNullOrEmpty();
         body.Coordinates.ShouldNotBeNull();
-        body.Arrives.ShouldNotBeNull();
+        body.Arrives.ShouldNotBeEmpty();
 
         foreach (var arrive in body.Arrives!)
         {

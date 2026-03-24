@@ -26,14 +26,17 @@ public class ElCanoAuthHandler : DelegatingHandler
         var headers = auth.GetHeaders();
         foreach (var (key, value) in headers)
         {
-            request.Headers.Remove(key);
             if (key.Equals("Content-type", StringComparison.OrdinalIgnoreCase))
             {
                 if (request.Content != null)
-                    request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json") { CharSet = "utf-8" };
+                {
+                    request.Content.Headers.Remove("Content-Type");
+                    request.Content.Headers.TryAddWithoutValidation("Content-Type", value);
+                }
             }
             else
             {
+                request.Headers.Remove(key);
                 request.Headers.TryAddWithoutValidation(key, value);
             }
         }

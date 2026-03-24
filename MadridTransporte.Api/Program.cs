@@ -23,17 +23,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddHttpClient<DataLoader>();
 
 // Services
-builder.Services.AddScoped<IStopsService, StopsService>();
-builder.Services.AddScoped<IRoutesService, RoutesService>();
-builder.Services.AddScoped<IItinerariesService, ItinerariesService>();
-builder.Services.AddScoped<IShapesService, ShapesService>();
+builder.Services.AddScoped<StopsService>();
+builder.Services.AddScoped<RoutesService>();
+builder.Services.AddScoped<ItinerariesService>();
+builder.Services.AddScoped<ShapesService>();
 
 // HTTP Clients
-builder.Services.AddScoped<ICrtmClient, CrtmClient>();
-builder.Services.AddHttpClient<IEmtClient, EmtClient>();
-builder.Services.AddHttpClient<IMetroClient, MetroClient>();
-builder.Services.AddHttpClient<IBusClient, BusClient>();
-builder.Services.AddScoped<ICrtmFallbackClient>(sp => (ICrtmFallbackClient)sp.GetRequiredService<IBusClient>());
+builder.Services.AddSingleton<CrtmClient>();
+builder.Services.AddHttpClient<EmtClient>();
+builder.Services.AddHttpClient<MetroClient>();
+builder.Services.AddHttpClient<BusClient>();
 
 builder.Services.AddTransient<ElCanoAuthHandler>();
 builder.Services.AddHttpClient("ElCano")
@@ -43,7 +42,7 @@ builder.Services.AddHttpClient("ElCano")
     })
     .AddHttpMessageHandler<ElCanoAuthHandler>();
 builder.Services.AddHttpClient("Renfe");
-builder.Services.AddScoped<ITrainClient, TrainClient>();
+builder.Services.AddScoped<TrainClient>();
 
 // CORS
 builder.Services.AddCors(options =>

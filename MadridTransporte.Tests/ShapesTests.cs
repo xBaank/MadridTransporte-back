@@ -10,6 +10,7 @@ public class ShapesTests
 {
     [Test]
     [Arguments("/lines/emt/shapes/144_A")]
+    [Arguments("/lines/emt/shapes/011_B")]
     [Arguments("/lines/bus/shapes/8__450____1_-_IT_1")]
     [Arguments("/lines/bus/shapes/9__2__065__2_-_IT_1")]
     [Arguments("/lines/metro/shapes/4__12_1___1__IT_1")]

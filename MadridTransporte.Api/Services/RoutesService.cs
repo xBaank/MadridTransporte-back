@@ -5,29 +5,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MadridTransporte.Api.Services;
 
-public class RoutesService(AppDbContext db) : IRoutesService
+public class RoutesService(AppDbContext db)
 {
-    public async Task<TransitRoute?> GetRouteByFullLineCodeAsync(string fullLineCode)
+    public async Task<TransitRoute?> GetRouteByFullLineCodeAsync(string fullLineCode, CancellationToken ct = default)
     {
-        return await db.Routes.FirstOrDefaultAsync(r => r.FullLineCode == fullLineCode);
+        return await db.Routes.FirstOrDefaultAsync(r => r.FullLineCode == fullLineCode, ct);
     }
 
-    public async Task<TransitRoute?> GetRouteAsync(string simpleLineCode, string codMode)
+    public async Task<TransitRoute?> GetRouteAsync(string simpleLineCode, string codMode, CancellationToken ct = default)
     {
         return await db.Routes.FirstOrDefaultAsync(r =>
-            r.SimpleLineCode == simpleLineCode && r.CodMode == codMode);
+            r.SimpleLineCode == simpleLineCode && r.CodMode == codMode, ct);
     }
 
-    public async Task<TransitRoute?> GetRouteAsync(string simpleLineCode, List<string> codModes)
+    public async Task<TransitRoute?> GetRouteAsync(string simpleLineCode, List<string> codModes, CancellationToken ct = default)
     {
         return await db.Routes.FirstOrDefaultAsync(r =>
-            r.SimpleLineCode == simpleLineCode && codModes.Contains(r.CodMode));
+            r.SimpleLineCode == simpleLineCode && codModes.Contains(r.CodMode), ct);
     }
 
-    public async Task<List<RouteDto>> GetRoutesWithItinerariesAsync()
+    public async Task<List<RouteDto>> GetRoutesWithItinerariesAsync(CancellationToken ct = default)
     {
-        var routes = await db.Routes.ToListAsync();
-        var itineraries = await db.Itineraries.ToListAsync();
+        var routes = await db.Routes.ToListAsync(ct);
+        var itineraries = await db.Itineraries.ToListAsync(ct);
         var itineraryLookup = itineraries.ToLookup(i => i.FullLineCode);
 
         return routes.Select(r => new RouteDto

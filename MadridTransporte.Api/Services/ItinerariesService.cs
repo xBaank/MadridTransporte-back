@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MadridTransporte.Api.Services;
 
-public class ItinerariesService(AppDbContext db) : IItinerariesService
+public class ItinerariesService(AppDbContext db)
 {
-    public async Task<ItineraryDto?> GetItineraryByCodeAsync(string itineraryCode)
+    public async Task<ItineraryDto?> GetItineraryByCodeAsync(string itineraryCode, CancellationToken ct = default)
     {
         var itinerary = await db.Itineraries
-            .FirstOrDefaultAsync(i => i.ItineraryCode == itineraryCode);
+            .FirstOrDefaultAsync(i => i.ItineraryCode == itineraryCode, ct);
 
         if (itinerary == null) return null;
 
@@ -22,7 +22,7 @@ public class ItinerariesService(AppDbContext db) : IItinerariesService
             })
             .Distinct()
             .OrderBy(so => so.Order)
-            .ToListAsync();
+            .ToListAsync(ct);
 
         return new ItineraryDto
         {
@@ -32,7 +32,7 @@ public class ItinerariesService(AppDbContext db) : IItinerariesService
         };
     }
 
-    public async Task<ItineraryDto?> GetItineraryByLineAndDirectionAsync(string fullLineCode, int direction, string? stopCode = null)
+    public async Task<ItineraryDto?> GetItineraryByLineAndDirectionAsync(string fullLineCode, int direction, string? stopCode = null, CancellationToken ct = default)
     {
         var query = db.Itineraries
             .Where(i => i.FullLineCode == fullLineCode && i.Direction == direction - 1);
@@ -45,7 +45,7 @@ public class ItinerariesService(AppDbContext db) : IItinerariesService
             query = query.Where(i => tripIdsWithStop.Contains(i.TripId));
         }
 
-        var itinerary = await query.FirstOrDefaultAsync();
+        var itinerary = await query.FirstOrDefaultAsync(ct);
         if (itinerary == null) return null;
 
         var stops = await db.StopOrders
@@ -57,7 +57,7 @@ public class ItinerariesService(AppDbContext db) : IItinerariesService
             })
             .Distinct()
             .OrderBy(so => so.Order)
-            .ToListAsync();
+            .ToListAsync(ct);
 
         return new ItineraryDto
         {
@@ -67,10 +67,10 @@ public class ItinerariesService(AppDbContext db) : IItinerariesService
         };
     }
 
-    public async Task<string?> GetFullLineCodeByItineraryCodeAsync(string itineraryCode)
+    public async Task<string?> GetFullLineCodeByItineraryCodeAsync(string itineraryCode, CancellationToken ct = default)
     {
         var itinerary = await db.Itineraries
-            .FirstOrDefaultAsync(i => i.ItineraryCode == itineraryCode);
+            .FirstOrDefaultAsync(i => i.ItineraryCode == itineraryCode, ct);
         return itinerary?.FullLineCode;
     }
 }

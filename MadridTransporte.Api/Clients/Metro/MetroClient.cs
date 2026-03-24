@@ -5,31 +5,31 @@ using MadridTransporte.Api.Utils;
 
 namespace MadridTransporte.Api.Clients.Metro;
 
-public class MetroClient(HttpClient httpClient, IStopsService stopsService, IRoutesService routesService, ILogger<MetroClient> logger) : IMetroClient
+public class MetroClient(HttpClient httpClient, StopsService stopsService, RoutesService routesService, ILogger<MetroClient> logger)
 {
     private const string BaseUrl = "https://serviciosapp.metromadrid.es/servicios/rest/teleindicadores";
 
-    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode)
+    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode, CancellationToken ct = default)
     {
         try
         {
-            var codigoEmpresa = await stopsService.GetIdByStopCodeAsync(fullStopCode);
+            var codigoEmpresa = await stopsService.GetIdByStopCodeAsync(fullStopCode, ct);
             if (codigoEmpresa == null) return null;
 
-            var coordinates = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode);
-            var stopName = await stopsService.GetStopNameByIdAsync(codigoEmpresa);
+            var coordinates = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode, ct);
+            var stopName = await stopsService.GetStopNameByIdAsync(codigoEmpresa, ct);
             var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"{BaseUrl}/{codigoEmpresa}");
             request.Headers.TryAddWithoutValidation("Accept", "application/json");
 
-            var response = await httpClient.SendAsync(request);
+            var response = await httpClient.SendAsync(request, ct);
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return null;
             if (!response.IsSuccessStatusCode)
                 return CreateFailedTimes(stopName, coordinates, simpleStopCode);
 
-            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
             if (!json.TryGetProperty("Vtelindicadores", out var indicators) || indicators.ValueKind != JsonValueKind.Array)
                 return CreateFailedTimes(stopName, coordinates, simpleStopCode);
 

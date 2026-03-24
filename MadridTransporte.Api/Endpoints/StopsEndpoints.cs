@@ -16,67 +16,67 @@ public static class StopsEndpoints
     {
         var stops = app.MapGroup("/stops");
 
-        stops.MapGet("/all", async (IStopsService stopsService) =>
+        stops.MapGet("/all", async (StopsService stopsService, CancellationToken ct) =>
         {
-            var result = await stopsService.GetAllStopsAsync();
+            var result = await stopsService.GetAllStopsAsync(ct);
             return Results.Ok(result);
         });
 
         // Bus
         MapStopTimesEndpoints(stops, "/bus", CodeUtils.BusCodMode,
-            async (fullStopCode, sp) => await sp.GetRequiredService<IBusClient>().GetStopTimesAsync(fullStopCode));
+            async (fullStopCode, sp, ct) => await sp.GetRequiredService<BusClient>().GetStopTimesAsync(fullStopCode, ct));
 
         // EMT
         MapStopTimesEndpoints(stops, "/emt", CodeUtils.EmtCodMode,
-            async (fullStopCode, sp) => await sp.GetRequiredService<IEmtClient>().GetStopTimesAsync(fullStopCode));
+            async (fullStopCode, sp, ct) => await sp.GetRequiredService<EmtClient>().GetStopTimesAsync(fullStopCode, ct));
 
         // Metro
         MapStopTimesEndpoints(stops, "/metro", CodeUtils.MetroCodMode,
-            async (fullStopCode, sp) => await sp.GetRequiredService<IMetroClient>().GetStopTimesAsync(fullStopCode));
+            async (fullStopCode, sp, ct) => await sp.GetRequiredService<MetroClient>().GetStopTimesAsync(fullStopCode, ct));
 
         // Tram (uses CRTM)
         MapStopTimesEndpoints(stops, "/tram", CodeUtils.TramCodMode,
-            async (fullStopCode, sp) => await sp.GetRequiredService<ICrtmClient>().GetStopTimesAsync(fullStopCode));
+            async (fullStopCode, sp, ct) => await sp.GetRequiredService<CrtmClient>().GetStopTimesAsync(fullStopCode, ct));
 
         // Train
         MapStopTimesEndpoints(stops, "/train", CodeUtils.TrainCodMode,
-            async (fullStopCode, sp) => await sp.GetRequiredService<ITrainClient>().GetStopTimesAsync(fullStopCode));
+            async (fullStopCode, sp, ct) => await sp.GetRequiredService<TrainClient>().GetStopTimesAsync(fullStopCode, ct));
 
         // Train routed
-        stops.MapGet("/train/times", async (string originStopCode, string destinationStopCode, ITrainClient trainClient) =>
+        stops.MapGet("/train/times", async (string originStopCode, string destinationStopCode, TrainClient trainClient, CancellationToken ct) =>
         {
-            var result = await trainClient.GetRoutedTimesAsync(originStopCode, destinationStopCode);
+            var result = await trainClient.GetRoutedTimesAsync(originStopCode, destinationStopCode, ct);
             return result != null ? Results.Ok(result) : Results.StatusCode(503);
         });
     }
 
     private static void MapStopTimesEndpoints(RouteGroupBuilder group, string prefix, string codMode,
-        Func<string, IServiceProvider, Task<StopTimesDto?>> getTimesFunc)
+        Func<string, IServiceProvider, CancellationToken, Task<StopTimesDto?>> getTimesFunc)
     {
         var modeGroup = group.MapGroup(prefix);
 
-        modeGroup.MapGet("/{stopCode}/times", async (string stopCode, IStopsService stopsService, IServiceProvider sp) =>
+        modeGroup.MapGet("/{stopCode}/times", async (string stopCode, StopsService stopsService, IServiceProvider sp, CancellationToken ct) =>
         {
             var fullStopCode = CodeUtils.CreateStopCode(codMode, stopCode);
-            await stopsService.GetStopByFullStopCodeAsync(fullStopCode); // validates existence
+            await stopsService.GetStopByFullStopCodeAsync(fullStopCode, ct); // validates existence
 
-            var times = await getTimesFunc(fullStopCode, sp);
+            var times = await getTimesFunc(fullStopCode, sp, ct);
             if (times == null) return Results.StatusCode(503);
 
             return times.Arrives != null ? Results.Ok(times) : Results.Json(times, statusCode: 503);
         });
 
-        modeGroup.MapGet("/{stopCode}/planned", async (string stopCode, IStopsService stopsService) =>
+        modeGroup.MapGet("/{stopCode}/planned", async (string stopCode, StopsService stopsService, CancellationToken ct) =>
         {
             var fullStopCode = CodeUtils.CreateStopCode(codMode, stopCode);
-            await stopsService.GetStopByFullStopCodeAsync(fullStopCode);
-            var planned = await stopsService.GetStopTimesPlannedAsync(fullStopCode);
+            await stopsService.GetStopByFullStopCodeAsync(fullStopCode, ct);
+            var planned = await stopsService.GetStopTimesPlannedAsync(fullStopCode, ct);
             return Results.Ok(planned);
         });
 
-        modeGroup.MapGet("/alerts", async (ICrtmClient crtmClient) =>
+        modeGroup.MapGet("/alerts", async (CrtmClient crtmClient, CancellationToken ct) =>
         {
-            var alerts = await crtmClient.GetAlertsAsync(codMode);
+            var alerts = await crtmClient.GetAlertsAsync(codMode, ct);
             return Results.Ok(alerts);
         });
     }

@@ -1,26 +1,27 @@
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using MadridTransporte.Api.Clients.Bus;
 using MadridTransporte.Api.Dtos;
 using MadridTransporte.Api.Services;
 using MadridTransporte.Api.Utils;
 
 namespace MadridTransporte.Api.Clients.Train;
 
-public class TrainClient : ITrainClient
+public class TrainClient
 {
     private readonly HttpClient _canoHttpClient;
     private readonly HttpClient _renfeHttpClient;
-    private readonly IStopsService _stopsService;
-    private readonly IRoutesService _routesService;
-    private readonly ICrtmFallbackClient _crtmFallback;
+    private readonly StopsService _stopsService;
+    private readonly RoutesService _routesService;
+    private readonly BusClient _crtmFallback;
     private readonly ILogger<TrainClient> _logger;
 
     public TrainClient(
         IHttpClientFactory httpClientFactory,
-        IStopsService stopsService,
-        IRoutesService routesService,
-        ICrtmFallbackClient crtmFallback,
+        StopsService stopsService,
+        RoutesService routesService,
+        BusClient crtmFallback,
         ILogger<TrainClient> logger)
     {
         _canoHttpClient = httpClientFactory.CreateClient("ElCano");
@@ -31,13 +32,13 @@ public class TrainClient : ITrainClient
         _logger = logger;
     }
 
-    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode)
+    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode, CancellationToken ct = default)
     {
-        var canoResult = await GetCanoTrainTimesAsync(fullStopCode);
+        var canoResult = await GetCanoTrainTimesAsync(fullStopCode, ct);
         if (canoResult != null) return canoResult;
 
         // Fallback to CRTM and filter to train codMode only
-        var crtmResult = await _crtmFallback.GetCrtmStopTimesAsync(fullStopCode);
+        var crtmResult = await _crtmFallback.GetCrtmStopTimesAsync(fullStopCode, ct);
         if (crtmResult?.Arrives == null) return crtmResult;
 
         crtmResult.Arrives = crtmResult.Arrives
@@ -46,15 +47,15 @@ public class TrainClient : ITrainClient
         return crtmResult;
     }
 
-    private async Task<StopTimesDto?> GetCanoTrainTimesAsync(string fullStopCode)
+    private async Task<StopTimesDto?> GetCanoTrainTimesAsync(string fullStopCode, CancellationToken ct = default)
     {
         try
         {
-            var stationCode = await _stopsService.GetIdByStopCodeAsync(fullStopCode);
+            var stationCode = await _stopsService.GetIdByStopCodeAsync(fullStopCode, ct);
             if (stationCode == null) return null;
 
-            var stopName = await _stopsService.GetStopNameByIdAsync(stationCode);
-            var coordinates = await _stopsService.GetCoordinatesByStopCodeAsync(fullStopCode);
+            var stopName = await _stopsService.GetStopNameByIdAsync(stationCode, ct);
+            var coordinates = await _stopsService.GetCoordinatesByStopCodeAsync(fullStopCode, ct);
             var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
 
             var body = new
@@ -66,22 +67,26 @@ public class TrainClient : ITrainClient
                 trafficType = "CERCANIAS",
             };
 
+            var bodyJson = JsonSerializer.Serialize(body);
+            var content = new StringContent(bodyJson);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
             var request = new HttpRequestMessage(HttpMethod.Post,
                 "https://circulacion.api.adif.es/portroyalmanager/secure/circulationpaths/departures/traffictype/")
             {
-                Content = JsonContent.Create(body),
+                Content = content,
             };
             request.Headers.TryAddWithoutValidation("User-Key", "f4ce9fbfa9d721e39b8984805901b5df");
             request.Headers.TryAddWithoutValidation("Host", "circulacion.api.adif.es");
             request.Headers.TryAddWithoutValidation("User-Agent", "okhttp/4.10.0");
             request.Headers.TryAddWithoutValidation("Connection", "Close");
 
-            var response = await _canoHttpClient.SendAsync(request);
+            var response = await _canoHttpClient.SendAsync(request, ct);
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
             if (!response.IsSuccessStatusCode) return null;
 
-            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
-            return await ExtractTrainStopTimes(json, coordinates, stopName, simpleStopCode);
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
+            return await ExtractTrainStopTimes(json, coordinates, stopName, simpleStopCode, ct);
         }
         catch (Exception ex)
         {
@@ -90,7 +95,7 @@ public class TrainClient : ITrainClient
         }
     }
 
-    private async Task<StopTimesDto> ExtractTrainStopTimes(JsonElement json, CoordinatesDto coordinates, string stopName, string simpleStopCode)
+    private async Task<StopTimesDto> ExtractTrainStopTimes(JsonElement json, CoordinatesDto coordinates, string stopName, string simpleStopCode, CancellationToken ct = default)
     {
         var paths = json.GetProperty("commercialPaths");
         var arrives = new List<ArriveDto>();
@@ -100,7 +105,7 @@ public class TrainClient : ITrainClient
             var departure = path.GetProperty("passthroughStep").GetProperty("departurePassthroughStepSides");
             var destinationCode = path.GetProperty("commercialPathInfo").GetProperty("commercialDestinationStationCode").GetString() ?? "";
             string destinationName;
-            try { destinationName = await _stopsService.GetStopNameByIdAsync(destinationCode); }
+            try { destinationName = await _stopsService.GetStopNameByIdAsync(destinationCode, ct); }
             catch { destinationName = ""; }
 
             var line = path.GetProperty("commercialPathInfo").TryGetProperty("line", out var lineEl)
@@ -132,15 +137,15 @@ public class TrainClient : ITrainClient
         };
     }
 
-    public async Task<JsonElement?> GetRoutedTimesAsync(string originStopCode, string destinationStopCode)
+    public async Task<JsonElement?> GetRoutedTimesAsync(string originStopCode, string destinationStopCode, CancellationToken ct = default)
     {
         try
         {
             var originFullCode = CodeUtils.CreateStopCode(CodeUtils.TrainCodMode, originStopCode);
             var destFullCode = CodeUtils.CreateStopCode(CodeUtils.TrainCodMode, destinationStopCode);
 
-            var originStation = await _stopsService.GetIdByStopCodeAsync(originFullCode);
-            var destStation = await _stopsService.GetIdByStopCodeAsync(destFullCode);
+            var originStation = await _stopsService.GetIdByStopCodeAsync(originFullCode, ct);
+            var destStation = await _stopsService.GetIdByStopCodeAsync(destFullCode, ct);
 
             if (originStation == null || destStation == null) return null;
 
@@ -159,10 +164,19 @@ public class TrainClient : ITrainClient
                 accesibilidadTrenes = true,
             };
 
-            var response = await _renfeHttpClient.PostAsJsonAsync("https://horarios.renfe.com/cer/HorariosServlet", body);
+            var bodyJson = JsonSerializer.Serialize(body);
+            var content = new StringContent(bodyJson);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://horarios.renfe.com/cer/HorariosServlet")
+            {
+                Content = content,
+            };
+
+            var response = await _renfeHttpClient.SendAsync(request, ct);
             if (!response.IsSuccessStatusCode) return null;
 
-            var bytes = await response.Content.ReadAsByteArrayAsync();
+            var bytes = await response.Content.ReadAsByteArrayAsync(ct);
             var text = Encoding.Latin1.GetString(bytes);
             var utf8Text = Encoding.UTF8.GetString(Encoding.Latin1.GetBytes(text));
 
@@ -192,9 +206,4 @@ public class TrainClient : ITrainClient
             })
             .ToList();
     }
-}
-
-public interface ICrtmFallbackClient
-{
-    Task<StopTimesDto?> GetCrtmStopTimesAsync(string fullStopCode);
 }

@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MadridTransporte.Api.Services;
 
-public class StopsService(AppDbContext db) : IStopsService
+public class StopsService(AppDbContext db)
 {
-    public async Task<List<StopDto>> GetAllStopsAsync()
+    public async Task<List<StopDto>> GetAllStopsAsync(CancellationToken ct = default)
     {
         return await db.Stops.Select(s => new StopDto
         {
@@ -21,12 +21,12 @@ public class StopsService(AppDbContext db) : IStopsService
             FullStopCode = s.FullStopCode,
             Wheelchair = s.Wheelchair,
             Zone = s.Zone,
-        }).ToListAsync();
+        }).ToListAsync(ct);
     }
 
-    public async Task<StopDto> GetStopByFullStopCodeAsync(string fullStopCode)
+    public async Task<StopDto> GetStopByFullStopCodeAsync(string fullStopCode, CancellationToken ct = default)
     {
-        var stop = await db.Stops.FirstOrDefaultAsync(s => s.FullStopCode == fullStopCode)
+        var stop = await db.Stops.FirstOrDefaultAsync(s => s.FullStopCode == fullStopCode, ct)
             ?? throw ApiException.NotFound($"Stop with id {fullStopCode} not found");
 
         return new StopDto
@@ -42,36 +42,36 @@ public class StopsService(AppDbContext db) : IStopsService
         };
     }
 
-    public async Task<string> GetStopNameByStopCodeAsync(string fullStopCode)
+    public async Task<string> GetStopNameByStopCodeAsync(string fullStopCode, CancellationToken ct = default)
     {
-        var stop = await db.Stops.FirstOrDefaultAsync(s => s.FullStopCode == fullStopCode)
+        var stop = await db.Stops.FirstOrDefaultAsync(s => s.FullStopCode == fullStopCode, ct)
             ?? throw ApiException.NotFound($"Stop with id {fullStopCode} not found");
         return stop.StopName;
     }
 
-    public async Task<CoordinatesDto> GetCoordinatesByStopCodeAsync(string fullStopCode)
+    public async Task<CoordinatesDto> GetCoordinatesByStopCodeAsync(string fullStopCode, CancellationToken ct = default)
     {
-        var stop = await db.Stops.FirstOrDefaultAsync(s => s.FullStopCode == fullStopCode)
+        var stop = await db.Stops.FirstOrDefaultAsync(s => s.FullStopCode == fullStopCode, ct)
             ?? throw ApiException.NotFound();
         return new CoordinatesDto { Latitude = stop.StopLat, Longitude = stop.StopLon };
     }
 
-    public async Task<string?> GetIdByStopCodeAsync(string stopCode)
+    public async Task<string?> GetIdByStopCodeAsync(string stopCode, CancellationToken ct = default)
     {
-        var info = await db.StopInfos.FirstOrDefaultAsync(s => s.IdEstacion == stopCode);
+        var info = await db.StopInfos.FirstOrDefaultAsync(s => s.IdEstacion == stopCode, ct);
         return info?.CodigoEmpresa;
     }
 
-    public async Task<string> GetStopNameByIdAsync(string codigoEmpresa)
+    public async Task<string> GetStopNameByIdAsync(string codigoEmpresa, CancellationToken ct = default)
     {
-        var info = await db.StopInfos.FirstOrDefaultAsync(s => s.CodigoEmpresa == codigoEmpresa)
+        var info = await db.StopInfos.FirstOrDefaultAsync(s => s.CodigoEmpresa == codigoEmpresa, ct)
             ?? throw ApiException.NotFound();
-        var stop = await db.Stops.FirstOrDefaultAsync(s => s.FullStopCode == info.IdEstacion)
+        var stop = await db.Stops.FirstOrDefaultAsync(s => s.FullStopCode == info.IdEstacion, ct)
             ?? throw ApiException.NotFound();
         return stop.StopName;
     }
 
-    public async Task<List<PlannedTimeDto>> GetStopTimesPlannedAsync(string fullStopCode)
+    public async Task<List<PlannedTimeDto>> GetStopTimesPlannedAsync(string fullStopCode, CancellationToken ct = default)
     {
         var madridNow = TimeUtils.GetMadridNow();
         var nowUtc = DateTimeOffset.UtcNow;
@@ -91,7 +91,7 @@ public class StopsService(AppDbContext db) : IStopsService
                 (dayOfWeek == DayOfWeek.Saturday && c.Saturday) ||
                 (dayOfWeek == DayOfWeek.Sunday && c.Sunday))
             .Select(c => c.ServiceId)
-            .ToListAsync();
+            .ToListAsync(ct);
 
         var startOfDayUtcEpochMs = new DateTimeOffset(startOfDayUtc, TimeSpan.Zero).ToUnixTimeMilliseconds();
 
@@ -102,9 +102,9 @@ public class StopsService(AppDbContext db) : IStopsService
                 it => it.TripId,
                 (so, it) => new { so, it })
             .Where(x => activeServiceIds.Contains(x.it.ServiceId))
-            .ToListAsync();
+            .ToListAsync(ct);
 
-        var routes = await db.Routes.ToListAsync();
+        var routes = await db.Routes.ToListAsync(ct);
         var routeMap = routes.ToDictionary(r => r.FullLineCode);
 
         return stopOrders

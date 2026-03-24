@@ -1,6 +1,5 @@
 using System.Text.Json;
 using MadridTransporte.Api.Clients.Crtm;
-using MadridTransporte.Api.Clients.Train;
 using MadridTransporte.Api.Dtos;
 using MadridTransporte.Api.Services;
 using MadridTransporte.Api.Utils;
@@ -8,19 +7,19 @@ using MadridTransporte.Api.Utils;
 namespace MadridTransporte.Api.Clients.Bus;
 
 public class BusClient(
-    ICrtmClient crtmClient,
+    CrtmClient crtmClient,
     HttpClient httpClient,
-    IStopsService stopsService,
-    IRoutesService routesService,
-    ILogger<BusClient> logger) : IBusClient, ICrtmFallbackClient
+    StopsService stopsService,
+    RoutesService routesService,
+    ILogger<BusClient> logger)
 {
-    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode)
+    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode, CancellationToken ct = default)
     {
-        var crtmTask = crtmClient.GetStopTimesAsync(fullStopCode);
-        var avanzaTask = GetAvanzaDataAsync(fullStopCode);
+        var crtmTask = crtmClient.GetStopTimesAsync(fullStopCode, ct);
+        var avanzaTask = GetAvanzaDataAsync(fullStopCode, ct);
 
-        var coords = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode);
-        var name = await stopsService.GetStopNameByStopCodeAsync(fullStopCode);
+        var coords = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode, ct);
+        var name = await stopsService.GetStopNameByStopCodeAsync(fullStopCode, ct);
 
         await Task.WhenAll(crtmTask, avanzaTask);
 
@@ -71,12 +70,12 @@ public class BusClient(
         return times;
     }
 
-    public async Task<StopTimesDto?> GetCrtmStopTimesAsync(string fullStopCode)
+    public async Task<StopTimesDto?> GetCrtmStopTimesAsync(string fullStopCode, CancellationToken ct = default)
     {
-        return await GetStopTimesAsync(fullStopCode);
+        return await GetStopTimesAsync(fullStopCode, ct);
     }
 
-    private async Task<List<ArriveDto>?> GetAvanzaDataAsync(string fullStopCode)
+    private async Task<List<ArriveDto>?> GetAvanzaDataAsync(string fullStopCode, CancellationToken ct = default)
     {
         var codMode = CodeUtils.GetCodModeFromFullStopCode(fullStopCode);
         if (codMode != CodeUtils.BusCodMode && codMode != CodeUtils.UrbanCodMode) return null;
@@ -85,10 +84,10 @@ public class BusClient(
         {
             var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
             var url = $"https://apisvt.avanzagrupo.com/lineas/getTraficosParada?empresa=25&parada={simpleStopCode}";
-            var response = await httpClient.GetAsync(url);
+            var response = await httpClient.GetAsync(url, ct);
             if (!response.IsSuccessStatusCode) return null;
 
-            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
             if (!json.TryGetProperty("data", out var data) ||
                 !data.TryGetProperty("traficos", out var traficos) ||
                 traficos.ValueKind != JsonValueKind.Array)
@@ -108,7 +107,7 @@ public class BusClient(
                     TimeUtils.GetMadridTimeZone().GetUtcOffset(madridNow));
 
                 var line = trafico.GetProperty("coLineaWeb").GetString() ?? "";
-                var route = await routesService.GetRouteAsync(line, [CodeUtils.BusCodMode, CodeUtils.UrbanCodMode]);
+                var route = await routesService.GetRouteAsync(line, [CodeUtils.BusCodMode, CodeUtils.UrbanCodMode], ct);
 
                 arrives.Add(new ArriveDto
                 {
