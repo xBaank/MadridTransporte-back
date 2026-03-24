@@ -28,7 +28,7 @@ public class ItinerariesTests
 {
     private static (string url, int direction) GetItineraryTestData(ItinerariesUrls code) => code switch
     {
-        ItinerariesUrls.EmtDirectionBased => ("/lines/emt/6__144___/itineraries/2?stopCode=4597", 2),
+        ItinerariesUrls.EmtDirectionBased => ("/lines/emt/144/itineraries/1?stopCode=4597", 1),
         ItinerariesUrls.InterurbanDirectionBased => ("/lines/bus/8__450___/itineraries/1?stopCode=08242", 1),
         ItinerariesUrls.Interurban2DirectionBased => ("/lines/bus/8__428___/itineraries/2?stopCode=08242", 2),
         ItinerariesUrls.UrbanDirectionBased => ("/lines/bus/9__2__065_/itineraries/2?stopCode=08242", 2),
@@ -36,7 +36,7 @@ public class ItinerariesTests
         ItinerariesUrls.TrainDirectionBased => ("/lines/train/5__4_A__/itineraries/1?stopCode=53", 1),
         ItinerariesUrls.TramDirectionBased => ("/lines/tram/10__ML4___/itineraries/1?stopCode=64", 1),
 
-        ItinerariesUrls.EmtCodeBased => ("/lines/emt/itineraries/6__144____2__IT_1", 2),
+        ItinerariesUrls.EmtCodeBased => ("/lines/emt/itineraries/144_A", 1),
         ItinerariesUrls.InterurbanCodeBased => ("/lines/bus/itineraries/8__450____1_-_IT_1", 1),
         ItinerariesUrls.UrbanCodeBased => ("/lines/bus/itineraries/9__2__065__2_-_IT_1", 2),
         ItinerariesUrls.MetroCodeBased => ("/lines/metro/itineraries/4__12_2___1__IT_1", 2),

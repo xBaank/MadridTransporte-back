@@ -254,20 +254,26 @@ public class DataLoader(
         logger.LogInformation("Loading itineraries from GTFS");
 
         var count = 0;
-        using var stream = FileUtils.CombineGtfsFiles("trips.txt", gtfsFeeds.Select(f => f.Dir).ToList());
 
-        await foreach (var batch in ReadCsvChunks(stream, BatchSize))
+        foreach (var (dir, _) in gtfsFeeds)
         {
-            var itineraries = batch
-                .Select(r => GtfsParsers.ParseItineraryFromGtfs(r, logger))
-                .Where(i => i != null)
-                .Cast<Itinerary>()
-                .ToList();
+            var filePath = Path.Combine(dir, "trips.txt");
+            if (!File.Exists(filePath)) continue;
 
-            if (itineraries.Count > 0)
+            using var stream = File.OpenRead(filePath);
+            await foreach (var batch in ReadCsvChunks(stream, BatchSize))
             {
-                await BulkInsertAsync(db, itineraries, ct);
-                count += itineraries.Count;
+                var itineraries = batch
+                    .Select(r => GtfsParsers.ParseItineraryFromGtfs(r, logger))
+                    .Where(i => i != null)
+                    .Cast<Itinerary>()
+                    .ToList();
+
+                if (itineraries.Count > 0)
+                {
+                    await BulkInsertAsync(db, itineraries, ct);
+                    count += itineraries.Count;
+                }
             }
         }
 
