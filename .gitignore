@@ -20,3 +20,5 @@ obj/
 ### Project ###
 .env
 nul
+
+.claude/

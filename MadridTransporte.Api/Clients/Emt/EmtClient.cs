@@ -7,7 +7,7 @@ using MadridTransporte.Api.Utils;
 
 namespace MadridTransporte.Api.Clients.Emt;
 
-public class EmtClient(HttpClient httpClient, StopsService stopsService, RoutesService routesService, ILogger<EmtClient> logger)
+public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger<EmtClient> logger)
 {
     private string? _accessToken;
     private readonly SemaphoreSlim _loginLock = new(1, 1);
