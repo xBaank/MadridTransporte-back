@@ -74,9 +74,8 @@ public class StopsService(AppDbContext db)
     public async Task<List<PlannedTimeDto>> GetStopTimesPlannedAsync(string fullStopCode, CancellationToken ct = default)
     {
         var madridNow = TimeUtils.GetMadridNow();
-        var nowUtc = DateTimeOffset.UtcNow;
-        var startOfDayUtc = nowUtc.Date;
-        var millisSinceStartOfDay = (long)(nowUtc - startOfDayUtc).TotalMilliseconds;
+        var madridMidnight = new DateTimeOffset(madridNow.Date, TimeUtils.GetMadridTimeZone().GetUtcOffset(madridNow.DateTime));
+        var millisSinceStartOfDay = (long)(madridNow - madridMidnight).TotalMilliseconds;
         var nowEpochMs = madridNow.ToUnixTimeMilliseconds();
 
         var dayOfWeek = madridNow.DayOfWeek;
@@ -93,7 +92,7 @@ public class StopsService(AppDbContext db)
             .Select(c => c.ServiceId)
             .ToListAsync(ct);
 
-        var startOfDayUtcEpochMs = new DateTimeOffset(startOfDayUtc, TimeSpan.Zero).ToUnixTimeMilliseconds();
+        var startOfDayMadridEpochMs = madridMidnight.ToUnixTimeMilliseconds();
 
         var stopOrders = await db.StopOrders
             .Where(so => so.FullStopCode == fullStopCode && so.DepartureTime >= millisSinceStartOfDay)
@@ -122,7 +121,7 @@ public class StopsService(AppDbContext db)
                     Direction = g.Key.Direction + 1,
                     ItineraryCode = g.Key.ItineraryCode,
                     Arrives = g
-                        .Select(x => x.so.DepartureTime + startOfDayUtcEpochMs)
+                        .Select(x => x.so.DepartureTime + startOfDayMadridEpochMs)
                         .Distinct()
                         .OrderBy(t => t)
                         .ToList(),

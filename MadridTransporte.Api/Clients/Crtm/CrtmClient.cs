@@ -2,6 +2,7 @@ using System.ServiceModel;
 using System.Text;
 using MadridTransporte.Api.Clients.Crtm.Generated;
 using MadridTransporte.Api.Dtos;
+using MadridTransporte.Api.Utils;
 using Microsoft.Extensions.Caching.Memory;
 using Gen = MadridTransporte.Api.Clients.Crtm.Generated;
 
@@ -12,14 +13,24 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
     private string Endpoint => config["Crtm:Endpoint"] ?? "http://www.citram.es:8080/WSMultimodalInformation/MultimodalInformation.svc";
 
     private MultimodalInformationClient? _soapClient;
-    private AuthHeader? _authHeader;
     private readonly SemaphoreSlim _lock = new(1, 1);
 
     private MultimodalInformationClient GetOrCreateClient()
     {
         if (_soapClient is { State: CommunicationState.Faulted or CommunicationState.Closed or CommunicationState.Closing })
         {
-            _soapClient.Abort();
+            try
+            {
+                _soapClient.Abort();
+                _soapClient.Close();
+            }
+            catch(Exception ex)
+            {
+                if(logger.IsEnabled(LogLevel.Error))
+                {
+                    logger.LogError(ex, "Error closing");
+                }
+            }
             _soapClient = null;
         }
 
@@ -54,26 +65,12 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
 
     private async Task<AuthHeader> GetAuthAsync(CancellationToken ct = default)
     {
-        if (_authHeader != null) return _authHeader;
-
-        await _lock.WaitAsync(ct);
-        try
-        {
-            if (_authHeader != null) return _authHeader;
-
-            var client = GetOrCreateClient();
-            var response = await client.GetPublicKeyAsync();
-            var connectionKey = CrtmAuthHelper.Encrypt(Encoding.UTF8.GetBytes(response.key));
-            _authHeader = new AuthHeader { connectionKey = connectionKey };
-            return _authHeader;
-        }
-        finally
-        {
-            _lock.Release();
-        }
+        var client = await GetClientAsync(ct);
+        var response = await client.GetPublicKeyAsync();
+        var connectionKey = CrtmAuthHelper.Encrypt(Encoding.UTF8.GetBytes(response.key));
+        return new AuthHeader { connectionKey = connectionKey };
     }
 
-    private void InvalidateAuth() => _authHeader = null;
 
     public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode, CancellationToken ct = default)
     {
@@ -87,7 +84,6 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         catch (Exception ex)
         {
             logger.LogWarning(ex, "CRTM GetStopTimes failed for {StopCode}", fullStopCode);
-            InvalidateAuth();
             return null;
         }
     }
@@ -110,7 +106,6 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         catch (Exception ex)
         {
             logger.LogWarning(ex, "CRTM GetAlerts failed for codMode {CodMode}", codMode);
-            InvalidateAuth();
             if (cache.TryGetValue(cacheKey, out List<AlertDto>? fallback) && fallback != null)
                 return fallback;
             return [];
@@ -129,7 +124,6 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         catch (Exception ex)
         {
             logger.LogWarning(ex, "CRTM GetLineItineraries failed for {LineCode}", lineCode);
-            InvalidateAuth();
             return null;
         }
     }
@@ -158,7 +152,6 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         catch (Exception ex)
         {
             logger.LogWarning(ex, "CRTM GetLineLocation failed for {LineCode}", lineCode);
-            InvalidateAuth();
             return null;
         }
     }
@@ -178,7 +171,7 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
             Direction = t.direction,
             CodMode = int.TryParse(t.line?.codMode, out var cm) ? cm : 8,
             Destination = t.destination ?? "",
-            EstimatedArrive = new DateTimeOffset(DateTime.SpecifyKind(t.time, DateTimeKind.Utc)).ToUnixTimeMilliseconds(),
+            EstimatedArrive = new DateTimeOffset(TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(t.time, DateTimeKind.Unspecified), TimeUtils.GetMadridTimeZone())).ToUnixTimeMilliseconds(),
         }).ToList();
 
         return new StopTimesDto
