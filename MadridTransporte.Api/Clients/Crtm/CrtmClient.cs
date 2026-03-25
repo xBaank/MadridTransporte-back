@@ -15,7 +15,9 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
 
     private static MultimodalInformationClient CreateClient(IConfiguration config)
     {
-        var endpoint = config["Crtm:Endpoint"] ?? "http://www.citram.es:8080/WSMultimodalInformation/MultimodalInformation.svc";
+        var endpoint =
+            config["Crtm:Endpoint"]
+            ?? "http://www.citram.es:8080/WSMultimodalInformation/MultimodalInformation.svc";
         var binding = new BasicHttpBinding
         {
             SendTimeout = TimeSpan.FromSeconds(config.GetValue("Crtm:TimeoutSeconds", 30)),
@@ -25,7 +27,12 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
 
     private MultimodalInformationClient GetOrCreateClient()
     {
-        if (_soapClient.State is CommunicationState.Faulted or CommunicationState.Closed or CommunicationState.Closing)
+        if (
+            _soapClient.State
+            is CommunicationState.Faulted
+                or CommunicationState.Closed
+                or CommunicationState.Closing
+        )
         {
             try
             {
@@ -67,13 +74,32 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         return new AuthHeader { connectionKey = connectionKey };
     }
 
-
-    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode, CancellationToken ct = default)
+    public async Task<StopTimesDto?> GetStopTimesAsync(
+        string fullStopCode,
+        CancellationToken ct = default
+    )
     {
+        try
+        {
             var auth = await GetAuthAsync(ct);
             var client = await GetClientAsync(ct);
-            var response = await client.GetStopTimesAsync(auth, fullStopCode, 1, 2, null, null, null, 3);
+            var response = await client.GetStopTimesAsync(
+                auth,
+                fullStopCode,
+                1,
+                2,
+                null,
+                null,
+                null,
+                3
+            );
             return MapStopTimesResponse(response.stopTimes, fullStopCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "CRTM GetStopTimes failed for {StopCode}", fullStopCode);
+            return null;
+        }
     }
 
     public async Task<List<AlertDto>> GetAlertsAsync(string codMode, CancellationToken ct = default)
@@ -100,7 +126,11 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         }
     }
 
-    public async Task<ItineraryDto?> GetLineItinerariesAsync(string lineCode, int direction, CancellationToken ct = default)
+    public async Task<ItineraryDto?> GetLineItinerariesAsync(
+        string lineCode,
+        int direction,
+        CancellationToken ct = default
+    )
     {
         try
         {
@@ -116,25 +146,50 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         }
     }
 
-    public async Task<VehicleLocationsDto?> GetLineLocationsAsync(string lineCode, int direction, string codMode, string? stopCode, CancellationToken ct = default)
+    public async Task<VehicleLocationsDto?> GetLineLocationsAsync(
+        string lineCode,
+        int direction,
+        string codMode,
+        string? stopCode,
+        CancellationToken ct = default
+    )
     {
         return await GetLocationsInternalAsync(lineCode, direction, null, codMode, stopCode, ct);
     }
 
-    public async Task<VehicleLocationsDto?> GetLineLocationsByItineraryAsync(string lineCode, string itineraryCode, string codMode, string? stopCode, CancellationToken ct = default)
+    public async Task<VehicleLocationsDto?> GetLineLocationsByItineraryAsync(
+        string lineCode,
+        string itineraryCode,
+        string codMode,
+        string? stopCode,
+        CancellationToken ct = default
+    )
     {
         return await GetLocationsInternalAsync(lineCode, 0, itineraryCode, codMode, stopCode, ct);
     }
 
-    private async Task<VehicleLocationsDto?> GetLocationsInternalAsync(string lineCode, int direction, string? itineraryCode, string codMode, string? stopCode, CancellationToken ct = default)
+    private async Task<VehicleLocationsDto?> GetLocationsInternalAsync(
+        string lineCode,
+        int direction,
+        string? itineraryCode,
+        string codMode,
+        string? stopCode,
+        CancellationToken ct = default
+    )
     {
         try
         {
             var auth = await GetAuthAsync(ct);
             var client = await GetClientAsync(ct);
             var response = await client.GetLineLocationAsync(
-                auth, codMode, lineCode, direction,
-                itineraryCode ?? "", "", stopCode ?? "8_");
+                auth,
+                codMode,
+                lineCode,
+                direction,
+                itineraryCode ?? "",
+                "",
+                stopCode ?? "8_"
+            );
             return MapLocationsResponse(response.vehiclesLocation);
         }
         catch (Exception ex)
@@ -146,21 +201,29 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
 
     private static StopTimesDto? MapStopTimesResponse(Gen.StopTime? stopTimes, string fullStopCode)
     {
-        if (stopTimes == null) return null;
+        if (stopTimes == null)
+            return null;
 
         var stop = stopTimes.stop;
         var stopName = stop?.name ?? "";
         var shortStopCode = stop?.shortCodStop ?? "";
 
-        var arrives = (stopTimes.times ?? []).Select(t => new ArriveDto
-        {
-            Line = t.line?.shortDescription ?? "",
-            LineCode = t.line?.codLine,
-            Direction = t.direction,
-            CodMode = int.TryParse(t.line?.codMode, out var cm) ? cm : 8,
-            Destination = t.destination ?? "",
-            EstimatedArrive = new DateTimeOffset(TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(t.time, DateTimeKind.Unspecified), TimeUtils.GetMadridTimeZone())).ToUnixTimeMilliseconds(),
-        }).ToList();
+        var arrives = (stopTimes.times ?? [])
+            .Select(t => new ArriveDto
+            {
+                Line = t.line?.shortDescription ?? "",
+                LineCode = t.line?.codLine,
+                Direction = t.direction,
+                CodMode = int.TryParse(t.line?.codMode, out var cm) ? cm : 8,
+                Destination = t.destination ?? "",
+                EstimatedArrive = new DateTimeOffset(
+                    TimeZoneInfo.ConvertTimeToUtc(
+                        DateTime.SpecifyKind(t.time, DateTimeKind.Unspecified),
+                        TimeUtils.GetMadridTimeZone()
+                    )
+                ).ToUnixTimeMilliseconds(),
+            })
+            .ToList();
 
         return new StopTimesDto
         {
@@ -168,7 +231,7 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
             StopName = stopName,
             SimpleStopCode = shortStopCode,
             Coordinates = new CoordinatesDto(),
-            Arrives =  GroupArrives(arrives),
+            Arrives = GroupArrives(arrives),
             Incidents = [],
         };
     }
@@ -194,32 +257,35 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
 
     private static List<AlertDto> MapAlertsResponse(Gen.IncidentAffectation[]? incidents)
     {
-        if (incidents == null) return [];
+        if (incidents == null)
+            return [];
 
-        return incidents.Select(ia => new AlertDto
-        {
-            Description = ia.description ?? "",
-            CodMode = int.TryParse(ia.codMode, out var cm) ? cm : 0,
-            CodLine = ia.codLine ?? "",
-            Stops = (ia.stopsAffectated ?? [])
-                .Select(s => s.codStop ?? "")
-                .ToList(),
-        }).ToList();
+        return incidents
+            .Select(ia => new AlertDto
+            {
+                Description = ia.description ?? "",
+                CodMode = int.TryParse(ia.codMode, out var cm) ? cm : 0,
+                CodLine = ia.codLine ?? "",
+                Stops = (ia.stopsAffectated ?? []).Select(s => s.codStop ?? "").ToList(),
+            })
+            .ToList();
     }
 
-    private static ItineraryDto? MapItinerariesResponse(Gen.LineItinerary[]? itineraries, string lineCode, int direction)
+    private static ItineraryDto? MapItinerariesResponse(
+        Gen.LineItinerary[]? itineraries,
+        string lineCode,
+        int direction
+    )
     {
-        if (itineraries == null) return null;
+        if (itineraries == null)
+            return null;
 
         var matching = itineraries.FirstOrDefault(li => li.direction == direction);
-        if (matching == null) return null;
+        if (matching == null)
+            return null;
 
         var stops = (matching.stops ?? [])
-            .Select((s, i) => new StopOrderDto
-            {
-                FullStopCode = s.codStop ?? "",
-                Order = i,
-            })
+            .Select((s, i) => new StopOrderDto { FullStopCode = s.codStop ?? "", Order = i })
             .ToList();
 
         return new ItineraryDto
@@ -232,19 +298,21 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
 
     private static VehicleLocationsDto? MapLocationsResponse(Gen.VehicleLocation[]? vehicles)
     {
-        var locations = (vehicles ?? []).Select(vl => new VehicleLocationDto
-        {
-            LineCode = vl.line?.codLine ?? "",
-            SimpleLineCode = vl.line?.shortDescription ?? "",
-            CodVehicle = vl.codVehicle ?? "",
-            Coordinates = new CoordinatesDto
+        var locations = (vehicles ?? [])
+            .Select(vl => new VehicleLocationDto
             {
-                Latitude = vl.coordinates?.latitude ?? 0,
-                Longitude = vl.coordinates?.longitude ?? 0,
-            },
-            Direction = vl.direction,
-            Service = vl.service ?? "",
-        }).ToList();
+                LineCode = vl.line?.codLine ?? "",
+                SimpleLineCode = vl.line?.shortDescription ?? "",
+                CodVehicle = vl.codVehicle ?? "",
+                Coordinates = new CoordinatesDto
+                {
+                    Latitude = vl.coordinates?.latitude ?? 0,
+                    Longitude = vl.coordinates?.longitude ?? 0,
+                },
+                Direction = vl.direction,
+                Service = vl.service ?? "",
+            })
+            .ToList();
 
         return new VehicleLocationsDto
         {
