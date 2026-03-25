@@ -18,9 +18,12 @@ public partial class CrtmClient(
     private readonly ObjectPool<MultimodalInformationClient> _pool =
         new DefaultObjectPool<MultimodalInformationClient>(new ClientPolicy(config));
 
-    private static async Task<AuthHeader> GetAuthAsync(MultimodalInformationClient client)
+    private static async Task<AuthHeader> GetAuthAsync(
+        MultimodalInformationClient client,
+        CancellationToken ct
+    )
     {
-        var response = await client.GetPublicKeyAsync();
+        var response = await client.GetPublicKeyAsync().WaitAsync(ct);
         var connectionKey = CrtmAuthHelper.Encrypt(Encoding.UTF8.GetBytes(response.key));
         return new AuthHeader { connectionKey = connectionKey };
     }
@@ -33,7 +36,7 @@ public partial class CrtmClient(
         var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(client);
+            var auth = await GetAuthAsync(client, ct);
             var response = await client.GetStopTimesAsync(
                 auth,
                 fullStopCode,
@@ -43,7 +46,7 @@ public partial class CrtmClient(
                 null,
                 null,
                 3
-            );
+            ).WaitAsync(ct);
             return MapStopTimesResponse(response.stopTimes, fullStopCode);
         }
         catch (Exception ex)
@@ -66,8 +69,8 @@ public partial class CrtmClient(
         var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(client);
-            var response = await client.GetIncidentsAffectationsAsync(auth, codMode, []);
+            var auth = await GetAuthAsync(client, ct);
+            var response = await client.GetIncidentsAffectationsAsync(auth, codMode, []).WaitAsync(ct);
             var alerts = MapAlertsResponse(response.incidentsAffectations);
             cache.Set(cacheKey, alerts, TimeSpan.FromHours(24));
             return alerts;
@@ -94,8 +97,8 @@ public partial class CrtmClient(
         var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(client);
-            var response = await client.GetLineItinerariesAsync(auth, lineCode, 1);
+            var auth = await GetAuthAsync(client, ct);
+            var response = await client.GetLineItinerariesAsync(auth, lineCode, 1).WaitAsync(ct);
             return MapItinerariesResponse(response.itineraries, lineCode, direction);
         }
         catch (Exception ex)
@@ -143,7 +146,7 @@ public partial class CrtmClient(
         var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(client);
+            var auth = await GetAuthAsync(client, ct);
             var response = await client.GetLineLocationAsync(
                 auth,
                 codMode,
@@ -152,7 +155,7 @@ public partial class CrtmClient(
                 itineraryCode ?? "",
                 "",
                 stopCode ?? "8_"
-            );
+            ).WaitAsync(ct);
             return MapLocationsResponse(response.vehiclesLocation);
         }
         catch (Exception ex)
