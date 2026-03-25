@@ -9,9 +9,9 @@ namespace MadridTransporte.Api.Services;
 
 public class StopsService(AppDbContext db)
 {
-    public async Task<List<StopDto>> GetAllStopsAsync(CancellationToken ct = default)
+    public IAsyncEnumerable<StopDto> GetAllStopsAsync(CancellationToken ct = default)
     {
-        return await db
+        return db
             .Stops.Select(s => new StopDto
             {
                 StopCode = s.StopCode,
@@ -23,7 +23,7 @@ public class StopsService(AppDbContext db)
                 Wheelchair = s.Wheelchair,
                 Zone = s.Zone,
             })
-            .ToListAsync(ct);
+            .AsAsyncEnumerable();
     }
 
     public async Task<StopDto> GetStopByFullStopCodeAsync(

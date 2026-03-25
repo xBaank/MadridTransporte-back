@@ -14,11 +14,8 @@ public static class LinesEndpoints
 
         lines.MapGet(
             "/all",
-            async (RoutesService routesService, CancellationToken ct) =>
-            {
-                var routes = await routesService.GetRoutesWithItinerariesAsync(ct);
-                return Results.Ok(routes);
-            }
+            (RoutesService routesService, CancellationToken ct) =>
+                routesService.GetRoutesWithItinerariesAsync(ct)
         );
 
         // Bus

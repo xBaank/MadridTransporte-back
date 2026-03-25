@@ -18,11 +18,7 @@ public static class StopsEndpoints
 
         stops.MapGet(
             "/all",
-            async (StopsService stopsService, CancellationToken ct) =>
-            {
-                var result = await stopsService.GetAllStopsAsync(ct);
-                return Results.Ok(result);
-            }
+            (StopsService stopsService, CancellationToken ct) => stopsService.GetAllStopsAsync(ct)
         );
 
         // Bus

@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using MadridTransporte.Api.Data;
 using MadridTransporte.Api.Data.Entities;
 using MadridTransporte.Api.Dtos;
@@ -39,14 +40,16 @@ public class RoutesService(AppDbContext db)
         );
     }
 
-    public async Task<List<RouteDto>> GetRoutesWithItinerariesAsync(CancellationToken ct = default)
+    public async IAsyncEnumerable<RouteDto> GetRoutesWithItinerariesAsync(
+        [EnumeratorCancellation] CancellationToken ct = default
+    )
     {
-        var routes = await db.Routes.ToListAsync(ct);
         var itineraries = await db.Itineraries.ToListAsync(ct);
         var itineraryLookup = itineraries.ToLookup(i => i.FullLineCode);
 
-        return routes
-            .Select(r => new RouteDto
+        await foreach (var r in db.Routes.AsAsyncEnumerable().WithCancellation(ct))
+        {
+            yield return new RouteDto
             {
                 FullLineCode = r.FullLineCode,
                 SimpleLineCode = r.SimpleLineCode,
@@ -62,7 +65,7 @@ public class RoutesService(AppDbContext db)
                         ServiceId = i.ServiceId,
                     })
                     .ToList(),
-            })
-            .ToList();
+            };
+        }
     }
 }
