@@ -222,6 +222,10 @@ public class TrainClient
             {
                 Content = content,
             };
+            request.Headers.TryAddWithoutValidation(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101 Firefox/64.0"
+            );
 
             var response = await _renfeHttpClient.SendAsync(request, ct);
             if (!response.IsSuccessStatusCode)

@@ -76,10 +76,22 @@ public static class StopsEndpoints
             async (
                 string originStopCode,
                 string destinationStopCode,
+                StopsService stopsService,
                 TrainClient trainClient,
                 CancellationToken ct
             ) =>
             {
+                var originFullCode = CodeUtils.CreateStopCode(
+                    CodeUtils.TrainCodMode,
+                    originStopCode
+                );
+                var destFullCode = CodeUtils.CreateStopCode(
+                    CodeUtils.TrainCodMode,
+                    destinationStopCode
+                );
+                await stopsService.GetStopByFullStopCodeAsync(originFullCode, ct);
+                await stopsService.GetStopByFullStopCodeAsync(destFullCode, ct);
+
                 var result = await trainClient.GetRoutedTimesAsync(
                     originStopCode,
                     destinationStopCode,
