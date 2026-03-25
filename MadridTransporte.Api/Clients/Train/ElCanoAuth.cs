@@ -26,9 +26,18 @@ public class ElCanoAuth
     private readonly string _xElcanoDateSimple;
     private readonly string _xElcanoUserId;
 
-    public ElCanoAuth(string accessKey, string secretKey, string host, string path,
-        string httpMethod, string contentType, string xElcanoClient, string xElcanoUserId,
-        string payload, string queryParams)
+    public ElCanoAuth(
+        string accessKey,
+        string secretKey,
+        string host,
+        string path,
+        string httpMethod,
+        string contentType,
+        string xElcanoClient,
+        string xElcanoUserId,
+        string payload,
+        string queryParams
+    )
     {
         _accessKey = accessKey;
         _secretKey = secretKey;
@@ -55,7 +64,7 @@ public class ElCanoAuth
             [HeaderXElcanoClient] = _xElcanoClient,
             [HeaderXElcanoDate] = _xElcanoDate,
             [HeaderXElcanoUserId] = _xElcanoUserId,
-            ["Authorization"] = CalculateAuthorization()
+            ["Authorization"] = CalculateAuthorization(),
         };
         return headers;
     }
@@ -70,7 +79,8 @@ public class ElCanoAuth
 
     private string PrepareCanonicalRequest()
     {
-        var signedHeaders = $"{HeaderContentType.ToLower()};{HeaderXElcanoHost.ToLower()};{HeaderXElcanoClient.ToLower()};{HeaderXElcanoDate.ToLower()};{HeaderXElcanoUserId.ToLower()}";
+        var signedHeaders =
+            $"{HeaderContentType.ToLower()};{HeaderXElcanoHost.ToLower()};{HeaderXElcanoClient.ToLower()};{HeaderXElcanoDate.ToLower()};{HeaderXElcanoUserId.ToLower()}";
 
         var sb = new StringBuilder();
         sb.Append(_httpMethod).Append('\n');
@@ -100,7 +110,8 @@ public class ElCanoAuth
 
     private string BuildAuthorizationString(string signature)
     {
-        var signedHeaders = $"{HeaderContentType.ToLower()};{HeaderXElcanoHost.ToLower()};{HeaderXElcanoClient.ToLower()};{HeaderXElcanoDate.ToLower()};{HeaderXElcanoUserId.ToLower()}";
+        var signedHeaders =
+            $"{HeaderContentType.ToLower()};{HeaderXElcanoHost.ToLower()};{HeaderXElcanoClient.ToLower()};{HeaderXElcanoDate.ToLower()};{HeaderXElcanoUserId.ToLower()}";
         return $"HMAC-SHA256 Credential={_accessKey}/{_xElcanoDateSimple}/{_xElcanoClient}/{_xElcanoUserId}/{ElcanoRequest},SignedHeaders={signedHeaders},Signature={signature}";
     }
 

@@ -6,10 +6,16 @@ public class ElCanoAuthHandler : DelegatingHandler
     private const string SecretKey = "Jthjtr946RTt";
     private const string UserId = "718da3df4199ede4";
 
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken
+    )
     {
         var uri = request.RequestUri!;
-        var payload = request.Content != null ? await request.Content.ReadAsStringAsync(cancellationToken) : "";
+        var payload =
+            request.Content != null
+                ? await request.Content.ReadAsStringAsync(cancellationToken)
+                : "";
 
         var auth = new ElCanoAuth(
             accessKey: AccessKey,
@@ -21,7 +27,8 @@ public class ElCanoAuthHandler : DelegatingHandler
             xElcanoClient: "AndroidElcanoApp",
             xElcanoUserId: UserId,
             payload: payload,
-            queryParams: uri.Query.TrimStart('?'));
+            queryParams: uri.Query.TrimStart('?')
+        );
 
         var headers = auth.GetHeaders();
         foreach (var (key, value) in headers)

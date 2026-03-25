@@ -17,16 +17,29 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
         await _loginLock.WaitAsync(ct);
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://openapi.emtmadrid.es/v1/mobilitylabs/user/login/");
-            request.Headers.TryAddWithoutValidation("passKey", "504fea88211f2f90633f964189b7696037d65cc3a5f47b8fa1d5ea5e34db0239ad2e068851e72be0cec125779224749e3bc236c1b7af39d8a3d398e99223f058");
-            request.Headers.TryAddWithoutValidation("X-ClientId", "428B01E6-693C-4F7F-A11E-3BB923420587");
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                "https://openapi.emtmadrid.es/v1/mobilitylabs/user/login/"
+            );
+            request.Headers.TryAddWithoutValidation(
+                "passKey",
+                "504fea88211f2f90633f964189b7696037d65cc3a5f47b8fa1d5ea5e34db0239ad2e068851e72be0cec125779224749e3bc236c1b7af39d8a3d398e99223f058"
+            );
+            request.Headers.TryAddWithoutValidation(
+                "X-ClientId",
+                "428B01E6-693C-4F7F-A11E-3BB923420587"
+            );
 
             var response = await httpClient.SendAsync(request, ct);
-            if (!response.IsSuccessStatusCode) throw new InvalidOperationException("EMT login failed");
+            if (!response.IsSuccessStatusCode)
+                throw new InvalidOperationException("EMT login failed");
 
             var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
-            _accessToken = json.GetProperty("data").EnumerateArray().First()
-                .GetProperty("accessToken").GetString();
+            _accessToken = json.GetProperty("data")
+                .EnumerateArray()
+                .First()
+                .GetProperty("accessToken")
+                .GetString();
         }
         finally
         {
@@ -34,7 +47,10 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
         }
     }
 
-    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode, CancellationToken ct = default)
+    public async Task<StopTimesDto?> GetStopTimesAsync(
+        string fullStopCode,
+        CancellationToken ct = default
+    )
     {
         var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
 
@@ -45,19 +61,24 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
         {
             try
             {
-                var url = $"https://openapi.emtmadrid.es/v2/transport/busemtmad/stops/{simpleStopCode}/arrives/";
+                var url =
+                    $"https://openapi.emtmadrid.es/v2/transport/busemtmad/stops/{simpleStopCode}/arrives/";
                 var body = new
                 {
                     cultureInfo = "ES",
                     Text_StopRequired_YN = "Y",
                     Text_EstimationsRequired_YN = "Y",
                     Text_IncidencesRequired_YN = "Y",
-                    DateTime_Referenced_Incidencies_YYYYMMDD = DateTime.UtcNow.ToString("yyyy-MM-dd"),
+                    DateTime_Referenced_Incidencies_YYYYMMDD = DateTime.UtcNow.ToString(
+                        "yyyy-MM-dd"
+                    ),
                 };
 
                 var bodyJson = JsonSerializer.Serialize(body);
                 var content = new StringContent(bodyJson);
-                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                    "application/json"
+                );
 
                 var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
                 request.Headers.TryAddWithoutValidation("accessToken", _accessToken);
@@ -67,18 +88,26 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     throw ApiException.NotFound("Stop not found");
 
-                if (response.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden)
+                if (
+                    response.StatusCode
+                    is System.Net.HttpStatusCode.Unauthorized
+                        or System.Net.HttpStatusCode.Forbidden
+                )
                 {
                     await LoginAsync(ct);
                     continue;
                 }
 
-                if (!response.IsSuccessStatusCode) continue;
+                if (!response.IsSuccessStatusCode)
+                    continue;
 
                 var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
                 return ExtractStopTimes(json, simpleStopCode);
             }
-            catch (ApiException) { throw; }
+            catch (ApiException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 logger.LogWarning(ex, "EMT request failed, {Tries} tries left", tries - 1);
@@ -134,60 +163,79 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
         };
 
         List<JsonElement>? linesInfo = null;
-        if (stopInfo.TryGetProperty("lines", out var linesEl) && linesEl.ValueKind == JsonValueKind.Array)
+        if (
+            stopInfo.TryGetProperty("lines", out var linesEl)
+            && linesEl.ValueKind == JsonValueKind.Array
+        )
             linesInfo = linesEl.EnumerateArray().ToList();
 
         List<ArriveDto>? arrives = null;
-        if (data.TryGetProperty("Arrive", out var arriveArr) && arriveArr.ValueKind == JsonValueKind.Array)
+        if (
+            data.TryGetProperty("Arrive", out var arriveArr)
+            && arriveArr.ValueKind == JsonValueKind.Array
+        )
         {
             arrives = [];
             foreach (var a in arriveArr.EnumerateArray())
             {
                 var secondsToArrive = a.GetProperty("estimateArrive").GetInt64();
-                var estimatedArrive = DateTimeOffset.UtcNow.AddSeconds(secondsToArrive).ToUnixTimeMilliseconds();
+                var estimatedArrive = DateTimeOffset
+                    .UtcNow.AddSeconds(secondsToArrive)
+                    .ToUnixTimeMilliseconds();
                 var line = a.GetProperty("line").GetString() ?? "";
                 var lineInfo = linesInfo?.FirstOrDefault(l =>
-                    l.TryGetProperty("label", out var label) && label.GetString() == line);
+                    l.TryGetProperty("label", out var label) && label.GetString() == line
+                );
 
-                var fullLine = lineInfo is { } li2 && li2.TryGetProperty("line", out var lineEl)
-                    ? lineEl.GetString() ?? line
-                    : line;
+                var fullLine =
+                    lineInfo is { } li2 && li2.TryGetProperty("line", out var lineEl)
+                        ? lineEl.GetString() ?? line
+                        : line;
 
                 int? direction = null;
                 if (lineInfo is { } li && li.TryGetProperty("to", out var toEl))
                     direction = toEl.GetString() == "A" ? 2 : 1;
 
-                arrives.Add(new ArriveDto
-                {
-                    Line = line,
-                    LineCode = fullLine,
-                    Destination = a.GetProperty("destination").GetString() ?? "",
-                    Direction = direction,
-                    CodMode = int.Parse(CodeUtils.EmtCodMode),
-                    EstimatedArrive = estimatedArrive,
-                });
+                arrives.Add(
+                    new ArriveDto
+                    {
+                        Line = line,
+                        LineCode = fullLine,
+                        Destination = a.GetProperty("destination").GetString() ?? "",
+                        Direction = direction,
+                        CodMode = int.Parse(CodeUtils.EmtCodMode),
+                        EstimatedArrive = estimatedArrive,
+                    }
+                );
             }
         }
 
         var incidents = new List<IncidentDto>();
-        if (data.TryGetProperty("Incident", out var incidentEl)
+        if (
+            data.TryGetProperty("Incident", out var incidentEl)
             && incidentEl.TryGetProperty("ListaIncident", out var lista)
             && lista.TryGetProperty("data", out var incData)
-            && incData.ValueKind == JsonValueKind.Array)
+            && incData.ValueKind == JsonValueKind.Array
+        )
         {
             foreach (var inc in incData.EnumerateArray())
             {
-                incidents.Add(new IncidentDto
-                {
-                    Title = inc.GetProperty("title").GetString() ?? "",
-                    Description = inc.GetProperty("description").GetString() ?? "",
-                    Cause = inc.GetProperty("cause").GetString() ?? "",
-                    Effect = inc.GetProperty("effect").GetString() ?? "",
-                    From = inc.GetProperty("rssFrom").GetString() ?? "",
-                    To = inc.GetProperty("rssTo").GetString() ?? "",
-                    Url = inc.TryGetProperty("moreInfo", out var mi) && mi.TryGetProperty("@url", out var urlEl)
-                        ? urlEl.GetString() ?? "" : "",
-                });
+                incidents.Add(
+                    new IncidentDto
+                    {
+                        Title = inc.GetProperty("title").GetString() ?? "",
+                        Description = inc.GetProperty("description").GetString() ?? "",
+                        Cause = inc.GetProperty("cause").GetString() ?? "",
+                        Effect = inc.GetProperty("effect").GetString() ?? "",
+                        From = inc.GetProperty("rssFrom").GetString() ?? "",
+                        To = inc.GetProperty("rssTo").GetString() ?? "",
+                        Url =
+                            inc.TryGetProperty("moreInfo", out var mi)
+                            && mi.TryGetProperty("@url", out var urlEl)
+                                ? urlEl.GetString() ?? ""
+                                : "",
+                    }
+                );
             }
         }
 

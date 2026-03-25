@@ -4,17 +4,25 @@ namespace MadridTransporte.Api.Loader;
 
 public static class FileUtils
 {
-    public static async Task<string> DownloadToTempFileAsync(HttpClient httpClient, string url, ILogger logger)
+    public static async Task<string> DownloadToTempFileAsync(
+        HttpClient httpClient,
+        string url,
+        ILogger logger
+    )
     {
         logger.LogInformation("Downloading {Url}", url);
         var tempFile = Path.GetTempFileName();
 
-        using var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+        using var response = await httpClient.GetAsync(
+            url,
+            HttpCompletionOption.ResponseHeadersRead
+        );
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync();
             throw new HttpRequestException(
-                $"GET {url} failed with {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}");
+                $"GET {url} failed with {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}"
+            );
         }
 
         await using var stream = await response.Content.ReadAsStreamAsync();
@@ -45,7 +53,8 @@ public static class FileUtils
         for (var i = 0; i < gtfsDirs.Count; i++)
         {
             var filePath = Path.Combine(gtfsDirs[i], fileName);
-            if (!File.Exists(filePath)) continue;
+            if (!File.Exists(filePath))
+                continue;
 
             using var reader = new StreamReader(filePath);
             var lineIndex = 0;
@@ -78,7 +87,8 @@ public static class FileUtils
 
         for (var i = 0; i < filePaths.Count; i++)
         {
-            if (!File.Exists(filePaths[i])) continue;
+            if (!File.Exists(filePaths[i]))
+                continue;
 
             using var reader = new StreamReader(filePaths[i]);
             var lineIndex = 0;
@@ -106,7 +116,8 @@ public static class FileUtils
         {
             try
             {
-                if (File.Exists(file)) File.Delete(file);
+                if (File.Exists(file))
+                    File.Delete(file);
             }
             catch
             {
@@ -118,7 +129,8 @@ public static class FileUtils
         {
             try
             {
-                if (Directory.Exists(dir)) Directory.Delete(dir, true);
+                if (Directory.Exists(dir))
+                    Directory.Delete(dir, true);
             }
             catch
             {

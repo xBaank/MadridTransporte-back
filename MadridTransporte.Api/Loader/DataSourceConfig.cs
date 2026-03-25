@@ -29,14 +29,14 @@ public static class DataSourceConfig
     public record GtfsFeed(string Url, int CodMode);
 
     public static GtfsFeed[] AllGtfsFeeds =>
-    [
-        new(MetroGtfsUrl, 4),
-        new(TrainGtfsUrl, 5),
-        new(TramGtfsUrl, 10),
-        new(InterurbanGtfsUrl, 8),
-        new(UrbanGtfsUrl, 9),
-        new(EmtGtfsUrl, 6),
-    ];
+        [
+            new(MetroGtfsUrl, 4),
+            new(TrainGtfsUrl, 5),
+            new(TramGtfsUrl, 10),
+            new(InterurbanGtfsUrl, 8),
+            new(UrbanGtfsUrl, 9),
+            new(EmtGtfsUrl, 6),
+        ];
 
     public static string[] AllGtfsUrls => AllGtfsFeeds.Select(f => f.Url).ToArray();
 

@@ -4,71 +4,22 @@ using MadridTransporte.Api.Clients.Crtm.Generated;
 using MadridTransporte.Api.Dtos;
 using MadridTransporte.Api.Utils;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.ObjectPool;
 using Gen = MadridTransporte.Api.Clients.Crtm.Generated;
 
 namespace MadridTransporte.Api.Clients.Crtm;
 
-public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmClient> logger)
+public partial class CrtmClient(
+    IConfiguration config,
+    IMemoryCache cache,
+    ILogger<CrtmClient> logger
+)
 {
-    private MultimodalInformationClient _soapClient = CreateClient(config);
-    private readonly SemaphoreSlim _lock = new(1, 1);
+    private readonly ObjectPool<MultimodalInformationClient> _pool =
+        new DefaultObjectPool<MultimodalInformationClient>(new ClientPolicy(config));
 
-    private static MultimodalInformationClient CreateClient(IConfiguration config)
+    private static async Task<AuthHeader> GetAuthAsync(MultimodalInformationClient client)
     {
-        var endpoint =
-            config["Crtm:Endpoint"]
-            ?? "http://www.citram.es:8080/WSMultimodalInformation/MultimodalInformation.svc";
-        var binding = new BasicHttpBinding
-        {
-            SendTimeout = TimeSpan.FromSeconds(config.GetValue("Crtm:TimeoutSeconds", 30)),
-        };
-        return new MultimodalInformationClient(binding, new EndpointAddress(endpoint));
-    }
-
-    private MultimodalInformationClient GetOrCreateClient()
-    {
-        if (
-            _soapClient.State
-            is CommunicationState.Faulted
-                or CommunicationState.Closed
-                or CommunicationState.Closing
-        )
-        {
-            try
-            {
-                _soapClient.Abort();
-                _soapClient.Close();
-            }
-            catch (Exception ex)
-            {
-                if (logger.IsEnabled(LogLevel.Error))
-                    logger.LogError(ex, "Error closing faulted CRTM client");
-            }
-            _soapClient = CreateClient(config);
-        }
-
-        return _soapClient;
-    }
-
-    private async Task<MultimodalInformationClient> GetClientAsync(CancellationToken ct = default)
-    {
-        if (_soapClient.State is CommunicationState.Opened or CommunicationState.Created)
-            return _soapClient;
-
-        await _lock.WaitAsync(ct);
-        try
-        {
-            return GetOrCreateClient();
-        }
-        finally
-        {
-            _lock.Release();
-        }
-    }
-
-    private async Task<AuthHeader> GetAuthAsync(CancellationToken ct = default)
-    {
-        var client = await GetClientAsync(ct);
         var response = await client.GetPublicKeyAsync();
         var connectionKey = CrtmAuthHelper.Encrypt(Encoding.UTF8.GetBytes(response.key));
         return new AuthHeader { connectionKey = connectionKey };
@@ -79,10 +30,10 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         CancellationToken ct = default
     )
     {
+        var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(ct);
-            var client = await GetClientAsync(ct);
+            var auth = await GetAuthAsync(client);
             var response = await client.GetStopTimesAsync(
                 auth,
                 fullStopCode,
@@ -100,6 +51,10 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
             logger.LogError(ex, "CRTM GetStopTimes failed for {StopCode}", fullStopCode);
             return null;
         }
+        finally
+        {
+            _pool.Return(client);
+        }
     }
 
     public async Task<List<AlertDto>> GetAlertsAsync(string codMode, CancellationToken ct = default)
@@ -108,10 +63,10 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         if (cache.TryGetValue(cacheKey, out List<AlertDto>? cached) && cached != null)
             return cached;
 
+        var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(ct);
-            var client = await GetClientAsync(ct);
+            var auth = await GetAuthAsync(client);
             var response = await client.GetIncidentsAffectationsAsync(auth, codMode, []);
             var alerts = MapAlertsResponse(response.incidentsAffectations);
             cache.Set(cacheKey, alerts, TimeSpan.FromHours(24));
@@ -124,6 +79,10 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
                 return fallback;
             return [];
         }
+        finally
+        {
+            _pool.Return(client);
+        }
     }
 
     public async Task<ItineraryDto?> GetLineItinerariesAsync(
@@ -132,10 +91,10 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         CancellationToken ct = default
     )
     {
+        var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(ct);
-            var client = await GetClientAsync(ct);
+            var auth = await GetAuthAsync(client);
             var response = await client.GetLineItinerariesAsync(auth, lineCode, 1);
             return MapItinerariesResponse(response.itineraries, lineCode, direction);
         }
@@ -143,6 +102,10 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         {
             logger.LogWarning(ex, "CRTM GetLineItineraries failed for {LineCode}", lineCode);
             return null;
+        }
+        finally
+        {
+            _pool.Return(client);
         }
     }
 
@@ -177,10 +140,10 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         CancellationToken ct = default
     )
     {
+        var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(ct);
-            var client = await GetClientAsync(ct);
+            var auth = await GetAuthAsync(client);
             var response = await client.GetLineLocationAsync(
                 auth,
                 codMode,
@@ -196,6 +159,10 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         {
             logger.LogWarning(ex, "CRTM GetLineLocation failed for {LineCode}", lineCode);
             return null;
+        }
+        finally
+        {
+            _pool.Return(client);
         }
     }
 

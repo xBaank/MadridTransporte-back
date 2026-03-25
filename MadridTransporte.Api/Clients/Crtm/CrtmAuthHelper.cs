@@ -5,7 +5,9 @@ namespace MadridTransporte.Api.Clients.Crtm;
 
 public static class CrtmAuthHelper
 {
-    private static readonly byte[] PrivateKey = Encoding.UTF8.GetBytes("pruebapruebapruebapruebaprueba12");
+    private static readonly byte[] PrivateKey = Encoding.UTF8.GetBytes(
+        "pruebapruebapruebapruebaprueba12"
+    );
     private static readonly byte[] Iv = new byte[16];
 
     public static string Encrypt(byte[] publicKey)

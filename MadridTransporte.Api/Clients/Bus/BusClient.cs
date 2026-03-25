@@ -11,9 +11,13 @@ public class BusClient(
     HttpClient httpClient,
     StopsService stopsService,
     RoutesService routesService,
-    ILogger<BusClient> logger)
+    ILogger<BusClient> logger
+)
 {
-    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode, CancellationToken ct = default)
+    public async Task<StopTimesDto?> GetStopTimesAsync(
+        string fullStopCode,
+        CancellationToken ct = default
+    )
     {
         var crtmTask = crtmClient.GetStopTimesAsync(fullStopCode, ct);
         var avanzaTask = GetAvanzaDataAsync(fullStopCode, ct);
@@ -26,19 +30,22 @@ public class BusClient(
         var crtmResult = await crtmTask;
         var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
 
-        var times = crtmResult ?? new StopTimesDto
-        {
-            CodMode = int.Parse(CodeUtils.BusCodMode),
-            StopName = name,
-            SimpleStopCode = simpleStopCode,
-            Coordinates = coords,
-            Arrives = null,
-            Incidents = [],
-        };
+        var times =
+            crtmResult
+            ?? new StopTimesDto
+            {
+                CodMode = int.Parse(CodeUtils.BusCodMode),
+                StopName = name,
+                SimpleStopCode = simpleStopCode,
+                Coordinates = coords,
+                Arrives = null,
+                Incidents = [],
+            };
 
         // Update coordinates and name from DB
         times.Coordinates = coords;
-        if (!string.IsNullOrEmpty(name)) times.StopName = name;
+        if (!string.IsNullOrEmpty(name))
+            times.StopName = name;
         times.SimpleStopCode = simpleStopCode;
 
         // Merge Avanza data
@@ -55,13 +62,22 @@ public class BusClient(
                 var newLines = avanzaArrives.Select(a => a.Line).ToHashSet();
                 if (!existingLines.Overlaps(newLines))
                 {
-                    var allArrives = avanzaArrives.Concat(
-                        times.Arrives.SelectMany(g => g.EstimatedArrives.Select(e => new ArriveDto
-                        {
-                            Line = g.Line, LineCode = g.LineCode, Direction = g.Direction,
-                            CodMode = g.CodMode, Anden = g.Anden, Destination = g.Destination,
-                            EstimatedArrive = e,
-                        }))).ToList();
+                    var allArrives = avanzaArrives
+                        .Concat(
+                            times.Arrives.SelectMany(g =>
+                                g.EstimatedArrives.Select(e => new ArriveDto
+                                {
+                                    Line = g.Line,
+                                    LineCode = g.LineCode,
+                                    Direction = g.Direction,
+                                    CodMode = g.CodMode,
+                                    Anden = g.Anden,
+                                    Destination = g.Destination,
+                                    EstimatedArrive = e,
+                                })
+                            )
+                        )
+                        .ToList();
                     times.Arrives = GroupArrives(allArrives);
                 }
             }
@@ -70,27 +86,38 @@ public class BusClient(
         return times;
     }
 
-    public async Task<StopTimesDto?> GetCrtmStopTimesAsync(string fullStopCode, CancellationToken ct = default)
+    public async Task<StopTimesDto?> GetCrtmStopTimesAsync(
+        string fullStopCode,
+        CancellationToken ct = default
+    )
     {
         return await GetStopTimesAsync(fullStopCode, ct);
     }
 
-    private async Task<List<ArriveDto>?> GetAvanzaDataAsync(string fullStopCode, CancellationToken ct = default)
+    private async Task<List<ArriveDto>?> GetAvanzaDataAsync(
+        string fullStopCode,
+        CancellationToken ct = default
+    )
     {
         var codMode = CodeUtils.GetCodModeFromFullStopCode(fullStopCode);
-        if (codMode != CodeUtils.BusCodMode && codMode != CodeUtils.UrbanCodMode) return null;
+        if (codMode != CodeUtils.BusCodMode && codMode != CodeUtils.UrbanCodMode)
+            return null;
 
         try
         {
             var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
-            var url = $"https://apisvt.avanzagrupo.com/lineas/getTraficosParada?empresa=25&parada={simpleStopCode}";
+            var url =
+                $"https://apisvt.avanzagrupo.com/lineas/getTraficosParada?empresa=25&parada={simpleStopCode}";
             var response = await httpClient.GetAsync(url, ct);
-            if (!response.IsSuccessStatusCode) return null;
+            if (!response.IsSuccessStatusCode)
+                return null;
 
             var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
-            if (!json.TryGetProperty("data", out var data) ||
-                !data.TryGetProperty("traficos", out var traficos) ||
-                traficos.ValueKind != JsonValueKind.Array)
+            if (
+                !json.TryGetProperty("data", out var data)
+                || !data.TryGetProperty("traficos", out var traficos)
+                || traficos.ValueKind != JsonValueKind.Array
+            )
                 return null;
 
             var madridNow = TimeUtils.GetMadridNow();
@@ -99,24 +126,37 @@ public class BusClient(
             foreach (var trafico in traficos.EnumerateArray())
             {
                 var llegada = trafico.GetProperty("llegada").GetString();
-                if (llegada == null) continue;
+                if (llegada == null)
+                    continue;
 
                 var hour = TimeOnly.Parse(llegada);
                 var localDate = DateOnly.FromDateTime(madridNow.DateTime);
-                var madridTime = new DateTimeOffset(localDate.ToDateTime(hour),
-                    TimeUtils.GetMadridTimeZone().GetUtcOffset(madridNow));
+                var madridTime = new DateTimeOffset(
+                    localDate.ToDateTime(hour),
+                    TimeUtils.GetMadridTimeZone().GetUtcOffset(madridNow)
+                );
 
                 var line = trafico.GetProperty("coLineaWeb").GetString() ?? "";
-                var route = await routesService.GetRouteAsync(line, [CodeUtils.BusCodMode, CodeUtils.UrbanCodMode], ct);
+                var route = await routesService.GetRouteAsync(
+                    line,
+                    [CodeUtils.BusCodMode, CodeUtils.UrbanCodMode],
+                    ct
+                );
 
-                arrives.Add(new ArriveDto
-                {
-                    Line = line,
-                    LineCode = route?.FullLineCode,
-                    Destination = "(Avanza) " + (trafico.GetProperty("dsDestino").GetString() ?? ""),
-                    CodMode = route != null && int.TryParse(route.CodMode, out var cm) ? cm : int.Parse(CodeUtils.BusCodMode),
-                    EstimatedArrive = madridTime.ToUnixTimeMilliseconds(),
-                });
+                arrives.Add(
+                    new ArriveDto
+                    {
+                        Line = line,
+                        LineCode = route?.FullLineCode,
+                        Destination =
+                            "(Avanza) " + (trafico.GetProperty("dsDestino").GetString() ?? ""),
+                        CodMode =
+                            route != null && int.TryParse(route.CodMode, out var cm)
+                                ? cm
+                                : int.Parse(CodeUtils.BusCodMode),
+                        EstimatedArrive = madridTime.ToUnixTimeMilliseconds(),
+                    }
+                );
             }
 
             return arrives;

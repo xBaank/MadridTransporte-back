@@ -12,7 +12,8 @@ namespace MadridTransporte.Api.Loader;
 public class DataLoader(
     IServiceScopeFactory scopeFactory,
     HttpClient httpClient,
-    ILogger<DataLoader> logger)
+    ILogger<DataLoader> logger
+)
 {
     private const int BatchSize = 50_000;
 
@@ -54,7 +55,13 @@ public class DataLoader(
 
             // StopOrders need the repeated metro stops map, so load after stops
             var repeatedToOriginalStops = await GetRepeatedMetroStops(db, ct);
-            await LoadStopOrders(db, gtfsDirs, csvFiles.TrainItineraries, repeatedToOriginalStops, ct);
+            await LoadStopOrders(
+                db,
+                gtfsDirs,
+                csvFiles.TrainItineraries,
+                repeatedToOriginalStops,
+                ct
+            );
 
             logger.LogInformation("Data load completed successfully");
         }
@@ -69,15 +76,20 @@ public class DataLoader(
         }
     }
 
-    private async Task<List<GtfsDirInfo>> DownloadAndExtractGtfs(List<string> tempFiles, List<string> tempDirs,
-        CancellationToken ct)
+    private async Task<List<GtfsDirInfo>> DownloadAndExtractGtfs(
+        List<string> tempFiles,
+        List<string> tempDirs,
+        CancellationToken ct
+    )
     {
         var downloadTasks = DataSourceConfig.AllGtfsFeeds.Select(async feed =>
         {
             var zipFile = await FileUtils.DownloadToTempFileAsync(httpClient, feed.Url, logger);
-            lock (tempFiles) tempFiles.Add(zipFile);
+            lock (tempFiles)
+                tempFiles.Add(zipFile);
             var dir = FileUtils.UnzipToTempDirectory(zipFile);
-            lock (tempDirs) tempDirs.Add(dir);
+            lock (tempDirs)
+                tempDirs.Add(dir);
             return new GtfsDirInfo(dir, feed.CodMode);
         });
 
@@ -92,12 +104,16 @@ public class DataLoader(
         var stopsInfoTasks = DataSourceConfig.StopsInfoUrls.Select(async url =>
         {
             var file = await FileUtils.DownloadToTempFileAsync(httpClient, url, logger);
-            lock (tempFiles) tempFiles.Add(file);
+            lock (tempFiles)
+                tempFiles.Add(file);
             return file;
         });
 
-        var trainItinFile = await FileUtils.DownloadToTempFileAsync(httpClient, DataSourceConfig.TrainItinerariesUrl,
-            logger);
+        var trainItinFile = await FileUtils.DownloadToTempFileAsync(
+            httpClient,
+            DataSourceConfig.TrainItinerariesUrl,
+            logger
+        );
         tempFiles.Add(trainItinFile);
 
         var stopsInfoFiles = await Task.WhenAll(stopsInfoTasks);
@@ -124,7 +140,8 @@ public class DataLoader(
         foreach (var (dir, feedCodMode) in gtfsFeeds)
         {
             var filePath = Path.Combine(dir, "stops.txt");
-            if (!File.Exists(filePath)) continue;
+            if (!File.Exists(filePath))
+                continue;
 
             using var stream = File.OpenRead(filePath);
             await foreach (var batch in ReadCsvChunks(stream, BatchSize))
@@ -133,15 +150,19 @@ public class DataLoader(
                 foreach (var record in batch)
                 {
                     var stopId = record.GetValueOrDefault("stop_id", "");
-                    if (!stopId.Contains("par") && !int.TryParse(stopId, out _)) continue;
-                    if (!seenStopIds.Add(stopId)) continue;
+                    if (!stopId.Contains("par") && !int.TryParse(stopId, out _))
+                        continue;
+                    if (!seenStopIds.Add(stopId))
+                        continue;
 
                     var stop = GtfsParsers.ParseStop(record, feedCodMode, logger);
-                    if (stop == null) continue;
+                    if (stop == null)
+                        continue;
 
                     if (stop.CodMode.ToString() == CodeUtils.MetroCodMode)
                     {
-                        if (!uniqueMetroNames.Add(stop.StopName)) continue;
+                        if (!uniqueMetroNames.Add(stop.StopName))
+                            continue;
                     }
 
                     stops.Add(stop);
@@ -159,10 +180,13 @@ public class DataLoader(
         logger.LogInformation("Loaded {Count} stops", count);
     }
 
-    private async Task<Dictionary<string, string>> GetRepeatedMetroStops(AppDbContext db, CancellationToken ct)
+    private async Task<Dictionary<string, string>> GetRepeatedMetroStops(
+        AppDbContext db,
+        CancellationToken ct
+    )
     {
-        var metroStops = await db.Stops
-            .Where(s => s.CodMode.ToString() == CodeUtils.MetroCodMode)
+        var metroStops = await db
+            .Stops.Where(s => s.CodMode.ToString() == CodeUtils.MetroCodMode)
             .Select(s => new { s.FullStopCode, s.StopName })
             .ToListAsync(ct);
 
@@ -180,8 +204,12 @@ public class DataLoader(
         return repeatedToOriginal;
     }
 
-    private async Task LoadRoutes(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, string trainItinerariesPath,
-        CancellationToken ct)
+    private async Task LoadRoutes(
+        AppDbContext db,
+        List<GtfsDirInfo> gtfsFeeds,
+        string trainItinerariesPath,
+        CancellationToken ct
+    )
     {
         logger.LogInformation("Loading routes");
 
@@ -192,17 +220,22 @@ public class DataLoader(
         var seenLineIds = new HashSet<string>();
         var count = 0;
 
-        using var gtfsStream = FileUtils.CombineGtfsFiles("routes.txt", gtfsFeeds.Select(f => f.Dir).ToList());
+        using var gtfsStream = FileUtils.CombineGtfsFiles(
+            "routes.txt",
+            gtfsFeeds.Select(f => f.Dir).ToList()
+        );
         await foreach (var batch in ReadCsvChunks(gtfsStream, BatchSize))
         {
             var routes = new List<TransitRoute>();
             foreach (var record in batch)
             {
                 var routeId = record.GetValueOrDefault("route_id", "");
-                if (!seenLineIds.Add(routeId)) continue;
+                if (!seenLineIds.Add(routeId))
+                    continue;
 
                 var route = GtfsParsers.ParseRouteFromGtfs(record, logger);
-                if (route != null) routes.Add(route);
+                if (route != null)
+                    routes.Add(route);
             }
 
             if (routes.Count > 0)
@@ -219,10 +252,12 @@ public class DataLoader(
             foreach (var record in batch)
             {
                 var lineId = record.GetValueOrDefault("IDFLINEA", "");
-                if (!seenLineIds.Add(lineId)) continue;
+                if (!seenLineIds.Add(lineId))
+                    continue;
 
                 var route = GtfsParsers.ParseRouteFromCsv(record, logger);
-                if (route != null) routes.Add(route);
+                if (route != null)
+                    routes.Add(route);
             }
 
             if (routes.Count > 0)
@@ -236,8 +271,12 @@ public class DataLoader(
         logger.LogInformation("Loaded {Count} routes", count);
     }
 
-    private async Task LoadItineraries(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, string trainItinerariesPath,
-        CancellationToken ct)
+    private async Task LoadItineraries(
+        AppDbContext db,
+        List<GtfsDirInfo> gtfsFeeds,
+        string trainItinerariesPath,
+        CancellationToken ct
+    )
     {
         logger.LogInformation("Loading itineraries");
 
@@ -251,7 +290,8 @@ public class DataLoader(
         foreach (var (dir, _) in gtfsFeeds)
         {
             var filePath = Path.Combine(dir, "trips.txt");
-            if (!File.Exists(filePath)) continue;
+            if (!File.Exists(filePath))
+                continue;
 
             using var stream = File.OpenRead(filePath);
             await foreach (var batch in ReadCsvChunks(stream, BatchSize))
@@ -294,7 +334,11 @@ public class DataLoader(
         logger.LogInformation("Loaded {Count} itineraries", count);
     }
 
-    private async Task LoadShapes(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, CancellationToken ct)
+    private async Task LoadShapes(
+        AppDbContext db,
+        List<GtfsDirInfo> gtfsFeeds,
+        CancellationToken ct
+    )
     {
         logger.LogInformation("Loading shapes");
 
@@ -303,7 +347,10 @@ public class DataLoader(
         await db.Database.ExecuteSqlRawAsync(@"TRUNCATE TABLE ""Shapes""", ct);
 
         var count = 0;
-        using var stream = FileUtils.CombineGtfsFiles("shapes.txt", gtfsFeeds.Select(f => f.Dir).ToList());
+        using var stream = FileUtils.CombineGtfsFiles(
+            "shapes.txt",
+            gtfsFeeds.Select(f => f.Dir).ToList()
+        );
 
         await foreach (var batch in ReadCsvChunks(stream, BatchSize))
         {
@@ -324,7 +371,11 @@ public class DataLoader(
         logger.LogInformation("Loaded {Count} shapes", count);
     }
 
-    private async Task LoadStopsInfo(AppDbContext db, List<string> stopsInfoFiles, CancellationToken ct)
+    private async Task LoadStopsInfo(
+        AppDbContext db,
+        List<string> stopsInfoFiles,
+        CancellationToken ct
+    )
     {
         logger.LogInformation("Loading stops info");
 
@@ -358,7 +409,11 @@ public class DataLoader(
         logger.LogInformation("Loaded {Count} stop infos", count);
     }
 
-    private async Task LoadCalendars(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, CancellationToken ct)
+    private async Task LoadCalendars(
+        AppDbContext db,
+        List<GtfsDirInfo> gtfsFeeds,
+        CancellationToken ct
+    )
     {
         logger.LogInformation("Loading calendars");
 
@@ -367,7 +422,10 @@ public class DataLoader(
         await db.Database.ExecuteSqlRawAsync(@"TRUNCATE TABLE ""Calendars""", ct);
 
         var count = 0;
-        using var stream = FileUtils.CombineGtfsFiles("calendar.txt", gtfsFeeds.Select(f => f.Dir).ToList());
+        using var stream = FileUtils.CombineGtfsFiles(
+            "calendar.txt",
+            gtfsFeeds.Select(f => f.Dir).ToList()
+        );
 
         await foreach (var batch in ReadCsvChunks(stream, BatchSize))
         {
@@ -388,8 +446,13 @@ public class DataLoader(
         logger.LogInformation("Loaded {Count} calendars", count);
     }
 
-    private async Task LoadStopOrders(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, string trainItinerariesPath,
-        Dictionary<string, string> repeatedToOriginalStops, CancellationToken ct)
+    private async Task LoadStopOrders(
+        AppDbContext db,
+        List<GtfsDirInfo> gtfsFeeds,
+        string trainItinerariesPath,
+        Dictionary<string, string> repeatedToOriginalStops,
+        CancellationToken ct
+    )
     {
         logger.LogInformation("Loading stop orders");
 
@@ -402,7 +465,8 @@ public class DataLoader(
         foreach (var (dir, feedCodMode) in gtfsFeeds)
         {
             var filePath = Path.Combine(dir, "stop_times.txt");
-            if (!File.Exists(filePath)) continue;
+            if (!File.Exists(filePath))
+                continue;
 
             using var stream = File.OpenRead(filePath);
             await foreach (var batch in ReadCsvChunks(stream, BatchSize))
@@ -411,7 +475,8 @@ public class DataLoader(
                 foreach (var record in batch)
                 {
                     var so = GtfsParsers.ParseStopOrderFromGtfs(record, feedCodMode, logger);
-                    if (so == null) continue;
+                    if (so == null)
+                        continue;
 
                     if (repeatedToOriginalStops.TryGetValue(so.FullStopCode, out var original))
                         so.FullStopCode = original;
@@ -447,7 +512,8 @@ public class DataLoader(
         logger.LogInformation("Loaded {Count} stop orders", count);
     }
 
-    private async Task BulkInsertAsync<T>(AppDbContext db, List<T> items, CancellationToken ct) where T : class
+    private async Task BulkInsertAsync<T>(AppDbContext db, List<T> items, CancellationToken ct)
+        where T : class
     {
         try
         {
@@ -455,13 +521,22 @@ public class DataLoader(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "BulkInsert failed for {Type} ({Count} records): {Message} | Inner: {Inner}",
-                typeof(T).Name, items.Count, ex.Message, ex.InnerException?.ToString() ?? "none");
+            logger.LogError(
+                ex,
+                "BulkInsert failed for {Type} ({Count} records): {Message} | Inner: {Inner}",
+                typeof(T).Name,
+                items.Count,
+                ex.Message,
+                ex.InnerException?.ToString() ?? "none"
+            );
             throw;
         }
     }
 
-    private static async IAsyncEnumerable<List<Dictionary<string, string>>> ReadCsvChunks(Stream stream, int chunkSize)
+    private static async IAsyncEnumerable<List<Dictionary<string, string>>> ReadCsvChunks(
+        Stream stream,
+        int chunkSize
+    )
     {
         using var reader = new StreamReader(stream);
         using var csv = new CsvReader(reader, GtfsCsvConfig);

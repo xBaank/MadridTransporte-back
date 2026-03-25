@@ -5,16 +5,26 @@ using MadridTransporte.Api.Utils;
 
 namespace MadridTransporte.Api.Clients.Metro;
 
-public class MetroClient(HttpClient httpClient, StopsService stopsService, RoutesService routesService, ILogger<MetroClient> logger)
+public class MetroClient(
+    HttpClient httpClient,
+    StopsService stopsService,
+    RoutesService routesService,
+    ILogger<MetroClient> logger
+)
 {
-    private const string BaseUrl = "https://serviciosapp.metromadrid.es/servicios/rest/teleindicadores";
+    private const string BaseUrl =
+        "https://serviciosapp.metromadrid.es/servicios/rest/teleindicadores";
 
-    public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode, CancellationToken ct = default)
+    public async Task<StopTimesDto?> GetStopTimesAsync(
+        string fullStopCode,
+        CancellationToken ct = default
+    )
     {
         try
         {
             var codigoEmpresa = await stopsService.GetIdByStopCodeAsync(fullStopCode, ct);
-            if (codigoEmpresa == null) return null;
+            if (codigoEmpresa == null)
+                return null;
 
             var coordinates = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode, ct);
             var stopName = await stopsService.GetStopNameByIdAsync(codigoEmpresa, ct);
@@ -30,7 +40,10 @@ public class MetroClient(HttpClient httpClient, StopsService stopsService, Route
                 return CreateFailedTimes(stopName, coordinates, simpleStopCode);
 
             var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
-            if (!json.TryGetProperty("Vtelindicadores", out var indicators) || indicators.ValueKind != JsonValueKind.Array)
+            if (
+                !json.TryGetProperty("Vtelindicadores", out var indicators)
+                || indicators.ValueKind != JsonValueKind.Array
+            )
                 return CreateFailedTimes(stopName, coordinates, simpleStopCode);
 
             return ExtractStopTimes(indicators, coordinates, stopName, simpleStopCode);
@@ -42,18 +55,32 @@ public class MetroClient(HttpClient httpClient, StopsService stopsService, Route
         }
     }
 
-    private StopTimesDto ExtractStopTimes(JsonElement indicators, CoordinatesDto coordinates, string stopName, string simpleStopCode)
+    private StopTimesDto ExtractStopTimes(
+        JsonElement indicators,
+        CoordinatesDto coordinates,
+        string stopName,
+        string simpleStopCode
+    )
     {
         var madridNow = TimeUtils.GetMadridNow();
         var arrives = new List<ArriveDto>();
 
         foreach (var indicator in indicators.EnumerateArray())
         {
-            var proximo = indicator.TryGetProperty("proximo", out var p) && p.ValueKind == JsonValueKind.Number ? p.GetInt64() : (long?)null;
-            var siguiente = indicator.TryGetProperty("siguiente", out var s) && s.ValueKind == JsonValueKind.Number ? s.GetInt64() : (long?)null;
+            var proximo =
+                indicator.TryGetProperty("proximo", out var p)
+                && p.ValueKind == JsonValueKind.Number
+                    ? p.GetInt64()
+                    : (long?)null;
+            var siguiente =
+                indicator.TryGetProperty("siguiente", out var s)
+                && s.ValueKind == JsonValueKind.Number
+                    ? s.GetInt64()
+                    : (long?)null;
 
             var emissionTimeStr = indicator.GetProperty("fechaHoraEmisionPrevision").GetString();
-            if (emissionTimeStr == null) continue;
+            if (emissionTimeStr == null)
+                continue;
 
             var emissionTime = DateTimeOffset.Parse(emissionTimeStr);
             var diffMinutes = (long)(madridNow - emissionTime).TotalMinutes;
@@ -62,32 +89,49 @@ public class MetroClient(HttpClient httpClient, StopsService stopsService, Route
             var siguienteDiff = siguiente.HasValue ? siguiente.Value - diffMinutes : (long?)null;
 
             var line = indicator.GetProperty("linea").GetInt64().ToString();
-            var route = routesService.GetRouteAsync(line, CodeUtils.MetroCodMode).GetAwaiter().GetResult();
-            var lineCode = route?.FullLineCode ?? CodeUtils.CreateLineCode(CodeUtils.MetroCodMode, line);
+            var route = routesService
+                .GetRouteAsync(line, CodeUtils.MetroCodMode)
+                .GetAwaiter()
+                .GetResult();
+            var lineCode =
+                route?.FullLineCode ?? CodeUtils.CreateLineCode(CodeUtils.MetroCodMode, line);
             var destination = indicator.GetProperty("sentido").GetString() ?? "";
-            int? anden = indicator.TryGetProperty("anden", out var andenEl) && andenEl.TryGetInt32(out var andenVal)
-                ? andenVal : null;
+            int? anden =
+                indicator.TryGetProperty("anden", out var andenEl)
+                && andenEl.TryGetInt32(out var andenVal)
+                    ? andenVal
+                    : null;
 
             if (proximoDiff is >= 0)
             {
                 var estimated = madridNow.AddMinutes(proximoDiff.Value + 1).AddSeconds(-1);
-                arrives.Add(new ArriveDto
-                {
-                    Line = line, LineCode = lineCode, Destination = destination,
-                    Anden = anden, CodMode = int.Parse(CodeUtils.MetroCodMode),
-                    EstimatedArrive = estimated.ToUnixTimeMilliseconds(),
-                });
+                arrives.Add(
+                    new ArriveDto
+                    {
+                        Line = line,
+                        LineCode = lineCode,
+                        Destination = destination,
+                        Anden = anden,
+                        CodMode = int.Parse(CodeUtils.MetroCodMode),
+                        EstimatedArrive = estimated.ToUnixTimeMilliseconds(),
+                    }
+                );
             }
 
             if (siguienteDiff is >= 0)
             {
                 var estimated = madridNow.AddMinutes(siguienteDiff.Value + 1).AddSeconds(-1);
-                arrives.Add(new ArriveDto
-                {
-                    Line = line, LineCode = lineCode, Destination = destination,
-                    Anden = anden, CodMode = int.Parse(CodeUtils.MetroCodMode),
-                    EstimatedArrive = estimated.ToUnixTimeMilliseconds(),
-                });
+                arrives.Add(
+                    new ArriveDto
+                    {
+                        Line = line,
+                        LineCode = lineCode,
+                        Destination = destination,
+                        Anden = anden,
+                        CodMode = int.Parse(CodeUtils.MetroCodMode),
+                        EstimatedArrive = estimated.ToUnixTimeMilliseconds(),
+                    }
+                );
             }
         }
 
@@ -102,15 +146,20 @@ public class MetroClient(HttpClient httpClient, StopsService stopsService, Route
         };
     }
 
-    private static StopTimesDto CreateFailedTimes(string name, CoordinatesDto coords, string simpleStopCode) => new()
-    {
-        CodMode = int.Parse(CodeUtils.MetroCodMode),
-        StopName = name,
-        SimpleStopCode = simpleStopCode,
-        Coordinates = coords,
-        Arrives = null,
-        Incidents = [],
-    };
+    private static StopTimesDto CreateFailedTimes(
+        string name,
+        CoordinatesDto coords,
+        string simpleStopCode
+    ) =>
+        new()
+        {
+            CodMode = int.Parse(CodeUtils.MetroCodMode),
+            StopName = name,
+            SimpleStopCode = simpleStopCode,
+            Coordinates = coords,
+            Arrives = null,
+            Incidents = [],
+        };
 
     private static List<ArriveGroupDto> GroupArrives(List<ArriveDto> arrives)
     {

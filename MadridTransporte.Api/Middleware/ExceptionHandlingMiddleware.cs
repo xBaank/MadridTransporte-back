@@ -2,7 +2,10 @@ using MadridTransporte.Api.Exceptions;
 
 namespace MadridTransporte.Api.Middleware;
 
-public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+public class ExceptionHandlingMiddleware(
+    RequestDelegate next,
+    ILogger<ExceptionHandlingMiddleware> logger
+)
 {
     public async Task InvokeAsync(HttpContext context)
     {

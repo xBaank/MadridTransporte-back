@@ -17,7 +17,8 @@ builder.Services.AddMemoryCache();
 
 // Database
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres"))
+);
 
 // Data Loader
 builder.Services.AddHttpClient<DataLoader>();
@@ -35,19 +36,19 @@ builder.Services.AddHttpClient<MetroClient>();
 builder.Services.AddHttpClient<BusClient>();
 
 builder.Services.AddTransient<ElCanoAuthHandler>();
-builder.Services.AddHttpClient("ElCano")
-    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-    {
-        ServerCertificateCustomValidationCallback = (_, _, _, _) => true,
-    })
+builder
+    .Services.AddHttpClient("ElCano")
+    .ConfigurePrimaryHttpMessageHandler(() =>
+        new HttpClientHandler { ServerCertificateCustomValidationCallback = (_, _, _, _) => true }
+    )
     .AddHttpMessageHandler<ElCanoAuthHandler>();
 builder.Services.AddHttpClient("Renfe");
 builder.Services.AddScoped<TrainClient>();
 
 // CORS
 builder.Services.AddCors(options =>
-    options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+    options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader())
+);
 
 // Compression
 builder.Services.AddResponseCompression(options => options.EnableForHttps = true);
@@ -72,11 +73,14 @@ if (app.Environment.IsDevelopment())
 
 app.MapGet("/health", () => Results.Ok(new { isRunning = true }));
 
-app.MapPost("/load", async (DataLoader loader, CancellationToken ct) =>
-{
-  _ =  Task.Run(async () => await loader.LoadDataAsync());
-    return Results.Ok(new { message = "Data loaded successfully" });
-});
+app.MapPost(
+    "/load",
+    async (DataLoader loader, CancellationToken ct) =>
+    {
+        _ = Task.Run(async () => await loader.LoadDataAsync());
+        return Results.Ok(new { message = "Data loaded successfully" });
+    }
+);
 
 app.MapStopsEndpoints();
 app.MapLinesEndpoints();

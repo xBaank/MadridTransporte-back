@@ -6,10 +6,13 @@ namespace MadridTransporte.Api.Services;
 
 public class ShapesService(AppDbContext db)
 {
-    public async Task<List<ShapeDto>> GetShapesByItineraryCodeAsync(string itineraryCode, CancellationToken ct = default)
+    public async Task<List<ShapeDto>> GetShapesByItineraryCodeAsync(
+        string itineraryCode,
+        CancellationToken ct = default
+    )
     {
-        return await db.Shapes
-            .Where(s => s.ItineraryId == itineraryCode)
+        return await db
+            .Shapes.Where(s => s.ItineraryId == itineraryCode)
             .OrderBy(s => s.Sequence)
             .Select(s => new ShapeDto
             {

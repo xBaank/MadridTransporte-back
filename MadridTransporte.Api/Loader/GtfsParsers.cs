@@ -33,13 +33,28 @@ public static class GtfsParsers
             {
                 StopCode = stopCode,
                 StopName = data.GetValueOrDefault("stop_name", ""),
-                StopLat = double.TryParse(data.GetValueOrDefault("stop_lat", "0"), CultureInfo.InvariantCulture,
-                    out var lat) ? lat : 0.0,
-                StopLon = double.TryParse(data.GetValueOrDefault("stop_lon", "0"), CultureInfo.InvariantCulture,
-                    out var lon) ? lon : 0.0,
+                StopLat = double.TryParse(
+                    data.GetValueOrDefault("stop_lat", "0"),
+                    CultureInfo.InvariantCulture,
+                    out var lat
+                )
+                    ? lat
+                    : 0.0,
+                StopLon = double.TryParse(
+                    data.GetValueOrDefault("stop_lon", "0"),
+                    CultureInfo.InvariantCulture,
+                    out var lon
+                )
+                    ? lon
+                    : 0.0,
                 CodMode = codMode,
                 FullStopCode = CodeUtils.CreateStopCode(codMode.ToString(), stopCode),
-                Wheelchair = int.TryParse(data.GetValueOrDefault("wheelchair_boarding", "0"), out var w) ? w : 0,
+                Wheelchair = int.TryParse(
+                    data.GetValueOrDefault("wheelchair_boarding", "0"),
+                    out var w
+                )
+                    ? w
+                    : 0,
                 Zone = data.GetValueOrDefault("zone_id", ""),
             };
         }
@@ -60,7 +75,8 @@ public static class GtfsParsers
             return new TransitRoute
             {
                 FullLineCode = routeId,
-                SimpleLineCode = data.GetValueOrDefault("route_short_name", "").ToUpper(CultureInfo.InvariantCulture),
+                SimpleLineCode = data.GetValueOrDefault("route_short_name", "")
+                    .ToUpper(CultureInfo.InvariantCulture),
                 RouteName = data.GetValueOrDefault("route_long_name", ""),
                 CodMode = codMode,
             };
@@ -79,7 +95,8 @@ public static class GtfsParsers
             return new TransitRoute
             {
                 FullLineCode = data.GetValueOrDefault("IDFLINEA", ""),
-                SimpleLineCode = data.GetValueOrDefault("CODIGOGESTIONLINEA", "").ToUpper(CultureInfo.InvariantCulture),
+                SimpleLineCode = data.GetValueOrDefault("CODIGOGESTIONLINEA", "")
+                    .ToUpper(CultureInfo.InvariantCulture),
                 RouteName = data.GetValueOrDefault("DENOMINACION", ""),
                 CodMode = data.GetValueOrDefault("MODO", ""),
             };
@@ -115,7 +132,9 @@ public static class GtfsParsers
             return new Itinerary
             {
                 ItineraryCode = data.GetValueOrDefault("shape_id", ""),
-                Direction = int.TryParse(data.GetValueOrDefault("direction_id", "0"), out var d) ? d : 0,
+                Direction = int.TryParse(data.GetValueOrDefault("direction_id", "0"), out var d)
+                    ? d
+                    : 0,
                 FullLineCode = data.GetValueOrDefault("route_id", ""),
                 TripId = data.GetValueOrDefault("trip_id", ""),
                 ServiceId = data.GetValueOrDefault("service_id", "UNKNOWN"),
@@ -133,7 +152,9 @@ public static class GtfsParsers
     {
         try
         {
-            var direction = int.TryParse(data.GetValueOrDefault("SENTIDO", "1"), out var s) ? s - 1 : 0;
+            var direction = int.TryParse(data.GetValueOrDefault("SENTIDO", "1"), out var s)
+                ? s - 1
+                : 0;
 
             return new Itinerary
             {
@@ -159,17 +180,31 @@ public static class GtfsParsers
             return new Shape
             {
                 ItineraryId = data.GetValueOrDefault("shape_id", ""),
-                Latitude = double.TryParse(data.GetValueOrDefault("shape_pt_lat", "0"),
-                    CultureInfo.InvariantCulture, out var lat)
+                Latitude = double.TryParse(
+                    data.GetValueOrDefault("shape_pt_lat", "0"),
+                    CultureInfo.InvariantCulture,
+                    out var lat
+                )
                     ? lat
                     : 0.0,
-                Longitude = double.TryParse(data.GetValueOrDefault("shape_pt_lon", "0"),
-                    CultureInfo.InvariantCulture, out var lon)
+                Longitude = double.TryParse(
+                    data.GetValueOrDefault("shape_pt_lon", "0"),
+                    CultureInfo.InvariantCulture,
+                    out var lon
+                )
                     ? lon
                     : 0.0,
-                Sequence = int.TryParse(data.GetValueOrDefault("shape_pt_sequence", "0"), out var seq) ? seq : 0,
-                Distance = double.TryParse(data.GetValueOrDefault("shape_dist_traveled", "0"),
-                    CultureInfo.InvariantCulture, out var dist)
+                Sequence = int.TryParse(
+                    data.GetValueOrDefault("shape_pt_sequence", "0"),
+                    out var seq
+                )
+                    ? seq
+                    : 0,
+                Distance = double.TryParse(
+                    data.GetValueOrDefault("shape_dist_traveled", "0"),
+                    CultureInfo.InvariantCulture,
+                    out var dist
+                )
                     ? dist
                     : 0.0,
             };
@@ -181,19 +216,25 @@ public static class GtfsParsers
         }
     }
 
-    public static StopOrder? ParseStopOrderFromGtfs(Dictionary<string, string> data, int feedCodMode, ILogger logger)
+    public static StopOrder? ParseStopOrderFromGtfs(
+        Dictionary<string, string> data,
+        int feedCodMode,
+        ILogger logger
+    )
     {
         try
         {
             var stopId = data.GetValueOrDefault("stop_id", "");
             var fullStopCode = stopId.StartsWith("par_")
-                ? stopId["par_".Length..]          // par_8_09568 → 8_09568
-                : $"{feedCodMode}_{stopId}";       // 73 → 6_73
+                ? stopId["par_".Length..] // par_8_09568 → 8_09568
+                : $"{feedCodMode}_{stopId}"; // 73 → 6_73
 
             return new StopOrder
             {
                 FullStopCode = fullStopCode,
-                Order = int.TryParse(data.GetValueOrDefault("stop_sequence", "0"), out var o) ? o : 0,
+                Order = int.TryParse(data.GetValueOrDefault("stop_sequence", "0"), out var o)
+                    ? o
+                    : 0,
                 TripId = data.GetValueOrDefault("trip_id", ""),
                 DepartureTime = ParseDepartureTime(data.GetValueOrDefault("departure_time", "")),
             };
@@ -224,7 +265,10 @@ public static class GtfsParsers
         }
     }
 
-    public static Data.Entities.Calendar? ParseCalendar(Dictionary<string, string> data, ILogger logger)
+    public static Data.Entities.Calendar? ParseCalendar(
+        Dictionary<string, string> data,
+        ILogger logger
+    )
     {
         try
         {
@@ -251,10 +295,12 @@ public static class GtfsParsers
 
     private static long ParseDepartureTime(string? timeStr)
     {
-        if (string.IsNullOrWhiteSpace(timeStr)) return 0;
+        if (string.IsNullOrWhiteSpace(timeStr))
+            return 0;
 
         var parts = timeStr.Split(':');
-        if (parts.Length != 3) return 0;
+        if (parts.Length != 3)
+            return 0;
 
         var hour = int.Parse(parts[0]);
         var daysToAdd = 0;
@@ -270,9 +316,14 @@ public static class GtfsParsers
 
     private static long ParseDateToEpochMs(string dateStr)
     {
-        if (string.IsNullOrWhiteSpace(dateStr)) return 0;
-        var date = DateTime.ParseExact(dateStr, "yyyyMMdd", CultureInfo.InvariantCulture,
-            DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+        if (string.IsNullOrWhiteSpace(dateStr))
+            return 0;
+        var date = DateTime.ParseExact(
+            dateStr,
+            "yyyyMMdd",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal
+        );
         return new DateTimeOffset(date, TimeSpan.Zero).ToUnixTimeMilliseconds();
     }
 }
