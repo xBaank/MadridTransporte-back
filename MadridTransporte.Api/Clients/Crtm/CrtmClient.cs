@@ -70,18 +70,10 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
 
     public async Task<StopTimesDto?> GetStopTimesAsync(string fullStopCode, CancellationToken ct = default)
     {
-        try
-        {
             var auth = await GetAuthAsync(ct);
             var client = await GetClientAsync(ct);
             var response = await client.GetStopTimesAsync(auth, fullStopCode, 1, 2, null, null, null, 3);
             return MapStopTimesResponse(response.stopTimes, fullStopCode);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "CRTM GetStopTimes failed for {StopCode}", fullStopCode);
-            return null;
-        }
     }
 
     public async Task<List<AlertDto>> GetAlertsAsync(string codMode, CancellationToken ct = default)
