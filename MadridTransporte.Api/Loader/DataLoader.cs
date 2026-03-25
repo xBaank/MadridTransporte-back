@@ -220,28 +220,32 @@ public class DataLoader(
         var seenLineIds = new HashSet<string>();
         var count = 0;
 
-        using var gtfsStream = FileUtils.CombineGtfsFiles(
-            "routes.txt",
-            gtfsFeeds.Select(f => f.Dir).ToList()
-        );
-        await foreach (var batch in ReadCsvChunks(gtfsStream, BatchSize))
+        foreach (var (dir, feedCodMode) in gtfsFeeds)
         {
-            var routes = new List<TransitRoute>();
-            foreach (var record in batch)
-            {
-                var routeId = record.GetValueOrDefault("route_id", "");
-                if (!seenLineIds.Add(routeId))
-                    continue;
+            var filePath = Path.Combine(dir, "routes.txt");
+            if (!File.Exists(filePath))
+                continue;
 
-                var route = GtfsParsers.ParseRouteFromGtfs(record, logger);
-                if (route != null)
-                    routes.Add(route);
-            }
-
-            if (routes.Count > 0)
+            using var stream = File.OpenRead(filePath);
+            await foreach (var batch in ReadCsvChunks(stream, BatchSize))
             {
-                await BulkInsertAsync(db, routes, ct);
-                count += routes.Count;
+                var routes = new List<TransitRoute>();
+                foreach (var record in batch)
+                {
+                    var routeId = record.GetValueOrDefault("route_id", "");
+                    if (!seenLineIds.Add(routeId))
+                        continue;
+
+                    var route = GtfsParsers.ParseRouteFromGtfs(record, feedCodMode, logger);
+                    if (route != null)
+                        routes.Add(route);
+                }
+
+                if (routes.Count > 0)
+                {
+                    await BulkInsertAsync(db, routes, ct);
+                    count += routes.Count;
+                }
             }
         }
 

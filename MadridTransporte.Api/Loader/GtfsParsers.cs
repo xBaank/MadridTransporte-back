@@ -65,12 +65,15 @@ public static class GtfsParsers
         }
     }
 
-    public static TransitRoute? ParseRouteFromGtfs(Dictionary<string, string> data, ILogger logger)
+    public static TransitRoute? ParseRouteFromGtfs(
+        Dictionary<string, string> data,
+        int feedCodMode,
+        ILogger logger
+    )
     {
         try
         {
             var routeId = data.GetValueOrDefault("route_id", "");
-            var codMode = routeId.Split('_')[0];
 
             return new TransitRoute
             {
@@ -78,7 +81,7 @@ public static class GtfsParsers
                 SimpleLineCode = data.GetValueOrDefault("route_short_name", "")
                     .ToUpper(CultureInfo.InvariantCulture),
                 RouteName = data.GetValueOrDefault("route_long_name", ""),
-                CodMode = codMode,
+                CodMode = feedCodMode.ToString(),
             };
         }
         catch (Exception ex)

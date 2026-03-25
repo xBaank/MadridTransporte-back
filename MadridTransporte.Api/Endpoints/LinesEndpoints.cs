@@ -152,16 +152,14 @@ public static class LinesEndpoints
                         route?.SimpleLineCode ?? CodeUtils.GetSimpleLineCodeFromLineCode(lineCode);
                     var routeCodMode = route?.CodMode ?? lineCodMode;
 
-                    var locations = await crtmClient.GetLineLocationsAsync(
-                        lineCode,
-                        direction,
-                        lineCodMode,
-                        fullStopCode,
-                        ct
-                    );
-                    if (locations == null)
-                        throw ApiException.ServiceUnavailable("Locations unavailable");
-
+                    var locations =
+                        await crtmClient.GetLineLocationsAsync(
+                            lineCode,
+                            direction,
+                            lineCodMode,
+                            fullStopCode,
+                            ct
+                        ) ?? throw ApiException.ServiceUnavailable("Locations unavailable");
                     locations.CodMode = int.TryParse(routeCodMode, out var cm) ? cm : 0;
                     locations.LineCode = simpleLineCode;
                     return Results.Ok(locations);
