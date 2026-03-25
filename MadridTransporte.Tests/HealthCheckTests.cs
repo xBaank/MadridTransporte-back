@@ -11,7 +11,9 @@ public class HealthCheckTests(PostgresFixture fixture)
     public async Task Should_Check_Health()
     {
         var response = await fixture.Client.GetAsync("/health");
-        var json = JsonSerializer.Deserialize<JsonElement>(await response.Content.ReadAsStringAsync());
+        var json = JsonSerializer.Deserialize<JsonElement>(
+            await response.Content.ReadAsStringAsync()
+        );
 
         response.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
         json.GetProperty("isRunning").GetBoolean().ShouldBeTrue();

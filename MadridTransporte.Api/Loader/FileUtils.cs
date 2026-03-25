@@ -41,45 +41,15 @@ public static class FileUtils
         return tempDir;
     }
 
-    /// <summary>
-    /// Combines the same-named file from multiple GTFS directories into a single stream,
-    /// skipping the header line on all but the first file.
-    /// </summary>
     public static Stream CombineGtfsFiles(string fileName, IReadOnlyList<string> gtfsDirs)
     {
-        var combined = new MemoryStream();
-        using var writer = new StreamWriter(combined, leaveOpen: true);
-
-        for (var i = 0; i < gtfsDirs.Count; i++)
-        {
-            var filePath = Path.Combine(gtfsDirs[i], fileName);
-            if (!File.Exists(filePath))
-                continue;
-
-            using var reader = new StreamReader(filePath);
-            var lineIndex = 0;
-            while (reader.ReadLine() is { } line)
-            {
-                // Skip header on subsequent files
-                if (i > 0 && lineIndex == 0)
-                {
-                    lineIndex++;
-                    continue;
-                }
-
-                writer.WriteLine(line);
-                lineIndex++;
-            }
-        }
-
-        writer.Flush();
-        combined.Position = 0;
-        return combined;
+        var filePaths = gtfsDirs
+            .Select(dir => Path.Combine(dir, fileName))
+            .Where(File.Exists)
+            .ToList();
+        return CombineCsvFiles(filePaths);
     }
 
-    /// <summary>
-    /// Combines multiple CSV files into a single stream, skipping the header on all but the first.
-    /// </summary>
     public static Stream CombineCsvFiles(IReadOnlyList<string> filePaths)
     {
         var combined = new MemoryStream();

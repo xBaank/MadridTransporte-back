@@ -54,7 +54,7 @@ public class BusClient(
         {
             if (times.Arrives == null)
             {
-                times.Arrives = GroupArrives(avanzaArrives);
+                times.Arrives = ArriveDto.GroupArrives(avanzaArrives);
             }
             else
             {
@@ -78,7 +78,7 @@ public class BusClient(
                             )
                         )
                         .ToList();
-                    times.Arrives = GroupArrives(allArrives);
+                    times.Arrives = ArriveDto.GroupArrives(allArrives);
                 }
             }
         }
@@ -166,23 +166,5 @@ public class BusClient(
             logger.LogWarning(ex, "Avanza data fetch failed");
             return null;
         }
-    }
-
-    private static List<ArriveGroupDto> GroupArrives(IEnumerable<ArriveDto> arrives)
-    {
-        return arrives
-            .OrderBy(a => int.TryParse(a.Line, out var n) ? n : int.MaxValue)
-            .GroupBy(a => (a.Line, a.Destination, a.Anden))
-            .Select(g => new ArriveGroupDto
-            {
-                CodMode = g.First().CodMode,
-                Line = g.First().Line,
-                LineCode = g.First().LineCode,
-                Direction = g.First().Direction,
-                Anden = g.First().Anden,
-                Destination = g.First().Destination,
-                EstimatedArrives = g.Select(a => a.EstimatedArrive).ToList(),
-            })
-            .ToList();
     }
 }

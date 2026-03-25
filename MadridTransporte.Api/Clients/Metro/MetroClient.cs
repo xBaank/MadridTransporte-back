@@ -46,7 +46,13 @@ public class MetroClient(
             )
                 return CreateFailedTimes(stopName, coordinates, simpleStopCode);
 
-            return ExtractStopTimes(indicators, coordinates, stopName, simpleStopCode);
+            return await ExtractStopTimesAsync(
+                indicators,
+                coordinates,
+                stopName,
+                simpleStopCode,
+                ct
+            );
         }
         catch (Exception ex)
         {
@@ -55,11 +61,12 @@ public class MetroClient(
         }
     }
 
-    private StopTimesDto ExtractStopTimes(
+    private async Task<StopTimesDto> ExtractStopTimesAsync(
         JsonElement indicators,
         CoordinatesDto coordinates,
         string stopName,
-        string simpleStopCode
+        string simpleStopCode,
+        CancellationToken ct
     )
     {
         var madridNow = TimeUtils.GetMadridNow();
@@ -89,10 +96,7 @@ public class MetroClient(
             var siguienteDiff = siguiente.HasValue ? siguiente.Value - diffMinutes : (long?)null;
 
             var line = indicator.GetProperty("linea").GetInt64().ToString();
-            var route = routesService
-                .GetRouteAsync(line, CodeUtils.MetroCodMode)
-                .GetAwaiter()
-                .GetResult();
+            var route = await routesService.GetRouteAsync(line, CodeUtils.MetroCodMode, ct);
             var lineCode =
                 route?.FullLineCode ?? CodeUtils.CreateLineCode(CodeUtils.MetroCodMode, line);
             var destination = indicator.GetProperty("sentido").GetString() ?? "";
@@ -141,7 +145,7 @@ public class MetroClient(
             StopName = stopName,
             SimpleStopCode = simpleStopCode,
             Coordinates = coordinates,
-            Arrives = GroupArrives(arrives),
+            Arrives = ArriveDto.GroupArrives(arrives),
             Incidents = [],
         };
     }
@@ -160,27 +164,4 @@ public class MetroClient(
             Arrives = null,
             Incidents = [],
         };
-
-    private static List<ArriveGroupDto> GroupArrives(List<ArriveDto> arrives)
-    {
-        return arrives
-            .OrderBy(a => int.TryParse(a.Line, out var n) ? n : int.MaxValue)
-            .GroupBy(a => (a.Line, a.Destination, a.Anden))
-            .Select(g => new ArriveGroupDto
-            {
-                CodMode = g.First().CodMode,
-                Line = g.First().Line,
-                LineCode = g.First().LineCode,
-                Direction = g.First().Direction,
-                Anden = g.First().Anden,
-                Destination = g.First().Destination,
-                EstimatedArrives = g.Select(a => a.EstimatedArrive).ToList(),
-            })
-            .ToList();
-    }
-
-    private async Task<JsonElement> ReadFromJsonAsync<T>(HttpResponseMessage response)
-    {
-        return await response.Content.ReadFromJsonAsync<JsonElement>();
-    }
 }

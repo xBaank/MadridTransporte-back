@@ -33,6 +33,24 @@ public class ArriveDto
     public int? Anden { get; set; }
     public required string Destination { get; set; }
     public long EstimatedArrive { get; set; }
+
+    public static List<ArriveGroupDto> GroupArrives(IEnumerable<ArriveDto> arrives)
+    {
+        return arrives
+            .OrderBy(a => int.TryParse(a.Line, out var n) ? n : int.MaxValue)
+            .GroupBy(a => (a.Line, a.Destination, a.Anden))
+            .Select(g => new ArriveGroupDto
+            {
+                CodMode = g.First().CodMode,
+                Line = g.First().Line,
+                LineCode = g.First().LineCode,
+                Direction = g.First().Direction,
+                Anden = g.First().Anden,
+                Destination = g.First().Destination,
+                EstimatedArrives = g.Select(a => a.EstimatedArrive).ToList(),
+            })
+            .ToList();
+    }
 }
 
 public class IncidentDto

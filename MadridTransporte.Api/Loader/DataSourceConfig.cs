@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace MadridTransporte.Api.Loader;
 
 public static class DataSourceConfig
@@ -37,8 +35,6 @@ public static class DataSourceConfig
             new(UrbanGtfsUrl, 9),
             new(EmtGtfsUrl, 6),
         ];
-
-    public static string[] AllGtfsUrls => AllGtfsFeeds.Select(f => f.Url).ToArray();
 
     public static string[] StopsInfoUrls => [MetroInfoUrl, TrainInfoUrl, TramInfoUrl];
 }

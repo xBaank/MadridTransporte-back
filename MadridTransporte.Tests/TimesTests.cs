@@ -27,7 +27,10 @@ public class TimesTests(PostgresFixture fixture)
         var responseBody = await response.Content.ReadAsStringAsync();
         response.StatusCode.ShouldBe(HttpStatusCode.OK, responseBody);
 
-        var body = JsonSerializer.Deserialize<StopTimesDto>(responseBody, PostgresFixture.JsonOptions);
+        var body = JsonSerializer.Deserialize<StopTimesDto>(
+            responseBody,
+            PostgresFixture.JsonOptions
+        );
         body.ShouldNotBeNull();
         body.CodMode.ShouldBeGreaterThan(0);
         body.StopName.ShouldNotBeNullOrEmpty();

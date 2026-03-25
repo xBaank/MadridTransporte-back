@@ -12,7 +12,10 @@ namespace MadridTransporte.Tests.Fixtures;
 
 public class PostgresFixture : IAsyncInitializer, IAsyncDisposable
 {
-    public static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+    public static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
 
     private PostgreSqlContainer _container = null!;
     public WebApplicationFactory<Program> Factory { get; private set; } = null!;
@@ -28,20 +31,22 @@ public class PostgresFixture : IAsyncInitializer, IAsyncDisposable
 
         await _container.StartAsync();
 
-        Factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
+        Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.UseEnvironment("Testing");
+            builder.ConfigureServices(services =>
             {
-                builder.UseEnvironment("Testing");
-                builder.ConfigureServices(services =>
-                {
-                    var descriptor = services.SingleOrDefault(d =>
-                        d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-                    if (descriptor != null) services.Remove(descriptor);
+                var descriptor = services.SingleOrDefault(d =>
+                    d.ServiceType == typeof(DbContextOptions<AppDbContext>)
+                );
+                if (descriptor != null)
+                    services.Remove(descriptor);
 
-                    services.AddDbContext<AppDbContext>(options =>
-                        options.UseNpgsql(_container.GetConnectionString()));
-                });
+                services.AddDbContext<AppDbContext>(options =>
+                    options.UseNpgsql(_container.GetConnectionString())
+                );
             });
+        });
 
         Client = Factory.CreateClient();
 

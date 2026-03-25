@@ -198,28 +198,9 @@ public partial class CrtmClient(
             StopName = stopName,
             SimpleStopCode = shortStopCode,
             Coordinates = new CoordinatesDto(),
-            Arrives = GroupArrives(arrives),
+            Arrives = ArriveDto.GroupArrives(arrives),
             Incidents = [],
         };
-    }
-
-    private static List<ArriveGroupDto> GroupArrives(List<ArriveDto> arrives)
-    {
-        return arrives
-            .OrderBy(a => int.TryParse(a.Line, out var n) ? n : int.MaxValue)
-            .GroupBy(a => (a.Line, a.Destination, a.Anden))
-            .Where(g => g.Any())
-            .Select(g => new ArriveGroupDto
-            {
-                CodMode = g.First().CodMode,
-                Line = g.First().Line,
-                LineCode = g.First().LineCode,
-                Direction = g.First().Direction,
-                Anden = g.First().Anden,
-                Destination = g.First().Destination,
-                EstimatedArrives = g.Select(a => a.EstimatedArrive).ToList(),
-            })
-            .ToList();
     }
 
     private static List<AlertDto> MapAlertsResponse(Gen.IncidentAffectation[]? incidents)

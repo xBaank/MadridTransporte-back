@@ -169,7 +169,7 @@ public class TrainClient
             StopName = stopName,
             SimpleStopCode = simpleStopCode,
             Coordinates = coordinates,
-            Arrives = GroupArrives(arrives),
+            Arrives = ArriveDto.GroupArrives(arrives),
             Incidents = [],
         };
     }
@@ -233,32 +233,13 @@ public class TrainClient
 
             var bytes = await response.Content.ReadAsByteArrayAsync(ct);
             var text = Encoding.Latin1.GetString(bytes);
-            var utf8Text = Encoding.UTF8.GetString(Encoding.Latin1.GetBytes(text));
 
-            return JsonSerializer.Deserialize<JsonElement>(utf8Text);
+            return JsonSerializer.Deserialize<JsonElement>(text);
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Renfe routed times failed");
             return null;
         }
-    }
-
-    private static List<ArriveGroupDto> GroupArrives(List<ArriveDto> arrives)
-    {
-        return arrives
-            .OrderBy(a => int.TryParse(a.Line, out var n) ? n : int.MaxValue)
-            .GroupBy(a => (a.Line, a.Destination, a.Anden))
-            .Select(g => new ArriveGroupDto
-            {
-                CodMode = g.First().CodMode,
-                Line = g.First().Line,
-                LineCode = g.First().LineCode,
-                Direction = g.First().Direction,
-                Anden = g.First().Anden,
-                Destination = g.First().Destination,
-                EstimatedArrives = g.Select(a => a.EstimatedArrive).ToList(),
-            })
-            .ToList();
     }
 }

@@ -20,7 +20,9 @@ public class AlertsTests(PostgresFixture fixture)
         var response = await fixture.Client.GetAsync(url);
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        var alerts = await response.Content.ReadFromJsonAsync<List<AlertDto>>(PostgresFixture.JsonOptions);
+        var alerts = await response.Content.ReadFromJsonAsync<List<AlertDto>>(
+            PostgresFixture.JsonOptions
+        );
         alerts.ShouldNotBeNull();
 
         foreach (var alert in alerts)

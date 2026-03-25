@@ -128,7 +128,10 @@ public class StopsService(AppDbContext db)
             .Where(x => activeServiceIds.Contains(x.it.ServiceId))
             .ToListAsync(ct);
 
-        var routes = await db.Routes.ToListAsync(ct);
+        var relevantLineCodes = stopOrders.Select(x => x.it.FullLineCode).Distinct().ToList();
+        var routes = await db
+            .Routes.Where(r => relevantLineCodes.Contains(r.FullLineCode))
+            .ToListAsync(ct);
         var routeMap = routes.ToDictionary(r => r.FullLineCode);
 
         return stopOrders

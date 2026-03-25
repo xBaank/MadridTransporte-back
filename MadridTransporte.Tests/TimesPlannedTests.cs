@@ -18,7 +18,9 @@ public class TimesPlannedTests(PostgresFixture fixture)
         var response = await fixture.Client.GetAsync(url);
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        var items = await response.Content.ReadFromJsonAsync<List<PlannedTimeDto>>(PostgresFixture.JsonOptions);
+        var items = await response.Content.ReadFromJsonAsync<List<PlannedTimeDto>>(
+            PostgresFixture.JsonOptions
+        );
         items.ShouldNotBeNull();
 
         foreach (var item in items)

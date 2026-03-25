@@ -15,7 +15,9 @@ public class RoutesTests(PostgresFixture fixture)
         var response = await fixture.Client.GetAsync("/lines/all");
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        var routes = await response.Content.ReadFromJsonAsync<List<RouteDto>>(PostgresFixture.JsonOptions);
+        var routes = await response.Content.ReadFromJsonAsync<List<RouteDto>>(
+            PostgresFixture.JsonOptions
+        );
         routes.ShouldNotBeNull();
         routes.ShouldNotBeEmpty();
 

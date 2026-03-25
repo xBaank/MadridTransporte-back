@@ -15,7 +15,9 @@ public class StopsTests(PostgresFixture fixture)
         var response = await fixture.Client.GetAsync("/stops/all");
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        var stops = await response.Content.ReadFromJsonAsync<List<StopDto>>(PostgresFixture.JsonOptions);
+        var stops = await response.Content.ReadFromJsonAsync<List<StopDto>>(
+            PostgresFixture.JsonOptions
+        );
         stops.ShouldNotBeNull();
         stops.ShouldNotBeEmpty();
 

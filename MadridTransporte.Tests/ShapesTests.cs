@@ -21,7 +21,9 @@ public class ShapesTests(PostgresFixture fixture)
         var response = await fixture.Client.GetAsync(url);
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        var shapes = await response.Content.ReadFromJsonAsync<List<ShapeDto>>(PostgresFixture.JsonOptions);
+        var shapes = await response.Content.ReadFromJsonAsync<List<ShapeDto>>(
+            PostgresFixture.JsonOptions
+        );
         shapes.ShouldNotBeNull();
         shapes.ShouldNotBeEmpty();
 
@@ -39,7 +41,9 @@ public class ShapesTests(PostgresFixture fixture)
         var response = await fixture.Client.GetAsync("/lines/bus/shapes/asd");
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        var shapes = await response.Content.ReadFromJsonAsync<List<ShapeDto>>(PostgresFixture.JsonOptions);
+        var shapes = await response.Content.ReadFromJsonAsync<List<ShapeDto>>(
+            PostgresFixture.JsonOptions
+        );
         shapes.ShouldNotBeNull();
         shapes.ShouldBeEmpty();
     }

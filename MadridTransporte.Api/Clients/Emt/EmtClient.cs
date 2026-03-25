@@ -245,26 +245,8 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
             StopName = stopName,
             SimpleStopCode = simpleStopCode,
             Coordinates = coordinates,
-            Arrives = arrives != null ? GroupArrives(arrives) : null,
+            Arrives = arrives != null ? ArriveDto.GroupArrives(arrives) : null,
             Incidents = incidents,
         };
-    }
-
-    private static List<ArriveGroupDto> GroupArrives(List<ArriveDto> arrives)
-    {
-        return arrives
-            .OrderBy(a => int.TryParse(a.Line, out var n) ? n : int.MaxValue)
-            .GroupBy(a => (a.Line, a.Destination, a.Anden))
-            .Select(g => new ArriveGroupDto
-            {
-                CodMode = g.First().CodMode,
-                Line = g.First().Line,
-                LineCode = g.First().LineCode,
-                Direction = g.First().Direction,
-                Anden = g.First().Anden,
-                Destination = g.First().Destination,
-                EstimatedArrives = g.Select(a => a.EstimatedArrive).ToList(),
-            })
-            .ToList();
     }
 }

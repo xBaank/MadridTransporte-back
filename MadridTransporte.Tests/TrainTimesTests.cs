@@ -14,12 +14,16 @@ public class TrainTimesTests(PostgresFixture fixture)
     [Test]
     public async Task Should_Get_Train_Routed_Times()
     {
-        var url = $"/stops/train/times?originStopCode={OriginStopCode}&destinationStopCode={DestinationStopCode}";
+        var url =
+            $"/stops/train/times?originStopCode={OriginStopCode}&destinationStopCode={DestinationStopCode}";
         var response = await fixture.Client.GetAsync(url);
         var responseBody = await response.Content.ReadAsStringAsync();
         response.StatusCode.ShouldBe(HttpStatusCode.OK, responseBody);
 
-        var body = JsonSerializer.Deserialize<JsonElement>(responseBody, PostgresFixture.JsonOptions);
+        var body = JsonSerializer.Deserialize<JsonElement>(
+            responseBody,
+            PostgresFixture.JsonOptions
+        );
         body.ValueKind.ShouldBe(JsonValueKind.Object);
 
         body.TryGetProperty("actTiempoReal", out var actTiempoReal).ShouldBeTrue();
