@@ -6,7 +6,8 @@ using Shouldly;
 
 namespace MadridTransporte.Tests;
 
-public class TimesPlannedTests
+[ClassDataSource<PostgresFixture>(Shared = SharedType.PerTestSession)]
+public class TimesPlannedTests(PostgresFixture fixture)
 {
     private const string BusStopCode = "08242";
 
@@ -14,9 +15,7 @@ public class TimesPlannedTests
     [Arguments("/stops/bus/" + BusStopCode + "/planned")]
     public async Task Should_Get_Stop_Times_Planned(string url)
     {
-        await PostgresFixture.EnsureInitialized();
-
-        var response = await PostgresFixture.Client.GetAsync(url);
+        var response = await fixture.Client.GetAsync(url);
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var items = await response.Content.ReadFromJsonAsync<List<PlannedTimeDto>>(PostgresFixture.JsonOptions);
@@ -34,9 +33,7 @@ public class TimesPlannedTests
     [Arguments("/stops/bus/asdasd/planned")]
     public async Task Should_Not_Get_Stop_Times_Planned(string url)
     {
-        await PostgresFixture.EnsureInitialized();
-
-        var response = await PostgresFixture.Client.GetAsync(url);
+        var response = await fixture.Client.GetAsync(url);
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 }

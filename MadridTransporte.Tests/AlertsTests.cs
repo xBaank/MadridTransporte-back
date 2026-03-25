@@ -6,7 +6,8 @@ using Shouldly;
 
 namespace MadridTransporte.Tests;
 
-public class AlertsTests
+[ClassDataSource<PostgresFixture>(Shared = SharedType.PerTestSession)]
+public class AlertsTests(PostgresFixture fixture)
 {
     [Test]
     [Arguments("/stops/bus/alerts")]
@@ -16,9 +17,7 @@ public class AlertsTests
     [Arguments("/stops/emt/alerts")]
     public async Task Should_Get_Alerts(string url)
     {
-        await PostgresFixture.EnsureInitialized();
-
-        var response = await PostgresFixture.Client.GetAsync(url);
+        var response = await fixture.Client.GetAsync(url);
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var alerts = await response.Content.ReadFromJsonAsync<List<AlertDto>>(PostgresFixture.JsonOptions);

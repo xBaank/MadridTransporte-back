@@ -10,37 +10,34 @@ namespace MadridTransporte.Api.Clients.Crtm;
 
 public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmClient> logger)
 {
-    private string Endpoint => config["Crtm:Endpoint"] ?? "http://www.citram.es:8080/WSMultimodalInformation/MultimodalInformation.svc";
-
-    private MultimodalInformationClient? _soapClient;
+    private MultimodalInformationClient _soapClient = CreateClient(config);
     private readonly SemaphoreSlim _lock = new(1, 1);
+
+    private static MultimodalInformationClient CreateClient(IConfiguration config)
+    {
+        var endpoint = config["Crtm:Endpoint"] ?? "http://www.citram.es:8080/WSMultimodalInformation/MultimodalInformation.svc";
+        var binding = new BasicHttpBinding
+        {
+            SendTimeout = TimeSpan.FromSeconds(config.GetValue("Crtm:TimeoutSeconds", 30)),
+        };
+        return new MultimodalInformationClient(binding, new EndpointAddress(endpoint));
+    }
 
     private MultimodalInformationClient GetOrCreateClient()
     {
-        if (_soapClient is { State: CommunicationState.Faulted or CommunicationState.Closed or CommunicationState.Closing })
+        if (_soapClient.State is CommunicationState.Faulted or CommunicationState.Closed or CommunicationState.Closing)
         {
             try
             {
                 _soapClient.Abort();
                 _soapClient.Close();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                if(logger.IsEnabled(LogLevel.Error))
-                {
-                    logger.LogError(ex, "Error closing");
-                }
+                if (logger.IsEnabled(LogLevel.Error))
+                    logger.LogError(ex, "Error closing faulted CRTM client");
             }
-            _soapClient = null;
-        }
-
-        if (_soapClient is null)
-        {
-            var binding = new BasicHttpBinding
-            {
-                SendTimeout = TimeSpan.FromSeconds(config.GetValue("Crtm:TimeoutSeconds", 30)),
-            };
-            _soapClient = new MultimodalInformationClient(binding, new EndpointAddress(Endpoint));
+            _soapClient = CreateClient(config);
         }
 
         return _soapClient;
@@ -48,9 +45,8 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
 
     private async Task<MultimodalInformationClient> GetClientAsync(CancellationToken ct = default)
     {
-        var client = _soapClient;
-        if (client is { State: CommunicationState.Opened or CommunicationState.Created })
-            return client;
+        if (_soapClient.State is CommunicationState.Opened or CommunicationState.Created)
+            return _soapClient;
 
         await _lock.WaitAsync(ct);
         try
@@ -83,7 +79,7 @@ public class CrtmClient(IConfiguration config, IMemoryCache cache, ILogger<CrtmC
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "CRTM GetStopTimes failed for {StopCode}", fullStopCode);
+            logger.LogError(ex, "CRTM GetStopTimes failed for {StopCode}", fullStopCode);
             return null;
         }
     }

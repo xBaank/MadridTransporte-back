@@ -6,14 +6,13 @@ using Shouldly;
 
 namespace MadridTransporte.Tests;
 
-public class StopsTests
+[ClassDataSource<PostgresFixture>(Shared = SharedType.PerTestSession)]
+public class StopsTests(PostgresFixture fixture)
 {
     [Test]
     public async Task Should_Get_All_Stops()
     {
-        await PostgresFixture.EnsureInitialized();
-
-        var response = await PostgresFixture.Client.GetAsync("/stops/all");
+        var response = await fixture.Client.GetAsync("/stops/all");
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var stops = await response.Content.ReadFromJsonAsync<List<StopDto>>(PostgresFixture.JsonOptions);

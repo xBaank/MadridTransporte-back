@@ -25,7 +25,8 @@ public enum ItinerariesUrls
     TramCodeBased,
 }
 
-public class ItinerariesTests
+[ClassDataSource<PostgresFixture>(Shared = SharedType.PerTestSession)]
+public class ItinerariesTests(PostgresFixture fixture)
 {
     private static (string url, int direction) GetItineraryTestData(ItinerariesUrls code) => code switch
     {
@@ -64,10 +65,8 @@ public class ItinerariesTests
     [Arguments(ItinerariesUrls.TramCodeBased)]
     public async Task Should_Get_Itineraries_From_Line(ItinerariesUrls code)
     {
-        await PostgresFixture.EnsureInitialized();
-
         var (url, expectedDirection) = GetItineraryTestData(code);
-        var response = await PostgresFixture.Client.GetAsync(url);
+        var response = await fixture.Client.GetAsync(url);
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var itinerary = await response.Content.ReadFromJsonAsync<ItineraryDto>(PostgresFixture.JsonOptions);
@@ -86,9 +85,7 @@ public class ItinerariesTests
     [Test]
     public async Task Should_Not_Get_Itineraries_From_Line()
     {
-        await PostgresFixture.EnsureInitialized();
-
-        var response = await PostgresFixture.Client.GetAsync("/lines/bus/asd/itineraries/1?stopCode=01231");
+        var response = await fixture.Client.GetAsync("/lines/bus/asd/itineraries/1?stopCode=01231");
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 }

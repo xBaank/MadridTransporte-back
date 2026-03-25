@@ -6,7 +6,8 @@ using Shouldly;
 
 namespace MadridTransporte.Tests;
 
-public class ShapesTests
+[ClassDataSource<PostgresFixture>(Shared = SharedType.PerTestSession)]
+public class ShapesTests(PostgresFixture fixture)
 {
     [Test]
     [Arguments("/lines/emt/shapes/144_A")]
@@ -17,9 +18,7 @@ public class ShapesTests
     [Arguments("/lines/tram/shapes/10__4_1___1__IT_1")]
     public async Task Should_Get_Shapes(string url)
     {
-        await PostgresFixture.EnsureInitialized();
-
-        var response = await PostgresFixture.Client.GetAsync(url);
+        var response = await fixture.Client.GetAsync(url);
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var shapes = await response.Content.ReadFromJsonAsync<List<ShapeDto>>(PostgresFixture.JsonOptions);
@@ -37,9 +36,7 @@ public class ShapesTests
     [Test]
     public async Task Should_Not_Get_Shapes()
     {
-        await PostgresFixture.EnsureInitialized();
-
-        var response = await PostgresFixture.Client.GetAsync("/lines/bus/shapes/asd");
+        var response = await fixture.Client.GetAsync("/lines/bus/shapes/asd");
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var shapes = await response.Content.ReadFromJsonAsync<List<ShapeDto>>(PostgresFixture.JsonOptions);

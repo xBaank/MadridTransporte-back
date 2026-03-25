@@ -4,14 +4,13 @@ using Shouldly;
 
 namespace MadridTransporte.Tests;
 
-public class HealthCheckTests
+[ClassDataSource<PostgresFixture>(Shared = SharedType.PerTestSession)]
+public class HealthCheckTests(PostgresFixture fixture)
 {
     [Test]
     public async Task Should_Check_Health()
     {
-        await PostgresFixture.EnsureInitialized();
-
-        var response = await PostgresFixture.Client.GetAsync("/health");
+        var response = await fixture.Client.GetAsync("/health");
         var json = JsonSerializer.Deserialize<JsonElement>(await response.Content.ReadAsStringAsync());
 
         response.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
