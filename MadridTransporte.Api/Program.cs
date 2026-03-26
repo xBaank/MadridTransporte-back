@@ -69,6 +69,9 @@ app.UseResponseCompression();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+        options.SwaggerEndpoint("/openapi/v1.json", "Madrid Transporte API")
+    );
 }
 
 app.MapGet("/health", () => Results.Ok(new { isRunning = true }));
