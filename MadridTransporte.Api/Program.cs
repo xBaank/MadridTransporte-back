@@ -5,7 +5,6 @@ using MadridTransporte.Api.Clients.Metro;
 using MadridTransporte.Api.Clients.Train;
 using MadridTransporte.Api.Data;
 using MadridTransporte.Api.Endpoints;
-using MadridTransporte.Api.Loader;
 using MadridTransporte.Api.Middleware;
 using MadridTransporte.Api.Services;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +18,6 @@ builder.Services.AddMemoryCache();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres"))
 );
-
-// Data Loader
-builder.Services.AddHttpClient<DataLoader>();
 
 // Services
 builder.Services.AddScoped<StopsService>();
@@ -75,15 +71,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapGet("/health", () => Results.Ok(new { isRunning = true }));
-
-app.MapPost(
-    "/load",
-    async (DataLoader loader, CancellationToken ct) =>
-    {
-        _ = Task.Run(async () => await loader.LoadDataAsync());
-        return Results.Ok(new { message = "Data loaded successfully" });
-    }
-);
 
 app.MapStopsEndpoints();
 app.MapLinesEndpoints();

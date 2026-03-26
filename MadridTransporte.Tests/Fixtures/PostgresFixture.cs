@@ -45,6 +45,8 @@ public class PostgresFixture : IAsyncInitializer, IAsyncDisposable
                 services.AddDbContext<AppDbContext>(options =>
                     options.UseNpgsql(_container.GetConnectionString())
                 );
+
+                services.AddHttpClient<DataLoader>();
             });
         });
 

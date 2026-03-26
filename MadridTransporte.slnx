@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="MadridTransporte.Api/MadridTransporte.Api.csproj" />
+  <Project Path="MadridTransporte.Loader/MadridTransporte.Loader.csproj" />
   <Project Path="MadridTransporte.Tests/MadridTransporte.Tests.csproj" />
 </Solution>

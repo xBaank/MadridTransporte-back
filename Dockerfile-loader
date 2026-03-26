@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY api/MadridTransporte.Api.csproj api/
+COPY loader/MadridTransporte.Loader.csproj loader/
+RUN dotnet restore loader/MadridTransporte.Loader.csproj
+COPY api/ api/
+COPY loader/ loader/
+RUN dotnet publish loader/MadridTransporte.Loader.csproj -c Release -o /app
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /app
+COPY --from=build /app .
+ENTRYPOINT ["dotnet", "MadridTransporte.Loader.dll"]
