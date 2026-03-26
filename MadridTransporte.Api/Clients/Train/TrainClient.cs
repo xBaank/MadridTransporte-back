@@ -39,12 +39,12 @@ public class TrainClient
     )
     {
         var canoResult = await GetCanoTrainTimesAsync(fullStopCode, ct);
-        if (canoResult != null)
+        if (canoResult is not null)
             return canoResult;
 
         // Fallback to CRTM and filter to train codMode only
         var crtmResult = await _crtmFallback.GetCrtmStopTimesAsync(fullStopCode, ct);
-        if (crtmResult?.Arrives == null)
+        if (crtmResult?.Arrives is null)
             return crtmResult;
 
         crtmResult.Arrives = crtmResult
@@ -61,7 +61,7 @@ public class TrainClient
         try
         {
             var stationCode = await _stopsService.GetIdByStopCodeAsync(fullStopCode, ct);
-            if (stationCode == null)
+            if (stationCode is null)
                 return null;
 
             var stopName = await _stopsService.GetStopNameByIdAsync(stationCode, ct);
@@ -191,7 +191,7 @@ public class TrainClient
             var originStation = await _stopsService.GetIdByStopCodeAsync(originFullCode, ct);
             var destStation = await _stopsService.GetIdByStopCodeAsync(destFullCode, ct);
 
-            if (originStation == null || destStation == null)
+            if (originStation is null || destStation is null)
                 return null;
 
             var madridNow = TimeUtils.GetMadridNow();

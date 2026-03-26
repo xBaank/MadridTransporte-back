@@ -56,7 +56,7 @@ public partial class CrtmClient(
     public async Task<List<AlertDto>> GetAlertsAsync(string codMode, CancellationToken ct = default)
     {
         var cacheKey = $"crtm_alerts_{codMode}";
-        if (cache.TryGetValue(cacheKey, out List<AlertDto>? cached) && cached != null)
+        if (cache.TryGetValue(cacheKey, out List<AlertDto>? cached) && cached is not null)
             return cached;
 
         var client = _pool.Get();
@@ -73,7 +73,7 @@ public partial class CrtmClient(
         catch (Exception ex)
         {
             logger.LogWarning(ex, "CRTM GetAlerts failed for codMode {CodMode}", codMode);
-            if (cache.TryGetValue(cacheKey, out List<AlertDto>? fallback) && fallback != null)
+            if (cache.TryGetValue(cacheKey, out List<AlertDto>? fallback) && fallback is not null)
                 return fallback;
             return [];
         }
@@ -168,7 +168,7 @@ public partial class CrtmClient(
 
     private static StopTimesDto? MapStopTimesResponse(Gen.StopTime? stopTimes, string fullStopCode)
     {
-        if (stopTimes == null)
+        if (stopTimes is null)
             return null;
 
         var stop = stopTimes.stop;
@@ -205,7 +205,7 @@ public partial class CrtmClient(
 
     private static List<AlertDto> MapAlertsResponse(Gen.IncidentAffectation[]? incidents)
     {
-        if (incidents == null)
+        if (incidents is null)
             return [];
 
         return incidents
@@ -225,11 +225,11 @@ public partial class CrtmClient(
         int direction
     )
     {
-        if (itineraries == null)
+        if (itineraries is null)
             return null;
 
         var matching = itineraries.FirstOrDefault(li => li.direction == direction);
-        if (matching == null)
+        if (matching is null)
             return null;
 
         var stops = (matching.stops ?? [])

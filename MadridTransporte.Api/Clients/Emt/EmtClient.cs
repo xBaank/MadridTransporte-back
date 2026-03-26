@@ -49,7 +49,7 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
 
     private async Task<JsonElement?> FetchStopDataAsync(string simpleStopCode, CancellationToken ct)
     {
-        if (_accessToken == null)
+        if (_accessToken is null)
             await LoginAsync(ct);
 
         for (var tries = 3; tries > 0; tries--)
@@ -119,7 +119,7 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
         var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
         var json = await FetchStopDataAsync(simpleStopCode, ct);
 
-        if (json == null)
+        if (json is null)
         {
             // Failed all tries — return unavailable
             try
@@ -154,7 +154,7 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
     {
         var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
         var json = await FetchStopDataAsync(simpleStopCode, ct);
-        if (json == null)
+        if (json is null)
             return null;
 
         return ExtractLocations(json.Value, simpleLineCode, direction);
@@ -360,7 +360,7 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
             StopName = stopName,
             SimpleStopCode = simpleStopCode,
             Coordinates = coordinates,
-            Arrives = arrives != null ? ArriveDto.GroupArrives(arrives) : null,
+            Arrives = arrives is not null ? ArriveDto.GroupArrives(arrives) : null,
             Incidents = incidents,
         };
     }

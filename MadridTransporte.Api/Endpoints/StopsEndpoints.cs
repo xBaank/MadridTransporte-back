@@ -93,7 +93,7 @@ public static class StopsEndpoints
                     destinationStopCode,
                     ct
                 );
-                return result != null ? Results.Ok(result) : Results.StatusCode(503);
+                return result is not null ? Results.Ok(result) : Results.StatusCode(503);
             }
         );
     }
@@ -120,10 +120,10 @@ public static class StopsEndpoints
                 await stopsService.GetStopByFullStopCodeAsync(fullStopCode, ct); // validates existence
 
                 var times = await getTimesFunc(fullStopCode, sp, ct);
-                if (times == null)
+                if (times is null)
                     return Results.StatusCode(503);
 
-                return times.Arrives != null
+                return times.Arrives is not null
                     ? Results.Ok(times)
                     : Results.Json(times, statusCode: 503);
             }

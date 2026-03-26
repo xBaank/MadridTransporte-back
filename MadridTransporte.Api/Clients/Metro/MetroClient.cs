@@ -23,7 +23,7 @@ public class MetroClient(
         try
         {
             var codigoEmpresa = await stopsService.GetIdByStopCodeAsync(fullStopCode, ct);
-            if (codigoEmpresa == null)
+            if (codigoEmpresa is null)
                 return null;
 
             var coordinates = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode, ct);
@@ -86,7 +86,7 @@ public class MetroClient(
                     : (long?)null;
 
             var emissionTimeStr = indicator.GetProperty("fechaHoraEmisionPrevision").GetString();
-            if (emissionTimeStr == null)
+            if (emissionTimeStr is null)
                 continue;
 
             var emissionTime = DateTimeOffset.Parse(emissionTimeStr);

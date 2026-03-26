@@ -16,7 +16,7 @@ public class ItinerariesService(AppDbContext db)
             ct
         );
 
-        if (itinerary == null)
+        if (itinerary is null)
             return null;
 
         var stops = await db
@@ -45,7 +45,7 @@ public class ItinerariesService(AppDbContext db)
             i.FullLineCode == fullLineCode && i.Direction == direction - 1
         );
 
-        if (stopCode != null)
+        if (stopCode is not null)
         {
             var tripIdsWithStop = db
                 .StopOrders.Where(so => so.FullStopCode == stopCode)
@@ -54,7 +54,7 @@ public class ItinerariesService(AppDbContext db)
         }
 
         var itinerary = await query.FirstOrDefaultAsync(ct);
-        if (itinerary == null && stopCode != null)
+        if (itinerary is null && stopCode is not null)
         {
             // stopCode filter found no matching trips; fall back to any itinerary for this line/direction
             itinerary = await db
@@ -64,7 +64,7 @@ public class ItinerariesService(AppDbContext db)
                 .FirstOrDefaultAsync(ct);
         }
 
-        if (itinerary == null)
+        if (itinerary is null)
             return null;
 
         var stops = await db

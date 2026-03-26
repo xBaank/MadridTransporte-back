@@ -12,10 +12,9 @@ public class ElCanoAuthHandler : DelegatingHandler
     )
     {
         var uri = request.RequestUri!;
-        var payload =
-            request.Content != null
-                ? await request.Content.ReadAsStringAsync(cancellationToken)
-                : "";
+        var payload = request.Content is not null
+            ? await request.Content.ReadAsStringAsync(cancellationToken)
+            : "";
 
         var auth = new ElCanoAuth(
             accessKey: AccessKey,
@@ -35,7 +34,7 @@ public class ElCanoAuthHandler : DelegatingHandler
         {
             if (key.Equals("Content-type", StringComparison.OrdinalIgnoreCase))
             {
-                if (request.Content != null)
+                if (request.Content is not null)
                 {
                     request.Content.Headers.Remove("Content-Type");
                     request.Content.Headers.TryAddWithoutValidation("Content-Type", value);

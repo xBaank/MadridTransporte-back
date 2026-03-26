@@ -50,9 +50,9 @@ public class BusClient(
 
         // Merge Avanza data
         var avanzaArrives = await avanzaTask;
-        if (avanzaArrives != null && avanzaArrives.Count > 0)
+        if (avanzaArrives is not null && avanzaArrives.Count > 0)
         {
-            if (times.Arrives == null)
+            if (times.Arrives is null)
             {
                 times.Arrives = ArriveDto.GroupArrives(avanzaArrives);
             }
@@ -126,7 +126,7 @@ public class BusClient(
             foreach (var trafico in traficos.EnumerateArray())
             {
                 var llegada = trafico.GetProperty("llegada").GetString();
-                if (llegada == null)
+                if (llegada is null)
                     continue;
 
                 var hour = TimeOnly.Parse(llegada);
@@ -151,7 +151,7 @@ public class BusClient(
                         Destination =
                             "(Avanza) " + (trafico.GetProperty("dsDestino").GetString() ?? ""),
                         CodMode =
-                            route != null && int.TryParse(route.CodMode, out var cm)
+                            route is not null && int.TryParse(route.CodMode, out var cm)
                                 ? cm
                                 : int.Parse(CodeUtils.BusCodMode),
                         EstimatedArrive = madridTime.ToUnixTimeMilliseconds(),

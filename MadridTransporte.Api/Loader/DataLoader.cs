@@ -156,7 +156,7 @@ public class DataLoader(
                         continue;
 
                     var stop = GtfsParsers.ParseStop(record, feedCodMode, logger);
-                    if (stop == null)
+                    if (stop is null)
                         continue;
 
                     if (stop.CodMode.ToString() == CodeUtils.MetroCodMode)
@@ -237,7 +237,7 @@ public class DataLoader(
                         continue;
 
                     var route = GtfsParsers.ParseRouteFromGtfs(record, feedCodMode, logger);
-                    if (route != null)
+                    if (route is not null)
                         routes.Add(route);
                 }
 
@@ -260,7 +260,7 @@ public class DataLoader(
                     continue;
 
                 var route = GtfsParsers.ParseRouteFromCsv(record, logger);
-                if (route != null)
+                if (route is not null)
                     routes.Add(route);
             }
 
@@ -304,7 +304,7 @@ public class DataLoader(
                 foreach (var r in batch)
                 {
                     var itinerary = GtfsParsers.ParseItineraryFromGtfs(r, logger);
-                    if (itinerary != null && seenTripIds.Add(itinerary.TripId))
+                    if (itinerary is not null && seenTripIds.Add(itinerary.TripId))
                         itineraries.Add(itinerary);
                 }
 
@@ -360,7 +360,7 @@ public class DataLoader(
         {
             var shapes = batch
                 .Select(r => GtfsParsers.ParseShape(r, logger))
-                .Where(s => s != null)
+                .Where(s => s is not null)
                 .Cast<Shape>()
                 .ToList();
 
@@ -398,7 +398,7 @@ public class DataLoader(
             foreach (var record in batch)
             {
                 var info = GtfsParsers.ParseStopInfo(record, logger);
-                if (info != null && seen.Add((info.IdEstacion, info.CodigoEmpresa)))
+                if (info is not null && seen.Add((info.IdEstacion, info.CodigoEmpresa)))
                     infos.Add(info);
             }
 
@@ -435,7 +435,7 @@ public class DataLoader(
         {
             var calendars = batch
                 .Select(r => GtfsParsers.ParseCalendar(r, logger))
-                .Where(c => c != null)
+                .Where(c => c is not null)
                 .Cast<Data.Entities.Calendar>()
                 .ToList();
 
@@ -479,7 +479,7 @@ public class DataLoader(
                 foreach (var record in batch)
                 {
                     var so = GtfsParsers.ParseStopOrderFromGtfs(record, feedCodMode, logger);
-                    if (so == null)
+                    if (so is null)
                         continue;
 
                     if (repeatedToOriginalStops.TryGetValue(so.FullStopCode, out var original))
@@ -501,7 +501,7 @@ public class DataLoader(
         {
             var stopOrders = batch
                 .Select(r => GtfsParsers.ParseStopOrderFromCsv(r, logger))
-                .Where(so => so != null)
+                .Where(so => so is not null)
                 .Cast<StopOrder>()
                 .ToList();
 
@@ -557,7 +557,7 @@ public class DataLoader(
             foreach (var header in headers)
             {
                 var value = csv.GetField(header);
-                if (value != null && !dict.ContainsKey(header))
+                if (value is not null && !dict.ContainsKey(header))
                     dict[header] = value;
             }
 

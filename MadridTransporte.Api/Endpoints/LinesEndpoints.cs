@@ -90,8 +90,9 @@ public static class LinesEndpoints
                 CancellationToken ct
             ) =>
             {
-                var fullStopCode =
-                    stopCode != null ? CodeUtils.CreateStopCode(codMode, stopCode) : null;
+                var fullStopCode = stopCode is not null
+                    ? CodeUtils.CreateStopCode(codMode, stopCode)
+                    : null;
 
                 var itinerary =
                     await itinerariesService.GetItineraryByLineAndDirectionAsync(
@@ -101,7 +102,7 @@ public static class LinesEndpoints
                         ct
                     ) ?? await crtmClient.GetLineItinerariesAsync(lineCode, direction, ct);
 
-                return itinerary != null ? Results.Ok(itinerary) : Results.NotFound();
+                return itinerary is not null ? Results.Ok(itinerary) : Results.NotFound();
             }
         );
 
@@ -114,7 +115,7 @@ public static class LinesEndpoints
             ) =>
             {
                 var itinerary = await itinerariesService.GetItineraryByCodeAsync(itineraryCode, ct);
-                return itinerary != null
+                return itinerary is not null
                     ? Results.Ok(itinerary)
                     : throw ApiException.NotFound("Itinerary code not found");
             }
@@ -135,12 +136,13 @@ public static class LinesEndpoints
                     itineraryCode,
                     ct
                 );
-                if (lineCode == null)
+                if (lineCode is null)
                     throw ApiException.NotFound("Itinerary code not found");
 
                 var lineCodMode = CodeUtils.GetCodModeFromLineCode(lineCode);
-                var fullStopCode =
-                    stopCode != null ? CodeUtils.CreateStopCode(codMode, stopCode) : null;
+                var fullStopCode = stopCode is not null
+                    ? CodeUtils.CreateStopCode(codMode, stopCode)
+                    : null;
                 var route = await routesService.GetRouteByFullLineCodeAsync(lineCode, ct);
                 var simpleLineCode =
                     route?.SimpleLineCode ?? CodeUtils.GetSimpleLineCodeFromLineCode(lineCode);
@@ -153,7 +155,7 @@ public static class LinesEndpoints
                     fullStopCode,
                     ct
                 );
-                if (locations == null)
+                if (locations is null)
                     throw ApiException.ServiceUnavailable("Locations unavailable");
 
                 locations.CodMode = int.TryParse(routeCodMode, out var cm) ? cm : 0;
@@ -176,8 +178,9 @@ public static class LinesEndpoints
                 ) =>
                 {
                     var lineCodMode = CodeUtils.GetCodModeFromLineCode(lineCode);
-                    var fullStopCode =
-                        stopCode != null ? CodeUtils.CreateStopCode(codMode, stopCode) : null;
+                    var fullStopCode = stopCode is not null
+                        ? CodeUtils.CreateStopCode(codMode, stopCode)
+                        : null;
                     var route = await routesService.GetRouteByFullLineCodeAsync(lineCode, ct);
                     var simpleLineCode =
                         route?.SimpleLineCode ?? CodeUtils.GetSimpleLineCodeFromLineCode(lineCode);

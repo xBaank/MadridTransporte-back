@@ -39,7 +39,7 @@ public class PostgresFixture : IAsyncInitializer, IAsyncDisposable
                 var descriptor = services.SingleOrDefault(d =>
                     d.ServiceType == typeof(DbContextOptions<AppDbContext>)
                 );
-                if (descriptor != null)
+                if (descriptor is not null)
                     services.Remove(descriptor);
 
                 services.AddDbContext<AppDbContext>(options =>
