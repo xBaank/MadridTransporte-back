@@ -37,16 +37,9 @@ public partial class CrtmClient(
         try
         {
             var auth = await GetAuthAsync(client, ct);
-            var response = await client.GetStopTimesAsync(
-                auth,
-                fullStopCode,
-                1,
-                2,
-                null,
-                null,
-                null,
-                3
-            ).WaitAsync(ct);
+            var response = await client
+                .GetStopTimesAsync(auth, fullStopCode, 1, 2, null, null, null, 3)
+                .WaitAsync(ct);
             return MapStopTimesResponse(response.stopTimes, fullStopCode);
         }
         catch (Exception ex)
@@ -70,7 +63,9 @@ public partial class CrtmClient(
         try
         {
             var auth = await GetAuthAsync(client, ct);
-            var response = await client.GetIncidentsAffectationsAsync(auth, codMode, []).WaitAsync(ct);
+            var response = await client
+                .GetIncidentsAffectationsAsync(auth, codMode, [])
+                .WaitAsync(ct);
             var alerts = MapAlertsResponse(response.incidentsAffectations);
             cache.Set(cacheKey, alerts, TimeSpan.FromHours(24));
             return alerts;
@@ -147,15 +142,17 @@ public partial class CrtmClient(
         try
         {
             var auth = await GetAuthAsync(client, ct);
-            var response = await client.GetLineLocationAsync(
-                auth,
-                codMode,
-                lineCode,
-                direction,
-                itineraryCode ?? "",
-                "",
-                stopCode ?? "8_"
-            ).WaitAsync(ct);
+            var response = await client
+                .GetLineLocationAsync(
+                    auth,
+                    codMode,
+                    lineCode,
+                    direction,
+                    itineraryCode ?? "",
+                    "",
+                    stopCode ?? "8_"
+                )
+                .WaitAsync(ct);
             return MapLocationsResponse(response.vehiclesLocation);
         }
         catch (Exception ex)
