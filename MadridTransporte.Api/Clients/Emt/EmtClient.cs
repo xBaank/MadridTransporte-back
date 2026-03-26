@@ -47,13 +47,8 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
         }
     }
 
-    public async Task<StopTimesDto?> GetStopTimesAsync(
-        string fullStopCode,
-        CancellationToken ct = default
-    )
+    private async Task<JsonElement?> FetchStopDataAsync(string simpleStopCode, CancellationToken ct)
     {
-        var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
-
         if (_accessToken == null)
             await LoginAsync(ct);
 
@@ -101,8 +96,7 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
                 if (!response.IsSuccessStatusCode)
                     continue;
 
-                var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
-                return ExtractStopTimes(json, simpleStopCode);
+                return await response.Content.ReadFromJsonAsync<JsonElement>(ct);
             }
             catch (ApiException)
             {
@@ -114,25 +108,146 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
             }
         }
 
-        // Failed all tries — return unavailable
-        try
+        return null;
+    }
+
+    public async Task<StopTimesDto?> GetStopTimesAsync(
+        string fullStopCode,
+        CancellationToken ct = default
+    )
+    {
+        var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
+        var json = await FetchStopDataAsync(simpleStopCode, ct);
+
+        if (json == null)
         {
-            var name = await stopsService.GetStopNameByStopCodeAsync(fullStopCode, ct);
-            var coords = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode, ct);
-            return new StopTimesDto
+            // Failed all tries — return unavailable
+            try
             {
-                CodMode = int.Parse(CodeUtils.EmtCodMode),
-                StopName = name,
-                SimpleStopCode = simpleStopCode,
-                Coordinates = coords,
-                Arrives = null,
-                Incidents = [],
-            };
+                var name = await stopsService.GetStopNameByStopCodeAsync(fullStopCode, ct);
+                var coords = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode, ct);
+                return new StopTimesDto
+                {
+                    CodMode = int.Parse(CodeUtils.EmtCodMode),
+                    StopName = name,
+                    SimpleStopCode = simpleStopCode,
+                    Coordinates = coords,
+                    Arrives = null,
+                    Incidents = [],
+                };
+            }
+            catch
+            {
+                return null;
+            }
         }
-        catch
-        {
+
+        return ExtractStopTimes(json.Value, simpleStopCode);
+    }
+
+    public async Task<VehicleLocationsDto?> GetLineLocationsAsync(
+        string fullStopCode,
+        string simpleLineCode,
+        int direction,
+        CancellationToken ct = default
+    )
+    {
+        var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
+        var json = await FetchStopDataAsync(simpleStopCode, ct);
+        if (json == null)
             return null;
+
+        return ExtractLocations(json.Value, simpleLineCode, direction);
+    }
+
+    private VehicleLocationsDto? ExtractLocations(
+        JsonElement json,
+        string simpleLineCode,
+        int direction
+    )
+    {
+        var code = json.TryGetProperty("code", out var c) ? c.GetString() : null;
+        if (code != "00" && code != "01")
+            return null;
+
+        var dataArr = json.GetProperty("data").EnumerateArray().ToList();
+        if (dataArr.Count == 0)
+            return null;
+        var data = dataArr[0];
+
+        var stopInfoArr = data.GetProperty("StopInfo").EnumerateArray().ToList();
+        if (stopInfoArr.Count == 0)
+            return null;
+        var stopInfo = stopInfoArr[0];
+
+        int? lineDirection = null;
+        if (
+            stopInfo.TryGetProperty("lines", out var linesEl)
+            && linesEl.ValueKind == JsonValueKind.Array
+        )
+        {
+            var lineInfo = linesEl
+                .EnumerateArray()
+                .FirstOrDefault(l =>
+                    l.TryGetProperty("label", out var label) && label.GetString() == simpleLineCode
+                );
+            if (
+                lineInfo.ValueKind != JsonValueKind.Undefined
+                && lineInfo.TryGetProperty("to", out var toEl)
+            )
+                lineDirection = toEl.GetString() == "A" ? 2 : 1;
         }
+
+        var locations = new List<VehicleLocationDto>();
+
+        if (
+            data.TryGetProperty("Arrive", out var arriveArr)
+            && arriveArr.ValueKind == JsonValueKind.Array
+        )
+        {
+            foreach (var a in arriveArr.EnumerateArray())
+            {
+                if (
+                    !a.TryGetProperty("line", out var lineEl)
+                    || lineEl.GetString() != simpleLineCode
+                )
+                    continue;
+                if (a.TryGetProperty("DistanceBus", out var distEl) && distEl.GetInt32() < 0)
+                    continue;
+                if (a.TryGetProperty("estimateArrive", out var etaEl) && etaEl.GetInt32() == 999999)
+                    continue;
+                if (!a.TryGetProperty("geometry", out var geo))
+                    continue;
+                if (!geo.TryGetProperty("coordinates", out var coords))
+                    continue;
+                var coordsList = coords.EnumerateArray().ToList();
+                if (coordsList.Count < 2)
+                    continue;
+
+                locations.Add(
+                    new VehicleLocationDto
+                    {
+                        LineCode = CodeUtils.CreateLineCode(CodeUtils.EmtCodMode, simpleLineCode),
+                        SimpleLineCode = simpleLineCode,
+                        CodVehicle = "",
+                        Coordinates = new CoordinatesDto
+                        {
+                            Latitude = coordsList[1].GetDouble(),
+                            Longitude = coordsList[0].GetDouble(),
+                        },
+                        Direction = lineDirection ?? 0,
+                        Service = "",
+                    }
+                );
+            }
+        }
+
+        return new VehicleLocationsDto
+        {
+            CodMode = int.Parse(CodeUtils.EmtCodMode),
+            LineCode = simpleLineCode,
+            Locations = locations.Where(l => l.Direction == direction).ToList(),
+        };
     }
 
     private StopTimesDto ExtractStopTimes(JsonElement json, string simpleStopCode)

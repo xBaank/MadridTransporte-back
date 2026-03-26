@@ -1,4 +1,5 @@
 using MadridTransporte.Api.Clients.Crtm;
+using MadridTransporte.Api.Clients.Emt;
 using MadridTransporte.Api.Dtos;
 using MadridTransporte.Api.Exceptions;
 using MadridTransporte.Api.Services;
@@ -20,8 +21,38 @@ public static class LinesEndpoints
 
         // Bus
         MapLineEndpoints(lines, "/bus", CodeUtils.BusCodMode, hasLocations: true);
-        // EMT
-        MapLineEndpoints(lines, "/emt", CodeUtils.EmtCodMode, hasLocations: true);
+        // EMT — locations come from EMT API, not CRTM
+        var emtGroup = MapLineEndpoints(lines, "/emt", CodeUtils.EmtCodMode, hasLocations: false);
+        emtGroup.MapGet(
+            "/{lineCode}/locations/{direction:int}",
+            async (
+                string lineCode,
+                int direction,
+                string stopCode,
+                EmtClient emtClient,
+                RoutesService routesService,
+                CancellationToken ct
+            ) =>
+            {
+                var fullStopCode = CodeUtils.CreateStopCode(CodeUtils.EmtCodMode, stopCode);
+                var route = await routesService.GetRouteByFullLineCodeAsync(lineCode, ct);
+                var simpleLineCode =
+                    route?.SimpleLineCode ?? CodeUtils.GetSimpleLineCodeFromLineCode(lineCode);
+                var routeCodMode = route?.CodMode ?? CodeUtils.GetCodModeFromLineCode(lineCode);
+
+                var locations =
+                    await emtClient.GetLineLocationsAsync(
+                        fullStopCode,
+                        simpleLineCode,
+                        direction,
+                        ct
+                    ) ?? throw ApiException.ServiceUnavailable("Locations unavailable");
+
+                locations.CodMode = int.TryParse(routeCodMode, out var cm) ? cm : 0;
+                locations.LineCode = simpleLineCode;
+                return Results.Ok(locations);
+            }
+        );
         // Metro
         MapLineEndpoints(lines, "/metro", CodeUtils.MetroCodMode, hasLocations: false);
         // Tram
@@ -30,7 +61,7 @@ public static class LinesEndpoints
         MapLineEndpoints(lines, "/train", CodeUtils.TrainCodMode, hasLocations: false);
     }
 
-    private static void MapLineEndpoints(
+    private static RouteGroupBuilder MapLineEndpoints(
         RouteGroupBuilder group,
         string prefix,
         string codMode,
@@ -166,5 +197,7 @@ public static class LinesEndpoints
                 }
             );
         }
+
+        return modeGroup;
     }
 }
