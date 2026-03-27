@@ -1,117 +1,90 @@
-# MadridTransporte-back  [![Java CI with Gradle](https://github.com/xBaank/bus-tracker-back/actions/workflows/gradle.yml/badge.svg)](https://github.com/xBaank/bus-tracker-back/actions/workflows/gradle.yml) 
+# MadridTransporte-back [![.NET CI](https://github.com/xBaank/MadridTransporte-back/actions/workflows/dotnet.yml/badge.svg)](https://github.com/xBaank/MadridTransporte-back/actions/workflows/dotnet.yml)
 
 This is the backend for the MadridTransporte app.
 
-| Image                | Version                                                                                                                                                                  |
-|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Api       | [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/xbank/bus_tracker_api)](https://hub.docker.com/repository/docker/xbank/bus_tracker_api/general)             |
-| Data loader | [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/xbank/bus_tracker_loader)](https://hub.docker.com/repository/docker/xbank/bus_tracker_loader/general) |
+| Image        | Version |
+|--------------|---------|
+| Api          | [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/xbank/bus_tracker_api)](https://hub.docker.com/repository/docker/xbank/bus_tracker_api/general) |
+| Data loader  | [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/xbank/bus_tracker_loader)](https://hub.docker.com/repository/docker/xbank/bus_tracker_loader/general) |
 
 ## Features
 
 - Bus locations
-- Bus stops times
-- Metro stops times
-- Emt stops times
-- Emt locations
-- Renfe stops times
+- Bus stop times
+- Metro stop times
+- EMT stop times
+- EMT locations
+- Renfe stop times
 - Stops data
 - Lines data
-- Stops times notifications
 
-It is written in kotlin using ktor.
+It is written in C# using .NET 10 and ASP.NET Core Minimal APIs, with PostgreSQL as the database.
 
 ## How to deploy
 
-I recommend using docker-compose to deploy the backend.
+Recommended approach is Docker Compose.
 
-### Docker-compose
+### Docker Compose
 
 ```yaml
-version: "3.9"
 services:
-  mongo:
-    image: mongo
+  db:
+    image: postgres:16-alpine
     restart: unless-stopped
+    shm_size: 128mb
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: madrid_transporte
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
   api:
     image: xbank/bus_tracker_api:latest
     restart: unless-stopped
     depends_on:
-      - mongo
+      - db
+    ports:
+      - "8080:8080"
     environment:
-      - SERVICE_JSON= #WRITE HERE YOUR SERVICE JSON, NOT THE FILE PATH, You can get it from https://console.firebase.google.com/u/0/project/YOUR_PROJECT/settings/serviceaccounts/adminsdk
-      - MONGO_CONNECTION_STRING= #WRITE HERE YOUR MONGO CONNECTION STRING
-      - NOTIFICATION_DELAY_TIME_SECONDS=60 #WRITE HERE THE DELAY TIME IN SECONDS FOR THE NOTIFICATION SERVICE, DEFAULT IS 60
-      - SOAP_TIMEOUT=45 #DEFAULT is 30
+      - ConnectionStrings__DefaultConnection=Host=db;Database=madrid_transporte;Username=app;Password=secret
+      - SOAP_TIMEOUT=45
+
   loader:
     image: xbank/bus_tracker_loader:latest
     restart: unless-stopped
     depends_on:
-      - mongo
+      - db
     environment:
-      - MONGO_CONNECTION_STRING= #WRITE HERE YOUR MONGO CONNECTION STRING
-    volumes:
-      - ./entrypoint.sh:/app/entrypoint.sh
-    entrypoint: ["/app/entrypoint.sh"]
-  nginx:
-    image: nginx
-    restart: unless-stopped
-    depends_on:
-      - api
-    ports:
-      - "443:443"
-    volumes:
-      - yourNginxConfFilePath:/etc/nginx/conf.d/default.conf #Example below
-      - yourPrivateKeyFilePath:/root/ssl/key.pem #You can generate it using letsencrypt
-      - yourFullchainFilePath:/root/ssl/cert.pem #You can generate it using letsencrypt
-      - yourNginxCacheFolderPath:/data/nginx/cache #You can use a volume to persist cache
-    command: [ "nginx", "-g", "daemon off;" ]
+      - ConnectionStrings__DefaultConnection=Host=db;Database=madrid_transporte;Username=app;Password=secret
+
+volumes:
+  db_data:
 ```
 
-### Entrypoint
-```sh
-#!/bin/bash
-while true; do
-  # Run your service command
-  echo "Running loader..."
-  java -jar /app/loader.jar
+The loader should be run periodically (e.g. once a day) to refresh GTFS data. It exits after completing the load. The API auto-migrates the database on startup.
 
-  # Wait for the specified interval (e.g., 1 day)
-  sleep 1d
-done
+## Development
+
+### Prerequisites
+
+- .NET 10 SDK
+- Docker (for the local PostgreSQL instance)
+
+### Local setup
+
+```bash
+# Start the local database
+docker compose up -d db
+
+# Run the API
+dotnet run --project MadridTransporte.Api
+
+# Load GTFS data (run once, or whenever data needs refreshing)
+dotnet run --project MadridTransporte.Loader
+
+# Run tests
+dotnet test --configuration Release
 ```
 
-### Nginx conf example
-
-```nginx
-upstream servers {
-    server api:8080 fail_timeout=50s max_fails=5;
-
-    keepalive 2;
-}
-
-limit_req_zone $binary_remote_addr zone=one:10m rate=10r/s;
-proxy_cache_path /data/nginx/cache keys_zone=mycache:10m levels=1:2 inactive=60m max_size=2g; proxy_cache_key "$scheme$request_method$host$request_uri";
-
-server {
-    limit_req zone=one burst=20;
-    listen                  443 ssl;
-    listen                  [::]:443 ssl;
-    server_name             api.server.com; #Your api domain
-    ssl_certificate         /root/ssl/cert.pem;
-    ssl_certificate_key     /root/ssl/key.pem;
-    location / {  
-        proxy_cache mycache;
-        proxy_cache_methods GET HEAD;
-        proxy_http_version 1.1;
-        proxy_set_header   "Connection" "";
-        add_header X-Proxy-Cache $upstream_cache_status;    
-        proxy_pass http://servers;
-    }
-}
-```
-
-[Frontend](https://github.com/xBaank/bus-tracker-front)
+[Frontend](https://github.com/xBaank/MadridTransporte-front)
