@@ -20,5 +20,6 @@ obj/
 ### Project ###
 .env
 nul
+TestResults/
 
 .claude/
