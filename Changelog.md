@@ -1,5 +1,10 @@
 # Changelog
 
+## 8.0.3
+
+- Fixed cross-platform timezone handling for Linux deployments
+- Simplified CRTM estimated arrival UTC conversion
+
 ## 8.0.2
 
 - Added `curl` to the API Docker image
