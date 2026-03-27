@@ -2,21 +2,18 @@ namespace MadridTransporte.Api.Loader;
 
 public static class DataSourceConfig
 {
-    private static string Ref => Environment.GetEnvironmentVariable("TARGET") ?? "master";
+    private static string Ref => Environment.GetEnvironmentVariable("TARGET") ?? "pre";
 
     private static string GitHubBaseUrl =>
         $"https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/{Ref}";
 
-    private static string ArcGisItemUrl(string id) =>
-        $"https://www.arcgis.com/sharing/rest/content/items/{id}/data";
-
     // GTFS zip files
-    public static string MetroGtfsUrl => ArcGisItemUrl("5c7f2951962540d69ffe8f640d94c246");
-    public static string TrainGtfsUrl => ArcGisItemUrl("1a25440bf66f499bae2657ec7fb40144");
-    public static string TramGtfsUrl => ArcGisItemUrl("aaed26cc0ff64b0c947ac0bc3e033196");
-    public static string EmtGtfsUrl => ArcGisItemUrl("868df0e58fca47e79b942902dffd7da0");
-    public static string UrbanGtfsUrl => ArcGisItemUrl("357e63c2904f43aeb5d8a267a64346d8");
-    public static string InterurbanGtfsUrl => ArcGisItemUrl("885399f83408473c8d815e40c5e702b7");
+    public static string MetroGtfsUrl => $"{GitHubBaseUrl}/google_transit_M4.zip";
+    public static string TrainGtfsUrl => $"{GitHubBaseUrl}/google_transit_M5.zip";
+    public static string EmtGtfsUrl => $"{GitHubBaseUrl}/google_transit_M6.zip";
+    public static string InterurbanGtfsUrl => $"{GitHubBaseUrl}/google_transit_M89.zip";
+    public static string UrbanGtfsUrl => $"{GitHubBaseUrl}/google_transit_M9.zip";
+    public static string TramGtfsUrl => $"{GitHubBaseUrl}/google_transit_M10.zip";
 
     // CSV files
     public static string MetroInfoUrl => $"{GitHubBaseUrl}/Metro_stations.csv";
