@@ -33,7 +33,8 @@ public class DataLoader(
 
         try
         {
-            logger.LogInformation("Starting data load");
+            if (logger.IsEnabled(LogLevel.Information))
+                logger.LogInformation("Starting data load");
 
             // Download GTFS zips and CSV files in parallel
             var gtfsDirsTask = DownloadAndExtractGtfs(tempFiles, tempDirs, ct);
@@ -63,11 +64,13 @@ public class DataLoader(
                 ct
             );
 
-            logger.LogInformation("Data load completed successfully");
+            if (logger.IsEnabled(LogLevel.Information))
+                logger.LogInformation("Data load completed successfully");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error loading data");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Error loading data");
             throw;
         }
         finally
@@ -127,7 +130,8 @@ public class DataLoader(
 
     private async Task LoadStops(AppDbContext db, List<GtfsDirInfo> gtfsFeeds, CancellationToken ct)
     {
-        logger.LogInformation("Loading stops");
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loading stops");
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
 
@@ -177,7 +181,8 @@ public class DataLoader(
         }
 
         await tx.CommitAsync(ct);
-        logger.LogInformation("Loaded {Count} stops", count);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loaded {Count} stops", count);
     }
 
     private async Task<Dictionary<string, string>> GetRepeatedMetroStops(
@@ -211,7 +216,8 @@ public class DataLoader(
         CancellationToken ct
     )
     {
-        logger.LogInformation("Loading routes");
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loading routes");
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
 
@@ -272,7 +278,8 @@ public class DataLoader(
         }
 
         await tx.CommitAsync(ct);
-        logger.LogInformation("Loaded {Count} routes", count);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loaded {Count} routes", count);
     }
 
     private async Task LoadItineraries(
@@ -282,7 +289,8 @@ public class DataLoader(
         CancellationToken ct
     )
     {
-        logger.LogInformation("Loading itineraries");
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loading itineraries");
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
 
@@ -335,7 +343,8 @@ public class DataLoader(
         }
 
         await tx.CommitAsync(ct);
-        logger.LogInformation("Loaded {Count} itineraries", count);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loaded {Count} itineraries", count);
     }
 
     private async Task LoadShapes(
@@ -344,7 +353,8 @@ public class DataLoader(
         CancellationToken ct
     )
     {
-        logger.LogInformation("Loading shapes");
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loading shapes");
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
 
@@ -372,7 +382,8 @@ public class DataLoader(
         }
 
         await tx.CommitAsync(ct);
-        logger.LogInformation("Loaded {Count} shapes", count);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loaded {Count} shapes", count);
     }
 
     private async Task LoadStopsInfo(
@@ -381,7 +392,8 @@ public class DataLoader(
         CancellationToken ct
     )
     {
-        logger.LogInformation("Loading stops info");
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loading stops info");
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
 
@@ -410,7 +422,8 @@ public class DataLoader(
         }
 
         await tx.CommitAsync(ct);
-        logger.LogInformation("Loaded {Count} stop infos", count);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loaded {Count} stop infos", count);
     }
 
     private async Task LoadCalendars(
@@ -419,7 +432,8 @@ public class DataLoader(
         CancellationToken ct
     )
     {
-        logger.LogInformation("Loading calendars");
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loading calendars");
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
 
@@ -447,7 +461,8 @@ public class DataLoader(
         }
 
         await tx.CommitAsync(ct);
-        logger.LogInformation("Loaded {Count} calendars", count);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loaded {Count} calendars", count);
     }
 
     private async Task LoadStopOrders(
@@ -458,7 +473,8 @@ public class DataLoader(
         CancellationToken ct
     )
     {
-        logger.LogInformation("Loading stop orders");
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loading stop orders");
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
 
@@ -513,7 +529,8 @@ public class DataLoader(
         }
 
         await tx.CommitAsync(ct);
-        logger.LogInformation("Loaded {Count} stop orders", count);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Loaded {Count} stop orders", count);
     }
 
     private async Task BulkInsertAsync<T>(AppDbContext db, List<T> items, CancellationToken ct)
@@ -525,14 +542,15 @@ public class DataLoader(
         }
         catch (Exception ex)
         {
-            logger.LogError(
-                ex,
-                "BulkInsert failed for {Type} ({Count} records): {Message} | Inner: {Inner}",
-                typeof(T).Name,
-                items.Count,
-                ex.Message,
-                ex.InnerException?.ToString() ?? "none"
-            );
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(
+                    ex,
+                    "BulkInsert failed for {Type} ({Count} records): {Message} | Inner: {Inner}",
+                    typeof(T).Name,
+                    items.Count,
+                    ex.Message,
+                    ex.InnerException?.ToString() ?? "none"
+                );
             throw;
         }
     }

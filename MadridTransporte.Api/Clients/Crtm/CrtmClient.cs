@@ -44,7 +44,8 @@ public partial class CrtmClient(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "CRTM GetStopTimes failed for {StopCode}", fullStopCode);
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "CRTM GetStopTimes failed for {StopCode}", fullStopCode);
             return null;
         }
         finally
@@ -72,7 +73,8 @@ public partial class CrtmClient(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "CRTM GetAlerts failed for codMode {CodMode}", codMode);
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning(ex, "CRTM GetAlerts failed for codMode {CodMode}", codMode);
             if (cache.TryGetValue(cacheKey, out List<AlertDto>? fallback) && fallback is not null)
                 return fallback;
             return [];
@@ -98,7 +100,8 @@ public partial class CrtmClient(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "CRTM GetLineItineraries failed for {LineCode}", lineCode);
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning(ex, "CRTM GetLineItineraries failed for {LineCode}", lineCode);
             return null;
         }
         finally
@@ -157,7 +160,8 @@ public partial class CrtmClient(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "CRTM GetLineLocation failed for {LineCode}", lineCode);
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning(ex, "CRTM GetLineLocation failed for {LineCode}", lineCode);
             return null;
         }
         finally

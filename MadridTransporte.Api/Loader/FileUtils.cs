@@ -10,7 +10,8 @@ public static class FileUtils
         ILogger logger
     )
     {
-        logger.LogInformation("Downloading {Url}", url);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Downloading {Url}", url);
         var tempFile = Path.GetTempFileName();
 
         using var response = await httpClient.GetAsync(
@@ -29,7 +30,8 @@ public static class FileUtils
         await using var fileStream = File.Create(tempFile);
         await stream.CopyToAsync(fileStream);
 
-        logger.LogInformation("Downloaded {Url}", url);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("Downloaded {Url}", url);
         return tempFile;
     }
 

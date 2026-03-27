@@ -104,7 +104,8 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "EMT request failed, {Tries} tries left", tries - 1);
+                if (logger.IsEnabled(LogLevel.Warning))
+                    logger.LogWarning(ex, "EMT request failed, {Tries} tries left", tries - 1);
             }
         }
 

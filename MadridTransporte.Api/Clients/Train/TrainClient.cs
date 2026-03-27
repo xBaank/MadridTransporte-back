@@ -106,7 +106,8 @@ public class TrainClient
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "El Cano train times failed for {StopCode}", fullStopCode);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning(ex, "El Cano train times failed for {StopCode}", fullStopCode);
             return null;
         }
     }
@@ -238,7 +239,8 @@ public class TrainClient
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Renfe routed times failed");
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning(ex, "Renfe routed times failed");
             return null;
         }
     }

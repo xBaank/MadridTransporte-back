@@ -56,7 +56,8 @@ public class MetroClient(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Metro times failed for {StopCode}", fullStopCode);
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning(ex, "Metro times failed for {StopCode}", fullStopCode);
             return null;
         }
     }

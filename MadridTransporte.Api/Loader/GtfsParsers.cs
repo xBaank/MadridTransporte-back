@@ -60,7 +60,8 @@ public static class GtfsParsers
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error parsing stop");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Error parsing stop");
             return null;
         }
     }
@@ -86,7 +87,8 @@ public static class GtfsParsers
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error parsing route from GTFS");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Error parsing route from GTFS");
             return null;
         }
     }
@@ -106,7 +108,8 @@ public static class GtfsParsers
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error parsing route from CSV");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Error parsing route from CSV");
             return null;
         }
     }
@@ -123,7 +126,8 @@ public static class GtfsParsers
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error parsing stop info");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Error parsing stop info");
             return null;
         }
     }
@@ -146,7 +150,8 @@ public static class GtfsParsers
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error parsing itinerary from GTFS");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Error parsing itinerary from GTFS");
             return null;
         }
     }
@@ -171,7 +176,8 @@ public static class GtfsParsers
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error parsing itinerary from CSV");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Error parsing itinerary from CSV");
             return null;
         }
     }
@@ -214,7 +220,8 @@ public static class GtfsParsers
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error parsing shape");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Error parsing shape");
             return null;
         }
     }
@@ -244,7 +251,8 @@ public static class GtfsParsers
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error parsing stop order from GTFS");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Error parsing stop order from GTFS");
             return null;
         }
     }
@@ -263,7 +271,8 @@ public static class GtfsParsers
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error parsing stop order from CSV");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Error parsing stop order from CSV");
             return null;
         }
     }
@@ -291,7 +300,8 @@ public static class GtfsParsers
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error parsing calendar");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Error parsing calendar");
             return null;
         }
     }

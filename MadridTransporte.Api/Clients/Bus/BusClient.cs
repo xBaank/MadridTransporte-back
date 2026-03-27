@@ -163,7 +163,8 @@ public class BusClient(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Avanza data fetch failed");
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning(ex, "Avanza data fetch failed");
             return null;
         }
     }
