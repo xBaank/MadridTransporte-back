@@ -3,7 +3,7 @@ namespace MadridTransporte.Api.Utils;
 public static class TimeUtils
 {
     private static readonly TimeZoneInfo MadridTimeZone = TimeZoneInfo.FindSystemTimeZoneById(
-        "Romance Standard Time"
+        OperatingSystem.IsWindows() ? "Romance Standard Time" : "Europe/Madrid"
     );
 
     public static DateTimeOffset GetMadridNow() =>

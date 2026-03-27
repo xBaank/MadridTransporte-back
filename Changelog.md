@@ -1,5 +1,13 @@
 # Changelog
 
+## 8.0.2
+
+- Added `curl` to the API Docker image
+
+## 8.0.1
+
+- Fixed Dockerfile-loader to use `aspnet` base image instead of `runtime`
+
 ## 8.0.0
 
 - Rewrote the entire backend from Kotlin/Ktor/MongoDB to .NET 10 / ASP.NET Core / PostgreSQL

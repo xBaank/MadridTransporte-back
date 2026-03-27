@@ -188,10 +188,7 @@ public partial class CrtmClient(
                 CodMode = int.TryParse(t.line?.codMode, out var cm) ? cm : 8,
                 Destination = t.destination ?? "",
                 EstimatedArrive = new DateTimeOffset(
-                    TimeZoneInfo.ConvertTimeToUtc(
-                        DateTime.SpecifyKind(t.time, DateTimeKind.Unspecified),
-                        TimeUtils.GetMadridTimeZone()
-                    )
+                    t.time.ToUniversalTime()
                 ).ToUnixTimeMilliseconds(),
             })
             .ToList();
