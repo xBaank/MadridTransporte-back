@@ -3,10 +3,6 @@
 ## 8.0.0
 
 - Rewrote the entire backend from Kotlin/Ktor/MongoDB to .NET 10 / ASP.NET Core / PostgreSQL
-- Extracted data loading into a separate `MadridTransporte.Loader` console app
-- EMT vehicle locations are now fetched directly from the EMT API instead of CRTM
-- GTFS data is now loaded from a GitHub backup repository instead of ArcGIS
-- Fixed dockerfiles not building
 
 ## 7.1.1
 
