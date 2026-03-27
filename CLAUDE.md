@@ -19,6 +19,9 @@ dotnet test --filter "HealthCheckTests" --configuration Release
 # Run the API locally
 dotnet run --project MadridTransporte.Api
 
+# Run the data loader (loads GTFS data into the database)
+dotnet run --project MadridTransporte.Loader
+
 # Add a database migration
 dotnet ef migrations add <MigrationName> --project MadridTransporte.Api
 
@@ -33,7 +36,7 @@ dotnet-svcutil "http://www.citram.es:8080/WSMultimodalInformation/MultimodalInfo
 
 **Stack:** .NET 10 / C# 13, ASP.NET Core Minimal APIs, PostgreSQL 16, Entity Framework Core with Npgsql.
 
-**Solution:** Two projects — `MadridTransporte.Api` (the web API) and `MadridTransporte.Tests` (integration tests).
+**Solution:** Three projects — `MadridTransporte.Api` (the web API), `MadridTransporte.Loader` (console app for loading GTFS data), and `MadridTransporte.Tests` (integration tests). The Loader references `MadridTransporte.Api` to share `AppDbContext` and the `Loader/` classes.
 
 ### Request Flow
 
@@ -42,15 +45,15 @@ dotnet-svcutil "http://www.citram.es:8080/WSMultimodalInformation/MultimodalInfo
 - **Endpoints** (`Endpoints/LinesEndpoints.cs`, `StopsEndpoints.cs`) — registers Minimal API routes, grouped by transport mode (`/bus`, `/emt`, `/metro`, `/tram`, `/train`)
 - **Services** (`Services/`) — business logic: `StopsService`, `RoutesService`, `ItinerariesService`, `ShapesService`
 - **Data** (`Data/AppDbContext.cs`) — EF Core context with entities: `Stop`, `TransitRoute`, `Itinerary`, `StopOrder`, `Calendar`, `Shape`, `StopInfo`
-- **Clients** (`Clients/`) — external integrations: `CrtmClient` (SOAP), `EmtClient`, `MetroClient`, `BusClient`, `TrainClient`
+- **Clients** (`Clients/`) — external integrations: `CrtmClient` (SOAP), `EmtClient`, `MetroClient`, `BusClient`, `TrainClient` (uses two named HTTP clients: `ElCano` with custom SSL bypass via `ElCanoAuthHandler`, and `Renfe`)
 
 ### GTFS Data Loading
 
-`Loader/` downloads and parses GTFS feeds (CSV) from multiple agencies and bulk-inserts them via `EFCore.BulkExtensions` in batches of 50k records. Loading is triggered via `POST /load`. Data sources run in parallel; train itineraries and metro repeated stops have special handling.
+`MadridTransporte.Api/Loader/` contains `DataLoader`, `GtfsParsers`, and `DataSourceConfig`. It downloads and parses GTFS feeds (CSV) from multiple agencies and bulk-inserts them via `EFCore.BulkExtensions` in batches of 50k records. Data sources run in parallel; train itineraries and metro repeated stops have special handling. The `MadridTransporte.Loader` console app is the entry point for running the load process.
 
 ### Entry Point
 
-`Program.cs` wires up DI (DbContext, HTTP clients, CORS, response compression), registers endpoints, exposes `/health` and `/load`, and auto-migrates the database on startup.
+`Program.cs` wires up DI (DbContext, HTTP clients, CORS, response compression, memory cache), registers endpoints, exposes `/health`, and auto-migrates the database on startup. OpenAPI/Swagger UI is available at `/openapi/v1.json` and `/swagger` in Development.
 
 ### Testing
 
@@ -64,4 +67,4 @@ Tests are integration tests that use `PostgresFixture` (Testcontainers + `postgr
 
 ### Deployment
 
-`Dockerfile-api` — multi-stage build, exposes port 8080. CI builds and publishes multi-platform images (`linux/amd64`, `linux/arm64`) to Docker Hub on git tags. Tests run on every push via `.github/workflows/dotnet.yml`.
+`Dockerfile-api` and `Dockerfile-loader` — multi-stage builds, API exposes port 8080. CI builds and publishes multi-platform images (`linux/amd64`, `linux/arm64`) to Docker Hub on git tags. Tests run on every push via `.github/workflows/dotnet.yml`.
