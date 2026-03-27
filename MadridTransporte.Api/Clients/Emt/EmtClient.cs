@@ -1,0 +1,367 @@
+using System.Net.Http.Json;
+using System.Text.Json;
+using MadridTransporte.Api.Dtos;
+using MadridTransporte.Api.Exceptions;
+using MadridTransporte.Api.Services;
+using MadridTransporte.Api.Utils;
+
+namespace MadridTransporte.Api.Clients.Emt;
+
+public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger<EmtClient> logger)
+{
+    private string? _accessToken;
+    private readonly SemaphoreSlim _loginLock = new(1, 1);
+
+    private async Task LoginAsync(CancellationToken ct = default)
+    {
+        await _loginLock.WaitAsync(ct);
+        try
+        {
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                "https://openapi.emtmadrid.es/v1/mobilitylabs/user/login/"
+            );
+            request.Headers.TryAddWithoutValidation(
+                "passKey",
+                "504fea88211f2f90633f964189b7696037d65cc3a5f47b8fa1d5ea5e34db0239ad2e068851e72be0cec125779224749e3bc236c1b7af39d8a3d398e99223f058"
+            );
+            request.Headers.TryAddWithoutValidation(
+                "X-ClientId",
+                "428B01E6-693C-4F7F-A11E-3BB923420587"
+            );
+
+            var response = await httpClient.SendAsync(request, ct);
+            if (!response.IsSuccessStatusCode)
+                throw new InvalidOperationException("EMT login failed");
+
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
+            _accessToken = json.GetProperty("data")
+                .EnumerateArray()
+                .First()
+                .GetProperty("accessToken")
+                .GetString();
+        }
+        finally
+        {
+            _loginLock.Release();
+        }
+    }
+
+    private async Task<JsonElement?> FetchStopDataAsync(string simpleStopCode, CancellationToken ct)
+    {
+        if (_accessToken is null)
+            await LoginAsync(ct);
+
+        for (var tries = 3; tries > 0; tries--)
+        {
+            try
+            {
+                var url =
+                    $"https://openapi.emtmadrid.es/v2/transport/busemtmad/stops/{simpleStopCode}/arrives/";
+                var body = new
+                {
+                    cultureInfo = "ES",
+                    Text_StopRequired_YN = "Y",
+                    Text_EstimationsRequired_YN = "Y",
+                    Text_IncidencesRequired_YN = "Y",
+                    DateTime_Referenced_Incidencies_YYYYMMDD = DateTime.UtcNow.ToString(
+                        "yyyy-MM-dd"
+                    ),
+                };
+
+                var bodyJson = JsonSerializer.Serialize(body);
+                var content = new StringContent(bodyJson);
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                    "application/json"
+                );
+
+                var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
+                request.Headers.TryAddWithoutValidation("accessToken", _accessToken);
+
+                var response = await httpClient.SendAsync(request, ct);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    throw ApiException.NotFound("Stop not found");
+
+                if (
+                    response.StatusCode
+                    is System.Net.HttpStatusCode.Unauthorized
+                        or System.Net.HttpStatusCode.Forbidden
+                )
+                {
+                    await LoginAsync(ct);
+                    continue;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                    continue;
+
+                return await response.Content.ReadFromJsonAsync<JsonElement>(ct);
+            }
+            catch (ApiException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "EMT request failed, {Tries} tries left", tries - 1);
+            }
+        }
+
+        return null;
+    }
+
+    public async Task<StopTimesDto?> GetStopTimesAsync(
+        string fullStopCode,
+        CancellationToken ct = default
+    )
+    {
+        var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
+        var json = await FetchStopDataAsync(simpleStopCode, ct);
+
+        if (json is null)
+        {
+            // Failed all tries — return unavailable
+            try
+            {
+                var name = await stopsService.GetStopNameByStopCodeAsync(fullStopCode, ct);
+                var coords = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode, ct);
+                return new StopTimesDto
+                {
+                    CodMode = int.Parse(CodeUtils.EmtCodMode),
+                    StopName = name,
+                    SimpleStopCode = simpleStopCode,
+                    Coordinates = coords,
+                    Arrives = null,
+                    Incidents = [],
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        return ExtractStopTimes(json.Value, simpleStopCode);
+    }
+
+    public async Task<VehicleLocationsDto?> GetLineLocationsAsync(
+        string fullStopCode,
+        string simpleLineCode,
+        int direction,
+        CancellationToken ct = default
+    )
+    {
+        var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
+        var json = await FetchStopDataAsync(simpleStopCode, ct);
+        if (json is null)
+            return null;
+
+        return ExtractLocations(json.Value, simpleLineCode, direction);
+    }
+
+    private VehicleLocationsDto? ExtractLocations(
+        JsonElement json,
+        string simpleLineCode,
+        int direction
+    )
+    {
+        var code = json.TryGetProperty("code", out var c) ? c.GetString() : null;
+        if (code != "00" && code != "01")
+            return null;
+
+        var dataArr = json.GetProperty("data").EnumerateArray().ToList();
+        if (dataArr.Count == 0)
+            return null;
+        var data = dataArr[0];
+
+        var stopInfoArr = data.GetProperty("StopInfo").EnumerateArray().ToList();
+        if (stopInfoArr.Count == 0)
+            return null;
+        var stopInfo = stopInfoArr[0];
+
+        int? lineDirection = null;
+        if (
+            stopInfo.TryGetProperty("lines", out var linesEl)
+            && linesEl.ValueKind == JsonValueKind.Array
+        )
+        {
+            var lineInfo = linesEl
+                .EnumerateArray()
+                .FirstOrDefault(l =>
+                    l.TryGetProperty("label", out var label) && label.GetString() == simpleLineCode
+                );
+            if (
+                lineInfo.ValueKind != JsonValueKind.Undefined
+                && lineInfo.TryGetProperty("to", out var toEl)
+            )
+                lineDirection = toEl.GetString() == "A" ? 2 : 1;
+        }
+
+        var locations = new List<VehicleLocationDto>();
+
+        if (
+            data.TryGetProperty("Arrive", out var arriveArr)
+            && arriveArr.ValueKind == JsonValueKind.Array
+        )
+        {
+            foreach (var a in arriveArr.EnumerateArray())
+            {
+                if (
+                    !a.TryGetProperty("line", out var lineEl)
+                    || lineEl.GetString() != simpleLineCode
+                )
+                    continue;
+                if (a.TryGetProperty("DistanceBus", out var distEl) && distEl.GetInt32() < 0)
+                    continue;
+                if (a.TryGetProperty("estimateArrive", out var etaEl) && etaEl.GetInt32() == 999999)
+                    continue;
+                if (!a.TryGetProperty("geometry", out var geo))
+                    continue;
+                if (!geo.TryGetProperty("coordinates", out var coords))
+                    continue;
+                var coordsList = coords.EnumerateArray().ToList();
+                if (coordsList.Count < 2)
+                    continue;
+
+                locations.Add(
+                    new VehicleLocationDto
+                    {
+                        LineCode = CodeUtils.CreateLineCode(CodeUtils.EmtCodMode, simpleLineCode),
+                        SimpleLineCode = simpleLineCode,
+                        CodVehicle = "",
+                        Coordinates = new CoordinatesDto
+                        {
+                            Latitude = coordsList[1].GetDouble(),
+                            Longitude = coordsList[0].GetDouble(),
+                        },
+                        Direction = lineDirection ?? 0,
+                        Service = "",
+                    }
+                );
+            }
+        }
+
+        return new VehicleLocationsDto
+        {
+            CodMode = int.Parse(CodeUtils.EmtCodMode),
+            LineCode = simpleLineCode,
+            Locations = locations.Where(l => l.Direction == direction).ToList(),
+        };
+    }
+
+    private StopTimesDto ExtractStopTimes(JsonElement json, string simpleStopCode)
+    {
+        var code = json.TryGetProperty("code", out var c) ? c.GetString() : null;
+        if (code != "00" && code != "01")
+        {
+            var description = json.TryGetProperty("description", out var d) ? d.GetString() : null;
+            throw new InvalidOperationException($"EMT error {code}: {description}");
+        }
+
+        var dataArr = json.GetProperty("data").EnumerateArray().ToList();
+        if (dataArr.Count == 0)
+            throw new InvalidOperationException("EMT returned empty data");
+
+        var data = dataArr[0];
+
+        var stopInfoArr = data.GetProperty("StopInfo").EnumerateArray().ToList();
+        if (stopInfoArr.Count == 0)
+            throw new InvalidOperationException("EMT returned empty StopInfo");
+        var stopInfo = stopInfoArr[0];
+        var stopName = stopInfo.GetProperty("stopName").GetString() ?? "";
+        var geoCoords = stopInfo.GetProperty("geometry").GetProperty("coordinates");
+        var coordinates = new CoordinatesDto
+        {
+            Latitude = geoCoords.EnumerateArray().ElementAt(1).GetDouble(),
+            Longitude = geoCoords.EnumerateArray().ElementAt(0).GetDouble(),
+        };
+
+        List<JsonElement>? linesInfo = null;
+        if (
+            stopInfo.TryGetProperty("lines", out var linesEl)
+            && linesEl.ValueKind == JsonValueKind.Array
+        )
+            linesInfo = linesEl.EnumerateArray().ToList();
+
+        List<ArriveDto>? arrives = null;
+        if (
+            data.TryGetProperty("Arrive", out var arriveArr)
+            && arriveArr.ValueKind == JsonValueKind.Array
+        )
+        {
+            arrives = [];
+            foreach (var a in arriveArr.EnumerateArray())
+            {
+                var secondsToArrive = a.GetProperty("estimateArrive").GetInt64();
+                var estimatedArrive = DateTimeOffset
+                    .UtcNow.AddSeconds(secondsToArrive)
+                    .ToUnixTimeMilliseconds();
+                var line = a.GetProperty("line").GetString() ?? "";
+                var lineInfo = linesInfo?.FirstOrDefault(l =>
+                    l.TryGetProperty("label", out var label) && label.GetString() == line
+                );
+
+                var fullLine =
+                    lineInfo is { } li2 && li2.TryGetProperty("line", out var lineEl)
+                        ? lineEl.GetString() ?? line
+                        : line;
+
+                int? direction = null;
+                if (lineInfo is { } li && li.TryGetProperty("to", out var toEl))
+                    direction = toEl.GetString() == "A" ? 2 : 1;
+
+                arrives.Add(
+                    new ArriveDto
+                    {
+                        Line = line,
+                        LineCode = fullLine,
+                        Destination = a.GetProperty("destination").GetString() ?? "",
+                        Direction = direction,
+                        CodMode = int.Parse(CodeUtils.EmtCodMode),
+                        EstimatedArrive = estimatedArrive,
+                    }
+                );
+            }
+        }
+
+        var incidents = new List<IncidentDto>();
+        if (
+            data.TryGetProperty("Incident", out var incidentEl)
+            && incidentEl.TryGetProperty("ListaIncident", out var lista)
+            && lista.TryGetProperty("data", out var incData)
+            && incData.ValueKind == JsonValueKind.Array
+        )
+        {
+            foreach (var inc in incData.EnumerateArray())
+            {
+                incidents.Add(
+                    new IncidentDto
+                    {
+                        Title = inc.GetProperty("title").GetString() ?? "",
+                        Description = inc.GetProperty("description").GetString() ?? "",
+                        Cause = inc.GetProperty("cause").GetString() ?? "",
+                        Effect = inc.GetProperty("effect").GetString() ?? "",
+                        From = inc.GetProperty("rssFrom").GetString() ?? "",
+                        To = inc.GetProperty("rssTo").GetString() ?? "",
+                        Url =
+                            inc.TryGetProperty("moreInfo", out var mi)
+                            && mi.TryGetProperty("@url", out var urlEl)
+                                ? urlEl.GetString() ?? ""
+                                : "",
+                    }
+                );
+            }
+        }
+
+        return new StopTimesDto
+        {
+            CodMode = int.Parse(CodeUtils.EmtCodMode),
+            StopName = stopName,
+            SimpleStopCode = simpleStopCode,
+            Coordinates = coordinates,
+            Arrives = arrives is not null ? ArriveDto.GroupArrives(arrives) : null,
+            Incidents = incidents,
+        };
+    }
+}

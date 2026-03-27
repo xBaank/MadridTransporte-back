@@ -39,7 +39,6 @@ jobs:
           push: true
           tags: ${{ steps.meta_api.outputs.tags }}
           labels: ${{ steps.meta_api.outputs.labels }}
-          name: remote ssh command
 
       - name: Extract metadata (tags, labels) for loader
         id: meta_loader
@@ -56,4 +55,4 @@ jobs:
           push: true
           tags: ${{ steps.meta_loader.outputs.tags }}
           labels: ${{ steps.meta_loader.outputs.labels }}
-          name: remote ssh command
+
