@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.0.4
+
+- Changed branch for data load to `master`
+
 ## 8.0.3
 
 - Fixed cross-platform timezone handling for Linux deployments
