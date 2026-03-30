@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using System.Text.Json;
 using MadridTransporte.Api.Dtos;
 using MadridTransporte.Api.Exceptions;

@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using MadridTransporte.Api.Clients.Bus;
@@ -8,30 +7,15 @@ using MadridTransporte.Api.Utils;
 
 namespace MadridTransporte.Api.Clients.Train;
 
-public class TrainClient
+public class TrainClient(
+    IHttpClientFactory httpClientFactory,
+    StopsService stopsService,
+    BusClient crtmFallback,
+    ILogger<TrainClient> logger
+)
 {
-    private readonly HttpClient _canoHttpClient;
-    private readonly HttpClient _renfeHttpClient;
-    private readonly StopsService _stopsService;
-    private readonly RoutesService _routesService;
-    private readonly BusClient _crtmFallback;
-    private readonly ILogger<TrainClient> _logger;
-
-    public TrainClient(
-        IHttpClientFactory httpClientFactory,
-        StopsService stopsService,
-        RoutesService routesService,
-        BusClient crtmFallback,
-        ILogger<TrainClient> logger
-    )
-    {
-        _canoHttpClient = httpClientFactory.CreateClient("ElCano");
-        _renfeHttpClient = httpClientFactory.CreateClient("Renfe");
-        _stopsService = stopsService;
-        _routesService = routesService;
-        _crtmFallback = crtmFallback;
-        _logger = logger;
-    }
+    private readonly HttpClient _canoHttpClient = httpClientFactory.CreateClient("ElCano");
+    private readonly HttpClient _renfeHttpClient = httpClientFactory.CreateClient("Renfe");
 
     public async Task<StopTimesDto?> GetStopTimesAsync(
         string fullStopCode,
@@ -43,7 +27,7 @@ public class TrainClient
             return canoResult;
 
         // Fallback to CRTM and filter to train codMode only
-        var crtmResult = await _crtmFallback.GetCrtmStopTimesAsync(fullStopCode, ct);
+        var crtmResult = await crtmFallback.GetCrtmStopTimesAsync(fullStopCode, ct);
         if (crtmResult?.Arrives is null)
             return crtmResult;
 
@@ -60,12 +44,12 @@ public class TrainClient
     {
         try
         {
-            var stationCode = await _stopsService.GetIdByStopCodeAsync(fullStopCode, ct);
+            var stationCode = await stopsService.GetIdByStopCodeAsync(fullStopCode, ct);
             if (stationCode is null)
                 return null;
 
-            var stopName = await _stopsService.GetStopNameByIdAsync(stationCode, ct);
-            var coordinates = await _stopsService.GetCoordinatesByStopCodeAsync(fullStopCode, ct);
+            var stopName = await stopsService.GetStopNameByIdAsync(stationCode, ct);
+            var coordinates = await stopsService.GetCoordinatesByStopCodeAsync(fullStopCode, ct);
             var simpleStopCode = CodeUtils.GetStopCodeFromFullStopCode(fullStopCode);
 
             var body = new
@@ -106,8 +90,8 @@ public class TrainClient
         }
         catch (Exception ex)
         {
-            if (_logger.IsEnabled(LogLevel.Warning))
-                _logger.LogWarning(ex, "El Cano train times failed for {StopCode}", fullStopCode);
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning(ex, "El Cano train times failed for {StopCode}", fullStopCode);
             return null;
         }
     }
@@ -135,7 +119,7 @@ public class TrainClient
             string destinationName;
             try
             {
-                destinationName = await _stopsService.GetStopNameByIdAsync(destinationCode, ct);
+                destinationName = await stopsService.GetStopNameByIdAsync(destinationCode, ct);
             }
             catch
             {
@@ -189,8 +173,8 @@ public class TrainClient
                 destinationStopCode
             );
 
-            var originStation = await _stopsService.GetIdByStopCodeAsync(originFullCode, ct);
-            var destStation = await _stopsService.GetIdByStopCodeAsync(destFullCode, ct);
+            var originStation = await stopsService.GetIdByStopCodeAsync(originFullCode, ct);
+            var destStation = await stopsService.GetIdByStopCodeAsync(destFullCode, ct);
 
             if (originStation is null || destStation is null)
                 return null;
@@ -239,8 +223,8 @@ public class TrainClient
         }
         catch (Exception ex)
         {
-            if (_logger.IsEnabled(LogLevel.Warning))
-                _logger.LogWarning(ex, "Renfe routed times failed");
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning(ex, "Renfe routed times failed");
             return null;
         }
     }

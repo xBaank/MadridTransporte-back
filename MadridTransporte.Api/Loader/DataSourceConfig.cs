@@ -2,7 +2,7 @@ namespace MadridTransporte.Api.Loader;
 
 public static class DataSourceConfig
 {
-    private static string Ref => Environment.GetEnvironmentVariable("TARGET") ?? "pre";
+    private static string Ref => Environment.GetEnvironmentVariable("TARGET") ?? "master";
 
     private static string GitHubBaseUrl =>
         $"https://github.com/xBaank/MadridTransporte-Backup/raw/refs/heads/{Ref}";

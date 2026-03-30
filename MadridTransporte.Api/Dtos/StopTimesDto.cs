@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace MadridTransporte.Api.Dtos;
 
 public class StopTimesDto

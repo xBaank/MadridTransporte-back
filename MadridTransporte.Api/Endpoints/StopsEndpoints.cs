@@ -4,7 +4,6 @@ using MadridTransporte.Api.Clients.Emt;
 using MadridTransporte.Api.Clients.Metro;
 using MadridTransporte.Api.Clients.Train;
 using MadridTransporte.Api.Dtos;
-using MadridTransporte.Api.Exceptions;
 using MadridTransporte.Api.Services;
 using MadridTransporte.Api.Utils;
 

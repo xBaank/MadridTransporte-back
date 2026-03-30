@@ -1,7 +1,6 @@
 using System.Globalization;
 using MadridTransporte.Api.Data.Entities;
 using MadridTransporte.Api.Utils;
-using Microsoft.Extensions.Logging;
 
 namespace MadridTransporte.Api.Loader;
 

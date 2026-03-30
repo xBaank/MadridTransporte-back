@@ -1,5 +1,4 @@
 using MadridTransporte.Api.Data;
-using MadridTransporte.Api.Data.Entities;
 using MadridTransporte.Api.Dtos;
 using MadridTransporte.Api.Exceptions;
 using MadridTransporte.Api.Utils;

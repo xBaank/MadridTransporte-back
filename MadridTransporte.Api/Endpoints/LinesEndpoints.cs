@@ -1,6 +1,5 @@
 using MadridTransporte.Api.Clients.Crtm;
 using MadridTransporte.Api.Clients.Emt;
-using MadridTransporte.Api.Dtos;
 using MadridTransporte.Api.Exceptions;
 using MadridTransporte.Api.Services;
 using MadridTransporte.Api.Utils;

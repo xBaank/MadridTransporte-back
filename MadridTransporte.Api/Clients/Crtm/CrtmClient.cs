@@ -1,8 +1,6 @@
-using System.ServiceModel;
 using System.Text;
 using MadridTransporte.Api.Clients.Crtm.Generated;
 using MadridTransporte.Api.Dtos;
-using MadridTransporte.Api.Utils;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.ObjectPool;
 using Gen = MadridTransporte.Api.Clients.Crtm.Generated;
