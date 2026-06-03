@@ -1,10 +1,13 @@
+using MadridTransporte.Api.Utils;
+
 namespace MadridTransporte.Api.Clients.Train;
 
-public class ElCanoAuthHandler : DelegatingHandler
+public class ElCanoAuthHandler(IConfiguration config) : DelegatingHandler
 {
-    private const string AccessKey = "and20210615";
-    private const string SecretKey = "Jthjtr946RTt";
-    private const string UserId = "718da3df4199ede4";
+    private string AccessKey => config.GetRequired("ElCano:AccessKey");
+    private string SecretKey => config.GetRequired("ElCano:SecretKey");
+    private string UserId => config.GetRequired("ElCano:UserId");
+    private string Client => config["ElCano:Client"] is { Length: > 0 } c ? c : "AndroidElcanoApp";
 
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
@@ -23,7 +26,7 @@ public class ElCanoAuthHandler : DelegatingHandler
             path: uri.AbsolutePath,
             httpMethod: request.Method.Method,
             contentType: "application/json;charset=utf-8",
-            xElcanoClient: "AndroidElcanoApp",
+            xElcanoClient: Client,
             xElcanoUserId: UserId,
             payload: payload,
             queryParams: uri.Query.TrimStart('?')
