@@ -61,9 +61,24 @@ Tests are integration tests that use `PostgresFixture` (Testcontainers + `postgr
 
 ### Configuration
 
-- `appsettings.json` — PostgreSQL connection string, CRTM endpoint/timeout, EMT credentials
-- `appsettings.Development.json` — logging overrides
+- `appsettings.json` — PostgreSQL connection string, CRTM endpoint/timeout, plus **empty placeholders** for the `Emt` (`PassKey`, `ClientId`) and `ElCano` (`AccessKey`, `SecretKey`, `UserId`, `Client`) secret sections
 - Local dev DB: `Host=localhost;Database=madrid_transporte;Username=app;Password=secret` (matches `docker-compose.yml`)
+
+#### Secrets
+
+Real values for the `Emt` and `ElCano` sections are **not committed**. Supply them via:
+
+- **Local dev:** .NET user-secrets (auto-loaded in the `Development` environment). The API project has a `UserSecretsId`. Set values with, e.g.:
+  ```bash
+  dotnet user-secrets set "Emt:PassKey" "<value>" --project MadridTransporte.Api
+  dotnet user-secrets set "Emt:ClientId" "<value>" --project MadridTransporte.Api
+  dotnet user-secrets set "ElCano:AccessKey" "<value>" --project MadridTransporte.Api
+  dotnet user-secrets set "ElCano:SecretKey" "<value>" --project MadridTransporte.Api
+  dotnet user-secrets set "ElCano:UserId" "<value>" --project MadridTransporte.Api
+  ```
+- **Production/CI:** environment variables (double-underscore separator), e.g. `Emt__PassKey`, `Emt__ClientId`, `ElCano__AccessKey`, `ElCano__SecretKey`, `ElCano__UserId`.
+
+`EmtClient` and `ElCanoAuthHandler` read these via `IConfiguration` and throw `InvalidOperationException` at runtime if a required key is missing/empty (`IConfiguration.GetRequired` in `Utils/ConfigurationExtensions.cs`).
 
 ### Deployment
 

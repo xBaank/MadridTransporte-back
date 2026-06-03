@@ -6,7 +6,12 @@ using MadridTransporte.Api.Utils;
 
 namespace MadridTransporte.Api.Clients.Emt;
 
-public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger<EmtClient> logger)
+public class EmtClient(
+    HttpClient httpClient,
+    StopsService stopsService,
+    IConfiguration config,
+    ILogger<EmtClient> logger
+)
 {
     private string? _accessToken;
     private readonly SemaphoreSlim _loginLock = new(1, 1);
@@ -20,13 +25,10 @@ public class EmtClient(HttpClient httpClient, StopsService stopsService, ILogger
                 HttpMethod.Get,
                 "https://openapi.emtmadrid.es/v1/mobilitylabs/user/login/"
             );
-            request.Headers.TryAddWithoutValidation(
-                "passKey",
-                "504fea88211f2f90633f964189b7696037d65cc3a5f47b8fa1d5ea5e34db0239ad2e068851e72be0cec125779224749e3bc236c1b7af39d8a3d398e99223f058"
-            );
+            request.Headers.TryAddWithoutValidation("passKey", config.GetRequired("Emt:PassKey"));
             request.Headers.TryAddWithoutValidation(
                 "X-ClientId",
-                "428B01E6-693C-4F7F-A11E-3BB923420587"
+                config.GetRequired("Emt:ClientId")
             );
 
             var response = await httpClient.SendAsync(request, ct);

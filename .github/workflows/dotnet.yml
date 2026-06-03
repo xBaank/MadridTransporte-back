@@ -35,3 +35,9 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --configuration Release
+        env:
+          Emt__PassKey: ${{ secrets.EMT_PASSKEY }}
+          Emt__ClientId: ${{ secrets.EMT_CLIENTID }}
+          ElCano__AccessKey: ${{ secrets.ELCANO_ACCESSKEY }}
+          ElCano__SecretKey: ${{ secrets.ELCANO_SECRETKEY }}
+          ElCano__UserId: ${{ secrets.ELCANO_USERID }}
