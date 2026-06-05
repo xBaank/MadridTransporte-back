@@ -19,7 +19,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@3999a1f4362c53e6a6048cde50f69868af81da5c
+        uses: docker/login-action@0267638d8ae53966df71bb06d552129dd542dfa7
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
