@@ -11,6 +11,7 @@ public class TrainClient(
     IHttpClientFactory httpClientFactory,
     StopsService stopsService,
     BusClient crtmFallback,
+    IConfiguration config,
     ILogger<TrainClient> logger
 )
 {
@@ -74,7 +75,10 @@ public class TrainClient(
             {
                 Content = content,
             };
-            request.Headers.TryAddWithoutValidation("User-Key", "f4ce9fbfa9d721e39b8984805901b5df");
+            request.Headers.TryAddWithoutValidation(
+                "User-Key",
+                config.GetRequired("ElCano:UserKey")
+            );
             request.Headers.TryAddWithoutValidation("Host", "circulacion.api.adif.es");
             request.Headers.TryAddWithoutValidation("User-Agent", "okhttp/4.10.0");
             request.Headers.TryAddWithoutValidation("Connection", "Close");
