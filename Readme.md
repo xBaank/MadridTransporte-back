@@ -47,8 +47,15 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Database=madrid_transporte;Username=app;Password=secret
-      - SOAP_TIMEOUT=45
+      - ConnectionStrings__Postgres=Host=db;Database=madrid_transporte;Username=app;Password=secret
+      - Crtm__TimeoutSeconds=45
+      # Secrets — required for live EMT / Renfe (Adif) data
+      - Emt__PassKey=${EMT_PASSKEY}
+      - Emt__ClientId=${EMT_CLIENTID}
+      - ElCano__AccessKey=${ELCANO_ACCESSKEY}
+      - ElCano__SecretKey=${ELCANO_SECRETKEY}
+      - ElCano__UserId=${ELCANO_USERID}
+      - ElCano__UserKey=${ELCANO_USERKEY}
 
   loader:
     image: xbank/bus_tracker_loader:latest
@@ -56,13 +63,36 @@ services:
     depends_on:
       - db
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Database=madrid_transporte;Username=app;Password=secret
+      - ConnectionStrings__Postgres=Host=db;Database=madrid_transporte;Username=app;Password=secret
 
 volumes:
   db_data:
 ```
 
 The loader should be run periodically (e.g. once a day) to refresh GTFS data. It exits after completing the load. The API auto-migrates the database on startup.
+
+## Configuration
+
+The API is configured via environment variables (using the standard ASP.NET Core `__` separator for nested keys). All of these can also be set in `appsettings.json`.
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `ConnectionStrings__Postgres` | Yes | PostgreSQL connection string. Used by both the API and the loader. |
+| `Crtm__TimeoutSeconds` | No | Timeout (seconds) for the CRTM SOAP client. Defaults to `30`. |
+| `Crtm__Endpoint` | No | CRTM SOAP endpoint. Defaults to the public CITRAM endpoint. |
+| `Emt__PassKey` | Yes* | EMT Mobility Labs API pass key. |
+| `Emt__ClientId` | Yes* | EMT Mobility Labs API client id. |
+| `ElCano__AccessKey` | Yes* | Adif (El Cano) API access key. |
+| `ElCano__SecretKey` | Yes* | Adif (El Cano) API secret key. |
+| `ElCano__UserId` | Yes* | Adif (El Cano) API user id. |
+| `ElCano__UserKey` | Yes* | Adif (El Cano) API user key (the `User-Key` header). |
+| `ElCano__Client` | No | Adif (El Cano) client identifier. Defaults to `AndroidElcanoApp`. |
+
+\* The API starts without these, but the corresponding endpoints (EMT arrivals/locations, Renfe/Adif train times) throw at runtime until the values are supplied. The loader needs only the connection string.
+
+### Secrets in CI
+
+CI reads the secret values from GitHub Actions secrets (`EMT_PASSKEY`, `EMT_CLIENTID`, `ELCANO_ACCESSKEY`, `ELCANO_SECRETKEY`, `ELCANO_USERID`, `ELCANO_USERKEY`) and maps them onto the matching `__` environment variables.
 
 ## Development
 
@@ -86,5 +116,20 @@ dotnet run --project MadridTransporte.Loader
 # Run tests
 dotnet test --configuration Release
 ```
+
+### Secrets (local)
+
+The EMT and Adif (El Cano) secrets are not committed. In the `Development` environment they are loaded from .NET user-secrets:
+
+```bash
+dotnet user-secrets set "Emt:PassKey" "<value>" --project MadridTransporte.Api
+dotnet user-secrets set "Emt:ClientId" "<value>" --project MadridTransporte.Api
+dotnet user-secrets set "ElCano:AccessKey" "<value>" --project MadridTransporte.Api
+dotnet user-secrets set "ElCano:SecretKey" "<value>" --project MadridTransporte.Api
+dotnet user-secrets set "ElCano:UserId" "<value>" --project MadridTransporte.Api
+dotnet user-secrets set "ElCano:UserKey" "<value>" --project MadridTransporte.Api
+```
+
+See [Configuration](#configuration) for the full list and the production environment-variable equivalents.
 
 [Frontend](https://github.com/xBaank/MadridTransporte-front)
