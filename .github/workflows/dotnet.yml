@@ -41,3 +41,4 @@ jobs:
           ElCano__AccessKey: ${{ secrets.ELCANO_ACCESSKEY }}
           ElCano__SecretKey: ${{ secrets.ELCANO_SECRETKEY }}
           ElCano__UserId: ${{ secrets.ELCANO_USERID }}
+          ElCano__UserKey: ${{ secrets.ELCANO_USERKEY }}
