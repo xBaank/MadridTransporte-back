@@ -14,4 +14,9 @@
   <ItemGroup>
     <ProjectReference Include="..\MadridTransporte.Api\MadridTransporte.Api.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\MadridTransporte.Api\appsettings.json" Link="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

@@ -16,8 +16,13 @@ public static class CodeUtils
 
     public static string GetCodModeFromLineCode(string input) => input.Split("__")[0];
 
-    public static string GetSimpleLineCodeFromLineCode(string input) =>
-        input.Split("__")[1].Split("___")[0];
+    public static string GetSimpleLineCodeFromLineCode(string input)
+    {
+        // Full line codes look like "codMode__line___" (e.g. "8__450___"). EMT URLs use the
+        // bare line code (e.g. "881"), which has no "__" separator — return it unchanged.
+        var parts = input.Split("__");
+        return parts.Length > 1 ? parts[1].Split("___")[0] : input;
+    }
 
     public static string GetStopCodeFromFullStopCode(string input) =>
         input[(input.IndexOf('_') + 1)..];

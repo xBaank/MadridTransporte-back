@@ -9,6 +9,7 @@ namespace MadridTransporte.Tests;
 public enum ItinerariesUrls
 {
     EmtDirectionBased,
+    EmtDirectionBased2,
     InterurbanDirectionBased,
     Interurban2DirectionBased,
     UrbanDirectionBased,
@@ -32,6 +33,9 @@ public class ItinerariesTests(PostgresFixture fixture)
         code switch
         {
             ItinerariesUrls.EmtDirectionBased => ("/lines/emt/144/itineraries/2?stopCode=4597", 2),
+            // Line 881 (special service "S10"): EMT URLs use the bare line code, and this line
+            // has no route_short_name match — the case that used to 500 on the locations endpoint.
+            ItinerariesUrls.EmtDirectionBased2 => ("/lines/emt/881/itineraries/1?stopCode=34", 1),
             ItinerariesUrls.InterurbanDirectionBased => (
                 "/lines/bus/8__450___/itineraries/1?stopCode=08242",
                 1
@@ -69,6 +73,7 @@ public class ItinerariesTests(PostgresFixture fixture)
 
     [Test]
     [Arguments(ItinerariesUrls.EmtDirectionBased)]
+    [Arguments(ItinerariesUrls.EmtDirectionBased2)]
     [Arguments(ItinerariesUrls.InterurbanDirectionBased)]
     [Arguments(ItinerariesUrls.Interurban2DirectionBased)]
     [Arguments(ItinerariesUrls.UrbanDirectionBased)]
