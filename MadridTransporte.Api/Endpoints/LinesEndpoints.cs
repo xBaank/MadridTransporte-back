@@ -37,7 +37,7 @@ public static class LinesEndpoints
                 var route = await routesService.GetRouteByFullLineCodeAsync(lineCode, ct);
                 var simpleLineCode =
                     route?.SimpleLineCode ?? CodeUtils.GetSimpleLineCodeFromLineCode(lineCode);
-                var routeCodMode = route?.CodMode ?? CodeUtils.GetCodModeFromLineCode(lineCode);
+                var routeCodMode = route?.CodMode ?? CodeUtils.EmtCodMode;
 
                 var locations =
                     await emtClient.GetLineLocationsAsync(

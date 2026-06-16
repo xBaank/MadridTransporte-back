@@ -4,6 +4,7 @@ using MadridTransporte.Api.Loader;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 using TUnit.Core.Interfaces;
@@ -34,6 +35,13 @@ public class PostgresFixture : IAsyncInitializer, IAsyncDisposable
         Factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Testing");
+
+            // Load the API project's user-secrets (Emt/ElCano keys) so external-API tests run
+            // locally. Optional, so CI is unaffected and keeps supplying them via env vars.
+            builder.ConfigureAppConfiguration(config =>
+                config.AddUserSecrets(typeof(Program).Assembly, optional: true)
+            );
+
             builder.ConfigureServices(services =>
             {
                 var descriptor = services.SingleOrDefault(d =>
