@@ -1,6 +1,7 @@
 using System.Text;
 using MadridTransporte.Api.Clients.Crtm.Generated;
 using MadridTransporte.Api.Dtos;
+using MadridTransporte.Api.Utils;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.ObjectPool;
 using Gen = MadridTransporte.Api.Clients.Crtm.Generated;
@@ -16,13 +17,19 @@ public partial class CrtmClient(
     private readonly ObjectPool<MultimodalInformationClient> _pool =
         new DefaultObjectPool<MultimodalInformationClient>(new ClientPolicy(config));
 
+    private readonly string _privateKey = config.GetRequired("Crtm:PrivateKey");
+
     private static async Task<AuthHeader> GetAuthAsync(
         MultimodalInformationClient client,
+        string privateKey,
         CancellationToken ct
     )
     {
         var response = await client.GetPublicKeyAsync().WaitAsync(ct);
-        var connectionKey = CrtmAuthHelper.Encrypt(Encoding.UTF8.GetBytes(response.key));
+        var connectionKey = CrtmAuthHelper.Encrypt(
+            Encoding.UTF8.GetBytes(response.key),
+            privateKey
+        );
         return new AuthHeader { connectionKey = connectionKey };
     }
 
@@ -34,7 +41,7 @@ public partial class CrtmClient(
         var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(client, ct);
+            var auth = await GetAuthAsync(client, _privateKey, ct);
             var response = await client
                 .GetStopTimesAsync(auth, fullStopCode, 1, 2, null, null, null, 3)
                 .WaitAsync(ct);
@@ -61,7 +68,7 @@ public partial class CrtmClient(
         var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(client, ct);
+            var auth = await GetAuthAsync(client, _privateKey, ct);
             var response = await client
                 .GetIncidentsAffectationsAsync(auth, codMode, [])
                 .WaitAsync(ct);
@@ -92,7 +99,7 @@ public partial class CrtmClient(
         var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(client, ct);
+            var auth = await GetAuthAsync(client, _privateKey, ct);
             var response = await client.GetLineItinerariesAsync(auth, lineCode, 1).WaitAsync(ct);
             return MapItinerariesResponse(response.itineraries, lineCode, direction);
         }
@@ -142,7 +149,7 @@ public partial class CrtmClient(
         var client = _pool.Get();
         try
         {
-            var auth = await GetAuthAsync(client, ct);
+            var auth = await GetAuthAsync(client, _privateKey, ct);
             var response = await client
                 .GetLineLocationAsync(
                     auth,

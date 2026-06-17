@@ -36,6 +36,7 @@ jobs:
       - name: Test
         run: dotnet test --no-build --configuration Release
         env:
+          Crtm__PrivateKey: ${{ secrets.CRTM_PRIVATEKEY }}
           Emt__PassKey: ${{ secrets.EMT_PASSKEY }}
           Emt__ClientId: ${{ secrets.EMT_CLIENTID }}
           ElCano__AccessKey: ${{ secrets.ELCANO_ACCESSKEY }}
