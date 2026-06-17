@@ -49,7 +49,8 @@ services:
     environment:
       - ConnectionStrings__Postgres=Host=db;Database=madrid_transporte;Username=app;Password=secret
       - Crtm__TimeoutSeconds=45
-      # Secrets — required for live EMT / Renfe (Adif) data
+      # Secrets — required for live CRTM / EMT / Renfe (Adif) data
+      - Crtm__PrivateKey=${CRTM_PRIVATEKEY}
       - Emt__PassKey=${EMT_PASSKEY}
       - Emt__ClientId=${EMT_CLIENTID}
       - ElCano__AccessKey=${ELCANO_ACCESSKEY}
@@ -80,6 +81,7 @@ The API is configured via environment variables (using the standard ASP.NET Core
 | `ConnectionStrings__Postgres` | Yes | PostgreSQL connection string. Used by both the API and the loader. |
 | `Crtm__TimeoutSeconds` | No | Timeout (seconds) for the CRTM SOAP client. Defaults to `30`. |
 | `Crtm__Endpoint` | No | CRTM SOAP endpoint. Defaults to the public CITRAM endpoint. |
+| `Crtm__PrivateKey` | Yes* | CRTM AES private key used to encrypt the connection key (must be 16, 24 or 32 bytes). |
 | `Emt__PassKey` | Yes* | EMT Mobility Labs API pass key. |
 | `Emt__ClientId` | Yes* | EMT Mobility Labs API client id. |
 | `ElCano__AccessKey` | Yes* | Adif (El Cano) API access key. |
@@ -88,11 +90,11 @@ The API is configured via environment variables (using the standard ASP.NET Core
 | `ElCano__UserKey` | Yes* | Adif (El Cano) API user key (the `User-Key` header). |
 | `ElCano__Client` | No | Adif (El Cano) client identifier. Defaults to `AndroidElcanoApp`. |
 
-\* The API starts without these, but the corresponding endpoints (EMT arrivals/locations, Renfe/Adif train times) throw at runtime until the values are supplied. The loader needs only the connection string.
+\* The API starts without these, but the corresponding endpoints (CRTM bus/metro/tram stop times, locations and itineraries; EMT arrivals/locations; Renfe/Adif train times) throw at runtime until the values are supplied. The loader needs only the connection string.
 
 ### Secrets in CI
 
-CI reads the secret values from GitHub Actions secrets (`EMT_PASSKEY`, `EMT_CLIENTID`, `ELCANO_ACCESSKEY`, `ELCANO_SECRETKEY`, `ELCANO_USERID`, `ELCANO_USERKEY`) and maps them onto the matching `__` environment variables.
+CI reads the secret values from GitHub Actions secrets (`CRTM_PRIVATEKEY`, `EMT_PASSKEY`, `EMT_CLIENTID`, `ELCANO_ACCESSKEY`, `ELCANO_SECRETKEY`, `ELCANO_USERID`, `ELCANO_USERKEY`) and maps them onto the matching `__` environment variables.
 
 ## Development
 
@@ -119,9 +121,10 @@ dotnet test --configuration Release
 
 ### Secrets (local)
 
-The EMT and Adif (El Cano) secrets are not committed. In the `Development` environment they are loaded from .NET user-secrets:
+The CRTM, EMT and Adif (El Cano) secrets are not committed. In the `Development` environment they are loaded from .NET user-secrets:
 
 ```bash
+dotnet user-secrets set "Crtm:PrivateKey" "<value>" --project MadridTransporte.Api
 dotnet user-secrets set "Emt:PassKey" "<value>" --project MadridTransporte.Api
 dotnet user-secrets set "Emt:ClientId" "<value>" --project MadridTransporte.Api
 dotnet user-secrets set "ElCano:AccessKey" "<value>" --project MadridTransporte.Api

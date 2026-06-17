@@ -5,15 +5,12 @@ namespace MadridTransporte.Api.Clients.Crtm;
 
 public static class CrtmAuthHelper
 {
-    private static readonly byte[] PrivateKey = Encoding.UTF8.GetBytes(
-        "pruebapruebapruebapruebaprueba12"
-    );
     private static readonly byte[] Iv = new byte[16];
 
-    public static string Encrypt(byte[] publicKey)
+    public static string Encrypt(byte[] publicKey, string privateKey)
     {
         using var aes = Aes.Create();
-        aes.Key = PrivateKey;
+        aes.Key = Encoding.UTF8.GetBytes(privateKey);
         aes.IV = Iv;
         aes.Mode = CipherMode.CBC;
         aes.Padding = PaddingMode.PKCS7;
