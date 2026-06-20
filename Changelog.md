@@ -1,5 +1,20 @@
 # Changelog
 
+## 9.0.0
+
+> [!IMPORTANT]\
+> Secrets and keys that were previously hardcoded are now read from configuration. Deployments must
+> now supply the `Emt`, `ElCano`, CRTM private key and Adif User-Key values via user-secrets (local)
+> or environment variables (production/CI). See the README and `CLAUDE.md` for the full list.
+
+- Moved hardcoded EMT and ElCano secrets out of code into configuration
+- Moved hardcoded Adif User-Key into configuration
+- Moved CRTM private key from a hardcoded value into configuration
+- Fixed HTTP 500 on EMT locations for lines with no route row
+- Adopted Central Package Management and fixed EF Core version drift
+- Documented deployment environment variables in the README
+- Updated dependencies
+
 ## 8.0.4
 
 - Changed branch for data load to `master`
