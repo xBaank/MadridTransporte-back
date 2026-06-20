@@ -1,5 +1,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
+COPY Directory.Packages.props global.json ./
 COPY MadridTransporte.Api/MadridTransporte.Api.csproj MadridTransporte.Api/
 RUN dotnet restore MadridTransporte.Api/MadridTransporte.Api.csproj
 COPY MadridTransporte.Api/ MadridTransporte.Api/
