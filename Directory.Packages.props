@@ -20,6 +20,6 @@
     <PackageVersion Include="System.ServiceModel.Http" Version="10.0.652802" />
     <PackageVersion Include="System.ServiceModel.Primitives" Version="10.0.652802" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.11.0" />
-    <PackageVersion Include="TUnit" Version="1.35.2" />
+    <PackageVersion Include="TUnit" Version="1.56.35" />
   </ItemGroup>
 </Project>
